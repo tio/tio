@@ -84,7 +84,6 @@ void restore(void)
 
 int connect_tty(void)
 {
-    int    console = 0;
     fd_set rdfs;           /* Read file descriptor set */
     int    maxfd;          /* Maximum file desciptor used */
     char   c, c0 = 0, c1 = 0;
@@ -132,14 +131,14 @@ int connect_tty(void)
     tcsetattr(fd, TCSANOW, &option.tio);
     tcsetattr(fd, TCSAFLUSH, &option.tio);
 
-    maxfd = MAX(fd, console) + 1;  /* Maximum bit entry (fd) to test */
+    maxfd = MAX(fd, STDIN_FILENO) + 1;  /* Maximum bit entry (fd) to test */
 
     /* Input loop */
     while (true)
     {
         FD_ZERO(&rdfs);
         FD_SET(fd, &rdfs);
-        FD_SET(console, &rdfs);
+        FD_SET(STDIN_FILENO, &rdfs);
 
         /* Block until input becomes available */
         select(maxfd, &rdfs, NULL, NULL, NULL);
@@ -159,10 +158,10 @@ int connect_tty(void)
                 return EXIT_FAILURE;
             }
         }
-        if (FD_ISSET(console, &rdfs))
+        if (FD_ISSET(STDIN_FILENO, &rdfs))
         {
             /* Input from stdin ready */
-            status = read(console, &c, 1);
+            status = read(STDIN_FILENO, &c, 1);
 
             /* Exit upon ctrl-g ctrl-q sequence */
             c1 = c0;
