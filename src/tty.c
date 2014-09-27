@@ -110,10 +110,7 @@ int connect_tty(void)
 
     /* Save current port settings */
     if (tcgetattr(fd, &old_tio) < 0)
-    {
-        printf("Error: Saving current port settings failed\n");
-        exit(EXIT_FAILURE);
-    }
+        return EXIT_FAILURE;
 
     /* Make sure we restore settings on exit */
     if (first)
@@ -158,7 +155,8 @@ int connect_tty(void)
             {
                 if (!option.no_autoconnect)
                     gotty_printf("Disconnected");
-                return(EXIT_FAILURE);
+                close(fd);
+                return EXIT_FAILURE;
             }
         }
         if (FD_ISSET(console, &rdfs))
@@ -170,12 +168,15 @@ int connect_tty(void)
             c1 = c0;
             c0 = c;
             if ((c0 == CTRLQ) && (c1 == CTRLG))
-                exit(EXIT_SUCCESS);
+                {
+                    close(fd);
+                    exit(EXIT_SUCCESS);
+                }
 
             /* Forward input to tty device */
             status = write(fd, &c, 1);
         }
     }
 
-    return(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }
