@@ -1,0 +1,82 @@
+=== Go TTY - The Really Simple TTY Terminal Application ===
+
+
+1. Introduction
+
+    Go TTY or "gotty" is a really simple TTY terminal application which
+    features a very simple commandline interface to easily connect to TTY
+    devices for basic input/output.
+
+    If you are looking for an advanced terminal application which supports
+    modem configuration and various protocols to support filetransfers etc.
+    please look elsewhere.
+
+    However, if all you need is to get going and establish that simple terminal
+    connection to your TTY device then Go TTY might be your perfect choice.
+
+    Go TTY was created by the author because he needed a no-nonsense simple TTY
+    terminal application to go do quick debugging.
+
+    Let's Go TTY!
+
+
+2. Interface
+
+    The commandline interface is really simple and pretty much self explanatory
+    (output from 'gotty --help'):
+
+
+        Usage: gotty [<options>] <device>
+
+        Options:
+          -b, --baudrate <baudrate>   Baud rate (default: 115200)
+          -d, --databits 5|6|7|8      Data bits (default: 8)
+          -f, --flow hard|soft|none   Flow control (default: none)
+          -s, --stopbits 1|2          Stop bits (default: 1)
+          -p, --parity even|odd|none  Parity (default: none)
+          -n, --no-autoconnect        Disable automatic connect
+          -v, --version               Display version
+          -h, --help                  Display help
+
+        In session, press ctrl-g + ctrl-q to quit.
+
+
+    The only option which requires a bit of elaboration is the --no-autoconnect
+    option.
+
+    By default the gotty application automatically connects to the provided
+    device if present. If the device is not present it will simply wait for it
+    to appear and then connect. If the connection is lost (eg.  device
+    disconnects) it will simply wait for the device to reappear and then
+    reconnect.
+
+    However, if the --no-autoconnect option is provided the gotty application
+    will simply exit if the device is not present and it will also exit if an
+    an established connection is lost (ie. no reconnect).
+
+
+3. Installation
+
+    Please see INSTALL file for details on how to install Go TTY.
+
+
+4. Contributing
+
+    Go TTY is open source. If you want to help out with the project please join
+    in. Any contributions (code, doc, ideas, etc.) are welcome.
+
+    The source is available on github:
+
+    https://github.com/lundmar/gotty
+
+    Here you can also find an issue tracker.
+
+
+5. License
+
+    Build Gear is GPLv2. See COPYING file for license details.
+
+
+6. Authors
+
+    See AUTHORS file for list of authors.
