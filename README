@@ -7,13 +7,6 @@
     features a very simple commandline interface to easily connect to TTY
     devices for basic input/output.
 
-    If you are looking for an advanced terminal application which supports
-    modem configuration and various protocols to support filetransfers etc.
-    please look elsewhere.
-
-    However, if all you need is to get going and establish that simple terminal
-    connection to your TTY device then Go TTY might be your perfect choice.
-
     Go TTY was created by the author because he needed a no-nonsense simple TTY
     terminal application to go do quick debugging.
 
