@@ -1,0 +1,66 @@
+.TH "gotty" "1" "27 September 2014" 
+
+.SH "NAME" 
+Go TTY \- The really simple TTY terminal application
+
+.SH "SYNOPSIS"
+.PP 
+.B gotty 
+[<OPTIONS>] <DEVICE>
+
+.SH "DESCRIPTION" 
+.PP 
+.B Go TTY
+or
+.B gotty
+is a really simple TTY terminal application which features a very simple
+commandline interface to easily connect to TTY devices for basic input/output.
+
+.SH "OPTIONS" 
+
+.TP
+.B \-b, \--baudrate <baudrate>
+
+Set baud rate (default: 115200).
+.TP
+.B \-d, \--databits 5|6|7|8
+
+Set data bits (default: 8).
+.TP
+.B \-f, \--flow hard|soft|none
+
+Set flow control (default: none).
+.TP
+.B \-s, \--stopbits 1|2
+
+Set stop bits (default: 1).
+.TP
+.B \-p, \--parity even|odd|none
+
+Set parity (default: none).
+.TP
+.B \-n, \--no-autoconnect
+
+Disable automatic connect.
+.TP
+.B \-v, \--version
+
+Display program version.
+.TP
+.B \-h, \--help
+
+Display help.
+
+.SH "EXAMPLES"
+.TP
+The most common use is without options. For example:
+gotty /dev/ttyUSB0
+.TP
+Which corresponds to:
+gotty -b 115200 -d 8 -f none -s 1 -p none /dev/ttyUSB0
+.TP
+It is recommended to connect serial tty devices by id. For example:
+gotty /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+.SH "AUTHOR" 
+.PP
+Written by Martin Lund <martin.lund@keep-it-simple.com>.

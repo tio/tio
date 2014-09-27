@@ -8,4 +8,5 @@ AC_LANG([C])
 AC_PROG_INSTALL
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([src/Makefile])
+AC_CONFIG_FILES([man/Makefile])
 AC_OUTPUT
