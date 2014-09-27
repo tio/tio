@@ -34,6 +34,9 @@ int main(int argc, char *argv[])
     /* Configure output terminal */
     configure_stdout();
 
+    /* Restore output terminal on exit */
+    atexit(&restore_stdout);
+
     /* Connect to tty device */
     if (option.no_autoconnect)
         status = connect_tty();

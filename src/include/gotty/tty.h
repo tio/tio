@@ -22,7 +22,11 @@
 #ifndef TTY_H
 #define TTY_H
 
+#define CTRLG 0x07
+#define CTRLQ 0x11
+
 void configure_stdout(void);
+void restore_stdout(void);
 int connect_tty(void);
 
 #endif

@@ -35,11 +35,9 @@
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
-#define CTRLG 0x07
-#define CTRLQ 0x11
-
-static int fd;
+static int connected = false;
 struct termios stdio, old_stdio, old_tio;
+static int fd;
 
 void configure_stdout(void)
 {
@@ -68,18 +66,20 @@ void configure_stdout(void)
     tcsetattr(STDOUT_FILENO, TCSAFLUSH, &stdio);
 }
 
-void restore(void)
+void restore_stdout(void)
 {
-    static int i=0;
-
     tcflush(STDOUT_FILENO, TCIOFLUSH);
     tcsetattr(STDOUT_FILENO, TCSANOW, &old_stdio);
     tcsetattr(STDOUT_FILENO, TCSAFLUSH, &old_stdio);
+}
 
+void restore_tty(void)
+{
     tcsetattr(fd, TCSANOW, &old_tio);
     tcsetattr(fd, TCSAFLUSH, &old_tio);
 
-    gotty_printf("Disconnected\n");
+    if (connected)
+        gotty_printf("Disconnected\n");
 }
 
 int connect_tty(void)
@@ -106,15 +106,16 @@ int connect_tty(void)
     }
 
     gotty_printf("Connected");
+    connected = true;
 
     /* Save current port settings */
     if (tcgetattr(fd, &old_tio) < 0)
         return EXIT_FAILURE;
 
-    /* Make sure we restore settings on exit */
+    /* Make sure we restore tty settings on exit */
     if (first)
     {
-        atexit(&restore);
+        atexit(&restore_tty);
         first = false;
     }
 
@@ -152,9 +153,11 @@ int connect_tty(void)
                 fflush(stdout);
             } else
             {
+                /* Error reading - device is likely unplugged */
                 if (!option.no_autoconnect)
                     gotty_printf("Disconnected");
                 close(fd);
+                connected = false;
                 return EXIT_FAILURE;
             }
         }
