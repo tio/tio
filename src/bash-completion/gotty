@@ -1,3 +1,7 @@
+#
+# Bash autocompletion script for gotty.
+#
+
 _gotty()
 {
     local cur prev opts base
@@ -5,24 +9,19 @@ _gotty()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
 
-    #
     #  The options we'll complete.
-    #
-    opts="--baudrate \
-          --databits \
-          --flow \
-          --stopbits \
-          --parity \
-          --no-autoconnect \
-          --version \
-          --help"
+    opts="-b --baudrate \
+          -d --databits \
+          -f --flow \
+          -s --stopbits \
+          -p --parity \
+          -n --no-autoconnect \
+          -v --version \
+          -h --help"
 
-
-    #
-    #  Complete the arguments to some of the options.
-    #
+    #  Complete the arguments to the options.
     case "${prev}" in
-        --baudrate)
+        -b | --baudrate)
             local baudrates="0 \
                              50 \
                              75 \
@@ -55,31 +54,31 @@ _gotty()
             COMPREPLY=( $(compgen -W "$baudrates" -- ${cur}) )
             return 0
             ;;
-        --databits)
+        -d | --databits)
             COMPREPLY=( $(compgen -W "5 6 7 8" -- ${cur}) )
             return 0
             ;;
-        --flow)
+        -f | --flow)
             COMPREPLY=( $(compgen -W "hard soft none" -- ${cur}) )
             return 0
             ;;
-        --stopbits)
+        -s | --stopbits)
             COMPREPLY=( $(compgen -W "1 2" -- ${cur}) )
             return 0
             ;;
-        --parity)
+        -p | --parity)
             COMPREPLY=( $(compgen -W "even odd none" -- ${cur}) )
             return 0
             ;;
-        --no-autoconnect)
+        -n | --no-autoconnect)
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
-        --version)
+        -v | --version)
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
-        --help)
+        -h | --help)
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
@@ -87,7 +86,9 @@ _gotty()
         ;;
     esac
 
-   COMPREPLY=($(compgen -W "${opts}" -- ${cur}))  
+   COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
    return 0
 }
+
+# Bind completion to gotty command
 complete -o default -F _gotty gotty
