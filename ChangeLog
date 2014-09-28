@@ -1,3 +1,8 @@
-=== Go TTY v0.1 ===
+=== Go TTY v0.2 ===
 
-First release.
+Changes since Go TTY v0.1:
+
+ * Fixed not being able to quit
+
+   When gotty was waiting for a device to appear it was impossible to quit                                                                                                                                          
+   using the ctrl-g ctrl-q sequence. This is now fixed.                     
