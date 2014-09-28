@@ -1,8 +1,6 @@
-=== Go TTY v0.2 ===
+=== Go TTY v0.3 ===
 
-Changes since Go TTY v0.1:
+Changes since Go TTY v0.2:
 
- * Fixed not being able to quit
-
-   When gotty was waiting for a device to appear it was impossible to quit                                                                                                                                          
-   using the ctrl-g ctrl-q sequence. This is now fixed.                     
+ * Improved Connected / Disconnected output
+ * Improved error output
