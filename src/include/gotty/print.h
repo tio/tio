@@ -32,8 +32,8 @@
 #define ANSI_COLOR_WHITE     "\x1b[1;37m"
 #define ANSI_COLOR_RESET     "\x1b[0m"
 
-#define gotty_printf(format, args...) \
-   fprintf (stdout, "\n\033[300D" ANSI_COLOR_YELLOW "[gotty] " format ANSI_COLOR_RESET "\033[300D\n", ## args); \
+#define color_printf(format, args...) \
+   fprintf (stdout, "\033[300D" ANSI_COLOR_YELLOW format ANSI_COLOR_RESET "\033[300D\n", ## args); \
    fflush(stdout);
 
 #ifdef DEBUG

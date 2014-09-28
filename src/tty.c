@@ -39,6 +39,7 @@
 static int connected = false;
 struct termios stdio, old_stdio, old_tio;
 static int fd;
+static char c;
 
 void configure_stdout(void)
 {
@@ -80,14 +81,18 @@ void restore_tty(void)
     tcsetattr(fd, TCSAFLUSH, &old_tio);
 
     if (connected)
-        gotty_printf("Disconnected\n");
+    {
+        if (c == 0)
+            putchar('\n');
+        color_printf("[gotty] Disconnected");
+    }
 }
 
 int connect_tty(void)
 {
     fd_set rdfs;           /* Read file descriptor set */
     int    maxfd;          /* Maximum file desciptor used */
-    char   c, c0 = 0, c1 = 0;
+    char   c0 = 0, c1 = 0;
     static bool first = true;
     int    status;
 
@@ -106,8 +111,9 @@ int connect_tty(void)
         exit(EXIT_FAILURE);
     }
 
-    gotty_printf("Connected");
+    color_printf("[gotty] Connected");
     connected = true;
+    c = 0;
 
     /* Save current port settings */
     if (tcgetattr(fd, &old_tio) < 0)
@@ -156,7 +162,11 @@ int connect_tty(void)
             {
                 /* Error reading - device is likely unplugged */
                 if (!option.no_autoconnect)
-                    gotty_printf("Disconnected");
+                {
+                    if (c != 0)
+                        putchar('\n');
+                    color_printf("[gotty] Disconnected");
+                }
                 close(fd);
                 connected = false;
                 return EXIT_FAILURE;
@@ -171,10 +181,10 @@ int connect_tty(void)
             c1 = c0;
             c0 = c;
             if ((c0 == CTRLQ) && (c1 == CTRLG))
-                {
-                    close(fd);
-                    exit(EXIT_SUCCESS);
-                }
+            {
+                close(fd);
+                exit(EXIT_SUCCESS);
+            }
 
             /* Forward input to tty device */
             status = write(fd, &c, 1);
