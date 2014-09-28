@@ -29,6 +29,7 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <stdbool.h>
+#include <errno.h>
 #include "gotty/tty.h"
 #include "gotty/print.h"
 #include "gotty/options.h"
@@ -94,14 +95,14 @@ int connect_tty(void)
     fd = open(option.device, O_RDWR | O_NOCTTY ); 
     if (fd <0)
     {
-        perror(option.device);
+        printf("\033[300DError: %s\n\033[300D", strerror(errno));
         exit(EXIT_FAILURE);
     }
 
     /* Make sure device is of tty type */
     if (!isatty(fd))
     {
-        printf("Error: Not a tty device");
+        printf("\033[300DError: Not a tty device\n\033[300D");
         exit(EXIT_FAILURE);
     }
 
