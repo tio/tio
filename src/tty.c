@@ -37,7 +37,7 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
 static int connected = false;
-struct termios stdio, old_stdio, old_tio;
+struct termios new_stdout, old_stdout, old_tio;
 static int fd;
 static bool tainted = false;
 
@@ -87,35 +87,35 @@ void wait_for_tty_device(void)
 void configure_stdout(void)
 {
     /* Save current stdout settings */
-    if (tcgetattr(STDOUT_FILENO, &old_stdio) < 0)
+    if (tcgetattr(STDOUT_FILENO, &old_stdout) < 0)
     {
         printf("Error: Saving current stdio settings failed\n");
         exit(EXIT_FAILURE);
     }
 
-    /* Prepare stdio settings */
-    bzero(&stdio, sizeof(stdio));
+    /* Prepare new stdout settings */
+    bzero(&new_stdout, sizeof(new_stdout));
 
-    /* Control, input, output, local modes for stdio */
-    stdio.c_cflag = 0;
-    stdio.c_iflag = 0;
-    stdio.c_oflag = 0;
-    stdio.c_lflag = 0;
+    /* Control, input, output, local modes for stdout */
+    new_stdout.c_cflag = 0;
+    new_stdout.c_iflag = 0;
+    new_stdout.c_oflag = 0;
+    new_stdout.c_lflag = 0;
 
     /* Control characters */
-    stdio.c_cc[VTIME] = 0; /* Inter-character timer unused */
-    stdio.c_cc[VMIN]  = 1; /* Blocking read until 1 character received */
+    new_stdout.c_cc[VTIME] = 0; /* Inter-character timer unused */
+    new_stdout.c_cc[VMIN]  = 1; /* Blocking read until 1 character received */
 
-    /* Activate stdio settings */
-    tcsetattr(STDOUT_FILENO, TCSANOW, &stdio);
-    tcsetattr(STDOUT_FILENO, TCSAFLUSH, &stdio);
+    /* Activate new stdout settings */
+    tcsetattr(STDOUT_FILENO, TCSANOW, &new_stdout);
+    tcsetattr(STDOUT_FILENO, TCSAFLUSH, &new_stdout);
 }
 
 void restore_stdout(void)
 {
     tcflush(STDOUT_FILENO, TCIOFLUSH);
-    tcsetattr(STDOUT_FILENO, TCSANOW, &old_stdio);
-    tcsetattr(STDOUT_FILENO, TCSAFLUSH, &old_stdio);
+    tcsetattr(STDOUT_FILENO, TCSANOW, &old_stdout);
+    tcsetattr(STDOUT_FILENO, TCSAFLUSH, &old_stdout);
 }
 
 void disconnect_tty(void)
