@@ -1,6 +1,12 @@
-=== Go TTY v0.3 ===
+=== Go TTY v0.4 ===
 
-Changes since Go TTY v0.2:
+Changes since Go TTY v0.3:
 
- * Improved Connected / Disconnected output
- * Improved error output
+ * Fixed disconnect output
+
+   In certain cases the disconnect message would eat a line of output from 
+   the tty device (if any). This is now fixed.                             
+
+ * Renamed stdio to new_stdout
+
+   Since it is actually only stdout we configure.
