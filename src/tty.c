@@ -39,7 +39,50 @@
 static int connected = false;
 struct termios stdio, old_stdio, old_tio;
 static int fd;
-static char c;
+static bool tainted = false;
+
+void wait_for_tty_device(void)
+{
+    int ready, n;
+    struct stat status;
+    fd_set rdfs;
+    struct timeval tv;
+    char c_stdin[3];
+
+    /* Loop until device pops up */
+    while (true)
+    {
+        /* Wait up to 1 seconds */
+        tv.tv_sec = 1;
+        tv.tv_usec = 0;
+
+        FD_ZERO(&rdfs);
+        FD_SET(STDIN_FILENO, &rdfs);
+
+        /* Block until input becomes available or timeout */
+        ready = select(STDIN_FILENO + 1, &rdfs, NULL, NULL, &tv);
+        if (ready)
+        {
+            /* Input from stdin ready */
+
+            /* Read one character */
+            n = read(STDIN_FILENO, &c_stdin[0], 1);
+
+            /* Exit upon ctrl-g ctrl-q sequence */
+            c_stdin[2] = c_stdin[1];
+            c_stdin[1] = c_stdin[0];
+            if ((c_stdin[1] == CTRLQ) && (c_stdin[2] == CTRLG))
+                exit(EXIT_SUCCESS);
+        } else
+        {
+            /* Timeout */
+
+            /* Test for device file */
+            if (stat(option.device, &status) == 0)
+                return;
+        }
+    }
+}
 
 void configure_stdout(void)
 {
@@ -75,26 +118,32 @@ void restore_stdout(void)
     tcsetattr(STDOUT_FILENO, TCSAFLUSH, &old_stdio);
 }
 
+void disconnect_tty(void)
+{
+    if (tainted)
+        putchar('\n');
+    color_printf("[gotty] Disconnected");
+    close(fd);
+    connected = false;
+}
+
 void restore_tty(void)
 {
     tcsetattr(fd, TCSANOW, &old_tio);
     tcsetattr(fd, TCSAFLUSH, &old_tio);
 
     if (connected)
-    {
-        if (c == 0)
-            putchar('\n');
-        color_printf("[gotty] Disconnected");
-    }
+        disconnect_tty();
 }
 
 int connect_tty(void)
 {
     fd_set rdfs;           /* Read file descriptor set */
     int    maxfd;          /* Maximum file desciptor used */
-    char   c0 = 0, c1 = 0;
     static bool first = true;
     int    status;
+    char   c_tty;
+    char   c_stdin[3];
 
     /* Open tty device */
     fd = open(option.device, O_RDWR | O_NOCTTY ); 
@@ -113,7 +162,9 @@ int connect_tty(void)
 
     color_printf("[gotty] Connected");
     connected = true;
-    c = 0;
+    tainted = false;
+    bzero(&c_stdin[0], 3);
+    c_tty = 0;
 
     /* Save current port settings */
     if (tcgetattr(fd, &old_tio) < 0)
@@ -153,41 +204,35 @@ int connect_tty(void)
         if (FD_ISSET(fd, &rdfs))
         {
             /* Input from tty device ready */
-            if (read(fd, &c, 1) > 0)
+            if (read(fd, &c_tty, 1) > 0)
             {
                 /* Print received tty character to stdout */
-                putchar(c);
+                putchar(c_tty);
                 fflush(stdout);
+                if (c_tty != 0x7) // Small trick to avoid ctrl-g echo
+                    tainted = true;
             } else
             {
                 /* Error reading - device is likely unplugged */
-                if (!option.no_autoconnect)
-                {
-                    if (c != 0)
-                        putchar('\n');
-                    color_printf("[gotty] Disconnected");
-                }
-                close(fd);
-                connected = false;
+                disconnect_tty();
                 return EXIT_FAILURE;
             }
         }
         if (FD_ISSET(STDIN_FILENO, &rdfs))
         {
             /* Input from stdin ready */
-            status = read(STDIN_FILENO, &c, 1);
+            status = read(STDIN_FILENO, &c_stdin[0], 1);
+            if ((c_stdin[0] != CTRLQ) && (c_stdin[0] != CTRLG))
+                tainted = true;
 
             /* Exit upon ctrl-g ctrl-q sequence */
-            c1 = c0;
-            c0 = c;
-            if ((c0 == CTRLQ) && (c1 == CTRLG))
-            {
-                close(fd);
+            c_stdin[2] = c_stdin[1];
+            c_stdin[1] = c_stdin[0];
+            if ((c_stdin[1] == CTRLQ) && (c_stdin[2] == CTRLG))
                 exit(EXIT_SUCCESS);
-            }
 
             /* Forward input to tty device */
-            status = write(fd, &c, 1);
+            status = write(fd, &c_stdin[0], 1);
         }
     }
 

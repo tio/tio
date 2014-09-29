@@ -22,7 +22,6 @@
 #include <stdio.h>
 #include "gotty/options.h"
 #include "gotty/tty.h"
-#include "gotty/device.h"
 
 int main(int argc, char *argv[])
 {
@@ -44,7 +43,7 @@ int main(int argc, char *argv[])
     {
         while (true)
         {
-            wait_for_device();
+            wait_for_tty_device();
             status = connect_tty();
         }
     }
