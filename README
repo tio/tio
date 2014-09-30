@@ -19,7 +19,7 @@
     (output from 'gotty --help'):
 
 
-        Usage: gotty [<options>] <device>
+        Usage: gotty [<options>] <tty device>
 
         Options:
           -b, --baudrate <baudrate>   Baud rate (default: 115200)

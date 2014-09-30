@@ -25,11 +25,12 @@
 #include <stdbool.h>
 #include <limits.h>
 #include <termios.h>
+#include <sys/param.h>
 
 /* Options */
 struct option_t
 {
-    char device[256];
+    char tty_device[MAXPATHLEN];
     bool no_autoconnect;
     struct termios tio;
 };

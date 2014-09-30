@@ -26,6 +26,7 @@
 #include <limits.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/param.h>
 #include <fcntl.h>
 #include <termios.h>
 #include <stdbool.h>
@@ -33,8 +34,6 @@
 #include "gotty/tty.h"
 #include "gotty/print.h"
 #include "gotty/options.h"
-
-#define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
 static int connected = false;
 struct termios new_stdout, old_stdout, old_tio;
@@ -78,7 +77,7 @@ void wait_for_tty_device(void)
             /* Timeout */
 
             /* Test for device file */
-            if (stat(option.device, &status) == 0)
+            if (stat(option.tty_device, &status) == 0)
                 return;
         }
     }
@@ -146,7 +145,7 @@ int connect_tty(void)
     char   c_stdin[3];
 
     /* Open tty device */
-    fd = open(option.device, O_RDWR | O_NOCTTY ); 
+    fd = open(option.tty_device, O_RDWR | O_NOCTTY );
     if (fd <0)
     {
         printf("\033[300DError: %s\n\033[300D", strerror(errno));

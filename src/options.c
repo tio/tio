@@ -39,7 +39,7 @@ struct option_t option =
 
 void print_options_help(char *argv[])
 {
-    printf("Usage: %s [<options>] <device>\n", argv[0]);
+    printf("Usage: %s [<options>] <tty device>\n", argv[0]);
     printf("\n");
     printf("Options:\n");
     printf("  -b, --baudrate <baudrate>   Baud rate (default: 115200)\n");
@@ -324,9 +324,9 @@ void parse_options(int argc, char *argv[])
 
     /* Assume first non-option is the tty device name */
     if (optind < argc)
-        strcpy(option.device, argv[optind++]);
+        strcpy(option.tty_device, argv[optind++]);
 
-    if (strlen(option.device) == 0)
+    if (strlen(option.tty_device) == 0)
     {
         printf("Error: Missing device name.\n");
         exit(EXIT_FAILURE);
