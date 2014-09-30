@@ -1,4 +1,4 @@
-.TH "gotty" "1" "27 September 2014" 
+.TH "gotty" "1" "30 September 2014"
 
 .SH "NAME" 
 Go TTY \- The really simple TTY terminal application
@@ -6,15 +6,15 @@ Go TTY \- The really simple TTY terminal application
 .SH "SYNOPSIS"
 .PP 
 .B gotty 
-[<OPTIONS>] <DEVICE>
+[<options>] <tty device>
 
 .SH "DESCRIPTION" 
 .PP 
 .B Go TTY
 or
 .B gotty
-is a really simple TTY terminal application which features a very simple
-commandline interface to easily connect to TTY devices for basic input/output.
+is a really simple TTY terminal application which features a simple commandline
+interface to easily connect to TTY devices for basic input/output.
 
 .SH "OPTIONS" 
 
@@ -35,7 +35,7 @@ Set flow control (default: none).
 
 Set stop bits (default: 1).
 .TP
-.B \-p, \--parity even|odd|none
+.B \-p, \--parity odd|even|none
 
 Set parity (default: none).
 .TP

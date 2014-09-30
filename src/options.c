@@ -46,7 +46,7 @@ void print_options_help(char *argv[])
     printf("  -d, --databits 5|6|7|8      Data bits (default: 8)\n");
     printf("  -f, --flow hard|soft|none   Flow control (default: none)\n");
     printf("  -s, --stopbits 1|2          Stop bits (default: 1)\n");
-    printf("  -p, --parity even|odd|none  Parity (default: none)\n");
+    printf("  -p, --parity odd|even|none  Parity (default: none)\n");
     printf("  -n, --no-autoconnect        Disable automatic connect\n");
     printf("  -v, --version               Display version\n");
     printf("  -h, --help                  Display help\n");

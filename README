@@ -4,8 +4,8 @@
 1. Introduction
 
     Go TTY or "gotty" is a really simple TTY terminal application which
-    features a very simple commandline interface to easily connect to TTY
-    devices for basic input/output.
+    features a simple commandline interface to easily connect to TTY devices
+    for basic input/output.
 
     Go TTY was created because the author needed a simple no-nonsense TTY
     terminal application to go do quick debugging.
