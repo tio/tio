@@ -1,5 +1,5 @@
 #
-# Bash autocompletion script for gotty.
+# Bash completion script for gotty.
 #
 
 _gotty()
