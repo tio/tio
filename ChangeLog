@@ -1,7 +1,5 @@
-=== Go TTY v0.5 ===
+=== Go TTY v0.6 ===
 
-Changes since Go TTY v0.4:
+Changes since Go TTY v0.5:
 
- * Updated MAN and README page
-
- * Various cleanup
+ * Added timestamp to gotty prompt
