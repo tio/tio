@@ -34,6 +34,7 @@
 #include "gotty/tty.h"
 #include "gotty/print.h"
 #include "gotty/options.h"
+#include "gotty/time.h"
 
 static int connected = false;
 struct termios new_stdout, old_stdout, old_tio;
@@ -121,7 +122,7 @@ void disconnect_tty(void)
 {
     if (tainted)
         putchar('\n');
-    color_printf("[gotty] Disconnected");
+    color_printf("[gotty %s] Disconnected", current_time());
     close(fd);
     connected = false;
 }
@@ -159,7 +160,7 @@ int connect_tty(void)
         exit(EXIT_FAILURE);
     }
 
-    color_printf("[gotty] Connected");
+    color_printf("[gotty %s] Connected", current_time());
     connected = true;
     tainted = false;
     bzero(&c_stdin[0], 3);
