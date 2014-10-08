@@ -51,6 +51,10 @@ Display program version.
 
 Display help.
 
+.SH "KEYS"
+.TP
+In session, press ctrl-g + q to quit.
+
 .SH "EXAMPLES"
 .TP
 The most common use is without options. For example:
@@ -61,6 +65,10 @@ gotty -b 115200 -d 8 -f none -s 1 -p none /dev/ttyUSB0
 .TP
 It is recommended to connect serial tty devices by id. For example:
 gotty /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+.PP
+Using serial devices by id ensures that gotty automatically reconnects to the
+correct serial device if the device is disconnected and then reconnected.
+
 .SH "AUTHOR" 
 .PP
 Written by Martin Lund <martin.lund@keep-it-simple.com>.
