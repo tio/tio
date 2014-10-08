@@ -51,7 +51,7 @@ void print_options_help(char *argv[])
     printf("  -v, --version               Display version\n");
     printf("  -h, --help                  Display help\n");
     printf("\n");
-    printf("In session, press ctrl-g + ctrl-q to quit.\n");
+    printf("In session, press ctrl-g + q to quit.\n");
     printf("\n");
 }
 
