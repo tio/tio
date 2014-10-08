@@ -1,5 +1,11 @@
-=== Go TTY v0.6 ===
+=== Go TTY v0.7 ===
 
-Changes since Go TTY v0.5:
+Changes since Go TTY v0.6:
 
- * Added timestamp to gotty prompt
+ * Changed quit key sequence to ctrl-g + q
+
+   Changed the quit key sequence from ctrl-g + ctrl-q to ctrl-g + q as the
+   latter is simpler and considered more conventional.
+
+ * Updated man page
+
