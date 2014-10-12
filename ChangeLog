@@ -1,11 +1,8 @@
-=== Go TTY v0.7 ===
+=== Go TTY v0.8 ===
 
-Changes since Go TTY v0.6:
+Changes since Go TTY v0.7:
 
- * Changed quit key sequence to ctrl-g + q
+ * Eliminated first time connect delay
 
-   Changed the quit key sequence from ctrl-g + ctrl-q to ctrl-g + q as the
-   latter is simpler and considered more conventional.
-
- * Updated man page
-
+   Rearranged timeout handling so that the first time connect delay is
+   eliminated.
