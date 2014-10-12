@@ -1,5 +1,5 @@
 AC_PREREQ([2.68])
-AC_INIT([Go TTY], [0.7], [], [gotty], [http://github.com/lundmar/gotty])
+AC_INIT([Go TTY], [0.8], [], [gotty], [http://github.com/lundmar/gotty])
 AC_CONFIG_HEADERS([src/include/config.h])
 AM_INIT_AUTOMAKE([1.11 foreign dist-xz no-dist-gzip -Wall -Werror])
 AM_SILENT_RULES([yes])
