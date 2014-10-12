@@ -52,7 +52,11 @@ void wait_for_tty_device(void)
     /* Loop until device pops up */
     while (true)
     {
-        /* Wait up to 1 seconds */
+        /* Test for device file */
+        if (stat(option.tty_device, &status) == 0)
+            return;
+
+        /* Wait up to 1 second */
         tv.tv_sec = 1;
         tv.tv_usec = 0;
 
@@ -73,13 +77,6 @@ void wait_for_tty_device(void)
             c_stdin[1] = c_stdin[0];
             if ((c_stdin[1] == KEY_Q) && (c_stdin[2] == KEY_CTRL_G))
                 exit(EXIT_SUCCESS);
-        } else
-        {
-            /* Timeout */
-
-            /* Test for device file */
-            if (stat(option.tty_device, &status) == 0)
-                return;
         }
     }
 }
