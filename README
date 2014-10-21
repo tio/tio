@@ -10,10 +10,10 @@
     Go TTY was created because the author needed a simple no-nonsense TTY
     terminal application to go do quick debugging.
 
-    Let's Go TTY!
+    Let's Go TTY! - http://gotty.io
 
 
-2. Interface
+2. Usage
 
     The commandline interface is really simple and pretty much self explanatory
     (output from 'gotty --help'):
@@ -38,38 +38,52 @@
     option.
 
     By default the gotty application automatically connects to the provided
-    device if present. If the device is not present it will simply wait for it
-    to appear and then connect. If the connection is lost (eg.  device
-    disconnects) it will simply wait for the device to reappear and then
-    reconnect.
+    device if present. If the device is not present it will wait for it to
+    appear and then connect. If the connection is lost (eg.  device
+    disconnects) it will wait for the device to reappear and then reconnect.
 
     However, if the --no-autoconnect option is provided the gotty application
-    will simply exit if the device is not present and it will also exit if an
-    an established connection is lost (ie. no reconnect).
+    will exit if the device is not present and it will also exit if an an
+    established connection is lost (ie. no reconnect).
+
+    Go TTY features full bash autocompletion support.
 
 
-3. Installation
+3. Download
 
-    Please see INSTALL file for details on how to install Go TTY.
+    Find the latest release at http://gotty.io
 
-
-4. Contributing
-
-    Go TTY is open source. If you want to help out with the project please join
-    in. Any contributions (code, doc, ideas, etc.) are welcome.
-
-    The source is available on github:
-
-    https://github.com/lundmar/gotty
-
-    Here you can also find an issue tracker.
+    The latest source is available on github:
+    https://github.com/gotty/gotty
 
 
-5. License
+4. Installation
+
+    Install steps:
+
+    $ ./configure
+    $ make
+    $ make install
+
+    See INSTALL file for installation details.
+
+
+5. Contributing
+
+    Go TTY is open source. Any contributions (bug fixes, doc, ideas, etc.) are
+    welcome.
+
+
+6. Support
+
+    Submit bug reports on github: https://github.com/gotty/gotty/issues
+
+
+7. License
 
     Go TTY is GPLv2. See COPYING file for license details.
 
 
-6. Authors
+8. Authors
 
-    See AUTHORS file for list of authors.
+    Written by Martin Lund <martin.lund@keep-it-simple.com>
