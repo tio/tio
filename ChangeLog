@@ -1,8 +1,5 @@
-=== Go TTY v0.8 ===
+=== Go TTY v0.9 ===
 
-Changes since Go TTY v0.7:
+Changes since Go TTY v0.8:
 
- * Eliminated first time connect delay
-
-   Rearranged timeout handling so that the first time connect delay is
-   eliminated.
+ * Updated README
