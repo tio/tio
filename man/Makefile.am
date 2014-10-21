@@ -1,1 +1,1 @@
-man_MANS = gotty.1
+dist_man_MANS = gotty.1
