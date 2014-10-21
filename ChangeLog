@@ -1,5 +1,8 @@
-=== Go TTY v0.9 ===
+=== Go TTY v1.0 ===
 
-Changes since Go TTY v0.8:
+Changes since Go TTY v0.9:
 
- * Updated README
+ * Fixed distribution tarball
+
+   Fixed missing header files and man page in distribution tarball.
+
