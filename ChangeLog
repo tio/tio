@@ -1,8 +1,9 @@
-=== Go TTY v1.0 ===
+=== Go TTY v1.1 ===
 
-Changes since Go TTY v0.9:
+Changes since Go TTY v1.0:
 
- * Fixed distribution tarball
+ * Flush I/O data on connect
 
-   Fixed missing header files and man page in distribution tarball.
+   Make sure there is no stale I/O data on tty device upon connect.
 
+ * Updated README
