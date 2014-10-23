@@ -16,7 +16,7 @@
 2. Usage
 
     The commandline interface is really simple and pretty much self explanatory
-    (output from 'gotty --help'):
+    as reflected in the output from 'gotty --help':
 
 
         Usage: gotty [<options>] <tty device>
@@ -37,21 +37,20 @@
     The only option which requires a bit of elaboration is the --no-autoconnect
     option.
 
-    By default the gotty application automatically connects to the provided
-    device if present. If the device is not present it will wait for it to
-    appear and then connect. If the connection is lost (eg.  device
-    disconnects) it will wait for the device to reappear and then reconnect.
+    By default gotty automatically connects to the provided device if present.
+    If the device is not present it will wait for it to appear and then
+    connect. If the connection is lost (eg. device disconnects) it will wait
+    for the device to reappear and then reconnect.
 
-    However, if the --no-autoconnect option is provided the gotty application
-    will exit if the device is not present and it will also exit if an an
-    established connection is lost (ie. no reconnect).
+    However, if the --no-autoconnect option is provided gotty will exit if the
+    device is not present or exit if an established connection is lost.
 
     Go TTY features full bash autocompletion support.
 
 
 3. Download
 
-    Find the latest release at http://gotty.io
+    Find the latest release tarball at http://gotty.io
 
     The latest source is available on github:
     https://github.com/gotty/gotty
