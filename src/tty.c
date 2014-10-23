@@ -157,6 +157,10 @@ int connect_tty(void)
         exit(EXIT_FAILURE);
     }
 
+    /* Flush stale I/O data (if any) */
+    tcflush(fd, TCIOFLUSH);
+
+    /* Print connect status */
     color_printf("[gotty %s] Connected", current_time());
     connected = true;
     tainted = false;
