@@ -33,6 +33,7 @@ struct option_t
     char tty_device[MAXPATHLEN];
     bool no_autoconnect;
     struct termios tio;
+    int char_delay;
 };
 
 extern struct option_t option;
