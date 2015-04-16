@@ -234,6 +234,10 @@ int connect_tty(void)
 
             /* Forward input to tty device */
             status = write(fd, &c_stdin[0], 1);
+
+	    /* Insert char delay */
+	    if (option.char_delay)
+		    usleep(option.char_delay * 1000);
         }
     }
 
