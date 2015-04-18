@@ -27,6 +27,7 @@
           -f, --flow hard|soft|none   Flow control (default: none)
           -s, --stopbits 1|2          Stop bits (default: 1)
           -p, --parity even|odd|none  Parity (default: none)
+          -o, --output-delay <ms>     Output delay (default: 0)
           -n, --no-autoconnect        Disable automatic connect
           -v, --version               Display version
           -h, --help                  Display help

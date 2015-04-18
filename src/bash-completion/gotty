@@ -15,6 +15,7 @@ _gotty()
           -f --flow \
           -s --stopbits \
           -p --parity \
+          -o --output-delay \
           -n --no-autoconnect \
           -v --version \
           -h --help"
@@ -68,6 +69,10 @@ _gotty()
             ;;
         -p | --parity)
             COMPREPLY=( $(compgen -W "even odd none" -- ${cur}) )
+            return 0
+            ;;
+        -o | --output-delay)
+            COMPREPLY=( $(compgen -W "0 1 10 100" -- ${cur}) )
             return 0
             ;;
         -n | --no-autoconnect)

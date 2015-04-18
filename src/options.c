@@ -43,11 +43,11 @@ void print_options_help(char *argv[])
     printf("\n");
     printf("Options:\n");
     printf("  -b, --baudrate <baudrate>   Baud rate (default: 115200)\n");
-    printf("  -c, --char-delay <ms>       Character delay (default: 0)\n");
     printf("  -d, --databits 5|6|7|8      Data bits (default: 8)\n");
     printf("  -f, --flow hard|soft|none   Flow control (default: none)\n");
     printf("  -s, --stopbits 1|2          Stop bits (default: 1)\n");
     printf("  -p, --parity odd|even|none  Parity (default: none)\n");
+    printf("  -o, --output-delay <ms>     Output delay (default: 0)\n");
     printf("  -n, --no-autoconnect        Disable automatic connect\n");
     printf("  -v, --version               Display version\n");
     printf("  -h, --help                  Display help\n");
@@ -74,8 +74,8 @@ void parse_options(int argc, char *argv[])
     bzero(&option.tio, sizeof(option.tio));
     option.tio.c_cflag = B115200 | CS8;
 
-    /* Set default char delay */
-    option.char_delay = 0;
+    /* Set default output delay */
+    option.output_delay = 0;
 
     while (1)
     {
@@ -86,10 +86,10 @@ void parse_options(int argc, char *argv[])
             {"flow",           required_argument, 0, 'f'},
             {"stopbits",       required_argument, 0, 's'},
             {"parity",         required_argument, 0, 'p'},
+            {"output-delay",   required_argument, 0, 'o'},
             {"no-autoconnect", no_argument,       0, 'n'},
             {"version",	       no_argument,       0, 'v'},
             {"help",           no_argument,       0, 'h'},
-            {"char-delay",     required_argument, 0, 'c'},
             {0,                0,                 0,  0 }
         };
 
@@ -97,7 +97,7 @@ void parse_options(int argc, char *argv[])
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:c:d:f:s:p:nvh", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:nvh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
@@ -216,10 +216,6 @@ void parse_options(int argc, char *argv[])
 
                 break;
 
-            case 'c':
-                option.char_delay = atoi(optarg);
-                break;
-
             case 'd':
                 databits = atoi(optarg);
                 option.tio.c_cflag &= ~CSIZE;
@@ -300,6 +296,10 @@ void parse_options(int argc, char *argv[])
                     printf("Error: Invalid parity.\n");
                     exit(EXIT_FAILURE);
                 }
+                break;
+
+            case 'o':
+                option.output_delay = atoi(optarg);
                 break;
 
             case 'n':
