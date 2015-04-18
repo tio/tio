@@ -1,9 +1,26 @@
-=== Go TTY v1.1 ===
+=== Go TTY v1.2 ===
 
-Changes since Go TTY v1.0:
+Changes since Go TTY v1.1:
 
- * Flush I/O data on connect
+ * Enabled .tar.gz distribution support
 
-   Make sure there is no stale I/O data on tty device upon connect.
+   Github does not allow releases including .tar.xz anymore so we have to
+   also enable old school .tar.gz.
 
- * Updated README
+ * Added AUTHORS file
+
+ * Added unit for baudrate
+
+ * Renamed --char-delay to --output-delay
+
+   Renaming to make the naming more specific for the feature.
+
+ * Fixed man page for whatis
+
+Jesper Larsen:
+
+ * Added packaging files for Ubuntu
+
+Jeppe Ledet-Pedersen:
+
+ * Add option for setting inter-character delay
