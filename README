@@ -22,7 +22,7 @@
         Usage: gotty [<options>] <tty device>
 
         Options:
-          -b, --baudrate <baudrate>   Baud rate (default: 115200)
+          -b, --baudrate <bps>        Baud rate (default: 115200)
           -d, --databits 5|6|7|8      Data bits (default: 8)
           -f, --flow hard|soft|none   Flow control (default: none)
           -s, --stopbits 1|2          Stop bits (default: 1)

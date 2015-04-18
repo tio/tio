@@ -42,7 +42,7 @@ void print_options_help(char *argv[])
     printf("Usage: %s [<options>] <tty device>\n", argv[0]);
     printf("\n");
     printf("Options:\n");
-    printf("  -b, --baudrate <baudrate>   Baud rate (default: 115200)\n");
+    printf("  -b, --baudrate <bps>        Baud rate (default: 115200)\n");
     printf("  -d, --databits 5|6|7|8      Data bits (default: 8)\n");
     printf("  -f, --flow hard|soft|none   Flow control (default: none)\n");
     printf("  -s, --stopbits 1|2          Stop bits (default: 1)\n");
