@@ -32,7 +32,7 @@
           -v, --version               Display version
           -h, --help                  Display help
 
-        In session, press ctrl-g + ctrl-q to quit.
+        In session, press ctrl-g + q to quit.
 
 
     The only option which requires a bit of elaboration is the --no-autoconnect
