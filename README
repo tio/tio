@@ -15,8 +15,8 @@
 
 2. Usage
 
-    The commandline interface is really simple and pretty much self explanatory
-    as reflected in the output from 'gotty --help':
+    The commandline interface is straightforward as reflected in the output
+    from 'gotty --help':
 
 
         Usage: gotty [<options>] <tty device>
