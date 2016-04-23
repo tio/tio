@@ -136,7 +136,7 @@ void restore_tty(void)
 int connect_tty(void)
 {
     fd_set rdfs;           /* Read file descriptor set */
-    int    maxfd;          /* Maximum file desciptor used */
+    int    maxfd;          /* Maximum file descriptor used */
     static bool first = true;
     int    status;
     char   c_tty;
