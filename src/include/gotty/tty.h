@@ -28,5 +28,6 @@
 void configure_stdout(void);
 void restore_stdout(void);
 int connect_tty(void);
+void wait_for_tty_device(void);
 
 #endif
