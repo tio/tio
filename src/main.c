@@ -20,6 +20,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "gotty/options.h"
 #include "gotty/tty.h"
 
