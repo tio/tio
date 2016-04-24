@@ -144,7 +144,7 @@ int connect_tty(void)
 
     /* Open tty device */
     fd = open(option.tty_device, O_RDWR | O_NOCTTY );
-    if (fd <0)
+    if (fd < 0)
     {
         printf("\033[300DError: %s\n\033[300D", strerror(errno));
         exit(EXIT_FAILURE);

@@ -42,6 +42,7 @@ int main(int argc, char *argv[])
         status = connect_tty();
     else
     {
+        /* Enter connect loop */
         while (true)
         {
             wait_for_tty_device();
