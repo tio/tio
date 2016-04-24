@@ -1,26 +1,34 @@
-=== Go TTY v1.2 ===
+=== Go TTY v1.3 ===
 
-Changes since Go TTY v1.1:
+Changes since Go TTY v1.2:
 
- * Enabled .tar.gz distribution support
+ * Do not quit on error
 
-   Github does not allow releases including .tar.xz anymore so we have to
-   also enable old school .tar.gz.
+   This makes gotty more robust in the sense it will not quit when an error
+   occurs but simply continue to try reconnect.
 
- * Added AUTHORS file
+ * Updated version text
 
- * Added unit for baudrate
+ * Updated AUTHORS file
 
- * Renamed --char-delay to --output-delay
+ * Cleanup man page examples
 
-   Renaming to make the naming more specific for the feature.
+ * Updated LICENSE file
 
- * Fixed man page for whatis
+ * Reverted back to tar.xz only distribution
 
-Jesper Larsen:
+ * Updated README
 
- * Added packaging files for Ubuntu
+Jakub Wilk:
 
-Jeppe Ledet-Pedersen:
+ * Clarified README that the license is GPLv2+
 
- * Add option for setting inter-character delay
+ * Stripped trailing whitespace from man page
+
+ * Fixed typo
+
+Jakob Haufe:
+
+ * Add missing declaration
+
+ * Add missing include
