@@ -308,7 +308,7 @@ void parse_options(int argc, char *argv[])
 
             case 'v':
                 printf("Go TTY v%s\n", VERSION);
-                printf("Copyright (c) 2014 Martin Lund\n");
+                printf("Copyright (c) 2014-2016 Martin Lund\n");
                 printf("\n");
                 printf("License GPLv2: GNU GPL version 2 or later <http://gnu.org/licenses/gpl-2.0.html>.\n");
                 printf("This is free software: you are free to change and redistribute it.\n");
