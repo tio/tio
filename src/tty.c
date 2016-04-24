@@ -52,8 +52,8 @@ void wait_for_tty_device(void)
     /* Loop until device pops up */
     while (true)
     {
-        /* Test for device file */
-        if (stat(option.tty_device, &status) == 0)
+        /* Test for accessible device file */
+        if (access(option.tty_device, R_OK) == 0)
             return;
 
         /* Wait up to 1 second */
