@@ -1,34 +1,8 @@
-=== Go TTY v1.3 ===
+=== Go TTY v1.4 ===
 
-Changes since Go TTY v1.2:
+Changes since Go TTY v1.3:
 
- * Do not quit on error
+ * Fix tty device file accessibility test
 
-   This makes gotty more robust in the sense it will not quit when an error
-   occurs but simply continue to try reconnect.
-
- * Updated version text
-
- * Updated AUTHORS file
-
- * Cleanup man page examples
-
- * Updated LICENSE file
-
- * Reverted back to tar.xz only distribution
-
- * Updated README
-
-Jakub Wilk:
-
- * Clarified README that the license is GPLv2+
-
- * Stripped trailing whitespace from man page
-
- * Fixed typo
-
-Jakob Haufe:
-
- * Add missing declaration
-
- * Add missing include
+   Fixes ending up in a freeze when a tty device exists but is not
+   readable.
