@@ -6,6 +6,9 @@ AM_SILENT_RULES([yes])
 AC_PROG_CC
 AC_LANG([C])
 AC_PROG_INSTALL
+PKG_PROG_PKG_CONFIG
+PKG_CHECK_VAR(bashcompdir, [bash-completion], [completionsdir], , bashcompdir="${sysconfdir}/bash_completion.d")
+AC_SUBST(bashcompdir)
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([src/Makefile])
 AC_CONFIG_FILES([man/Makefile])

@@ -7,5 +7,5 @@ gotty_SOURCES = tty.c \
                 include/gotty/options.h \
                 include/gotty/time.h \
                 include/gotty/print.h
-bashcompletiondir=$(sysconfdir)/bash_completion.d
+bashcompletiondir=@bashcompdir@
 dist_bashcompletion_DATA=bash-completion/gotty
