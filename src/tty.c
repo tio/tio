@@ -35,6 +35,7 @@
 #include "gotty/print.h"
 #include "gotty/options.h"
 #include "gotty/time.h"
+#include "gotty/log.h"
 
 static int connected = false;
 struct termios new_stdout, old_stdout, old_tio;
@@ -204,6 +205,11 @@ int connect_tty(void)
                 /* Print received tty character to stdout */
                 putchar(c_tty);
                 fflush(stdout);
+
+                /* Write to log */
+                if (option.log)
+                    log_write(c_tty);
+
                 if (c_tty != 0x7) // Small trick to avoid ctrl-g echo
                     tainted = true;
             } else
@@ -228,6 +234,10 @@ int connect_tty(void)
 
             /* Forward input to tty device */
             status = write(fd, &c_stdin[0], 1);
+
+            /* Write to log */
+            if (option.log)
+                log_write(c_stdin[0]);
 
             /* Insert output delay */
             if (option.output_delay)

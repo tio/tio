@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include "gotty/options.h"
 #include "gotty/tty.h"
+#include "gotty/log.h"
 
 int main(int argc, char *argv[])
 {
@@ -34,8 +35,15 @@ int main(int argc, char *argv[])
     /* Configure output terminal */
     configure_stdout();
 
+    /* Install log exit handler */
+    atexit(&log_exit);
+
     /* Restore output terminal on exit */
     atexit(&restore_stdout);
+
+    /* Create log file */
+    if (option.log)
+        log_open(option.log_filename);
 
     /* Connect to tty device */
     if (option.no_autoconnect)
@@ -49,6 +57,9 @@ int main(int argc, char *argv[])
             status = connect_tty();
         }
     }
+
+    /* Close log */
+    log_close();
 
     return status;
 }

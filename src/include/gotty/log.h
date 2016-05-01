@@ -1,7 +1,7 @@
 /*
  * Go TTY - The Really Simple Terminal Application
  *
- * Copyright (c) 2014  Martin Lund
+ * Copyright (c) 2014-2016  Martin Lund
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,27 +19,12 @@
  * 02110-1301, USA.
  */
 
-#ifndef OPTIONS_H
-#define OPTIONS_H
+#ifndef LOG_H
+#define LOG_H
 
-#include <stdbool.h>
-#include <limits.h>
-#include <termios.h>
-#include <sys/param.h>
-
-/* Options */
-struct option_t
-{
-    char tty_device[MAXPATHLEN];
-    bool log;
-    char log_filename[_POSIX_ARG_MAX];
-    bool no_autoconnect;
-    int output_delay;
-    struct termios tio;
-};
-
-extern struct option_t option;
-
-void parse_options(int argc, char *argv[]);
+void log_open(char *filename);
+void log_write(char c);
+void log_close(void);
+void log_exit(void);
 
 #endif

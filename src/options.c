@@ -27,14 +27,18 @@
 #include <errno.h>
 #include <getopt.h>
 #include <termios.h>
+#include <limits.h>
 #include "config.h"
 #include "gotty/options.h"
 #include "gotty/print.h"
 
 struct option_t option =
 {
-    "",       /* Device name */
-    false,    /* No autoconnect */
+    "",       // Device name
+    false,    // No log
+    "",       // Log filename
+    false,    // No autoconnect
+    0,        // No output delay
 };
 
 void print_options_help(char *argv[])
@@ -49,6 +53,7 @@ void print_options_help(char *argv[])
     printf("  -p, --parity odd|even|none  Parity (default: none)\n");
     printf("  -o, --output-delay <ms>     Output delay (default: 0)\n");
     printf("  -n, --no-autoconnect        Disable automatic connect\n");
+    printf("  -l, --log <filename>        Log to file\n");
     printf("  -v, --version               Display version\n");
     printf("  -h, --help                  Display help\n");
     printf("\n");
@@ -88,6 +93,7 @@ void parse_options(int argc, char *argv[])
             {"parity",         required_argument, 0, 'p'},
             {"output-delay",   required_argument, 0, 'o'},
             {"no-autoconnect", no_argument,       0, 'n'},
+            {"log",            required_argument, 0, 'l'},
             {"version",	       no_argument,       0, 'v'},
             {"help",           no_argument,       0, 'h'},
             {0,                0,                 0,  0 }
@@ -97,7 +103,7 @@ void parse_options(int argc, char *argv[])
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:nvh", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:nl:vh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
@@ -304,6 +310,11 @@ void parse_options(int argc, char *argv[])
 
             case 'n':
                 option.no_autoconnect = true;
+                break;
+
+            case 'l':
+                option.log = true;
+                strncpy(option.log_filename, optarg, _POSIX_ARG_MAX);
                 break;
 
             case 'v':

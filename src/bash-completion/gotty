@@ -17,6 +17,7 @@ _gotty()
           -p --parity \
           -o --output-delay \
           -n --no-autoconnect \
+          -l --log \
           -v --version \
           -h --help"
 
@@ -76,6 +77,10 @@ _gotty()
             return 0
             ;;
         -n | --no-autoconnect)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        -l | --log)
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;

@@ -1,7 +1,7 @@
 /*
  * Go TTY - The Really Simple Terminal Application
  *
- * Copyright (c) 2014  Martin Lund
+ * Copyright (c) 2014-2016  Martin Lund
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,27 +19,44 @@
  * 02110-1301, USA.
  */
 
-#ifndef OPTIONS_H
-#define OPTIONS_H
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include "gotty/options.h"
+#include "gotty/print.h"
 
-#include <stdbool.h>
-#include <limits.h>
-#include <termios.h>
-#include <sys/param.h>
+static FILE *fp;
+static bool error = false;
 
-/* Options */
-struct option_t
+void log_open(char *filename)
 {
-    char tty_device[MAXPATHLEN];
-    bool log;
-    char log_filename[_POSIX_ARG_MAX];
-    bool no_autoconnect;
-    int output_delay;
-    struct termios tio;
-};
+    fp = fopen(filename, "w+");
 
-extern struct option_t option;
+    if (fp == NULL)
+    {
+        error = true;
+        exit(EXIT_FAILURE);
+    }
+}
 
-void parse_options(int argc, char *argv[]);
+void log_write(char c)
+{
+    if (fp != NULL)
+        fputc(c, fp);
+}
 
-#endif
+void log_close(void)
+{
+    if (fp != NULL)
+        fclose(fp);
+}
+
+void log_exit(void)
+{
+    if (option.log)
+        log_close();
+
+    if (error)
+        printf("Error: Could not open log file %s (%s)\n", option.log_filename, strerror(errno));
+}
