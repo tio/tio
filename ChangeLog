@@ -1,8 +1,21 @@
-=== Go TTY v1.4 ===
+=== Go TTY v1.5 ===
 
-Changes since Go TTY v1.3:
+Changes since Go TTY v1.4:
 
- * Fix tty device file accessibility test
+ * Added log feature
 
-   Fixes ending up in a freeze when a tty device exists but is not
-   readable.
+   Added "--log <filename>" option which writes all activity to specified
+   file.
+
+ * Add support for configurable bash completion path
+
+   Rewrote the configure script to support the following options:
+   
+   --with-bash-completion-dir=PATH
+   --without-bash-completion-dir
+
+Jakob Haufe:
+
+ * Don't hardcode path for bash completions
+
+   Instead, use pkg-config to find out where the completions should go.
