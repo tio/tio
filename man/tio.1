@@ -1,20 +1,20 @@
-.TH "gotty" "1" "30 September 2014"
+.TH "tio" "1" "30 September 2014"
 
 .SH "NAME"
-gotty \- The really simple TTY terminal application
+tio \- The simple TTY terminal I/O application
 
 .SH "SYNOPSIS"
 .PP
-.B gotty
+.B tio
 [<options>] <tty device>
 
 .SH "DESCRIPTION"
 .PP
-.B Go TTY
+.B tio
 or
-.B gotty
-is a really simple TTY terminal application which features a simple commandline
-interface to easily connect to TTY devices for basic input/output.
+.B tio
+is a simple TTY terminal application which features a straightforward
+commandline interface to easily connect to TTY devices for basic input/output.
 
 .SH "OPTIONS"
 
@@ -67,17 +67,17 @@ In session, press ctrl-g + q to quit.
 .TP
 The most common use is without options. For example:
 
-gotty /dev/ttyUSB0
+tio /dev/ttyUSB0
 .TP
 Which corresponds to:
 
-gotty -b 115200 -d 8 -f none -s 1 -p none /dev/ttyUSB0
+tio -b 115200 -d 8 -f none -s 1 -p none /dev/ttyUSB0
 .TP
 It is recommended to connect serial tty devices by id. For example:
 
-gotty /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 .PP
-Using serial devices by id ensures that gotty automatically reconnects to the
+Using serial devices by id ensures that tio automatically reconnects to the
 correct serial device if the device is disconnected and then reconnected.
 
 .SH "AUTHOR"

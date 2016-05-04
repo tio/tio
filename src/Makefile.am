@@ -1,16 +1,16 @@
-bin_PROGRAMS = gotty
-gotty_SOURCES = tty.c \
+bin_PROGRAMS = tio
+tio_SOURCES = tty.c \
                 options.c \
                 time.c \
                 main.c \
                 log.c \
-                include/gotty/tty.h \
-                include/gotty/options.h \
-                include/gotty/time.h \
-                include/gotty/print.h \
-                include/gotty/log.h
+                include/tio/tty.h \
+                include/tio/options.h \
+                include/tio/time.h \
+                include/tio/print.h \
+                include/tio/log.h
 
 if ENABLE_BASH_COMPLETION
 bashcompletiondir=@BASH_COMPLETION_DIR@
-dist_bashcompletion_DATA=bash-completion/gotty
+dist_bashcompletion_DATA=bash-completion/tio
 endif

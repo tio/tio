@@ -1,25 +1,22 @@
-=== Go TTY - The Really Simple TTY Terminal Application ===
+=== tio - the simple TTY terminal I/O application ===
 
 
 1. Introduction
 
-    Go TTY or "gotty" is a really simple TTY terminal application which
-    features a simple commandline interface to easily connect to TTY devices
-    for basic input/output.
+    "tio" is a simple TTY terminal application which features a straightfoward
+    commandline interface to easily connect to TTY devices for basic
+    input/output.
 
-    Go TTY was created because the author needed a simple no-nonsense TTY
-    terminal application to go do quick debugging.
-
-    Let's Go TTY! - http://gotty.io
-
+    It was created because the author needed a simple no-nonsense TTY
+    terminal application to easily connect to various terminal TTY devices.
 
 2. Usage
 
     The commandline interface is straightforward as reflected in the output
-    from 'gotty --help':
+    from 'tio --help':
 
 
-        Usage: gotty [<options>] <tty device>
+        Usage: tio [<options>] <tty device>
 
         Options:
           -b, --baudrate <bps>        Baud rate (default: 115200)
@@ -39,23 +36,23 @@
     The only option which requires a bit of elaboration is the --no-autoconnect
     option.
 
-    By default gotty automatically connects to the provided device if present.
+    By default tio automatically connects to the provided device if present.
     If the device is not present it will wait for it to appear and then
     connect. If the connection is lost (eg. device disconnects) it will wait
     for the device to reappear and then reconnect.
 
-    However, if the --no-autoconnect option is provided gotty will exit if the
+    However, if the --no-autoconnect option is provided tio will exit if the
     device is not present or exit if an established connection is lost.
 
-    Go TTY features full bash autocompletion support.
+    Tio features full bash autocompletion support.
 
 
 3. Download
 
-    Find the latest release tarball at http://gotty.io
+    Find the latest release tarball at http://tio.github.io
 
     The latest source is available on github:
-    https://github.com/gotty/gotty
+    https://github.com/tio/tio
 
 
 4. Installation
@@ -71,18 +68,18 @@
 
 5. Contributing
 
-    Go TTY is open source. Any contributions (bug fixes, doc, ideas, etc.) are
+    Tio is open source. Any contributions (bug fixes, doc, ideas, etc.) are
     welcome.
 
 
 6. Support
 
-    Submit bug reports on github: https://github.com/gotty/gotty/issues
+    Submit bug reports on github: https://github.com/tio/tio/issues
 
 
 7. License
 
-    Go TTY is GPLv2+. See COPYING file for license details.
+    Tio is GPLv2+. See COPYING file for license details.
 
 
 8. Authors

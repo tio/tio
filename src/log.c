@@ -1,5 +1,5 @@
 /*
- * Go TTY - The Really Simple Terminal Application
+ * tio - the simple TTY terminal I/O application
  *
  * Copyright (c) 2014-2016  Martin Lund
  *
@@ -23,8 +23,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "gotty/options.h"
-#include "gotty/print.h"
+#include "tio/options.h"
+#include "tio/print.h"
 
 static FILE *fp;
 static bool error = false;

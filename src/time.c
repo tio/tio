@@ -1,7 +1,7 @@
 /*
- * Go TTY - The Really Simple Terminal Application
+ * tio - the simple TTY terminal I/O application
  *
- * Copyright (c) 2014  Martin Lund
+ * Copyright (c) 2014-2016  Martin Lund
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

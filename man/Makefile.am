@@ -1,1 +1,1 @@
-dist_man_MANS = gotty.1
+dist_man_MANS = tio.1

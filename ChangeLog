@@ -1,21 +1,4 @@
-=== Go TTY v1.5 ===
+=== tio v1.6 ===
 
-Changes since Go TTY v1.4:
+Changes since tio v1.5:
 
- * Added log feature
-
-   Added "--log <filename>" option which writes all activity to specified
-   file.
-
- * Add support for configurable bash completion path
-
-   Rewrote the configure script to support the following options:
-   
-   --with-bash-completion-dir=PATH
-   --without-bash-completion-dir
-
-Jakob Haufe:
-
- * Don't hardcode path for bash completions
-
-   Instead, use pkg-config to find out where the completions should go.

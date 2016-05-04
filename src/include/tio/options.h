@@ -1,5 +1,5 @@
 /*
- * Go TTY - The Really Simple Terminal Application
+ * tio - the simple TTY terminal I/O application
  *
  * Copyright (c) 2014-2016  Martin Lund
  *
@@ -19,12 +19,27 @@
  * 02110-1301, USA.
  */
 
-#ifndef LOG_H
-#define LOG_H
+#ifndef OPTIONS_H
+#define OPTIONS_H
 
-void log_open(char *filename);
-void log_write(char c);
-void log_close(void);
-void log_exit(void);
+#include <stdbool.h>
+#include <limits.h>
+#include <termios.h>
+#include <sys/param.h>
+
+/* Options */
+struct option_t
+{
+    char tty_device[MAXPATHLEN];
+    bool log;
+    char log_filename[_POSIX_ARG_MAX];
+    bool no_autoconnect;
+    int output_delay;
+    struct termios tio;
+};
+
+extern struct option_t option;
+
+void parse_options(int argc, char *argv[]);
 
 #endif

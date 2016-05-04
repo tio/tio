@@ -1,8 +1,8 @@
 #
-# Bash completion script for gotty.
+# Bash completion script for tio.
 #
 
-_gotty()
+_tio()
 {
     local cur prev opts base
     COMPREPLY=()
@@ -100,5 +100,5 @@ _gotty()
    return 0
 }
 
-# Bind completion to gotty command
-complete -o default -F _gotty gotty
+# Bind completion to tio command
+complete -o default -F _tio tio

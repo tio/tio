@@ -1,6 +1,6 @@
 *.tar.xz
 src/*.o
-src/gotty
+src/tio
 Makefile.in
 Makefile
 aclocal.m4
@@ -20,4 +20,4 @@ src/include/config.h.in
 src/include/config.h.in~
 src/include/stamp-h1
 *.swp
-/gotty-*
+/tio-*

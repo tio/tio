@@ -1,7 +1,7 @@
 /*
- * Go TTY - The Really Simple Terminal Application
+ * tio - the simple TTY terminal I/O application
  *
- * Copyright (c) 2014  Martin Lund
+ * Copyright (c) 2014-2016  Martin Lund
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,8 +29,8 @@
 #include <termios.h>
 #include <limits.h>
 #include "config.h"
-#include "gotty/options.h"
-#include "gotty/print.h"
+#include "tio/options.h"
+#include "tio/print.h"
 
 struct option_t option =
 {
@@ -318,7 +318,7 @@ void parse_options(int argc, char *argv[])
                 break;
 
             case 'v':
-                printf("Go TTY v%s\n", VERSION);
+                printf("tio v%s\n", VERSION);
                 printf("Copyright (c) 2014-2016 Martin Lund\n");
                 printf("\n");
                 printf("License GPLv2: GNU GPL version 2 or later <http://gnu.org/licenses/gpl-2.0.html>.\n");

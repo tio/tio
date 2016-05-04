@@ -1,7 +1,7 @@
 /*
- * Go TTY - The Really Simple Terminal Application
+ * tio - the simple TTY terminal I/O application
  *
- * Copyright (c) 2014  Martin Lund
+ * Copyright (c) 2014-2016  Martin Lund
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,15 +19,12 @@
  * 02110-1301, USA.
  */
 
-#ifndef TTY_H
-#define TTY_H
+#ifndef LOG_H
+#define LOG_H
 
-#define KEY_CTRL_G 0x07
-#define KEY_Q 0x71
-
-void configure_stdout(void);
-void restore_stdout(void);
-int connect_tty(void);
-void wait_for_tty_device(void);
+void log_open(char *filename);
+void log_write(char c);
+void log_close(void);
+void log_exit(void);
 
 #endif

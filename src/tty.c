@@ -1,7 +1,7 @@
 /*
- * Go TTY - The Really Simple Terminal Application
+ * tio - the simple TTY terminal I/O application
  *
- * Copyright (c) 2014  Martin Lund
+ * Copyright (c) 2014-2016  Martin Lund
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -31,11 +31,11 @@
 #include <termios.h>
 #include <stdbool.h>
 #include <errno.h>
-#include "gotty/tty.h"
-#include "gotty/print.h"
-#include "gotty/options.h"
-#include "gotty/time.h"
-#include "gotty/log.h"
+#include "tio/tty.h"
+#include "tio/print.h"
+#include "tio/options.h"
+#include "tio/time.h"
+#include "tio/log.h"
 
 static int connected = false;
 struct termios new_stdout, old_stdout, old_tio;
@@ -120,7 +120,7 @@ void disconnect_tty(void)
 {
     if (tainted)
         putchar('\n');
-    color_printf("[gotty %s] Disconnected", current_time());
+    color_printf("[tio %s] Disconnected", current_time());
     close(fd);
     connected = false;
 }
@@ -156,7 +156,7 @@ int connect_tty(void)
     tcflush(fd, TCIOFLUSH);
 
     /* Print connect status */
-    color_printf("[gotty %s] Connected", current_time());
+    color_printf("[tio %s] Connected", current_time());
     connected = true;
     tainted = false;
     bzero(&c_stdin[0], 3);
