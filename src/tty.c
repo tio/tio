@@ -76,7 +76,7 @@ void wait_for_tty_device(void)
             /* Exit upon ctrl-g + q sequence */
             c_stdin[2] = c_stdin[1];
             c_stdin[1] = c_stdin[0];
-            if ((c_stdin[1] == KEY_Q) && (c_stdin[2] == KEY_CTRL_G))
+            if ((c_stdin[1] == KEY_Q) && (c_stdin[2] == KEY_CTRL_T))
                 exit(EXIT_SUCCESS);
         }
     }
@@ -223,13 +223,13 @@ int connect_tty(void)
         {
             /* Input from stdin ready */
             status = read(STDIN_FILENO, &c_stdin[0], 1);
-            if ((c_stdin[0] != KEY_Q) && (c_stdin[0] != KEY_CTRL_G))
+            if ((c_stdin[0] != KEY_Q) && (c_stdin[0] != KEY_CTRL_T))
                 tainted = true;
 
             /* Exit upon ctrl-g + q sequence */
             c_stdin[2] = c_stdin[1];
             c_stdin[1] = c_stdin[0];
-            if ((c_stdin[1] == KEY_Q) && (c_stdin[2] == KEY_CTRL_G))
+            if ((c_stdin[1] == KEY_Q) && (c_stdin[2] == KEY_CTRL_T))
                 exit(EXIT_SUCCESS);
 
             /* Forward input to tty device */
