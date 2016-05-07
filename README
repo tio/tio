@@ -1,4 +1,4 @@
-=== tio - the simple TTY terminal I/O application ===
+=== tio - The simple TTY terminal I/O application ===
 
 
 1. Introduction
@@ -9,6 +9,7 @@
 
     It was created because the author needed a simple no-nonsense TTY
     terminal application to easily connect to various terminal TTY devices.
+
 
 2. Usage
 
@@ -33,8 +34,8 @@
         In session, press ctrl-t + q to quit.
 
 
-    The only option which requires a bit of elaboration is the --no-autoconnect
-    option.
+    The only option which requires a bit of elaboration is perhaps the
+    --no-autoconnect option.
 
     By default tio automatically connects to the provided device if present.
     If the device is not present it will wait for it to appear and then
@@ -51,8 +52,7 @@
 
     Find the latest release tarball at http://tio.github.io
 
-    The latest source is available on github:
-    https://github.com/tio/tio
+    The latest source is available on github: https://github.com/tio/tio
 
 
 4. Installation
@@ -84,6 +84,6 @@
 
 8. Authors
 
-    Written by Martin Lund <martin.lund@keep-it-simple.com>
+    Created by Martin Lund <martin.lund@keep-it-simple.com>
 
-    See the AUTHORS file for full list of authors (including contributors).
+    See the AUTHORS file for full list of authors.
