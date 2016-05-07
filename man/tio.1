@@ -17,43 +17,43 @@ commandline interface to easily connect to TTY devices for basic input/output.
 .SH "OPTIONS"
 
 .TP
-.B \-b, \--baudrate <bps>
+.B \-b, \-\-baudrate <bps>
 
 Set baud rate [bps] (default: 115200).
 .TP
-.B \-d, \--databits 5|6|7|8
+.B \-d, \-\-databits 5|6|7|8
 
 Set data bits (default: 8).
 .TP
-.B \-f, \--flow hard|soft|none
+.B \-f, \-\-flow hard|soft|none
 
 Set flow control (default: none).
 .TP
-.B \-s, \--stopbits 1|2
+.B \-s, \-\-stopbits 1|2
 
 Set stop bits (default: 1).
 .TP
-.B \-p, \--parity odd|even|none
+.B \-p, \-\-parity odd|even|none
 
 Set parity (default: none).
 .TP
-.B \-o, \--output-delay <ms>
+.B \-o, \-\-output\-delay <ms>
 
-Set output delay [ms] - delay inserted between each transmitted character (default: 0).
+Set output delay [ms] \(em delay inserted between each transmitted character (default: 0).
 .TP
-.B \-n, \--no-autoconnect
+.B \-n, \-\-no\-autoconnect
 
 Disable automatic connect.
 .TP
-.B \-l, \--log <filename>
+.B \-l, \-\-log <filename>
 
 Log to file.
 .TP
-.B \-v, \--version
+.B \-v, \-\-version
 
 Display program version.
 .TP
-.B \-h, \--help
+.B \-h, \-\-help
 
 Display help.
 
@@ -69,15 +69,15 @@ tio /dev/ttyUSB0
 .TP
 Which corresponds to:
 
-tio -b 115200 -d 8 -f none -s 1 -p none /dev/ttyUSB0
+tio \-b 115200 \-d 8 \-f none \-s 1 \-p none /dev/ttyUSB0
 .TP
 It is recommended to connect serial tty devices by id. For example:
 
-tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
 .PP
 Using serial devices by id ensures that tio automatically reconnects to the
 correct serial device if the device is disconnected and then reconnected.
 
 .SH "AUTHOR"
 .PP
-Written by Martin Lund <martin.lund@keep-it-simple.com>.
+Written by Martin Lund <martin.lund@keep\-it\-simple.com>.
