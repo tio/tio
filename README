@@ -3,7 +3,7 @@
 
 1. Introduction
 
-    "tio" is a simple TTY terminal application which features a straightfoward
+    "tio" is a simple TTY terminal application which features a straightforward
     commandline interface to easily connect to TTY devices for basic
     input/output.
 
