@@ -73,7 +73,7 @@ void wait_for_tty_device(void)
             /* Read one character */
             n = read(STDIN_FILENO, &c_stdin[0], 1);
 
-            /* Exit upon ctrl-g + q sequence */
+            /* Exit upon ctrl-t + q sequence */
             c_stdin[2] = c_stdin[1];
             c_stdin[1] = c_stdin[0];
             if ((c_stdin[1] == KEY_Q) && (c_stdin[2] == KEY_CTRL_T))
@@ -210,7 +210,7 @@ int connect_tty(void)
                 if (option.log)
                     log_write(c_tty);
 
-                if (c_tty != 0x7) // Small trick to avoid ctrl-g echo
+                if (c_tty != KEY_CTRL_T) // Small trick to avoid ctrl-t echo
                     tainted = true;
             } else
             {
@@ -226,7 +226,7 @@ int connect_tty(void)
             if ((c_stdin[0] != KEY_Q) && (c_stdin[0] != KEY_CTRL_T))
                 tainted = true;
 
-            /* Exit upon ctrl-g + q sequence */
+            /* Exit upon ctrl-t + q sequence */
             c_stdin[2] = c_stdin[1];
             c_stdin[1] = c_stdin[0];
             if ((c_stdin[1] == KEY_Q) && (c_stdin[2] == KEY_CTRL_T))
