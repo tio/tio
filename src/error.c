@@ -21,48 +21,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <string.h>
+#include <errno.h>
 #include "tio/options.h"
-#include "tio/tty.h"
-#include "tio/log.h"
-#include "tio/error.h"
 #include "tio/print.h"
 
-int main(int argc, char *argv[])
+char *error = "";
+
+void error_exit(void)
 {
-    int status;
-
-    /* Parse options */
-    parse_options(argc, argv);
-
-    /* Configure output terminal */
-    configure_stdout();
-
-    /* Install error exit handler */
-    atexit(&error_exit);
-
-    /* Install log exit handler */
-    atexit(&log_exit);
-
-    /* Restore output terminal on exit */
-    atexit(&restore_stdout);
-
-    /* Create log file */
-    if (option.log)
-        log_open(option.log_filename);
-
-    /* Connect to tty device */
-    if (option.no_autoconnect)
-        status = connect_tty();
-    else
-    {
-        /* Enter connect loop */
-        while (true)
-        {
-            wait_for_tty_device();
-            status = connect_tty();
-        }
-    }
-
-    return status;
+    if ((error[0] != 0) && (option.no_autoconnect))
+        printf("Error: %s\n", error);
 }
