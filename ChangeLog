@@ -1,14 +1,16 @@
-=== tio v1.6 ===
+=== tio v1.7 ===
 
-Changes since tio v1.5:
+Changes since tio v1.6:
 
- * Renamed "gotty" to "tio"
+ * Changed escape key from ^g to ^t
 
-   Renamed to "tio" because it is shorter and this new name also more
-   precisely reflects what the program is - a simple TTY terminal I/O
-   application.
+   After renaming to "tio" it makes sense to change the escape key
+   accordingly. Hence, the new escape key is ^t.
 
-   "tio" can be considered short for terminal I/O or TTY I/O or a
-   combination of the two, whichever you prefer.
+   Meaning, in session, its now ctrl-t + q to quit.
 
-   Also, wanted to avoid naming conflicts with other projects.
+Jakub Wilk:
+
+ * Fixed silly "tio or tio" in man page
+
+ * Fixed typo
