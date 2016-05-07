@@ -6,6 +6,7 @@ AM_SILENT_RULES([yes])
 AC_PROG_CC
 AC_LANG([C])
 AC_PROG_INSTALL
+AM_CFLAGS="-Wall"
 
 PKG_PROG_PKG_CONFIG
 AC_ARG_WITH([bash-completion-dir],
