@@ -58,8 +58,5 @@ int main(int argc, char *argv[])
         }
     }
 
-    /* Close log */
-    log_close();
-
     return status;
 }
