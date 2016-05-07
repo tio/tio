@@ -1,4 +1,4 @@
-.TH "tio" "1" "30 September 2014"
+.TH "tio" "1" "7 May 2016"
 
 .SH "NAME"
 tio \- The simple TTY terminal I/O application
@@ -6,7 +6,7 @@ tio \- The simple TTY terminal I/O application
 .SH "SYNOPSIS"
 .PP
 .B tio
-[<options>] <tty device>
+.RI "[" <options> "] " "<tty device>"
 
 .SH "DESCRIPTION"
 .PP
@@ -17,43 +17,43 @@ commandline interface to easily connect to TTY devices for basic input/output.
 .SH "OPTIONS"
 
 .TP
-.B \-b, \--baudrate <bps>
+.BR \-b ", " "\-\-baudrate " \fI<bps>
 
 Set baud rate [bps] (default: 115200).
 .TP
-.B \-d, \--databits 5|6|7|8
+.BR \-d ", " "\-\-databits 5" | 6 | 7 | 8
 
 Set data bits (default: 8).
 .TP
-.B \-f, \--flow hard|soft|none
+.BR \-f ", " "\-\-flow hard" | soft | none
 
 Set flow control (default: none).
 .TP
-.B \-s, \--stopbits 1|2
+.BR \-s ", " "\-\-stopbits 1" | 2
 
 Set stop bits (default: 1).
 .TP
-.B \-p, \--parity odd|even|none
+.BR \-p ", " "\-\-parity odd" | even | none
 
 Set parity (default: none).
 .TP
-.B \-o, \--output-delay <ms>
+.BR \-o ", " "\-\-output\-delay " \fI<ms>
 
-Set output delay [ms] - delay inserted between each transmitted character (default: 0).
+Set output delay [ms] \(em delay inserted between each transmitted character (default: 0).
 .TP
-.B \-n, \--no-autoconnect
+.BR \-n ", " \-\-no\-autoconnect
 
 Disable automatic connect.
 .TP
-.B \-l, \--log <filename>
+.BR \-l ", " "\-\-log " \fI<filename>
 
 Log to file.
 .TP
-.B \-v, \--version
+.BR \-v ", " \-\-version
 
 Display program version.
 .TP
-.B \-h, \--help
+.BR \-h ", " \-\-help
 
 Display help.
 
@@ -69,15 +69,15 @@ tio /dev/ttyUSB0
 .TP
 Which corresponds to:
 
-tio -b 115200 -d 8 -f none -s 1 -p none /dev/ttyUSB0
+tio \-b 115200 \-d 8 \-f none \-s 1 \-p none /dev/ttyUSB0
 .TP
 It is recommended to connect serial tty devices by id. For example:
 
-tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
 .PP
 Using serial devices by id ensures that tio automatically reconnects to the
 correct serial device if the device is disconnected and then reconnected.
 
 .SH "AUTHOR"
 .PP
-Written by Martin Lund <martin.lund@keep-it-simple.com>.
+Written by Martin Lund <martin.lund@keep\-it\-simple.com>.
