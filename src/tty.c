@@ -228,8 +228,7 @@ int connect_tty(void)
                 if (option.log)
                     log_write(c_tty);
 
-                if (c_tty != KEY_CTRL_T) // Small trick to avoid ctrl-t echo
-                    tainted = true;
+                tainted = true;
             } else
             {
                 /* Error reading - device is likely unplugged */
@@ -243,9 +242,6 @@ int connect_tty(void)
             status = read(STDIN_FILENO, &c_stdin[0], 1);
             if (status < 0)
                 printf("Warning: Could not read from stdin\r\n");
-
-            if ((c_stdin[0] != KEY_Q) && (c_stdin[0] != KEY_CTRL_T))
-                tainted = true;
 
             /* Exit upon ctrl-t + q sequence */
             c_stdin[2] = c_stdin[1];
