@@ -38,10 +38,10 @@
 #include "tio/log.h"
 #include "tio/error.h"
 
-static int connected = false;
-struct termios new_stdout, old_stdout, old_tio;
-static int fd;
+static struct termios new_stdout, old_stdout, old_tio;
+static bool connected = false;
 static bool tainted = false;
+static int fd;
 
 void wait_for_tty_device(void)
 {
