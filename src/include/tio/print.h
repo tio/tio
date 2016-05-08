@@ -33,7 +33,7 @@
 #define ANSI_COLOR_RESET     "\x1b[0m"
 
 #define color_printf(format, args...) \
-   fprintf (stdout, "\033[300D" ANSI_COLOR_YELLOW format ANSI_COLOR_RESET "\033[300D\n", ## args); \
+   fprintf (stdout, "\r" ANSI_COLOR_YELLOW format ANSI_COLOR_RESET "\r\n", ## args); \
    fflush(stdout);
 
 #ifdef DEBUG
