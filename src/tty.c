@@ -79,7 +79,7 @@ void wait_for_tty_device(void)
             /* Read one character */
             status = read(STDIN_FILENO, &c_stdin[0], 1);
             if (status < 0)
-                printf("Warning: Could not read from stdin\n");
+                printf("Warning: Could not read from stdin\r\n");
 
             /* Exit upon ctrl-t + q sequence */
             c_stdin[2] = c_stdin[1];
@@ -242,7 +242,7 @@ int connect_tty(void)
             /* Input from stdin ready */
             status = read(STDIN_FILENO, &c_stdin[0], 1);
             if (status < 0)
-                printf("Warning: Could not read from stdin");
+                printf("Warning: Could not read from stdin\r\n");
 
             if ((c_stdin[0] != KEY_Q) && (c_stdin[0] != KEY_CTRL_T))
                 tainted = true;
@@ -260,7 +260,7 @@ int connect_tty(void)
                 /* Forward input to tty device */
                 status = write(fd, &c_stdin[0], 1);
                 if (status < 0)
-                    printf("Warning: Could not write to tty device");
+                    printf("Warning: Could not write to tty device\r\n");
             }
 
             /* Write to log */
