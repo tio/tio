@@ -253,10 +253,15 @@ int connect_tty(void)
             if ((c_stdin[1] == KEY_Q) && (c_stdin[2] == KEY_CTRL_T))
                 exit(EXIT_SUCCESS);
 
-            /* Forward input to tty device */
-            status = write(fd, &c_stdin[0], 1);
-            if (status < 0)
-                printf("Warning: Could not write to tty device");
+            /* Ignore ctrl-t except when repeated */
+            if ((c_stdin[0] != KEY_CTRL_T) ||
+                ((c_stdin[0] == KEY_CTRL_T) && (c_stdin[1] == KEY_CTRL_T)))
+            {
+                /* Forward input to tty device */
+                status = write(fd, &c_stdin[0], 1);
+                if (status < 0)
+                    printf("Warning: Could not write to tty device");
+            }
 
             /* Write to log */
             if (option.log)
