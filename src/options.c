@@ -94,7 +94,7 @@ void parse_options(int argc, char *argv[])
             {"output-delay",   required_argument, 0, 'o'},
             {"no-autoconnect", no_argument,       0, 'n'},
             {"log",            required_argument, 0, 'l'},
-            {"version",	       no_argument,       0, 'v'},
+            {"version",        no_argument,       0, 'v'},
             {"help",           no_argument,       0, 'h'},
             {0,                0,                 0,  0 }
         };
