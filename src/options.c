@@ -314,7 +314,7 @@ void parse_options(int argc, char *argv[])
 
             case 'l':
                 option.log = true;
-                strncpy(option.log_filename, optarg, _POSIX_ARG_MAX);
+                option.log_filename = optarg;
                 break;
 
             case 'v':
@@ -344,7 +344,7 @@ void parse_options(int argc, char *argv[])
 
     /* Assume first non-option is the tty device name */
     if (optind < argc)
-        strcpy(option.tty_device, argv[optind++]);
+        option.tty_device = argv[optind++];
 
     if (strlen(option.tty_device) == 0)
     {

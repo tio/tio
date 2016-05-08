@@ -30,9 +30,9 @@
 /* Options */
 struct option_t
 {
-    char tty_device[MAXPATHLEN];
+    const char *tty_device;
     bool log;
-    char log_filename[_POSIX_ARG_MAX];
+    const char *log_filename;
     bool no_autoconnect;
     int output_delay;
     struct termios tio;
