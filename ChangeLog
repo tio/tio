@@ -1,4 +1,69 @@
-=== tio v1.7 ===
+=== tio v1.8 ===
+
+
+Changes since tio v1.7:
+
+ * Fixed enablement of compiler warnings
+
+ * Fixed log_open() prototype
+
+ * Fixed index error wrt ctrl-t detection
+
+ * Fixed handling of ctrl-t
+
+   Before, when exercising the quit key sequence (ctrl-t + q) the ctrl-t code
+   (0x14) would be sent.
+
+   This is now fixed so that it is not sent.
+
+   However, in case it is needed to send ctrl-t to the device it is possible by
+   simply repeating the ctrl-t.
+
+   Meaning, ctrl-t + ctrl-t = ctrl-t sent to device.
+
+ * Improved error handling
+
+   Fixes a memory leak and avoids aggressive busy looping when problems
+   accessing tty device.
+
+ * Removed redundant log_close() call
+
+ * Enabled compiler warnings
+
+Jakub Wilk:
+
+ * Stopped copying arguments to fixed-size buffers
+
+   Don't needlessly copy command-line arguments into fixed-size buffers.
+
+   Previously the program crashed if an overlong pathname was provided on
+   the command line. Also, some systems (such as GNU Hurd) don't define
+   MAXPATHLEN at all.
+
+ * Added const to log_open() prototype
+
+ * Completed the ^g to ^t transition
+
+   In 72a287f18995 the escape key was changed from ^g to ^t, but some
+   code and comments still referred to the old key.
+
+ * Used HTTPS for tio.github.io
+
+ * Man page beautification
+
+ * Bumped date in man page
+
+ * Improve man page formatting
+
+   Use regular font for metacharacters such as "[]", "," or "|";
+   use italic font for metavariables.
+
+ * Fixed hyphen vs minus vs em-dash confusion in man page
+
+   - prints as hyphen;
+   \- prints as minus sign;
+   \em prints as em-dash.
+
 
 Changes since tio v1.6:
 
@@ -14,3 +79,4 @@ Jakub Wilk:
  * Fixed silly "tio or tio" in man page
 
  * Fixed typo
+
