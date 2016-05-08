@@ -152,7 +152,7 @@ int connect_tty(void)
     int    maxfd;          /* Maximum file descriptor used */
     static bool first = true;
     char   c_tty;
-    char   c_stdin[3];
+    char   c_stdin[3] = {};
     int    status;
 
     /* Open tty device */
@@ -255,7 +255,7 @@ int connect_tty(void)
 
             /* Ignore ctrl-t except when repeated */
             if ((c_stdin[0] != KEY_CTRL_T) ||
-                ((c_stdin[0] == KEY_CTRL_T) && (c_stdin[1] == KEY_CTRL_T)))
+                ((c_stdin[1] == KEY_CTRL_T) && (c_stdin[2] == KEY_CTRL_T)))
             {
                 /* Forward input to tty device */
                 status = write(fd, &c_stdin[0], 1);
