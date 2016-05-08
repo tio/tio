@@ -29,7 +29,7 @@
 static FILE *fp;
 static bool error = false;
 
-void log_open(char *filename)
+void log_open(const char *filename)
 {
     fp = fopen(filename, "w+");
 
