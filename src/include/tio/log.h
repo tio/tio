@@ -22,7 +22,7 @@
 #ifndef LOG_H
 #define LOG_H
 
-void log_open(char *filename);
+void log_open(const char *filename);
 void log_write(char c);
 void log_close(void);
 void log_exit(void);
