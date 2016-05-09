@@ -72,7 +72,7 @@ void wait_for_tty_device(void)
 
         /* Block until input becomes available or timeout */
         status = select(STDIN_FILENO + 1, &rdfs, NULL, NULL, &tv);
-        if (status)
+        if (status > 0)
         {
             /* Input from stdin ready */
 
@@ -229,7 +229,7 @@ int connect_tty(void)
 
         /* Block until input becomes available */
         status = select(maxfd, &rdfs, NULL, NULL, NULL);
-        if (status)
+        if (status > 0)
         {
             if (FD_ISSET(fd, &rdfs))
             {
