@@ -33,7 +33,7 @@ char * current_time(void)
     tmp = localtime(&t);
     if (tmp == NULL)
     {
-        perror("localtime");
+        printf("Error: Retrieving local time failed\n");
         exit(EXIT_FAILURE);
     }
 
