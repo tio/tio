@@ -32,20 +32,17 @@ int main(int argc, char *argv[])
 {
     int status;
 
+    /* Install error exit handler */
+    atexit(&error_exit);
+
     /* Parse options */
     parse_options(argc, argv);
 
     /* Configure output terminal */
     configure_stdout();
 
-    /* Install error exit handler */
-    atexit(&error_exit);
-
     /* Install log exit handler */
     atexit(&log_exit);
-
-    /* Restore output terminal on exit */
-    atexit(&restore_stdout);
 
     /* Create log file */
     if (option.log)

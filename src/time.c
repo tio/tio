@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "tio/error.h"
 
 char * current_time(void)
 {
@@ -33,7 +34,7 @@ char * current_time(void)
     tmp = localtime(&t);
     if (tmp == NULL)
     {
-        printf("Error: Retrieving local time failed\n");
+        error_printf("Retrieving local time failed");
         exit(EXIT_FAILURE);
     }
 

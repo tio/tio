@@ -30,7 +30,7 @@
 #include <limits.h>
 #include "config.h"
 #include "tio/options.h"
-#include "tio/print.h"
+#include "tio/error.h"
 
 struct option_t option =
 {
@@ -71,7 +71,7 @@ void parse_options(int argc, char *argv[])
     if (argc == 1)
     {
         print_options_help(argv);
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 
     /* Set default termios settings:
@@ -213,7 +213,7 @@ void parse_options(int argc, char *argv[])
                         baudrate = B4000000;
                         break;
                     default:
-                        printf("Error: Invalid baud rate.\n");
+                        error_printf("Invalid baud rate");
                         exit(EXIT_FAILURE);
                 }
 
@@ -240,7 +240,7 @@ void parse_options(int argc, char *argv[])
                         option.tio.c_cflag |= CS8;
                         break;
                     default:
-                        printf("Error: Invalid data bits.\n");
+                        error_printf("Invalid data bits");
                         exit(EXIT_FAILURE);
                 }
                 break;
@@ -263,7 +263,7 @@ void parse_options(int argc, char *argv[])
                 }
                 else
                 {
-                    printf("Error: Invalid flow control.\n");
+                    error_printf("Invalid flow control");
                     exit(EXIT_FAILURE);
                 }
                 break;
@@ -279,7 +279,7 @@ void parse_options(int argc, char *argv[])
                         option.tio.c_cflag |= CSTOPB;
                         break;
                     default:
-                        printf("Error: Invalid stop bits.\n");
+                        error_printf("Invalid stop bits");
                         exit(EXIT_FAILURE);
                 }
                 break;
@@ -299,7 +299,7 @@ void parse_options(int argc, char *argv[])
                     option.tio.c_cflag &= ~PARENB;
                 else
                 {
-                    printf("Error: Invalid parity.\n");
+                    error_printf("Invalid parity");
                     exit(EXIT_FAILURE);
                 }
                 break;
@@ -324,21 +324,21 @@ void parse_options(int argc, char *argv[])
                 printf("License GPLv2: GNU GPL version 2 or later <http://gnu.org/licenses/gpl-2.0.html>.\n");
                 printf("This is free software: you are free to change and redistribute it.\n");
                 printf("There is NO WARRANTY, to the extent permitted by law.\n");
-                exit(0);
+                exit(EXIT_SUCCESS);
                 break;
 
             case 'h':
                 print_options_help(argv);
-                exit(0);
+                exit(EXIT_SUCCESS);
                 break;
 
             case '?':
                 /* getopt_long already printed an error message */
-                exit(1);
+                exit(EXIT_FAILURE);
                 break;
 
             default:
-                exit(1);
+                exit(EXIT_FAILURE);
         }
     }
 
@@ -348,14 +348,14 @@ void parse_options(int argc, char *argv[])
 
     if (strlen(option.tty_device) == 0)
     {
-        printf("Error: Missing device name.\n");
+        error_printf("Missing device name");
         exit(EXIT_FAILURE);
     }
 
     /* Print any remaining command line arguments (unknown options) */
     if (optind < argc)
     {
-        printf("%s: unknown arguments: ", argv[0]);
+        printf("Error: unknown arguments: ");
         while (optind < argc)
             printf("%s ", argv[optind++]);
         printf("\n");

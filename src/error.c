@@ -25,11 +25,12 @@
 #include <errno.h>
 #include "tio/options.h"
 #include "tio/print.h"
+#include "tio/error.h"
 
-char *error = "";
+char error[1000];
 
 void error_exit(void)
 {
     if ((error[0] != 0) && (option.no_autoconnect))
-        printf("Error: %s\n", error);
+        printf("\rError: %s\r\n", error);
 }
