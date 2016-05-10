@@ -1,4 +1,46 @@
-=== tio v1.8 ===
+=== tio v1.9 ===
+
+Changes since tio v1.8:
+
+ * Cleanup of error handling
+
+   Introduced consistent way of handling errors and printing error messages.
+
+   Also upgraded some warnings to errors.
+
+ * Updated localtime() error message
+
+ * Cleanup
+
+Jakub Wilk:
+
+ * Fix error handling for select()
+
+   Previously the error handling code for select() was unreachable.
+
+ * Removed unneeded quotes from AM_CFLAGS
+
+ * Expanded tabs
+
+ * Fixed setting "tainted"
+
+   Set "tainted" if and only if any character was read from the device.
+
+   Ctrl-t is no longer sent to the device on exit, so the trick to avoid
+   its echo is not necessary.
+
+   Characters read from stdin don't directly affect output, so they
+   shouldn't enable "tainted".
+
+ * Used \r in color_printf()
+
+   \033[300D is an unusual way to move the cursor back to column 1.
+   Use straightforward \r instead.
+
+ * Added missing \r\n to warning messages
+
+   \n alone is not enough, because the terminal is in raw mode.
+
 
 
 Changes since tio v1.7:
@@ -65,6 +107,7 @@ Jakub Wilk:
    \em prints as em-dash.
 
 
+
 Changes since tio v1.6:
 
  * Changed escape key from ^g to ^t
@@ -79,4 +122,3 @@ Jakub Wilk:
  * Fixed silly "tio or tio" in man page
 
  * Fixed typo
-
