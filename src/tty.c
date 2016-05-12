@@ -27,6 +27,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/param.h>
+#include <sys/file.h>
 #include <fcntl.h>
 #include <termios.h>
 #include <stdbool.h>
@@ -146,6 +147,7 @@ void disconnect_tty(void)
     if (connected)
     {
         color_printf("[tio %s] Disconnected", current_time());
+        flock(fd, LOCK_UN);
         close(fd);
         connected = false;
     }
@@ -182,6 +184,14 @@ int connect_tty(void)
     {
         error_printf("Not a tty device");
         goto error_isatty;
+    }
+
+    /* Lock device file */
+    status = flock(fd, LOCK_EX | LOCK_NB);
+    if ((status == -1) && (errno == EWOULDBLOCK))
+    {
+        printf("Error: Device file is locked by another process\r\n");
+        exit(EXIT_FAILURE);
     }
 
     /* Flush stale I/O data (if any) */
