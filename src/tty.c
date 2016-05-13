@@ -79,7 +79,7 @@ void wait_for_tty_device(void)
 
             /* Read one character */
             status = read(STDIN_FILENO, &c_stdin[0], 1);
-            if (status < 0)
+            if (status <= 0)
             {
                 error_printf("Could not read from stdin");
                 exit(EXIT_FAILURE);
@@ -266,7 +266,7 @@ int connect_tty(void)
             {
                 /* Input from stdin ready */
                 status = read(STDIN_FILENO, &c_stdin[0], 1);
-                if (status < 0)
+                if (status <= 0)
                 {
                     error_printf("Could not read from stdin");
                     goto error_read;
