@@ -1,4 +1,19 @@
-=== tio v1.9 ===
+=== tio v1.10 ===
+
+Changes since tio v1.9:
+
+ * Introduced lock on device file
+
+   Tio will now test for and obtain an advisory lock on the tty device file
+   to prevent starting multiple sessions on the same tty device.
+
+ * Updated AUTHORS
+
+Jakub Wilk:
+
+ * Treat EOF on stdin as error
+
+
 
 Changes since tio v1.8:
 
@@ -122,3 +137,4 @@ Jakub Wilk:
  * Fixed silly "tio or tio" in man page
 
  * Fixed typo
+
