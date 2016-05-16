@@ -1,4 +1,14 @@
-=== tio v1.10 ===
+=== tio v1.11 ===
+
+Changes since tio v1.10:
+
+ * Enabled large file support (LFS)
+
+   Added autotools AC_SYS_LARGEFILE to support 64 bit file size handling.
+
+ * Updated tio title
+
+
 
 Changes since tio v1.9:
 
