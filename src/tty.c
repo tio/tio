@@ -49,7 +49,7 @@ void wait_for_tty_device(void)
     fd_set rdfs;
     int    status;
     struct timeval tv;
-    static char c_stdin[3];
+    static char input_char, previous_char = 0;
     static bool first = true;
 
     /* Loop until device pops up */
@@ -78,7 +78,7 @@ void wait_for_tty_device(void)
             /* Input from stdin ready */
 
             /* Read one character */
-            status = read(STDIN_FILENO, &c_stdin[0], 1);
+            status = read(STDIN_FILENO, &input_char, 1);
             if (status <= 0)
             {
                 error_printf("Could not read from stdin");
@@ -86,10 +86,10 @@ void wait_for_tty_device(void)
             }
 
             /* Exit upon ctrl-t + q sequence */
-            c_stdin[2] = c_stdin[1];
-            c_stdin[1] = c_stdin[0];
-            if ((c_stdin[1] == KEY_Q) && (c_stdin[2] == KEY_CTRL_T))
+            if ((input_char == KEY_Q) && (previous_char == KEY_CTRL_T))
                 exit(EXIT_SUCCESS);
+
+            previous_char = input_char;
 
         } else if (status == -1)
         {
@@ -167,8 +167,7 @@ int connect_tty(void)
     fd_set rdfs;           /* Read file descriptor set */
     int    maxfd;          /* Maximum file descriptor used */
     static bool first = true;
-    char   c_tty;
-    char   c_stdin[3] = {};
+    static char input_char, previous_char = 0;
     int    status;
 
     /* Open tty device */
@@ -201,8 +200,6 @@ int connect_tty(void)
     color_printf("[tio %s] Connected", current_time());
     connected = true;
     tainted = false;
-    bzero(&c_stdin[0], 3);
-    c_tty = 0;
 
     /* Save current port settings */
     if (tcgetattr(fd, &old_tio) < 0)
@@ -244,15 +241,15 @@ int connect_tty(void)
             if (FD_ISSET(fd, &rdfs))
             {
                 /* Input from tty device ready */
-                if (read(fd, &c_tty, 1) > 0)
+                if (read(fd, &input_char, 1) > 0)
                 {
                     /* Print received tty character to stdout */
-                    putchar(c_tty);
+                    putchar(input_char);
                     fflush(stdout);
 
                     /* Write to log */
                     if (option.log)
-                        log_write(c_tty);
+                        log_write(input_char);
 
                     tainted = true;
                 } else
@@ -265,7 +262,7 @@ int connect_tty(void)
             if (FD_ISSET(STDIN_FILENO, &rdfs))
             {
                 /* Input from stdin ready */
-                status = read(STDIN_FILENO, &c_stdin[0], 1);
+                status = read(STDIN_FILENO, &input_char, 1);
                 if (status <= 0)
                 {
                     error_printf("Could not read from stdin");
@@ -273,24 +270,24 @@ int connect_tty(void)
                 }
 
                 /* Exit upon ctrl-t + q sequence */
-                c_stdin[2] = c_stdin[1];
-                c_stdin[1] = c_stdin[0];
-                if ((c_stdin[1] == KEY_Q) && (c_stdin[2] == KEY_CTRL_T))
+                if ((input_char == KEY_Q) && (previous_char == KEY_CTRL_T))
                     exit(EXIT_SUCCESS);
 
                 /* Ignore ctrl-t except when repeated */
-                if ((c_stdin[0] != KEY_CTRL_T) ||
-                        ((c_stdin[1] == KEY_CTRL_T) && (c_stdin[2] == KEY_CTRL_T)))
+                if ((input_char != KEY_CTRL_T) ||
+                        ((input_char == KEY_CTRL_T) && (previous_char == KEY_CTRL_T)))
                 {
                     /* Forward input to tty device */
-                    status = write(fd, &c_stdin[0], 1);
+                    status = write(fd, &input_char, 1);
                     if (status < 0)
                         printf("Warning: Could not write to tty device\r\n");
                 }
 
+                previous_char = input_char;
+
                 /* Write to log */
                 if (option.log)
-                    log_write(c_stdin[0]);
+                    log_write(input_char);
 
                 /* Insert output delay */
                 if (option.output_delay)
