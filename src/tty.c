@@ -319,14 +319,16 @@ int connect_tty(void)
 
                     /* Update transmit statistics */
                     tx_total++;
+
+                    /* Insert output delay */
+                    if (option.output_delay)
+                        usleep(option.output_delay * 1000);
+
                 }
 
                 /* Save previous key */
                 previous_char = input_char;
 
-                /* Insert output delay */
-                if (option.output_delay)
-                    usleep(option.output_delay * 1000);
             }
         } else if (status == -1)
         {
