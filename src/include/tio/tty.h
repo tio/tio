@@ -24,6 +24,7 @@
 
 #define KEY_CTRL_T 0x14
 #define KEY_Q 0x71
+#define KEY_T 0x74
 
 void configure_stdout(void);
 void restore_stdout(void);

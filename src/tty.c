@@ -166,8 +166,9 @@ int connect_tty(void)
 {
     fd_set rdfs;           /* Read file descriptor set */
     int    maxfd;          /* Maximum file descriptor used */
+    char   input_char, output_char;
+    static char previous_char = 0;
     static bool first = true;
-    static char input_char, previous_char = 0;
     int    status;
 
     /* Open tty device */
@@ -261,6 +262,8 @@ int connect_tty(void)
             }
             if (FD_ISSET(STDIN_FILENO, &rdfs))
             {
+                char forward = true;
+
                 /* Input from stdin ready */
                 status = read(STDIN_FILENO, &input_char, 1);
                 if (status <= 0)
@@ -269,25 +272,44 @@ int connect_tty(void)
                     goto error_read;
                 }
 
-                /* Exit upon ctrl-t + q sequence */
-                if ((input_char == KEY_Q) && (previous_char == KEY_CTRL_T))
-                    exit(EXIT_SUCCESS);
+                /* Forward input to output except ctrl-t key */
+                output_char = input_char;
+                if (input_char == KEY_CTRL_T)
+                    forward = false;
 
-                /* Ignore ctrl-t except when repeated */
-                if ((input_char != KEY_CTRL_T) ||
-                        ((input_char == KEY_CTRL_T) && (previous_char == KEY_CTRL_T)))
+                /* Handle escape key commands */
+                if (previous_char == KEY_CTRL_T)
                 {
-                    /* Forward input to tty device */
-                    status = write(fd, &input_char, 1);
-                    if (status < 0)
-                        printf("Warning: Could not write to tty device\r\n");
+                    switch (input_char)
+                    {
+                        case KEY_Q:
+                            /* Exit upon ctrl-t q sequence */
+                            exit(EXIT_SUCCESS);
+                        case KEY_T:
+                            /* Send ctrl-t key code upon ctrl-t t sequence */
+                            output_char = KEY_CTRL_T;
+                            break;
+                        default:
+                            /* Ignore unknown ctrl-t escaped keys */
+                            forward = false;
+                            break;
+                    }
                 }
 
-                previous_char = input_char;
+                if (forward)
+                {
+                    /* Send output to tty device */
+                    status = write(fd, &output_char, 1);
+                    if (status < 0)
+                        warning_printf("Could not write to tty device");
 
-                /* Write to log */
-                if (option.log)
-                    log_write(input_char);
+                    /* Write to log */
+                    if (option.log)
+                        log_write(output_char);
+                }
+
+                /* Save previous key */
+                previous_char = input_char;
 
                 /* Insert output delay */
                 if (option.output_delay)

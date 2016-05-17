@@ -36,6 +36,10 @@
    fprintf (stdout, "\r" ANSI_COLOR_YELLOW format ANSI_COLOR_RESET "\r\n", ## args); \
    fflush(stdout);
 
+#define warning_printf(format, args...) \
+   fprintf (stdout, "\rWarning: " format "\r\n", ## args); \
+   fflush(stdout);
+
 #ifdef DEBUG
 #define debug_printf(format, args...) \
    fprintf (stdout, "[debug] " format, ## args)
