@@ -22,9 +22,10 @@
 #ifndef TTY_H
 #define TTY_H
 
-#define KEY_CTRL_T 0x14
 #define KEY_Q 0x71
+#define KEY_S 0x73
 #define KEY_T 0x74
+#define KEY_CTRL_T 0x14
 
 void configure_stdout(void);
 void restore_stdout(void);

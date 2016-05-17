@@ -40,6 +40,7 @@
 #include "tio/error.h"
 
 static struct termios new_stdout, old_stdout, old_tio;
+static long rx_total = 0, tx_total = 0;
 static bool connected = false;
 static bool tainted = false;
 static int fd;
@@ -244,6 +245,9 @@ int connect_tty(void)
                 /* Input from tty device ready */
                 if (read(fd, &input_char, 1) > 0)
                 {
+                    /* Update receive statistics */
+                    rx_total++;
+
                     /* Print received tty character to stdout */
                     putchar(input_char);
                     fflush(stdout);
@@ -253,6 +257,7 @@ int connect_tty(void)
                         log_write(input_char);
 
                     tainted = true;
+
                 } else
                 {
                     /* Error reading - device is likely unplugged */
@@ -289,6 +294,11 @@ int connect_tty(void)
                             /* Send ctrl-t key code upon ctrl-t t sequence */
                             output_char = KEY_CTRL_T;
                             break;
+                        case KEY_S:
+                            /* Show tx/rx statistics upon ctrl-t s sequence */
+                            color_printf("[tio %s] Sent %ld bytes, received %ld bytes", current_time(), tx_total, rx_total);
+                            forward = false;
+                            break;
                         default:
                             /* Ignore unknown ctrl-t escaped keys */
                             forward = false;
@@ -306,6 +316,9 @@ int connect_tty(void)
                     /* Write to log */
                     if (option.log)
                         log_write(output_char);
+
+                    /* Update transmit statistics */
+                    tx_total++;
                 }
 
                 /* Save previous key */
