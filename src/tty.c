@@ -245,7 +245,7 @@ int connect_tty(void)
     status = flock(fd, LOCK_EX | LOCK_NB);
     if ((status == -1) && (errno == EWOULDBLOCK))
     {
-        printf("Error: Device file is locked by another process\r\n");
+        error_printf("Device file is locked by another process");
         exit(EXIT_FAILURE);
     }
 

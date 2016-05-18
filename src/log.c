@@ -25,9 +25,10 @@
 #include <errno.h>
 #include "tio/options.h"
 #include "tio/print.h"
+#include "tio/error.h"
 
 static FILE *fp;
-static bool error = false;
+static bool log_error = false;
 
 void log_open(const char *filename)
 {
@@ -35,7 +36,7 @@ void log_open(const char *filename)
 
     if (fp == NULL)
     {
-        error = true;
+        log_error = true;
         exit(EXIT_FAILURE);
     }
 }
@@ -57,6 +58,6 @@ void log_exit(void)
     if (option.log)
         log_close();
 
-    if (error)
-        printf("Error: Could not open log file %s (%s)\n", option.log_filename, strerror(errno));
+    if (log_error)
+        error_printf("Could not open log file %s (%s)", option.log_filename, strerror(errno));
 }
