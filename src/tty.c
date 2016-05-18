@@ -32,7 +32,6 @@
 #include <termios.h>
 #include <stdbool.h>
 #include <errno.h>
-#include <time.h>
 #include "tio/tty.h"
 #include "tio/print.h"
 #include "tio/options.h"
@@ -309,8 +308,6 @@ int connect_tty(void)
 
                 if (forward)
                 {
-                    struct timespec ts;
-
                     /* Send output to tty device */
                     status = write(fd, &output_char, 1);
                     if (status < 0)
@@ -324,11 +321,7 @@ int connect_tty(void)
                     tx_total++;
 
                     /* Insert output delay */
-                    ts.tv_sec = 0;
-                    ts.tv_nsec = option.output_delay * 1000000;
-                    if (option.output_delay)
-                        nanosleep(&ts, NULL);
-
+                    delay(option.output_delay);
                 }
 
                 /* Save previous key */

@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "tio/error.h"
+#include "tio/print.h"
 
 char * current_time(void)
 {
@@ -41,4 +42,14 @@ char * current_time(void)
     strftime(time_string, sizeof(time_string), "%H:%M:%S", tmp);
 
     return time_string;
+}
+
+void delay(long ms)
+{
+    struct timespec ts;
+
+    ts.tv_sec = ms / 1000;
+    ts.tv_nsec = (ms % 1000) * 1000000;
+
+    nanosleep(&ts, NULL);
 }

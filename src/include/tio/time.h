@@ -23,5 +23,6 @@
 #define TIME_H
 
 char * current_time(void);
+void delay(long ms);
 
 #endif
