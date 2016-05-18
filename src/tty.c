@@ -45,6 +45,46 @@ static bool connected = false;
 static bool tainted = false;
 static int fd;
 
+void handle_command_sequence(char input_char, char previous_char, char *output_char, bool *forward)
+{
+    char unused_char;
+    bool unused_bool;
+
+    /* Ignore unused arguments */
+    if (output_char == NULL)
+        output_char = &unused_char;
+
+    if (forward == NULL)
+        forward = &unused_bool;
+
+    /* Handle escape key commands */
+    if (previous_char == KEY_CTRL_T)
+    {
+        switch (input_char)
+        {
+            case KEY_Q:
+                /* Exit upon ctrl-t q sequence */
+                exit(EXIT_SUCCESS);
+            case KEY_T:
+                /* Send ctrl-t key code upon ctrl-t t sequence */
+                *output_char = KEY_CTRL_T;
+                break;
+            case KEY_S:
+                /* Show tx/rx statistics upon ctrl-t s sequence */
+                if (tainted)
+                    putchar('\n');
+                color_printf("[tio %s] Sent %ld bytes, received %ld bytes", current_time(), tx_total, rx_total);
+                tainted = false;
+                *forward = false;
+                break;
+            default:
+                /* Ignore unknown ctrl-t escaped keys */
+                *forward = false;
+                break;
+        }
+    }
+}
+
 void wait_for_tty_device(void)
 {
     fd_set rdfs;
@@ -86,9 +126,8 @@ void wait_for_tty_device(void)
                 exit(EXIT_FAILURE);
             }
 
-            /* Exit upon ctrl-t + q sequence */
-            if ((input_char == KEY_Q) && (previous_char == KEY_CTRL_T))
-                exit(EXIT_SUCCESS);
+            /* Handle commands */
+            handle_command_sequence(input_char, previous_char, NULL, NULL);
 
             previous_char = input_char;
 
@@ -267,7 +306,7 @@ int connect_tty(void)
             }
             if (FD_ISSET(STDIN_FILENO, &rdfs))
             {
-                char forward = true;
+                bool forward = true;
 
                 /* Input from stdin ready */
                 status = read(STDIN_FILENO, &input_char, 1);
@@ -282,29 +321,8 @@ int connect_tty(void)
                 if (input_char == KEY_CTRL_T)
                     forward = false;
 
-                /* Handle escape key commands */
-                if (previous_char == KEY_CTRL_T)
-                {
-                    switch (input_char)
-                    {
-                        case KEY_Q:
-                            /* Exit upon ctrl-t q sequence */
-                            exit(EXIT_SUCCESS);
-                        case KEY_T:
-                            /* Send ctrl-t key code upon ctrl-t t sequence */
-                            output_char = KEY_CTRL_T;
-                            break;
-                        case KEY_S:
-                            /* Show tx/rx statistics upon ctrl-t s sequence */
-                            color_printf("[tio %s] Sent %ld bytes, received %ld bytes", current_time(), tx_total, rx_total);
-                            forward = false;
-                            break;
-                        default:
-                            /* Ignore unknown ctrl-t escaped keys */
-                            forward = false;
-                            break;
-                    }
-                }
+                /* Handle commands */
+                handle_command_sequence(input_char, previous_char, &output_char, &forward);
 
                 if (forward)
                 {
