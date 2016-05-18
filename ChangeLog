@@ -1,4 +1,40 @@
-=== tio v1.11 ===
+=== tio v1.12 ===
+
+Changes since tio v1.11:
+
+ * Consolidated command key handling
+
+ * Moved delay mechanism into separate function
+
+ * Retired obsolete usleep()
+
+   Replaced with nanosleep()
+
+ * Added simple tx/rx statistics command (ctrl-t s)
+
+   To display the total number of bytes transmitted/received simply perform the
+   'ctrl-t s' command sequence.
+
+   This feature can be useful when eg. trying to detect non-printable
+   characters.
+
+ * Further simplification of key handling
+
+   Changed so that the "ctrl-t ctrl-t" sequence is now simply "ctrl-t t" to
+   send the ctrl-t key code. This is inspired by screen which does similar
+   to send its command key code (ctrl-a a).
+
+   This change also allows to easier add new key commands if needed.
+
+   Updated man page accordingly.
+
+ * Cleaned up and simplified key handling
+
+Jakub Wilk:
+
+ * Insert output delay only if something was output
+
+
 
 Changes since tio v1.10:
 
@@ -147,4 +183,3 @@ Jakub Wilk:
  * Fixed silly "tio or tio" in man page
 
  * Fixed typo
-
