@@ -62,6 +62,21 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
     {
         switch (input_char)
         {
+            case KEY_I:
+                if (tainted)
+                    putchar('\n');
+                color_printf("[tio %s] TTY device: %s", current_time(), option.tty_device);
+                color_printf("[tio %s] Baudrate: %d", current_time(), option.baudrate);
+                color_printf("[tio %s] Databits: %d", current_time(), option.databits);
+                color_printf("[tio %s] Flow: %s", current_time(), option.flow);
+                color_printf("[tio %s] Stopbits: %d", current_time(), option.stopbits);
+                color_printf("[tio %s] Parity: %s", current_time(), option.parity);
+                color_printf("[tio %s] Output delay: %d", current_time(), option.output_delay);
+                if (option.log)
+                    color_printf("[tio %s] Log file: %s", current_time(), option.log_filename);
+                tainted = false;
+                *forward = false;
+                break;
             case KEY_Q:
                 /* Exit upon ctrl-t q sequence */
                 exit(EXIT_SUCCESS);

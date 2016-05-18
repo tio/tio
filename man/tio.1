@@ -61,6 +61,8 @@ Display help.
 .PP
 .TP 16n
 In session, the following key sequences are intercepted as tio commands:
+.IP "\fBctrl-t i"
+Show session settings information (baudrate, databits, etc.)
 .IP "\fBctrl-t q"
 Quit
 .IP "\fBctrl-t s"
@@ -70,11 +72,11 @@ Send ctrl-t key code
 
 .SH "EXAMPLES"
 .TP
-The most common use is without options. For example:
+A typical use is without options. For example:
 
 tio /dev/ttyUSB0
 .TP
-Which corresponds to:
+Which corresponds to the commonly used options:
 
 tio \-b 115200 \-d 8 \-f none \-s 1 \-p none /dev/ttyUSB0
 .TP

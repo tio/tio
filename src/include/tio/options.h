@@ -36,6 +36,11 @@ struct option_t
     bool no_autoconnect;
     int output_delay;
     struct termios tio;
+    int baudrate;
+    int databits;
+    char *flow;
+    int stopbits;
+    char *parity;
 };
 
 extern struct option_t option;

@@ -22,6 +22,7 @@
 #ifndef TTY_H
 #define TTY_H
 
+#define KEY_I 0x69
 #define KEY_Q 0x71
 #define KEY_S 0x73
 #define KEY_T 0x74

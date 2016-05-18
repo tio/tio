@@ -39,6 +39,12 @@ struct option_t option =
     "",       // Log filename
     false,    // No autoconnect
     0,        // No output delay
+    {},
+    115200,   // Baudrate
+    8,        // Databits
+    "none",   // Flow
+    1,        // Stopbits
+    "none"    // Parity
 };
 
 void print_options_help(char *argv[])
@@ -65,8 +71,6 @@ void parse_options(int argc, char *argv[])
 {
     int c;
     int baudrate;
-    int databits;
-    int stopbits;
 
     if (argc == 1)
     {
@@ -122,7 +126,7 @@ void parse_options(int argc, char *argv[])
                 break;
 
             case 'b':
-                baudrate = atoi(optarg);
+                option.baudrate = baudrate = atoi(optarg);
                 switch (baudrate)
                 {
                     case 0:
@@ -223,9 +227,9 @@ void parse_options(int argc, char *argv[])
                 break;
 
             case 'd':
-                databits = atoi(optarg);
+                option.databits = atoi(optarg);
                 option.tio.c_cflag &= ~CSIZE;
-                switch (databits)
+                switch (option.databits)
                 {
                     case 5:
                         option.tio.c_cflag |= CS5;
@@ -246,6 +250,8 @@ void parse_options(int argc, char *argv[])
                 break;
 
             case 'f':
+                option.flow = optarg;
+
                 if (strcmp("hard", optarg) == 0)
                 {
                     option.tio.c_cflag |= CRTSCTS;
@@ -269,8 +275,8 @@ void parse_options(int argc, char *argv[])
                 break;
 
             case 's':
-                stopbits = atoi(optarg);
-                switch (stopbits)
+                option.stopbits = atoi(optarg);
+                switch (option.stopbits)
                 {
                     case 1:
                         option.tio.c_cflag &= ~CSTOPB;
@@ -285,6 +291,8 @@ void parse_options(int argc, char *argv[])
                 break;
 
             case 'p':
+                option.parity = optarg;
+
                 if (strcmp("odd", optarg) == 0)
                 {
                     option.tio.c_cflag |= PARENB;
