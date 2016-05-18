@@ -27,10 +27,14 @@
 #include "tio/print.h"
 #include "tio/error.h"
 
-char error[1000];
+char error[2][1000];
 
 void error_exit(void)
 {
-    if ((error[0] != 0) && (option.no_autoconnect))
-        printf("\rError: %s\r\n", error);
+    /* Always print errors but only print silent errors when in no autoconnect
+     * mode */
+    if (error[0][0] != 0)
+        printf("\rError: %s\r\n", error[0]);
+    else if ((error[1][0] != 0) && (option.no_autoconnect))
+        printf("\rError: %s\r\n", error[1]);
 }

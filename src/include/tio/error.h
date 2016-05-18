@@ -25,10 +25,13 @@
 #define TIO_SUCCESS 0
 #define TIO_ERROR   1
 
-extern char error[1000];
+extern char error[2][1000];
 
 #define error_printf(format, args...) \
-   snprintf (error, 1000, format, ## args);
+   snprintf (error[0], 1000, format, ## args);
+
+#define error_printf_silent(format, args...) \
+   snprintf (error[1], 1000, format, ## args);
 
 void error_exit(void);
 

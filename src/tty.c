@@ -230,14 +230,14 @@ int connect_tty(void)
     fd = open(option.tty_device, O_RDWR | O_NOCTTY );
     if (fd < 0)
     {
-        error_printf("Could not open tty device (%s)", strerror(errno));
+        error_printf_silent("Could not open tty device (%s)", strerror(errno));
         goto error_open;
     }
 
     /* Make sure device is of tty type */
     if (!isatty(fd))
     {
-        error_printf("Not a tty device");
+        error_printf_silent("Not a tty device");
         goto error_isatty;
     }
 
@@ -315,7 +315,7 @@ int connect_tty(void)
                 } else
                 {
                     /* Error reading - device is likely unplugged */
-                    error_printf("Could not read from tty device");
+                    error_printf_silent("Could not read from tty device");
                     goto error_read;
                 }
             }
@@ -327,7 +327,7 @@ int connect_tty(void)
                 status = read(STDIN_FILENO, &input_char, 1);
                 if (status <= 0)
                 {
-                    error_printf("Could not read from stdin");
+                    error_printf_silent("Could not read from stdin");
                     goto error_read;
                 }
 
