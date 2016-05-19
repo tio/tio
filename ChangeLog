@@ -1,4 +1,25 @@
-=== tio v1.12 ===
+=== tio v1.13 ===
+
+
+
+Changes since tio v1.12:
+
+ * Fixed some error prints
+
+ * Fixed error printing for no autoconnect mode
+
+   Always print errors but only print silent errors when in no autoconnect
+   mode.
+
+ * Added key command for showing session settings
+
+   A new key command "ctrl-t i" is added to allow the user to display the
+   various session settings information (baudrate, databits, log file, etc.).
+
+   This is usefull in case you have a running session but have forgotten
+   what the settings are.
+
+
 
 Changes since tio v1.11:
 
