@@ -130,10 +130,6 @@ void wait_for_tty_device(void)
             /* Don't wait first time */
             tv.tv_sec = 0;
             tv.tv_usec = 1;
-
-            tio_printf("tio v%s", VERSION);
-            tio_printf("Press ctrl-t + q to quit");
-
             first = false;
         } else
         {
@@ -201,6 +197,10 @@ void configure_stdout(void)
     /* Activate new stdout settings */
     tcsetattr(STDOUT_FILENO, TCSANOW, &new_stdout);
     tcsetattr(STDOUT_FILENO, TCSAFLUSH, &new_stdout);
+
+    /* Print launch hints */
+    tio_printf("tio v%s", VERSION);
+    tio_printf("Press ctrl-t + q to quit");
 
     /* Make sure we restore old stdout settings on exit */
     atexit(&restore_stdout);
