@@ -352,10 +352,6 @@ int connect_tty(void)
                     if (status < 0)
                         warning_printf("Could not write to tty device");
 
-                    /* Write to log */
-                    if (option.log)
-                        log_write(output_char);
-
                     /* Update transmit statistics */
                     tx_total++;
 
