@@ -45,7 +45,7 @@ Changes since tio v1.11:
    send the ctrl-t key code. This is inspired by screen which does similar
    to send its command key code (ctrl-a a).
 
-   This change also allows to easier add new key commands if needed.
+   This change also eases adding new key commands if needed.
 
    Updated man page accordingly.
 
