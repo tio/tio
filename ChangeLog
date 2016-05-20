@@ -16,7 +16,7 @@ Changes since tio v1.12:
    A new key command "ctrl-t i" is added to allow the user to display the
    various session settings information (baudrate, databits, log file, etc.).
 
-   This is usefull in case you have a running session but have forgotten
+   This is useful in case you have a running session but have forgotten
    what the settings are.
 
 
