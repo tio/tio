@@ -32,6 +32,7 @@
 #include <termios.h>
 #include <stdbool.h>
 #include <errno.h>
+#include "config.h"
 #include "tio/tty.h"
 #include "tio/print.h"
 #include "tio/options.h"
@@ -69,15 +70,18 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
         switch (input_char)
         {
             case KEY_I:
-                tio_printf("TTY device: %s", option.tty_device);
-                tio_printf("Baudrate: %d", option.baudrate);
-                tio_printf("Databits: %d", option.databits);
-                tio_printf("Flow: %s", option.flow);
-                tio_printf("Stopbits: %d", option.stopbits);
-                tio_printf("Parity: %s", option.parity);
-                tio_printf("Output delay: %d", option.output_delay);
+                tio_printf("Settings information:");
+                tio_printf(" TTY device: %s", option.tty_device);
+                tio_printf(" Baudrate: %d", option.baudrate);
+                tio_printf(" Databits: %d", option.databits);
+                tio_printf(" Flow: %s", option.flow);
+                tio_printf(" Stopbits: %d", option.stopbits);
+                tio_printf(" Parity: %s", option.parity);
+                tio_printf(" Output delay: %d", option.output_delay);
                 if (option.log)
-                    tio_printf("Log file: %s", option.log_filename);
+                {
+                    tio_printf(" Log file: %s", option.log_filename);
+                }
                 *forward = false;
                 break;
             case KEY_Q:
@@ -89,7 +93,8 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 break;
             case KEY_S:
                 /* Show tx/rx statistics upon ctrl-t s sequence */
-                tio_printf("Sent %ld bytes, received %ld bytes", tx_total, rx_total);
+                tio_printf("Statistics:");
+                tio_printf(" Sent %ld bytes, received %ld bytes", tx_total, rx_total);
                 *forward = false;
                 break;
             default:
@@ -116,6 +121,10 @@ void wait_for_tty_device(void)
             /* Don't wait first time */
             tv.tv_sec = 0;
             tv.tv_usec = 1;
+
+            tio_printf("tio v%s", VERSION);
+            tio_printf("Press ctrl-t + q to quit");
+
             first = false;
         } else
         {
