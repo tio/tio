@@ -47,10 +47,11 @@ static bool tainted = false;
 static int fd;
 
 #define tio_printf(format, args...) \
+{ \
     if (tainted) putchar('\n'); \
-color_printf("[tio %s] " format, current_time(), ## args); \
-tainted = false;
-
+    color_printf("[tio %s] " format, current_time(), ## args); \
+    tainted = false; \
+}
 
 void handle_command_sequence(char input_char, char previous_char, char *output_char, bool *forward)
 {
@@ -88,9 +89,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" Parity: %s", option.parity);
                 tio_printf(" Output delay: %d", option.output_delay);
                 if (option.log)
-                {
                     tio_printf(" Log file: %s", option.log_filename);
-                }
                 *forward = false;
                 break;
             case KEY_Q:
