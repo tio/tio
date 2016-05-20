@@ -77,7 +77,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf("Parity: %s", option.parity);
                 tio_printf("Output delay: %d", option.output_delay);
                 if (option.log)
-                    color_printf("Log file: %s", option.log_filename);
+                    tio_printf("Log file: %s", option.log_filename);
                 *forward = false;
                 break;
             case KEY_Q:
