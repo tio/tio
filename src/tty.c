@@ -69,6 +69,15 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
     {
         switch (input_char)
         {
+            case KEY_QUESTION:
+                tio_printf("Key commands:");
+                tio_printf(" ctrl-t ?   List available key commands");
+                tio_printf(" ctrl-t i   Show settings information");
+                tio_printf(" ctrl-t q   Quit");
+                tio_printf(" ctrl-t s   Show statistics");
+                tio_printf(" ctrl-t t   Send ctrl-t key code");
+                *forward = false;
+                break;
             case KEY_I:
                 tio_printf("Settings information:");
                 tio_printf(" TTY device: %s", option.tty_device);
