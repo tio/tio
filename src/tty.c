@@ -45,6 +45,12 @@ static bool connected = false;
 static bool tainted = false;
 static int fd;
 
+#define tio_printf(format, args...) \
+    if (tainted) putchar('\n'); \
+color_printf("[tio %s] " format, current_time(), ## args); \
+tainted = false;
+
+
 void handle_command_sequence(char input_char, char previous_char, char *output_char, bool *forward)
 {
     char unused_char;
@@ -63,18 +69,15 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
         switch (input_char)
         {
             case KEY_I:
-                if (tainted)
-                    putchar('\n');
-                color_printf("[tio %s] TTY device: %s", current_time(), option.tty_device);
-                color_printf("[tio %s] Baudrate: %d", current_time(), option.baudrate);
-                color_printf("[tio %s] Databits: %d", current_time(), option.databits);
-                color_printf("[tio %s] Flow: %s", current_time(), option.flow);
-                color_printf("[tio %s] Stopbits: %d", current_time(), option.stopbits);
-                color_printf("[tio %s] Parity: %s", current_time(), option.parity);
-                color_printf("[tio %s] Output delay: %d", current_time(), option.output_delay);
+                tio_printf("TTY device: %s", option.tty_device);
+                tio_printf("Baudrate: %d", option.baudrate);
+                tio_printf("Databits: %d", option.databits);
+                tio_printf("Flow: %s", option.flow);
+                tio_printf("Stopbits: %d", option.stopbits);
+                tio_printf("Parity: %s", option.parity);
+                tio_printf("Output delay: %d", option.output_delay);
                 if (option.log)
-                    color_printf("[tio %s] Log file: %s", current_time(), option.log_filename);
-                tainted = false;
+                    color_printf("Log file: %s", option.log_filename);
                 *forward = false;
                 break;
             case KEY_Q:
@@ -86,10 +89,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 break;
             case KEY_S:
                 /* Show tx/rx statistics upon ctrl-t s sequence */
-                if (tainted)
-                    putchar('\n');
-                color_printf("[tio %s] Sent %ld bytes, received %ld bytes", current_time(), tx_total, rx_total);
-                tainted = false;
+                tio_printf("Sent %ld bytes, received %ld bytes", tx_total, rx_total);
                 *forward = false;
                 break;
             default:
@@ -196,12 +196,9 @@ void restore_stdout(void)
 
 void disconnect_tty(void)
 {
-    if (tainted)
-        putchar('\n');
-
     if (connected)
     {
-        color_printf("[tio %s] Disconnected", current_time());
+        tio_printf("Disconnected");
         flock(fd, LOCK_UN);
         close(fd);
         connected = false;
@@ -253,7 +250,7 @@ int connect_tty(void)
     tcflush(fd, TCIOFLUSH);
 
     /* Print connect status */
-    color_printf("[tio %s] Connected", current_time());
+    tio_printf("Connected");
     connected = true;
     tainted = false;
 
