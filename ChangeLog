@@ -1,4 +1,38 @@
-=== tio v1.13 ===
+=== tio v1.14 ===
+
+
+
+Changes since tio v1.13:
+
+ * Fixed tio_printf macro
+
+ * Fixed launch hints
+
+   Fixed launch hints not being printed in no autoconnect mode.
+
+ * Added 'ctrl-t ?' to list available commands
+
+ * Fixed log mechanism
+
+   To avoid echoing only log what is received from tty device.
+
+ * Improved tio output
+
+   Added titles and indentation to commands output for clearer separation
+   when firing commands repeatedly.
+
+   Also added print of tio version and quit command hint at launch.
+
+ * Cleaned up tio print mechanism
+
+Jakub Wilk:
+
+ * Fixed grammar
+
+   "allow" is a transitive verb, which requires an object,
+   so "allow to <verb>" is ungrammatical.
+
+ * Fixed typo
 
 
 
