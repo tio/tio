@@ -41,7 +41,7 @@
 #include "tio/error.h"
 
 static struct termios new_stdout, old_stdout, old_tio;
-static long rx_total = 0, tx_total = 0;
+static unsigned long rx_total = 0, tx_total = 0;
 static bool connected = false;
 static bool tainted = false;
 static int fd;
