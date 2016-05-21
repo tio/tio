@@ -102,7 +102,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
             case KEY_S:
                 /* Show tx/rx statistics upon ctrl-t s sequence */
                 tio_printf("Statistics:");
-                tio_printf(" Sent %ld bytes, received %ld bytes", tx_total, rx_total);
+                tio_printf(" Sent %lu bytes, received %lu bytes", tx_total, rx_total);
                 *forward = false;
                 break;
             default:
