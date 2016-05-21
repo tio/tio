@@ -19,6 +19,7 @@
  * 02110-1301, USA.
  */
 
+#include "config.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
@@ -28,7 +29,6 @@
 #include <getopt.h>
 #include <termios.h>
 #include <limits.h>
-#include "config.h"
 #include "tio/options.h"
 #include "tio/error.h"
 
