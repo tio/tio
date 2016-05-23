@@ -124,7 +124,7 @@ void stdout_configure(void)
     }
 
     /* Prepare new stdout settings */
-    bzero(&new_stdout, sizeof(new_stdout));
+    memset(&new_stdout, 0, sizeof(new_stdout));
 
     /* Control, input, output, local modes for stdout */
     new_stdout.c_cflag = 0;
@@ -158,7 +158,7 @@ void tty_configure(void)
 {
     unsigned int baudrate;
 
-    bzero(&tio, sizeof(tio));
+    memset(&tio, 0, sizeof(tio));
 
     /* Set speed */
     switch (option.baudrate)
