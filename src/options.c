@@ -67,6 +67,22 @@ void print_help(char *argv[])
     printf("\n");
 }
 
+long string_to_long(char *string)
+{
+    long result;
+    char *end_token;
+
+    errno = 0;
+    result = strtol(string, &end_token, 10);
+    if ((errno != 0) || (*end_token != 0))
+    {
+        error_printf("Invalid digit");
+        exit(EXIT_FAILURE);
+    }
+
+    return result;
+}
+
 void parse_options(int argc, char *argv[])
 {
     int c;
@@ -117,11 +133,11 @@ void parse_options(int argc, char *argv[])
                 break;
 
             case 'b':
-                option.baudrate = atoi(optarg);
+                option.baudrate = string_to_long(optarg);
                 break;
 
             case 'd':
-                option.databits = atoi(optarg);
+                option.databits = string_to_long(optarg);
                 break;
 
             case 'f':
@@ -129,7 +145,7 @@ void parse_options(int argc, char *argv[])
                 break;
 
             case 's':
-                option.stopbits = atoi(optarg);
+                option.stopbits = string_to_long(optarg);
                 break;
 
             case 'p':
@@ -137,7 +153,7 @@ void parse_options(int argc, char *argv[])
                 break;
 
             case 'o':
-                option.output_delay = atoi(optarg);
+                option.output_delay = string_to_long(optarg);
                 break;
 
             case 'n':
