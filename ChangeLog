@@ -1,4 +1,39 @@
-=== tio v1.14 ===
+=== tio v1.15 ===
+
+Changes since tio v1.14:
+
+ * Removed + to remove potential confusion
+
+ * Added input digit checks
+
+ * Fixed license string
+
+ * Introduced tty_configure()
+
+   Moved tty configuration actions to tty_configure() in tty.c. This way
+   options.c is strictly about parsing options nothing else.
+
+ * Function names cleanup
+
+ * Updated AUTHORS file
+
+   Added Nick who created the new tio package for Arch Linux.
+
+ * Fixed tx/rx counters type
+
+Jakob Haufe:
+
+ * Include config.h before standard headers
+
+   This makes use of 8d6d202 (Enable large file support) for real.
+
+Jakub Wilk:
+
+ * Fixed printf directives for tx/rx counters
+
+   In 9a66de0affda, types of tx/rx counters were changed from "long" to
+   "unsigned long", but their printf directives remained "%ld".
+   Change them to "%lu" to match the actual types.
 
 
 
