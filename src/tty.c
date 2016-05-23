@@ -114,7 +114,47 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
     }
 }
 
-void wait_for_tty_device(void)
+void stdout_configure(void)
+{
+    /* Save current stdout settings */
+    if (tcgetattr(STDOUT_FILENO, &old_stdout) < 0)
+    {
+        error_printf("Saving current stdio settings failed");
+        exit(EXIT_FAILURE);
+    }
+
+    /* Prepare new stdout settings */
+    bzero(&new_stdout, sizeof(new_stdout));
+
+    /* Control, input, output, local modes for stdout */
+    new_stdout.c_cflag = 0;
+    new_stdout.c_iflag = 0;
+    new_stdout.c_oflag = 0;
+    new_stdout.c_lflag = 0;
+
+    /* Control characters */
+    new_stdout.c_cc[VTIME] = 0; /* Inter-character timer unused */
+    new_stdout.c_cc[VMIN]  = 1; /* Blocking read until 1 character received */
+
+    /* Activate new stdout settings */
+    tcsetattr(STDOUT_FILENO, TCSANOW, &new_stdout);
+    tcsetattr(STDOUT_FILENO, TCSAFLUSH, &new_stdout);
+
+    /* Print launch hints */
+    tio_printf("tio v%s", VERSION);
+    tio_printf("Press ctrl-t + q to quit");
+
+    /* Make sure we restore old stdout settings on exit */
+    atexit(&stdout_restore);
+}
+
+void stdout_restore(void)
+{
+    tcsetattr(STDOUT_FILENO, TCSANOW, &old_stdout);
+    tcsetattr(STDOUT_FILENO, TCSAFLUSH, &old_stdout);
+}
+
+void tty_wait_for_device(void)
 {
     fd_set rdfs;
     int    status;
@@ -172,47 +212,7 @@ void wait_for_tty_device(void)
     }
 }
 
-void configure_stdout(void)
-{
-    /* Save current stdout settings */
-    if (tcgetattr(STDOUT_FILENO, &old_stdout) < 0)
-    {
-        error_printf("Saving current stdio settings failed");
-        exit(EXIT_FAILURE);
-    }
-
-    /* Prepare new stdout settings */
-    bzero(&new_stdout, sizeof(new_stdout));
-
-    /* Control, input, output, local modes for stdout */
-    new_stdout.c_cflag = 0;
-    new_stdout.c_iflag = 0;
-    new_stdout.c_oflag = 0;
-    new_stdout.c_lflag = 0;
-
-    /* Control characters */
-    new_stdout.c_cc[VTIME] = 0; /* Inter-character timer unused */
-    new_stdout.c_cc[VMIN]  = 1; /* Blocking read until 1 character received */
-
-    /* Activate new stdout settings */
-    tcsetattr(STDOUT_FILENO, TCSANOW, &new_stdout);
-    tcsetattr(STDOUT_FILENO, TCSAFLUSH, &new_stdout);
-
-    /* Print launch hints */
-    tio_printf("tio v%s", VERSION);
-    tio_printf("Press ctrl-t + q to quit");
-
-    /* Make sure we restore old stdout settings on exit */
-    atexit(&restore_stdout);
-}
-
-void restore_stdout(void)
-{
-    tcsetattr(STDOUT_FILENO, TCSANOW, &old_stdout);
-    tcsetattr(STDOUT_FILENO, TCSAFLUSH, &old_stdout);
-}
-
-void disconnect_tty(void)
+void tty_disconnect(void)
 {
     if (connected)
     {
@@ -223,16 +223,16 @@ void disconnect_tty(void)
     }
 }
 
-void restore_tty(void)
+void tty_restore(void)
 {
     tcsetattr(fd, TCSANOW, &old_tio);
     tcsetattr(fd, TCSAFLUSH, &old_tio);
 
     if (connected)
-        disconnect_tty();
+        tty_disconnect();
 }
 
-int connect_tty(void)
+int tty_connect(void)
 {
     fd_set rdfs;           /* Read file descriptor set */
     int    maxfd;          /* Maximum file descriptor used */
@@ -279,7 +279,7 @@ int connect_tty(void)
     /* Make sure we restore tty settings on exit */
     if (first)
     {
-        atexit(&restore_tty);
+        atexit(&tty_restore);
         first = false;
     }
 
@@ -384,7 +384,7 @@ int connect_tty(void)
 error_tcgetattr:
 error_isatty:
 error_read:
-    disconnect_tty();
+    tty_disconnect();
 error_open:
     return TIO_ERROR;
 }

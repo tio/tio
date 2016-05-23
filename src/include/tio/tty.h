@@ -29,9 +29,9 @@
 #define KEY_T 0x74
 #define KEY_CTRL_T 0x14
 
-void configure_stdout(void);
-void restore_stdout(void);
-int connect_tty(void);
-void wait_for_tty_device(void);
+void stdout_configure(void);
+void stdout_restore(void);
+int tty_connect(void);
+void tty_wait_for_device(void);
 
 #endif

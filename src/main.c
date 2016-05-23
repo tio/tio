@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     parse_options(argc, argv);
 
     /* Configure output terminal */
-    configure_stdout();
+    stdout_configure();
 
     /* Install log exit handler */
     atexit(&log_exit);
@@ -51,14 +51,14 @@ int main(int argc, char *argv[])
 
     /* Connect to tty device */
     if (option.no_autoconnect)
-        status = connect_tty();
+        status = tty_connect();
     else
     {
         /* Enter connect loop */
         while (true)
         {
-            wait_for_tty_device();
-            status = connect_tty();
+            tty_wait_for_device();
+            status = tty_connect();
         }
     }
 

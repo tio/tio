@@ -47,7 +47,7 @@ struct option_t option =
     "none"    // Parity
 };
 
-void print_options_help(char *argv[])
+void print_help(char *argv[])
 {
     printf("Usage: %s [<options>] <tty device>\n", argv[0]);
     printf("\n");
@@ -74,7 +74,7 @@ void parse_options(int argc, char *argv[])
 
     if (argc == 1)
     {
-        print_options_help(argv);
+        print_help(argv);
         exit(EXIT_SUCCESS);
     }
 
@@ -336,7 +336,7 @@ void parse_options(int argc, char *argv[])
                 break;
 
             case 'h':
-                print_options_help(argv);
+                print_help(argv);
                 exit(EXIT_SUCCESS);
                 break;
 
