@@ -32,19 +32,19 @@
 #include "tio/options.h"
 #include "tio/error.h"
 
+/* Default options */
 struct option_t option =
 {
     "",       // Device name
-    false,    // No log
-    "",       // Log filename
-    false,    // No autoconnect
-    0,        // No output delay
-    {},
     115200,   // Baudrate
     8,        // Databits
     "none",   // Flow
     1,        // Stopbits
-    "none"    // Parity
+    "none",   // Parity
+    0,        // No output delay
+    false,    // No autoconnect
+    false,    // No log
+    ""        // Log filename
 };
 
 void print_help(char *argv[])
@@ -70,21 +70,12 @@ void print_help(char *argv[])
 void parse_options(int argc, char *argv[])
 {
     int c;
-    int baudrate;
 
     if (argc == 1)
     {
         print_help(argv);
         exit(EXIT_SUCCESS);
     }
-
-    /* Set default termios settings:
-     * (115200 baud, 8 data bits, no flow control, 1 stop bit, no parity) */
-    bzero(&option.tio, sizeof(option.tio));
-    option.tio.c_cflag = B115200 | CS8;
-
-    /* Set default output delay */
-    option.output_delay = 0;
 
     while (1)
     {
@@ -126,190 +117,23 @@ void parse_options(int argc, char *argv[])
                 break;
 
             case 'b':
-                option.baudrate = baudrate = atoi(optarg);
-                switch (baudrate)
-                {
-                    case 0:
-                        baudrate = B0;
-                        break;
-                    case 50:
-                        baudrate = B50;
-                        break;
-                    case 75:
-                        baudrate = B75;
-                        break;
-                    case 110:
-                        baudrate = B110;
-                        break;
-                    case 134:
-                        baudrate = B134;
-                        break;
-                    case 150:
-                        baudrate = B150;
-                        break;
-                    case 300:
-                        baudrate = B300;
-                        break;
-                    case 600:
-                        baudrate = B600;
-                        break;
-                    case 1200:
-                        baudrate = B1200;
-                        break;
-                    case 2400:
-                        baudrate = B2400;
-                        break;
-                    case 4800:
-                        baudrate = B4800;
-                        break;
-                    case 9600:
-                        baudrate = B9600;
-                        break;
-                    case 19200:
-                        baudrate = B19200;
-                        break;
-                    case 38400:
-                        baudrate = B38400;
-                        break;
-                    case 57600:
-                        baudrate = B57600;
-                        break;
-                    case 115200:
-                        baudrate = B115200;
-                        break;
-                    case 230400:
-                        baudrate = B230400;
-                        break;
-                    case 460800:
-                        baudrate = B460800;
-                        break;
-                    case 500000:
-                        baudrate = B500000;
-                        break;
-                    case 576000:
-                        baudrate = B576000;
-                        break;
-                    case 921600:
-                        baudrate = B921600;
-                        break;
-                    case 1000000:
-                        baudrate = B1000000;
-                        break;
-                    case 1152000:
-                        baudrate = B1152000;
-                        break;
-                    case 1500000:
-                        baudrate = B1500000;
-                        break;
-                    case 2000000:
-                        baudrate = B2000000;
-                        break;
-                    case 2500000:
-                        baudrate = B2500000;
-                        break;
-                    case 3000000:
-                        baudrate = B3000000;
-                        break;
-                    case 3500000:
-                        baudrate = B3500000;
-                        break;
-                    case 4000000:
-                        baudrate = B4000000;
-                        break;
-                    default:
-                        error_printf("Invalid baud rate");
-                        exit(EXIT_FAILURE);
-                }
-
-                cfsetispeed(&option.tio, baudrate);
-                cfsetospeed(&option.tio, baudrate);
-
+                option.baudrate = atoi(optarg);
                 break;
 
             case 'd':
                 option.databits = atoi(optarg);
-                option.tio.c_cflag &= ~CSIZE;
-                switch (option.databits)
-                {
-                    case 5:
-                        option.tio.c_cflag |= CS5;
-                        break;
-                    case 6:
-                        option.tio.c_cflag |= CS6;
-                        break;
-                    case 7:
-                        option.tio.c_cflag |= CS7;
-                        break;
-                    case 8:
-                        option.tio.c_cflag |= CS8;
-                        break;
-                    default:
-                        error_printf("Invalid data bits");
-                        exit(EXIT_FAILURE);
-                }
                 break;
 
             case 'f':
                 option.flow = optarg;
-
-                if (strcmp("hard", optarg) == 0)
-                {
-                    option.tio.c_cflag |= CRTSCTS;
-                    option.tio.c_iflag &= ~(IXON | IXOFF | IXANY);
-                }
-                else if (strcmp("soft", optarg) == 0)
-                {
-                    option.tio.c_cflag &= ~CRTSCTS;
-                    option.tio.c_iflag |= IXON | IXOFF;
-                }
-                else if (strcmp("none", optarg) == 0)
-                {
-                    option.tio.c_cflag &= ~CRTSCTS;
-                    option.tio.c_iflag &= ~(IXON | IXOFF | IXANY);
-                }
-                else
-                {
-                    error_printf("Invalid flow control");
-                    exit(EXIT_FAILURE);
-                }
                 break;
 
             case 's':
                 option.stopbits = atoi(optarg);
-                switch (option.stopbits)
-                {
-                    case 1:
-                        option.tio.c_cflag &= ~CSTOPB;
-                        break;
-                    case 2:
-                        option.tio.c_cflag |= CSTOPB;
-                        break;
-                    default:
-                        error_printf("Invalid stop bits");
-                        exit(EXIT_FAILURE);
-                }
                 break;
 
             case 'p':
                 option.parity = optarg;
-
-                if (strcmp("odd", optarg) == 0)
-                {
-                    option.tio.c_cflag |= PARENB;
-                    option.tio.c_cflag |= PARODD;
-                }
-                else if (strcmp("even", optarg) == 0)
-                {
-                    option.tio.c_cflag |= PARENB;
-                    option.tio.c_cflag &= ~PARODD;
-                }
-                else if (strcmp("none", optarg) == 0)
-                    option.tio.c_cflag &= ~PARENB;
-                else
-                {
-                    error_printf("Invalid parity");
-                    exit(EXIT_FAILURE);
-                }
                 break;
 
             case 'o':

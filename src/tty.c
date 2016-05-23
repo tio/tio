@@ -41,7 +41,7 @@
 #include "tio/log.h"
 #include "tio/error.h"
 
-static struct termios new_stdout, old_stdout, old_tio;
+static struct termios tio, new_stdout, old_stdout, old_tio;
 static unsigned long rx_total = 0, tx_total = 0;
 static bool connected = false;
 static bool tainted = false;
@@ -152,6 +152,187 @@ void stdout_restore(void)
 {
     tcsetattr(STDOUT_FILENO, TCSANOW, &old_stdout);
     tcsetattr(STDOUT_FILENO, TCSAFLUSH, &old_stdout);
+}
+
+void tty_configure(void)
+{
+    unsigned int baudrate;
+
+    bzero(&tio, sizeof(tio));
+
+    /* Set speed */
+    switch (option.baudrate)
+    {
+        case 0:
+            baudrate = B0;
+            break;
+        case 50:
+            baudrate = B50;
+            break;
+        case 75:
+            baudrate = B75;
+            break;
+        case 110:
+            baudrate = B110;
+            break;
+        case 134:
+            baudrate = B134;
+            break;
+        case 150:
+            baudrate = B150;
+            break;
+        case 300:
+            baudrate = B300;
+            break;
+        case 600:
+            baudrate = B600;
+            break;
+        case 1200:
+            baudrate = B1200;
+            break;
+        case 2400:
+            baudrate = B2400;
+            break;
+        case 4800:
+            baudrate = B4800;
+            break;
+        case 9600:
+            baudrate = B9600;
+            break;
+        case 19200:
+            baudrate = B19200;
+            break;
+        case 38400:
+            baudrate = B38400;
+            break;
+        case 57600:
+            baudrate = B57600;
+            break;
+        case 115200:
+            baudrate = B115200;
+            break;
+        case 230400:
+            baudrate = B230400;
+            break;
+        case 460800:
+            baudrate = B460800;
+            break;
+        case 500000:
+            baudrate = B500000;
+            break;
+        case 576000:
+            baudrate = B576000;
+            break;
+        case 921600:
+            baudrate = B921600;
+            break;
+        case 1000000:
+            baudrate = B1000000;
+            break;
+        case 1152000:
+            baudrate = B1152000;
+            break;
+        case 1500000:
+            baudrate = B1500000;
+            break;
+        case 2000000:
+            baudrate = B2000000;
+            break;
+        case 2500000:
+            baudrate = B2500000;
+            break;
+        case 3000000:
+            baudrate = B3000000;
+            break;
+        case 3500000:
+            baudrate = B3500000;
+            break;
+        case 4000000:
+            baudrate = B4000000;
+            break;
+        default:
+            error_printf("Invalid baud rate");
+            exit(EXIT_FAILURE);
+    }
+
+    cfsetispeed(&tio, baudrate);
+    cfsetospeed(&tio, baudrate);
+
+    /* Set databits */
+    tio.c_cflag &= ~CSIZE; // ?
+    switch (option.databits)
+    {
+        case 5:
+            tio.c_cflag |= CS5;
+            break;
+        case 6:
+            tio.c_cflag |= CS6;
+            break;
+        case 7:
+            tio.c_cflag |= CS7;
+            break;
+        case 8:
+            tio.c_cflag |= CS8;
+            break;
+        default:
+            error_printf("Invalid data bits");
+            exit(EXIT_FAILURE);
+    }
+
+    /* Set flow control */
+    if (strcmp("hard", option.flow) == 0)
+    {
+        tio.c_cflag |= CRTSCTS;
+        tio.c_iflag &= ~(IXON | IXOFF | IXANY);
+    }
+    else if (strcmp("soft", option.flow) == 0)
+    {
+        tio.c_cflag &= ~CRTSCTS;
+        tio.c_iflag |= IXON | IXOFF;
+    }
+    else if (strcmp("none", option.flow) == 0)
+    {
+        tio.c_cflag &= ~CRTSCTS;
+        tio.c_iflag &= ~(IXON | IXOFF | IXANY);
+    }
+    else
+    {
+        error_printf("Invalid flow control");
+        exit(EXIT_FAILURE);
+    }
+
+    /* Set stopbits */
+    switch (option.stopbits)
+    {
+        case 1:
+            tio.c_cflag &= ~CSTOPB;
+            break;
+        case 2:
+            tio.c_cflag |= CSTOPB;
+            break;
+        default:
+            error_printf("Invalid stop bits");
+            exit(EXIT_FAILURE);
+    }
+
+    /* Set parity */
+    if (strcmp("odd", option.parity) == 0)
+    {
+        tio.c_cflag |= PARENB;
+        tio.c_cflag |= PARODD;
+    }
+    else if (strcmp("even", option.parity) == 0)
+    {
+        tio.c_cflag |= PARENB;
+        tio.c_cflag &= ~PARODD;
+    }
+    else if (strcmp("none", option.parity) == 0)
+        tio.c_cflag &= ~PARENB;
+    else
+    {
+        error_printf("Invalid parity");
+        exit(EXIT_FAILURE);
+    }
 }
 
 void tty_wait_for_device(void)
@@ -284,17 +465,17 @@ int tty_connect(void)
     }
 
     /* Control, input, output, local modes for tty device */
-    option.tio.c_cflag |= CLOCAL | CREAD;
-    option.tio.c_oflag = 0;
-    option.tio.c_lflag = 0;
+    tio.c_cflag |= CLOCAL | CREAD;
+    tio.c_oflag = 0;
+    tio.c_lflag = 0;
 
     /* Control characters */
-    option.tio.c_cc[VTIME] = 0; /* Inter-character timer unused */
-    option.tio.c_cc[VMIN]  = 1; /* Blocking read until 1 character received */
+    tio.c_cc[VTIME] = 0; /* Inter-character timer unused */
+    tio.c_cc[VMIN]  = 1; /* Blocking read until 1 character received */
 
     /* Activate new port settings */
-    tcsetattr(fd, TCSANOW, &option.tio);
-    tcsetattr(fd, TCSAFLUSH, &option.tio);
+    tcsetattr(fd, TCSANOW, &tio);
+    tcsetattr(fd, TCSAFLUSH, &tio);
 
     maxfd = MAX(fd, STDIN_FILENO) + 1;  /* Maximum bit entry (fd) to test */
 

@@ -39,6 +39,9 @@ int main(int argc, char *argv[])
     /* Parse options */
     parse_options(argc, argv);
 
+    /* Configure tty device */
+    tty_configure();
+
     /* Configure output terminal */
     stdout_configure();
 

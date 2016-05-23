@@ -31,16 +31,15 @@
 struct option_t
 {
     const char *tty_device;
-    bool log;
-    const char *log_filename;
-    bool no_autoconnect;
-    int output_delay;
-    struct termios tio;
-    int baudrate;
+    unsigned int baudrate;
     int databits;
     char *flow;
     int stopbits;
     char *parity;
+    int output_delay;
+    bool no_autoconnect;
+    bool log;
+    const char *log_filename;
 };
 
 extern struct option_t option;
