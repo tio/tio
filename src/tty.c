@@ -142,7 +142,7 @@ void stdout_configure(void)
 
     /* Print launch hints */
     tio_printf("tio v%s", VERSION);
-    tio_printf("Press ctrl-t + q to quit");
+    tio_printf("Press ctrl-t q to quit");
 
     /* Make sure we restore old stdout settings on exit */
     atexit(&stdout_restore);
