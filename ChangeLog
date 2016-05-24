@@ -1,4 +1,16 @@
-=== tio v1.15 ===
+=== tio v1.16 ===
+
+Changes since tio v1.15:
+
+ * Updated man page
+
+ * Updated README
+
+ * Removed obsolete packaging files
+
+ * Removed use of deprecated bzero()
+
+
 
 Changes since tio v1.14:
 
