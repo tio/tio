@@ -1,3 +1,0 @@
-version=3
-
-https://github.com/gotty/gotty/releases/ download/v(?:.*)/gotty-(.*).tar.xz
