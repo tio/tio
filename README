@@ -31,7 +31,7 @@
           -v, --version               Display version
           -h, --help                  Display help
 
-        In session, press ctrl-t + q to quit.
+        In session, press ctrl-t q to quit.
 
 
     The only option which requires a bit of elaboration is perhaps the
