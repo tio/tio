@@ -83,7 +83,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
             case KEY_I:
                 tio_printf("Settings information:");
                 tio_printf(" TTY device: %s", option.tty_device);
-                tio_printf(" Baudrate: %d", option.baudrate);
+                tio_printf(" Baudrate: %u", option.baudrate);
                 tio_printf(" Databits: %d", option.databits);
                 tio_printf(" Flow: %s", option.flow);
                 tio_printf(" Stopbits: %d", option.stopbits);
