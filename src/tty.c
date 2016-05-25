@@ -156,7 +156,7 @@ void stdout_restore(void)
 
 void tty_configure(void)
 {
-    unsigned int baudrate;
+    speed_t baudrate;
 
     memset(&tio, 0, sizeof(tio));
 
