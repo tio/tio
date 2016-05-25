@@ -181,6 +181,9 @@ void tty_configure(void)
         case 150:
             baudrate = B150;
             break;
+        case 200:
+            baudrate = B200;
+            break;
         case 300:
             baudrate = B300;
             break;
@@ -189,6 +192,9 @@ void tty_configure(void)
             break;
         case 1200:
             baudrate = B1200;
+            break;
+        case 1800:
+            baudrate = B1800;
             break;
         case 2400:
             baudrate = B2400;
