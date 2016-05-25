@@ -1,0 +1,3 @@
+language: c
+before_script: ./autogen.sh
+script: ./configure && make
