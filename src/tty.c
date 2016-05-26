@@ -163,132 +163,70 @@ void tty_configure(void)
     /* Set speed */
     switch (option.baudrate)
     {
-        case 0:
-            baudrate = B0;
-            break;
-        case 50:
-            baudrate = B50;
-            break;
-        case 75:
-            baudrate = B75;
-            break;
-        case 110:
-            baudrate = B110;
-            break;
-        case 134:
-            baudrate = B134;
-            break;
-        case 150:
-            baudrate = B150;
-            break;
-        case 200:
-            baudrate = B200;
-            break;
-        case 300:
-            baudrate = B300;
-            break;
-        case 600:
-            baudrate = B600;
-            break;
-        case 1200:
-            baudrate = B1200;
-            break;
-        case 1800:
-            baudrate = B1800;
-            break;
-        case 2400:
-            baudrate = B2400;
-            break;
-        case 4800:
-            baudrate = B4800;
-            break;
-        case 9600:
-            baudrate = B9600;
-            break;
-        case 19200:
-            baudrate = B19200;
-            break;
-        case 38400:
-            baudrate = B38400;
-            break;
+        case 0: baudrate = B0; break;
+        case 50: baudrate = B50; break;
+        case 75: baudrate = B75; break;
+        case 110: baudrate = B110; break;
+        case 134: baudrate = B134; break;
+        case 150: baudrate = B150; break;
+        case 200: baudrate = B200; break;
+        case 300: baudrate = B300; break;
+        case 600: baudrate = B600; break;
+        case 1200: baudrate = B1200; break;
+        case 1800: baudrate = B1800; break;
+        case 2400: baudrate = B2400; break;
+        case 4800: baudrate = B4800; break;
+        case 9600: baudrate = B9600; break;
+        case 19200: baudrate = B19200; break;
+        case 38400: baudrate = B38400; break;
 #if HAVE_DECL_B57600
-        case 57600:
-            baudrate = B57600;
-            break;
+        case 57600: baudrate = B57600; break;
 #endif
 #if HAVE_DECL_B115200
-        case 115200:
-            baudrate = B115200;
-            break;
+        case 115200: baudrate = B115200; break;
 #endif
 #if HAVE_DECL_B230400
-        case 230400:
-            baudrate = B230400;
-            break;
+        case 230400: baudrate = B230400; break;
 #endif
 #if HAVE_DECL_B460800
-        case 460800:
-            baudrate = B460800;
-            break;
+        case 460800: baudrate = B460800; break;
 #endif
 #if HAVE_DECL_B500000
-        case 500000:
-            baudrate = B500000;
-            break;
+        case 500000: baudrate = B500000; break;
 #endif
 #if HAVE_DECL_B576000
-        case 576000:
-            baudrate = B576000;
-            break;
+        case 576000: baudrate = B576000; break;
 #endif
 #if HAVE_DECL_B921600
-        case 921600:
-            baudrate = B921600;
-            break;
+        case 921600: baudrate = B921600; break;
 #endif
 #if HAVE_DECL_B1000000
-        case 1000000:
-            baudrate = B1000000;
-            break;
+        case 1000000: baudrate = B1000000; break;
 #endif
 #if HAVE_DECL_B1152000
-        case 1152000:
-            baudrate = B1152000;
-            break;
+        case 1152000: baudrate = B1152000; break;
 #endif
 #if HAVE_DECL_B1500000
-        case 1500000:
-            baudrate = B1500000;
-            break;
+        case 1500000: baudrate = B1500000; break;
 #endif
 #if HAVE_DECL_B2000000
-        case 2000000:
-            baudrate = B2000000;
-            break;
+        case 2000000: baudrate = B2000000; break;
 #endif
 #if HAVE_DECL_B2500000
-        case 2500000:
-            baudrate = B2500000;
-            break;
+        case 2500000: baudrate = B2500000; break;
 #endif
 #if HAVE_DECL_B3000000
-        case 3000000:
-            baudrate = B3000000;
-            break;
+        case 3000000: baudrate = B3000000; break;
 #endif
 #if HAVE_DECL_B3500000
-        case 3500000:
-            baudrate = B3500000;
-            break;
+        case 3500000: baudrate = B3500000; break;
 #endif
 #if HAVE_DECL_B4000000
-        case 4000000:
-            baudrate = B4000000;
-            break;
+        case 4000000: baudrate = B4000000; break;
 #endif
         default:
-            error_printf("Invalid baud rate");
-            exit(EXIT_FAILURE);
+                      error_printf("Invalid baud rate");
+                      exit(EXIT_FAILURE);
     }
 
     cfsetispeed(&tio, baudrate);
