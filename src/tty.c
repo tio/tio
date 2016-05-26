@@ -407,8 +407,8 @@ int tty_connect(void)
     /* Make sure device is of tty type */
     if (!isatty(fd))
     {
-        error_printf_silent("Not a tty device");
-        goto error_isatty;
+        error_printf("Not a tty device");
+        exit(EXIT_FAILURE);;
     }
 
     /* Lock device file */
@@ -537,7 +537,6 @@ int tty_connect(void)
     return TIO_SUCCESS;
 
 error_tcgetattr:
-error_isatty:
 error_read:
     tty_disconnect();
 error_open:
