@@ -211,51 +211,81 @@ void tty_configure(void)
         case 38400:
             baudrate = B38400;
             break;
+#ifdef HAVE_DECL_B57600
         case 57600:
             baudrate = B57600;
             break;
+#endif
+#ifdef HAVE_DECL_B115200
         case 115200:
             baudrate = B115200;
             break;
+#endif
+#ifdef HAVE_DECL_B230400
         case 230400:
             baudrate = B230400;
             break;
+#endif
+#ifdef HAVE_DECL_B460800
         case 460800:
             baudrate = B460800;
             break;
+#endif
+#ifdef HAVE_DECL_B500000
         case 500000:
             baudrate = B500000;
             break;
+#endif
+#ifdef HAVE_DECL_B576000
         case 576000:
             baudrate = B576000;
             break;
+#endif
+#ifdef HAVE_DECL_B921600
         case 921600:
             baudrate = B921600;
             break;
+#endif
+#ifdef HAVE_DECL_B1000000
         case 1000000:
             baudrate = B1000000;
             break;
+#endif
+#ifdef HAVE_DECL_B1152000
         case 1152000:
             baudrate = B1152000;
             break;
+#endif
+#ifdef HAVE_DECL_B1500000
         case 1500000:
             baudrate = B1500000;
             break;
+#endif
+#ifdef HAVE_DECL_B2000000
         case 2000000:
             baudrate = B2000000;
             break;
+#endif
+#ifdef HAVE_DECL_B2500000
         case 2500000:
             baudrate = B2500000;
             break;
+#endif
+#ifdef HAVE_DECL_B3000000
         case 3000000:
             baudrate = B3000000;
             break;
+#endif
+#ifdef HAVE_DECL_B3500000
         case 3500000:
             baudrate = B3500000;
             break;
+#endif
+#ifdef HAVE_DECL_B4000000
         case 4000000:
             baudrate = B4000000;
             break;
+#endif
         default:
             error_printf("Invalid baud rate");
             exit(EXIT_FAILURE);

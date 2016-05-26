@@ -21,3 +21,4 @@ src/include/config.h.in~
 src/include/stamp-h1
 *.swp
 /tio-*
+/src/bash-completion/tio
