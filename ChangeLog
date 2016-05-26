@@ -1,4 +1,44 @@
-=== tio v1.16 ===
+
+=== tio v1.17 ===
+
+Changes since tio v1.16:
+
+ * Compacted tty_configure() a bit
+
+ * Fixed automatic baud rate enablement
+
+ * Minor cleanups
+
+ * Added autodetection of available baud rates
+
+   Various platforms support different baud rates.
+
+   To avoid adding platform specific handling generic baud rate detection
+   tests are introduced in the configure script. Successfully detected baud
+   rates are automatically enabled. This applies to both the C code and the
+   bash completion script.
+
+   Note:
+   Baud rates below 57600 are defined by POSIX-1 and supported by most
+   platforms so only baud rate 57600 and above are tested.
+
+ * Updated bash-completion
+
+ * Fixed printf() format type
+
+ * Added Travis build configuration
+
+Jakub Wilk:
+
+ * Generated bash completion at configure time
+
+ * Reduce code duplication in baud rate detection
+
+ * Add support for baud rates 200 and 1800
+
+ * Fixed baudrate type
+
+
 
 Changes since tio v1.15:
 
