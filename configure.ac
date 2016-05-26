@@ -29,7 +29,16 @@ AM_CONDITIONAL([ENABLE_BASH_COMPLETION],[test "x$with_bash_completion_dir" != "x
 # TIO_CHECK_BAUDRATE(N)
 AC_DEFUN(
     [TIO_CHECK_BAUDRATE],
-    [AC_CHECK_DECLS([B$1], [AC_SUBST([B$1], [$1])], [], [[#include <termios.h>]])]
+    [
+        tio_have_decl=0
+        AS_IF([test $1 -le 38400],
+            # Baud rates up to 38400 are defined by POSIX,
+            # so we don't have to check for them.
+            [tio_have_decl=1],
+            [AC_CHECK_DECLS([B$1], [tio_have_decl=1], [], [[#include <termios.h>]])]
+        )
+        AS_IF([test $tio_have_decl = 1], [AC_SUBST([BAUDRATES], ["$BAUDRATES $1"])])
+    ]
 )
 
 # TIO_CHECK_BAUDRATES(N1, N2, ...)
@@ -39,7 +48,24 @@ AC_DEFUN(
 )
 
 # Check for available terminal I/O speeds
+BAUDRATES=
 TIO_CHECK_BAUDRATES(
+    0,
+    50,
+    75,
+    110,
+    134,
+    150,
+    200,
+    300,
+    600,
+    1200,
+    1800,
+    2400,
+    4800,
+    9600,
+    19200,
+    38400,
     57600,
     115200,
     230400,
@@ -59,5 +85,6 @@ TIO_CHECK_BAUDRATES(
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([src/Makefile])
+AC_CONFIG_FILES([src/bash-completion/tio])
 AC_CONFIG_FILES([man/Makefile])
 AC_OUTPUT
