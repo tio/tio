@@ -233,7 +233,7 @@ void tty_configure(void)
     cfsetospeed(&tio, baudrate);
 
     /* Set databits */
-    tio.c_cflag &= ~CSIZE; // ?
+    tio.c_cflag &= ~CSIZE;
     switch (option.databits)
     {
         case 5:
