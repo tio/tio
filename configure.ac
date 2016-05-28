@@ -30,14 +30,11 @@ AM_CONDITIONAL([ENABLE_BASH_COMPLETION],[test "x$with_bash_completion_dir" != "x
 AC_DEFUN(
     [TIO_CHECK_BAUDRATE],
     [
-        tio_have_decl=0
-        AS_IF([test $1 -le 38400],
-            # Baud rates up to 38400 are defined by POSIX,
-            # so we don't have to check for them.
-            [tio_have_decl=1],
-            [AC_CHECK_DECLS([B$1], [tio_have_decl=1], [], [[#include <termios.h>]])]
+        AC_CHECK_DECL([B$1], [tio_have_decl=1], [tio_have_decl=0], [[#include <termios.h>]])
+        AS_IF([test $tio_have_decl = 1], [
+            AC_SUBST([BAUDRATES], ["$BAUDRATES $1"])
+            AC_SUBST([BAUDRATE_CASES], ["$BAUDRATE_CASES case $1: baudrate = B$1; break;"])]
         )
-        AS_IF([test $tio_have_decl = 1], [AC_SUBST([BAUDRATES], ["$BAUDRATES $1"])])
     ]
 )
 
@@ -49,6 +46,7 @@ AC_DEFUN(
 
 # Check for available terminal I/O speeds
 BAUDRATES=
+BAUDRATE_CASES=
 TIO_CHECK_BAUDRATES(
     0,
     50,
@@ -82,6 +80,8 @@ TIO_CHECK_BAUDRATES(
     3500000,
     4000000
 )
+
+AC_DEFINE_UNQUOTED([AUTOCONF_BAUDRATE_CASES],[$BAUDRATE_CASES],[Switch cases for detected baud rates])
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([src/Makefile])
