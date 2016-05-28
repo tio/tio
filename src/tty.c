@@ -45,7 +45,12 @@ static struct termios tio, new_stdout, old_stdout, old_tio;
 static unsigned long rx_total = 0, tx_total = 0;
 static bool connected = false;
 static bool tainted = false;
+static bool standard_baudrate = true;
 static int fd;
+
+#ifndef BOTHER
+#define BOTHER 0010000
+#endif
 
 #define tio_printf(format, args...) \
 { \
@@ -156,7 +161,7 @@ void stdout_restore(void)
 
 void tty_configure(void)
 {
-    speed_t baudrate;
+    speed_t baudrate = 0;
 
     memset(&tio, 0, sizeof(tio));
 
@@ -177,12 +182,25 @@ void tty_configure(void)
         AUTOCONF_BAUDRATE_CASES
 
         default:
+#if !HAVE_DECL_BOTHER
             error_printf("Invalid baud rate");
             exit(EXIT_FAILURE);
+#else
+            standard_baudrate = false;
+            break;
+#endif
     }
 
-    cfsetispeed(&tio, baudrate);
-    cfsetospeed(&tio, baudrate);
+    if (standard_baudrate)
+    {
+        cfsetispeed(&tio, baudrate);
+        cfsetospeed(&tio, baudrate);
+    } else
+    {
+        tio.c_ispeed = tio.c_ospeed = baudrate;
+        tio.c_cflag &= ~CBAUD;
+        tio.c_cflag |= BOTHER;
+    }
 
     /* Set databits */
     tio.c_cflag &= ~CSIZE;
@@ -373,6 +391,10 @@ int tty_connect(void)
 
     /* Flush stale I/O data (if any) */
     tcflush(fd, TCIOFLUSH);
+
+    /* Warn if non standard baud rate is used */
+    if (!standard_baudrate)
+        tio_printf("Warning: Using a non standard baud rate");
 
     /* Print connect status */
     tio_printf("Connected");
