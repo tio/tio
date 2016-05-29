@@ -1,5 +1,44 @@
 
-=== tio v1.17 ===
+=== tio v1.18 ===
+
+Changes since tio v1.17:
+
+ * Updated man page
+
+ * Added support for non-standard baud rates
+
+   Only enabled when possible, that is, when the BOTHER definition is
+   available.
+
+   It is untested but it should work as described here:
+   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=683826
+
+   Some Cypress USB<->serial devices supposedly supports arbitrary speeds.
+
+ * Generate baudrate switch cases based on detection
+
+   Support a single source of baud rate configuration as discussed in
+   https://github.com/tio/tio/issues/45 .
+
+   To do so, autogeneration of the switch cases which do the baud rate
+   option value check and configuration/conversion in tty_configure() is
+   introduced via a single macro.
+
+   Just to be safe, this change also enables configure detection of all
+   baud rates, including the ones previously assumed supported by most/all
+   systems (POSIX).
+
+ * Minor cleanup
+
+ * Exit when not a tty device in autoconnect mode
+
+Jakub Wilk:
+
+ * Added non-standard baud rates that are defined on FreeBSD
+
+ * Capitalized "GitHub" in README
+
+
 
 Changes since tio v1.16:
 
