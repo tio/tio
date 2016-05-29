@@ -1,4 +1,4 @@
-.TH "tio" "1" "7 May 2016"
+.TH "tio" "1" "29 June 2016"
 
 .SH "NAME"
 tio \- a simple TTY terminal I/O application
@@ -44,6 +44,13 @@ Set output delay [ms] inserted between each transmitted character (default: 0).
 .BR \-n ", " \-\-no\-autoconnect
 
 Disable automatic connect.
+
+By default tio automatically connects to the provided device if present. If the device is not present it will wait for it to appear and then connect. If the connection is lost (eg. device disconnects) it will wait for the device to reappear and then reconnect.
+
+However, if the
+.B \-\-no\-autoconnect
+option is provided tio will exit if the device is not present or exit if an established connection is lost.
+
 .TP
 .BR \-l ", " "\-\-log " \fI<filename>
 
