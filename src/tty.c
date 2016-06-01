@@ -21,6 +21,7 @@
 
 #include "config.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
@@ -63,6 +64,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
 {
     char unused_char;
     bool unused_bool;
+    int __attribute__((unused)) status;
 
     /* Ignore unused arguments */
     if (output_char == NULL)
@@ -79,11 +81,16 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
             case KEY_QUESTION:
                 tio_printf("Key commands:");
                 tio_printf(" ctrl-t ?   List available key commands");
+                tio_printf(" ctrl-t c   Clear screen");
                 tio_printf(" ctrl-t i   Show settings information");
                 tio_printf(" ctrl-t q   Quit");
                 tio_printf(" ctrl-t s   Show statistics");
                 tio_printf(" ctrl-t t   Send ctrl-t key code");
                 *forward = false;
+                break;
+            case KEY_C:
+                status = system("clear");
+                 *forward = false;
                 break;
             case KEY_I:
                 tio_printf("Settings information:");
