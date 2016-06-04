@@ -81,19 +81,15 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
             case KEY_QUESTION:
                 tio_printf("Key commands:");
                 tio_printf(" ctrl-t ?   List available key commands");
-                tio_printf(" ctrl-t c   Clear screen");
-                tio_printf(" ctrl-t i   Show settings information");
+                tio_printf(" ctrl-t c   Show configuration");
+                tio_printf(" ctrl-t l   Clear screen");
                 tio_printf(" ctrl-t q   Quit");
                 tio_printf(" ctrl-t s   Show statistics");
                 tio_printf(" ctrl-t t   Send ctrl-t key code");
                 *forward = false;
                 break;
             case KEY_C:
-                status = system("clear");
-                 *forward = false;
-                break;
-            case KEY_I:
-                tio_printf("Settings information:");
+                tio_printf("Configuration:");
                 tio_printf(" TTY device: %s", option.tty_device);
                 tio_printf(" Baudrate: %u", option.baudrate);
                 tio_printf(" Databits: %d", option.databits);
@@ -105,18 +101,22 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                     tio_printf(" Log file: %s", option.log_filename);
                 *forward = false;
                 break;
+            case KEY_L:
+                status = system("clear");
+                 *forward = false;
+                break;
             case KEY_Q:
                 /* Exit upon ctrl-t q sequence */
                 exit(EXIT_SUCCESS);
-            case KEY_T:
-                /* Send ctrl-t key code upon ctrl-t t sequence */
-                *output_char = KEY_CTRL_T;
-                break;
             case KEY_S:
                 /* Show tx/rx statistics upon ctrl-t s sequence */
                 tio_printf("Statistics:");
                 tio_printf(" Sent %lu bytes, received %lu bytes", tx_total, rx_total);
                 *forward = false;
+                break;
+            case KEY_T:
+                /* Send ctrl-t key code upon ctrl-t t sequence */
+                *output_char = KEY_CTRL_T;
                 break;
             default:
                 /* Ignore unknown ctrl-t escaped keys */
