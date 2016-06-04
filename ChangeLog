@@ -1,5 +1,23 @@
 
-=== tio v1.18 ===
+=== tio v1.19 ===
+
+Changes since tio v1.18:
+
+ * Rearranged key commands
+
+   Rearranged the key commands:
+
+   ctrl-t c (clear screen) is now
+   ctrl-t l which is similar to the well known shell ctrl-l
+
+   ctrl-t i (show settings information) is now
+   ctrl-t c (show configuration)
+
+   Updated man page accordingly.
+
+ * Added "ctrl-t c" key command to clear screen
+
+
 
 Changes since tio v1.17:
 
