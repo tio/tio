@@ -123,6 +123,8 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
 
 void stdout_configure(void)
 {
+    int status;
+
     /* Save current stdout settings */
     if (tcgetattr(STDOUT_FILENO, &old_stdout) < 0)
     {
@@ -144,8 +146,12 @@ void stdout_configure(void)
     new_stdout.c_cc[VMIN]  = 1; /* Blocking read until 1 character received */
 
     /* Activate new stdout settings */
-    tcsetattr(STDOUT_FILENO, TCSANOW, &new_stdout);
-    tcsetattr(STDOUT_FILENO, TCSAFLUSH, &new_stdout);
+    status = tcsetattr(STDOUT_FILENO, TCSANOW, &new_stdout);
+    if (status == -1)
+    {
+        error_printf("Could not apply new stdout settings (%s)", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
 
     /* Print launch hints */
     tio_printf("tio v%s", VERSION);
@@ -158,11 +164,11 @@ void stdout_configure(void)
 void stdout_restore(void)
 {
     tcsetattr(STDOUT_FILENO, TCSANOW, &old_stdout);
-    tcsetattr(STDOUT_FILENO, TCSAFLUSH, &old_stdout);
 }
 
 void tty_configure(void)
 {
+    int status;
     speed_t baudrate;
 
     memset(&tio, 0, sizeof(tio));
@@ -188,8 +194,21 @@ void tty_configure(void)
             exit(EXIT_FAILURE);
     }
 
-    cfsetispeed(&tio, baudrate);
+    // Set input speed
+    status = cfsetispeed(&tio, baudrate);
+    if (status == -1)
+    {
+        error_printf("Could not configure input speed (%s)", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+
+    // Set output speed
     cfsetospeed(&tio, baudrate);
+    if (status == -1)
+    {
+        error_printf("Could not configure output speed (%s)", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
 
     /* Set databits */
     tio.c_cflag &= ~CSIZE;
@@ -340,7 +359,6 @@ void tty_disconnect(void)
 void tty_restore(void)
 {
     tcsetattr(fd, TCSANOW, &old_tio);
-    tcsetattr(fd, TCSAFLUSH, &old_tio);
 
     if (connected)
         tty_disconnect();
@@ -407,8 +425,12 @@ int tty_connect(void)
     tio.c_cc[VMIN]  = 1; /* Blocking read until 1 character received */
 
     /* Activate new port settings */
-    tcsetattr(fd, TCSANOW, &tio);
-    tcsetattr(fd, TCSAFLUSH, &tio);
+    status = tcsetattr(fd, TCSANOW, &tio);
+    if (status == -1)
+    {
+        error_printf_silent("Could not apply port settings (%s)", strerror(errno));
+        goto error_tcsetattr;
+    }
 
     maxfd = MAX(fd, STDIN_FILENO) + 1;  /* Maximum bit entry (fd) to test */
 
@@ -495,6 +517,7 @@ int tty_connect(void)
 
     return TIO_SUCCESS;
 
+error_tcsetattr:
 error_tcgetattr:
 error_read:
     tty_disconnect();
