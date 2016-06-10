@@ -87,9 +87,6 @@ TIO_CHECK_BAUDRATES(
 
 AC_DEFINE_UNQUOTED([AUTOCONF_BAUDRATE_CASES],[$BAUDRATE_CASES],[Switch cases for detected baud rates])
 
-# Check that it is possible to set arbitrary baud rates using BOTHER
-AC_CHECK_DECLS([BOTHER], [], [], [[#include <asm/termios.h>]])
-
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([src/Makefile])
 AC_CONFIG_FILES([src/bash-completion/tio])
