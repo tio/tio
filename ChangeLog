@@ -1,5 +1,22 @@
 
-=== tio v1.19 ===
+=== tio v1.20 ===
+
+Changes since tio v1.19:
+
+ * Added more error handling of terminal calls
+
+   Also removed duplicate terminal flushing calls.
+
+ * Revert "Added support for non-standard baud rates"
+
+   This reverts commit deec83a4eeddd5c3b2d4df041aede2bceb8867da.
+
+   Reverting because supporting non-standard or arbitrary baud rates is
+   troublesome because the c library provides no means of doing so and even
+   if bare metal linux kernel interface is used it will not work on all
+   Linux kernels version.
+
+
 
 Changes since tio v1.18:
 
