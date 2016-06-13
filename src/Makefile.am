@@ -16,6 +16,6 @@ tio_SOURCES = tty.c \
 if ENABLE_BASH_COMPLETION
 
 bashcompletiondir=@BASH_COMPLETION_DIR@
-dist_bashcompletion_DATA=bash-completion/tio
+bashcompletion_DATA=bash-completion/tio
 
 endif
