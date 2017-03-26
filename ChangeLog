@@ -9,7 +9,7 @@ Changes since tio v1.19:
 
  * Revert "Added support for non-standard baud rates"
 
-   This reverts commit deec83a4eeddd5c3b2d4df041aede2bceb8867da.
+   This reverts a change made in v1.18.
 
    Reverting because supporting non-standard or arbitrary baud rates is
    troublesome because the c library provides no means of doing so and even
@@ -151,15 +151,8 @@ Jakob Haufe:
 
  * Include config.h before standard headers
 
-   This makes use of 8d6d202 (Enable large file support) for real.
-
-Jakub Wilk:
-
- * Fixed printf directives for tx/rx counters
-
-   In 9a66de0affda, types of tx/rx counters were changed from "long" to
-   "unsigned long", but their printf directives remained "%ld".
-   Change them to "%lu" to match the actual types.
+   Large file support was meant to be enabled in v1.11.
+   This change enables it for real.
 
 
 
@@ -363,7 +356,7 @@ Jakub Wilk:
 
  * Completed the ^g to ^t transition
 
-   In 72a287f18995 the escape key was changed from ^g to ^t, but some
+   In v1.7 the escape key was changed from ^g to ^t, but some
    code and comments still referred to the old key.
 
  * Used HTTPS for tio.github.io
