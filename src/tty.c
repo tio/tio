@@ -76,12 +76,16 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
             case KEY_QUESTION:
                 tio_printf("Key commands:");
                 tio_printf(" ctrl-t ?   List available key commands");
+                tio_printf(" ctrl-t b   Send break");
                 tio_printf(" ctrl-t c   Show configuration");
                 tio_printf(" ctrl-t l   Clear screen");
                 tio_printf(" ctrl-t q   Quit");
                 tio_printf(" ctrl-t s   Show statistics");
                 tio_printf(" ctrl-t t   Send ctrl-t key code");
                 *forward = false;
+                break;
+            case KEY_B:
+                tcsendbreak(fd, 0);
                 break;
             case KEY_C:
                 tio_printf("Configuration:");
