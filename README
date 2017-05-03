@@ -48,14 +48,24 @@
     Tio features full bash autocompletion support.
 
 
-3. Download
+3. Install
+
+    Install tio in seconds on Ubuntu and other snap supported Linux
+    distributions: https://snapcraft.io/docs/core/install
+
+    snap install tio
+
+    Installing a snap is very quick. Snaps are secure. They are isolated
+    with all of their dependencies. Snaps also auto update when a new
+    version is released.
+
+
+4. Download and Compile
 
     Find the latest release tarball at https://tio.github.io
 
     The latest source is available on GitHub: https://github.com/tio/tio
 
-
-4. Installation
 
     Install steps:
 
