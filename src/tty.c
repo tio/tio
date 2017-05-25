@@ -86,6 +86,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 break;
             case KEY_B:
                 tcsendbreak(fd, 0);
+                *forward = false;
                 break;
             case KEY_C:
                 tio_printf("Configuration:");
@@ -102,7 +103,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 break;
             case KEY_L:
                 status = system("clear");
-                 *forward = false;
+                *forward = false;
                 break;
             case KEY_Q:
                 /* Exit upon ctrl-t q sequence */
