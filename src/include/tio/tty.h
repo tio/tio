@@ -25,11 +25,15 @@
 #define KEY_QUESTION 0x3f
 #define KEY_B 0x62
 #define KEY_C 0x63
+#define KEY_H 0x68
 #define KEY_L 0x6C
 #define KEY_Q 0x71
 #define KEY_S 0x73
 #define KEY_T 0x74
 #define KEY_CTRL_T 0x14
+
+#define NORMAL 0
+#define HEX 1
 
 void stdout_configure(void);
 void stdout_restore(void);

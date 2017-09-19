@@ -47,12 +47,24 @@ static unsigned long rx_total = 0, tx_total = 0;
 static bool connected = false;
 static bool tainted = false;
 static int fd;
+static bool print_mode = NORMAL;
+static void (*print)(char c);
 
 #define tio_printf(format, args...) \
 { \
     if (tainted) putchar('\n'); \
     color_printf("[tio %s] " format, current_time(), ## args); \
     tainted = false; \
+}
+
+static void print_hex(char c)
+{
+    printf("%02x ", (unsigned char) c);
+}
+
+static void print_normal(char c)
+{
+    putchar(c);
 }
 
 void handle_command_sequence(char input_char, char previous_char, char *output_char, bool *forward)
@@ -78,16 +90,19 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" ctrl-t ?   List available key commands");
                 tio_printf(" ctrl-t b   Send break");
                 tio_printf(" ctrl-t c   Show configuration");
+                tio_printf(" ctrl-t h   Toggle hexidecimal mode");
                 tio_printf(" ctrl-t l   Clear screen");
                 tio_printf(" ctrl-t q   Quit");
                 tio_printf(" ctrl-t s   Show statistics");
                 tio_printf(" ctrl-t t   Send ctrl-t key code");
                 *forward = false;
                 break;
+
             case KEY_B:
                 tcsendbreak(fd, 0);
                 *forward = false;
                 break;
+
             case KEY_C:
                 tio_printf("Configuration:");
                 tio_printf(" TTY device: %s", option.tty_device);
@@ -101,23 +116,45 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                     tio_printf(" Log file: %s", option.log_filename);
                 *forward = false;
                 break;
+
+            case KEY_H:
+                /* Toggle hexidecimal printing mode */
+                if (print_mode == NORMAL)
+                {
+                    print = print_hex;
+                    print_mode = HEX;
+                    tio_printf("Switched to hexidecimal mode");
+                }
+                else
+                {
+                    print = print_normal;
+                    print_mode = NORMAL;
+                    tio_printf("Switched to normal mode");
+                }
+                *forward = false;
+                break;
+
             case KEY_L:
                 status = system("clear");
                 *forward = false;
                 break;
+
             case KEY_Q:
                 /* Exit upon ctrl-t q sequence */
                 exit(EXIT_SUCCESS);
+
             case KEY_S:
                 /* Show tx/rx statistics upon ctrl-t s sequence */
                 tio_printf("Statistics:");
                 tio_printf(" Sent %lu bytes, received %lu bytes", tx_total, rx_total);
                 *forward = false;
                 break;
+
             case KEY_T:
                 /* Send ctrl-t key code upon ctrl-t t sequence */
                 *output_char = KEY_CTRL_T;
                 break;
+
             default:
                 /* Ignore unknown ctrl-t escaped keys */
                 *forward = false;
@@ -161,6 +198,9 @@ void stdout_configure(void)
     /* Print launch hints */
     tio_printf("tio v%s", VERSION);
     tio_printf("Press ctrl-t q to quit");
+
+    /* At start use normal print function */
+    print = print_normal;
 
     /* Make sure we restore old stdout settings on exit */
     atexit(&stdout_restore);
@@ -459,7 +499,7 @@ int tty_connect(void)
                     rx_total++;
 
                     /* Print received tty character to stdout */
-                    putchar(input_char);
+                    print(input_char);
                     fflush(stdout);
 
                     /* Write to log */
