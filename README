@@ -1,4 +1,4 @@
-=== tio - a simple TTY terminal I/O application ===
+################# tio - a simple TTY terminal I/O application ##################
 
 
 1. Introduction
@@ -50,9 +50,7 @@
 
 3. Download
 
-    Find the latest release tarball at https://tio.github.io
-
-    The latest source is available on GitHub: https://github.com/tio/tio
+    The latest release tarball is available at https://tio.github.io
 
 
 4. Installation
@@ -69,12 +67,15 @@
 5. Contributing
 
     Tio is open source. Any contributions (bug fixes, doc, ideas, etc.) are
-    welcome.
+    welcome. Visit the tio GitHub page to access latest source code, create
+    pull requests, add issues etc..
+
+    GitHub: https://github.com/tio/tio
 
 
 6. Support
 
-    Submit bug reports on GitHub: https://github.com/tio/tio/issues
+    Submit bug reports via GitHub: https://github.com/tio/tio/issues
 
 
 7. License
