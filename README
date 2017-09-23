@@ -48,6 +48,11 @@
 
     Tio features full bash autocompletion support.
 
+    Tio also supports various key commands. Press ctrl-t ? to list the
+    available key commands.
+
+    See the tio man page for more details.
+
 
 3. Download
 
