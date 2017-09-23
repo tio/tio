@@ -2,6 +2,7 @@
 ################# tio - a simple TTY terminal I/O application ##################
 ################################################################################
 
+
 1. Introduction
 
     "tio" is a simple TTY terminal application which features a straightforward
@@ -44,7 +45,7 @@
     for the device to reappear and then reconnect.
 
     However, if the --no-autoconnect option is provided tio will exit if the
-    device is not present or exit if an established connection is lost.
+    device is not present or an established connection is lost.
 
     Tio features full bash autocompletion support.
 
@@ -61,13 +62,19 @@
 
 4. Installation
 
-    Install steps:
+    Installation steps (from source):
 
     $ ./configure
     $ make
     $ make install
 
-    See INSTALL file for installation details.
+    See INSTALL file for more installation details.
+
+
+    Installation steps (binary package):
+
+    Tio comes prepackaged for various GNU/Linux distributions. Visit
+    https://tio.github.io to see package installation details.
 
 
 5. Contributing
