@@ -83,6 +83,9 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
     /* Handle escape key commands */
     if (previous_char == KEY_CTRL_T)
     {
+        /* Do not forward input char to output by default */
+        *forward = false;
+
         switch (input_char)
         {
             case KEY_QUESTION:
@@ -95,12 +98,10 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" ctrl-t q   Quit");
                 tio_printf(" ctrl-t s   Show statistics");
                 tio_printf(" ctrl-t t   Send ctrl-t key code");
-                *forward = false;
                 break;
 
             case KEY_B:
                 tcsendbreak(fd, 0);
-                *forward = false;
                 break;
 
             case KEY_C:
@@ -114,7 +115,6 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" Output delay: %d", option.output_delay);
                 if (option.log)
                     tio_printf(" Log file: %s", option.log_filename);
-                *forward = false;
                 break;
 
             case KEY_H:
@@ -131,12 +131,10 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                     print_mode = NORMAL;
                     tio_printf("Switched to normal mode");
                 }
-                *forward = false;
                 break;
 
             case KEY_L:
                 status = system("clear");
-                *forward = false;
                 break;
 
             case KEY_Q:
@@ -147,17 +145,16 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 /* Show tx/rx statistics upon ctrl-t s sequence */
                 tio_printf("Statistics:");
                 tio_printf(" Sent %lu bytes, received %lu bytes", tx_total, rx_total);
-                *forward = false;
                 break;
 
             case KEY_T:
                 /* Send ctrl-t key code upon ctrl-t t sequence */
                 *output_char = KEY_CTRL_T;
+                *forward = true;
                 break;
 
             default:
                 /* Ignore unknown ctrl-t escaped keys */
-                *forward = false;
                 break;
         }
     }
