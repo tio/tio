@@ -16,11 +16,11 @@ Changes since tio v1.21:
 
 Changes since tio v1.20:
 
- * Add support for hexidecimal mode
+ * Add support for hexadecimal mode
 
    A new key command 'ctrl-t h' is introduced which toggles between
-   hexidecial mode and normal mode. When in hexidecimal mode data received
-   will be printed in hexidecimal.
+   hexadecimal mode and normal mode. When in hexadecimal mode data received
+   will be printed in hexadecimal.
 
  * Do not distribute src/bash_completion/tio
 

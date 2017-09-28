@@ -93,7 +93,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" ctrl-t ?   List available key commands");
                 tio_printf(" ctrl-t b   Send break");
                 tio_printf(" ctrl-t c   Show configuration");
-                tio_printf(" ctrl-t h   Toggle hexidecimal mode");
+                tio_printf(" ctrl-t h   Toggle hexadecimal mode");
                 tio_printf(" ctrl-t l   Clear screen");
                 tio_printf(" ctrl-t q   Quit");
                 tio_printf(" ctrl-t s   Show statistics");
@@ -118,12 +118,12 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 break;
 
             case KEY_H:
-                /* Toggle hexidecimal printing mode */
+                /* Toggle hexadecimal printing mode */
                 if (print_mode == NORMAL)
                 {
                     print = print_hex;
                     print_mode = HEX;
-                    tio_printf("Switched to hexidecimal mode");
+                    tio_printf("Switched to hexadecimal mode");
                 }
                 else
                 {
