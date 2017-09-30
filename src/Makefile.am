@@ -14,8 +14,6 @@ tio_SOURCES = tty.c \
               include/tio/error.h
 
 if ENABLE_BASH_COMPLETION
-
 bashcompletiondir=@BASH_COMPLETION_DIR@
 bashcompletion_DATA=bash-completion/tio
-
 endif
