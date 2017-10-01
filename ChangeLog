@@ -1,5 +1,26 @@
 
-=== tio v1.23 ===
+=== tio v1.24 ===
+
+
+Changes since tio v1.23:
+
+ * Optimize clear screen command
+
+   Replaced system call with inline ANSI/VT100 clear screen code sequence
+
+ * Fix bash completion installation
+
+   Fixed the configure script to avoid that the bash completion script gets
+   installed outside of the prefix location. The default install location
+   is now $prefix/share/bash-completion/completions.
+
+   Use the configure option '--with-bash-completion-dir=PATH' if you need
+   to install the bash completion script elsewhere.
+
+Jakub Wilk:
+
+ * Add missing commas in conditional sentences
+
 
 
 Changes since tio v1.22:
