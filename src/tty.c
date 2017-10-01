@@ -134,7 +134,9 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 break;
 
             case KEY_L:
-                status = system("clear");
+                /* Clear screen using ANSI/VT100 escape code */
+                printf("\033c");
+                fflush(stdout);
                 break;
 
             case KEY_Q:
