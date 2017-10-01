@@ -71,7 +71,6 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
 {
     char unused_char;
     bool unused_bool;
-    int __attribute__((unused)) status;
 
     /* Ignore unused arguments */
     if (output_char == NULL)
