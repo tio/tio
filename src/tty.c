@@ -173,13 +173,11 @@ void stdout_configure(void)
     }
 
     /* Prepare new stdout settings */
-    memset(&new_stdout, 0, sizeof(new_stdout));
+    memcpy(&new_stdout, &old_stdout, sizeof(old_stdout));
 
-    /* Control, input, output, local modes for stdout */
-    new_stdout.c_cflag = 0;
-    new_stdout.c_iflag = 0;
-    new_stdout.c_oflag = 0;
-    new_stdout.c_lflag = 0;
+    /* Reconfigure stdout (RAW configuration) */
+    new_stdout.c_oflag &= ~(OPOST);
+    new_stdout.c_lflag &= ~(ECHO|ICANON|ISIG|ECHOE|ECHOK|ECHONL);
 
     /* Control characters */
     new_stdout.c_cc[VTIME] = 0; /* Inter-character timer unused */
