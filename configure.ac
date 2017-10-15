@@ -7,7 +7,6 @@ AC_PROG_CC
 AC_LANG([C])
 AC_PROG_INSTALL
 AC_SYS_LARGEFILE
-PKG_PROG_PKG_CONFIG
 
 # Handle bash completion
 AC_ARG_WITH([bash-completion-dir],
