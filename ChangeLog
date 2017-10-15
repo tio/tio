@@ -1,5 +1,26 @@
 
-=== tio v1.24 ===
+=== tio v1.25 ===
+
+
+Changes since tio v1.24:
+
+ * Fix error applying new stdout settings
+
+   On Fedora 26 tio will quit with the following error message:
+
+   "Error: Could not apply new stdout settings (Invalid argument)"
+
+   In case of Fedora, it turns out that the new stdout settings used are a
+   bit too agressive because an empty termios structure is used. To remedy
+   this we reuse the existing stdout settings and only reconfigure the
+   specific options we need to make a "raw" stdout configuration.
+
+ * Remove unused pkgconfig in configure
+
+ * Code cleanup
+
+   Remove unused variable.
+
 
 
 Changes since tio v1.23:
