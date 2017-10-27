@@ -62,7 +62,7 @@
 
 4. Installation
 
-    Installation steps (from source):
+4.1 Installation from source:
 
     $ ./configure
     $ make
@@ -71,10 +71,10 @@
     See INSTALL file for more installation details.
 
 
-    Installation steps (binary package):
+4.2 Installation using package:
 
     Tio comes prepackaged for various GNU/Linux distributions. Visit
-    https://tio.github.io to see package installation details.
+    https://tio.github.io for package installation details.
 
 
 5. Contributing
