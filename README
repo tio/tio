@@ -91,12 +91,17 @@
     Submit bug reports via GitHub: https://github.com/tio/tio/issues
 
 
-7. License
+7. Website
+
+    Visit https://tio.github.io
+
+
+8. License
 
     Tio is GPLv2+. See COPYING file for license details.
 
 
-8. Authors
+9. Authors
 
     Created by Martin Lund <martin.lund@keep-it-simple.com>
 
