@@ -326,6 +326,15 @@ void tty_configure(void)
         error_printf("Invalid parity");
         exit(EXIT_FAILURE);
     }
+
+    /* Control, input, output, local modes for tty device */
+    tio.c_cflag |= CLOCAL | CREAD;
+    tio.c_oflag = 0;
+    tio.c_lflag = 0;
+
+    /* Control characters */
+    tio.c_cc[VTIME] = 0; // Inter-character timer unused
+    tio.c_cc[VMIN]  = 1; // Blocking read until 1 character received
 }
 
 void tty_wait_for_device(void)
@@ -455,15 +464,6 @@ int tty_connect(void)
         atexit(&tty_restore);
         first = false;
     }
-
-    /* Control, input, output, local modes for tty device */
-    tio.c_cflag |= CLOCAL | CREAD;
-    tio.c_oflag = 0;
-    tio.c_lflag = 0;
-
-    /* Control characters */
-    tio.c_cc[VTIME] = 0; /* Inter-character timer unused */
-    tio.c_cc[VMIN]  = 1; /* Blocking read until 1 character received */
 
     /* Activate new port settings */
     status = tcsetattr(fd, TCSANOW, &tio);
