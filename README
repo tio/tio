@@ -30,6 +30,7 @@
           -o, --output-delay <ms>     Output delay (default: 0)
           -n, --no-autoconnect        Disable automatic connect
           -l, --log <filename>        Log to file
+          -m, --map <flags>           Map special characters
           -v, --version               Display version
           -h, --help                  Display help
 

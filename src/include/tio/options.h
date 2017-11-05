@@ -40,6 +40,7 @@ struct option_t
     bool no_autoconnect;
     bool log;
     const char *log_filename;
+    const char *map;
 };
 
 extern struct option_t option;

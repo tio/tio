@@ -55,6 +55,28 @@ option is provided, tio will exit if the device is not present or an established
 .BR \-l ", " "\-\-log " \fI<filename>
 
 Log to file.
+
+.TP
+.BR \-m ", " "\-\-map " \fI<flags>
+
+Map (replace, translate) special characters on input or output. The following mapping flags are supported:
+
+.RS
+.TP 8n
+.IP "\fBINLCR"
+Translate NL to CR on input.
+.IP "\fBIGNCR"
+Ignore carriage return on input.
+.IP "\fBICRNL"
+Translate carriage return to newline on input (unless IGNCR is set).
+.IP "\fBONLCR"
+Map NL to CR-NL on output.
+.IP "\fBOCRNL"
+Map CR to NL on output.
+.P
+If defining more than one flag, the flags must be comma separated.
+.RE
+
 .TP
 .BR \-v ", " \-\-version
 

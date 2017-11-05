@@ -18,6 +18,7 @@ _tio()
           -o --output-delay \
           -n --no-autoconnect \
           -l --log \
+          -m --map \
           -v --version \
           -h --help"
 
@@ -54,6 +55,10 @@ _tio()
             ;;
         -l | --log)
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        -m | --map)
+            COMPREPLY=( $(compgen -W "INLCR IGNCR ICRNL ONLCR OCRNL" -- ${cur}) )
             return 0
             ;;
         -v | --version)

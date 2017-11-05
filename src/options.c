@@ -25,6 +25,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <errno.h>
 #include <getopt.h>
 #include <termios.h>
@@ -44,7 +45,8 @@ struct option_t option =
     0,        // No output delay
     false,    // No autoconnect
     false,    // No log
-    ""        // Log filename
+    "",       // Log filename
+    ""        // Map string
 };
 
 void print_help(char *argv[])
@@ -60,6 +62,7 @@ void print_help(char *argv[])
     printf("  -o, --output-delay <ms>     Output delay (default: 0)\n");
     printf("  -n, --no-autoconnect        Disable automatic connect\n");
     printf("  -l, --log <filename>        Log to file\n");
+    printf("  -m, --map <flags>           Map special characters\n");
     printf("  -v, --version               Display version\n");
     printf("  -h, --help                  Display help\n");
     printf("\n");
@@ -105,6 +108,7 @@ void parse_options(int argc, char *argv[])
             {"output-delay",   required_argument, 0, 'o'},
             {"no-autoconnect", no_argument,       0, 'n'},
             {"log",            required_argument, 0, 'l'},
+            {"map",            required_argument, 0, 'm'},
             {"version",        no_argument,       0, 'v'},
             {"help",           no_argument,       0, 'h'},
             {0,                0,                 0,  0 }
@@ -114,7 +118,7 @@ void parse_options(int argc, char *argv[])
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:nl:vh", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:nl:m:vh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
@@ -163,6 +167,10 @@ void parse_options(int argc, char *argv[])
             case 'l':
                 option.log = true;
                 option.log_filename = optarg;
+                break;
+
+            case 'm':
+                option.map = optarg;
                 break;
 
             case 'v':
