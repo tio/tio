@@ -42,7 +42,7 @@
 #include "tio/log.h"
 #include "tio/error.h"
 
-static struct termios tio, new_stdout, old_stdout, old_tio;
+static struct termios tio, tio_old, stdout_new, stdout_old, stdin_new, stdin_old;
 static unsigned long rx_total = 0, tx_total = 0;
 static bool connected = false;
 static bool tainted = false;
@@ -163,30 +163,70 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
     }
 }
 
+void stdin_configure(void)
+{
+    int status;
+
+    /* Save current stdin settings */
+    if (tcgetattr(STDIN_FILENO, &stdin_old) < 0)
+    {
+        error_printf("Saving current stdin settings failed");
+        exit(EXIT_FAILURE);
+    }
+
+    /* Prepare new stdin settings */
+    memcpy(&stdin_new, &stdin_old, sizeof(stdin_old));
+
+    /* Reconfigure stdin (RAW configuration) */
+    stdin_new.c_iflag &= ~(ICRNL); // Do not translate CR -> NL on input
+    stdin_new.c_oflag &= ~(OPOST);
+    stdin_new.c_lflag &= ~(ECHO|ICANON|ISIG|ECHOE|ECHOK|ECHONL);
+
+    /* Control characters */
+    stdin_new.c_cc[VTIME] = 0; /* Inter-character timer unused */
+    stdin_new.c_cc[VMIN]  = 1; /* Blocking read until 1 character received */
+
+    /* Activate new stdin settings */
+    status = tcsetattr(STDIN_FILENO, TCSANOW, &stdin_new);
+    if (status == -1)
+    {
+        error_printf("Could not apply new stdin settings (%s)", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+
+    /* Make sure we restore old stdin settings on exit */
+    atexit(&stdin_restore);
+}
+
+void stdin_restore(void)
+{
+    tcsetattr(STDIN_FILENO, TCSANOW, &stdin_old);
+}
+
 void stdout_configure(void)
 {
     int status;
 
     /* Save current stdout settings */
-    if (tcgetattr(STDOUT_FILENO, &old_stdout) < 0)
+    if (tcgetattr(STDOUT_FILENO, &stdout_old) < 0)
     {
         error_printf("Saving current stdio settings failed");
         exit(EXIT_FAILURE);
     }
 
     /* Prepare new stdout settings */
-    memcpy(&new_stdout, &old_stdout, sizeof(old_stdout));
+    memcpy(&stdout_new, &stdout_old, sizeof(stdout_old));
 
     /* Reconfigure stdout (RAW configuration) */
-    new_stdout.c_oflag &= ~(OPOST);
-    new_stdout.c_lflag &= ~(ECHO|ICANON|ISIG|ECHOE|ECHOK|ECHONL);
+    stdout_new.c_oflag &= ~(OPOST);
+    stdout_new.c_lflag &= ~(ECHO|ICANON|ISIG|ECHOE|ECHOK|ECHONL);
 
     /* Control characters */
-    new_stdout.c_cc[VTIME] = 0; /* Inter-character timer unused */
-    new_stdout.c_cc[VMIN]  = 1; /* Blocking read until 1 character received */
+    stdout_new.c_cc[VTIME] = 0; /* Inter-character timer unused */
+    stdout_new.c_cc[VMIN]  = 1; /* Blocking read until 1 character received */
 
     /* Activate new stdout settings */
-    status = tcsetattr(STDOUT_FILENO, TCSANOW, &new_stdout);
+    status = tcsetattr(STDOUT_FILENO, TCSANOW, &stdout_new);
     if (status == -1)
     {
         error_printf("Could not apply new stdout settings (%s)", strerror(errno));
@@ -206,7 +246,7 @@ void stdout_configure(void)
 
 void stdout_restore(void)
 {
-    tcsetattr(STDOUT_FILENO, TCSANOW, &old_stdout);
+    tcsetattr(STDOUT_FILENO, TCSANOW, &stdout_old);
 }
 
 void tty_configure(void)
@@ -446,7 +486,7 @@ void tty_disconnect(void)
 
 void tty_restore(void)
 {
-    tcsetattr(fd, TCSANOW, &old_tio);
+    tcsetattr(fd, TCSANOW, &tio_old);
 
     if (connected)
         tty_disconnect();
@@ -493,7 +533,7 @@ int tty_connect(void)
     tainted = false;
 
     /* Save current port settings */
-    if (tcgetattr(fd, &old_tio) < 0)
+    if (tcgetattr(fd, &tio_old) < 0)
         goto error_tcgetattr;
 
     /* Make sure we restore tty settings on exit */

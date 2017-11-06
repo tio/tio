@@ -42,6 +42,9 @@ int main(int argc, char *argv[])
     /* Configure tty device */
     tty_configure();
 
+    /* Configure input terminal */
+    stdin_configure();
+
     /* Configure output terminal */
     stdout_configure();
 
