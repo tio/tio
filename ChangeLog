@@ -1,5 +1,29 @@
 
-=== tio v1.25 ===
+=== tio v1.26 ===
+
+
+Changes since tio v1.25:
+
+ * Reconfigure stdin
+
+   Make stdin behave more raw'ish. In particular, don't
+   translate CR -> NL on input.
+
+ * Add special character map feature
+
+   Add a --map option which allows to map special characters, in particular CR and
+   NL characters which are used in various combinations on varios platforms.
+
+ * Cleanup
+
+ * Update AUTHORS
+
+ * Update README
+
+ * Mention website
+
+ * Update man page
+
 
 
 Changes since tio v1.24:
