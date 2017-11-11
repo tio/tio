@@ -64,11 +64,11 @@ Map (replace, translate) special characters on input or output. The following ma
 .RS
 .TP 8n
 .IP "\fBINLCR"
-Translate NL to CR on input.
+Map NL to CR on input.
 .IP "\fBIGNCR"
-Ignore carriage return on input.
+Ignore CR on input.
 .IP "\fBICRNL"
-Translate carriage return to newline on input (unless IGNCR is set).
+Map CR to NL on input (unless IGNCR is set).
 .IP "\fBONLCR"
 Map NL to CR-NL on output.
 .IP "\fBOCRNL"
@@ -115,13 +115,13 @@ tio /dev/ttyUSB0
 .TP
 Which corresponds to the commonly used options:
 
-tio \-b 115200 \-d 8 \-f none \-s 1 \-p none /dev/ttyUSB0
+tio \-\-baudrate 115200 \-\-databits 8 \-\-flow none \-\-stopbits 1 \-\-parity none /dev/ttyUSB0
 .TP
-It is recommended to connect serial tty devices by id. For example:
+It is recommended to connect serial tty devices by ID. For example:
 
 tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
 .PP
-Using serial devices by id ensures that tio automatically reconnects to the
+Using serial devices by ID ensures that tio automatically reconnects to the
 correct serial device if the device is disconnected and then reconnected.
 
 .SH "WEBSITE"
