@@ -42,13 +42,18 @@
 #include "tio/log.h"
 #include "tio/error.h"
 
+#ifdef HAVE_TERMIOS2
+extern int setspeed2(int fd, int baudrate);
+#endif
+
 static struct termios tio, tio_old, stdout_new, stdout_old, stdin_new, stdin_old;
 static unsigned long rx_total = 0, tx_total = 0;
 static bool connected = false;
 static bool tainted = false;
-static int fd;
 static bool print_mode = NORMAL;
+static bool standard_baudrate = true;
 static void (*print)(char c);
+static int fd;
 
 #define tio_printf(format, args...) \
 { \
@@ -276,24 +281,32 @@ void tty_configure(void)
         AUTOCONF_BAUDRATE_CASES
 
         default:
+#ifdef HAVE_TERMIOS2
+            standard_baudrate = false;
+            break;
+#else
             error_printf("Invalid baud rate");
             exit(EXIT_FAILURE);
+#endif
     }
 
-    // Set input speed
-    status = cfsetispeed(&tio, baudrate);
-    if (status == -1)
+    if (standard_baudrate)
     {
-        error_printf("Could not configure input speed (%s)", strerror(errno));
-        exit(EXIT_FAILURE);
-    }
+        // Set input speed
+        status = cfsetispeed(&tio, baudrate);
+        if (status == -1)
+        {
+            error_printf("Could not configure input speed (%s)", strerror(errno));
+            exit(EXIT_FAILURE);
+        }
 
-    // Set output speed
-    cfsetospeed(&tio, baudrate);
-    if (status == -1)
-    {
-        error_printf("Could not configure output speed (%s)", strerror(errno));
-        exit(EXIT_FAILURE);
+        // Set output speed
+        cfsetospeed(&tio, baudrate);
+        if (status == -1)
+        {
+            error_printf("Could not configure output speed (%s)", strerror(errno));
+            exit(EXIT_FAILURE);
+        }
     }
 
     /* Set databits */
@@ -551,6 +564,17 @@ int tty_connect(void)
         goto error_tcsetattr;
     }
 
+#ifdef HAVE_TERMIOS2
+    if (!standard_baudrate)
+    {
+        if (setspeed2(fd, option.baudrate) != 0)
+        {
+            error_printf_silent("Could not set baudrate speed (%s)", strerror(errno));
+            goto error_setspeed2;
+        }
+    }
+#endif
+
     maxfd = MAX(fd, STDIN_FILENO) + 1;  /* Maximum bit entry (fd) to test */
 
     /* Input loop */
@@ -636,6 +660,9 @@ int tty_connect(void)
 
     return TIO_SUCCESS;
 
+#ifdef HAVE_TERMIOS2
+error_setspeed2:
+#endif
 error_tcsetattr:
 error_tcgetattr:
 error_read:

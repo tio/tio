@@ -13,6 +13,10 @@ tio_SOURCES = tty.c \
               include/tio/log.h \
               include/tio/error.h
 
+if ADD_SETSPEED2
+tio_SOURCES += setspeed2.c
+endif
+
 if ENABLE_BASH_COMPLETION
 bashcompletiondir=@BASH_COMPLETION_DIR@
 bashcompletion_DATA=bash-completion/tio
