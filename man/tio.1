@@ -1,4 +1,4 @@
-.TH "tio" "1" "October 2017"
+.TH "tio" "1" "November 2017"
 
 .SH "NAME"
 tio \- a simple TTY terminal I/O application
@@ -39,7 +39,7 @@ Set parity (default: none).
 .TP
 .BR \-o ", " "\-\-output\-delay " \fI<ms>
 
-Set output delay [ms] inserted between each transmitted character (default: 0).
+Set output delay [ms] inserted between each sent character (default: 0).
 .TP
 .BR \-n ", " \-\-no\-autoconnect
 
@@ -103,7 +103,7 @@ Clear screen
 .IP "\fBctrl-t q"
 Quit
 .IP "\fBctrl-t s"
-Show statistics (total number of bytes transmitted/received)
+Show TX/RX statistics
 .IP "\fBctrl-t t"
 Send ctrl-t key code
 
@@ -115,7 +115,7 @@ tio /dev/ttyUSB0
 .TP
 Which corresponds to the commonly used options:
 
-tio \-\-baudrate 115200 \-\-databits 8 \-\-flow none \-\-stopbits 1 \-\-parity none /dev/ttyUSB0
+tio \-b 115200 \-d 8 \-f none \-s 1 \-p none /dev/ttyUSB0
 .TP
 It is recommended to connect serial tty devices by ID. For example:
 
