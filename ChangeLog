@@ -1,5 +1,23 @@
 
-=== tio v1.26 ===
+=== tio v1.27 ===
+
+
+
+Changes since tio v1.26:
+
+ * Update man page
+
+ * Add support for setting non-standard baudrates
+
+   Support for non-standard baudrate settings will be automatically enabled
+   if the termios2 interface is detected available. However, to play it
+   safe, the old and widely supported termios interface will still be used
+   when setting standard baudrates.
+
+ * Cleanup
+
+ * Update AUTHORS
+
 
 
 Changes since tio v1.25:
@@ -75,6 +93,7 @@ Changes since tio v1.22:
 Jakub Wilk:
 
  * Fix typos
+
 
 
 Changes since tio v1.21:
