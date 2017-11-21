@@ -29,8 +29,8 @@ Changes since tio v1.25:
 
  * Add special character map feature
 
-   Add a --map option which allows to map special characters, in particular CR and
-   NL characters which are used in various combinations on varios platforms.
+   Add a --map option which allows mapping special characters, in particular CR and
+   NL characters which are used in various combinations on various platforms.
 
  * Cleanup
 
@@ -53,7 +53,7 @@ Changes since tio v1.24:
    "Error: Could not apply new stdout settings (Invalid argument)"
 
    In case of Fedora, it turns out that the new stdout settings used are a
-   bit too agressive because an empty termios structure is used. To remedy
+   bit too aggressive because an empty termios structure is used. To remedy
    this we reuse the existing stdout settings and only reconfigure the
    specific options we need to make a "raw" stdout configuration.
 
