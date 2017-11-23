@@ -1,16 +1,14 @@
-################################################################################
-################# tio - a simple TTY terminal I/O application ##################
-################################################################################
+=== tio - a simple TTY terminal I/O application ===
 
 
 1. Introduction
 
-    "tio" is a simple TTY terminal application which features a straightforward
+    tio is a simple TTY terminal application which features a straightforward
     commandline interface to easily connect to TTY devices for basic
     input/output.
 
-    It was created because the author needed a simple no-nonsense TTY
-    terminal application to easily connect to various terminal TTY devices.
+    It was created because the author needed a simple no-nonsense TTY terminal
+    application to easily connect to various terminal TTY devices.
 
 
 2. Usage
@@ -56,53 +54,54 @@
     See the tio man page for more details.
 
 
-3. Download
+3. Installation
 
-    The latest release tarball is available at https://tio.github.io
+    The latest release version is available at https://tio.github.io
 
+3.1 Installation using release tarball
 
-4. Installation
+    Install steps:
 
-4.1 Installation from source:
-
-    $ ./configure
-    $ make
-    $ make install
+     $ ./configure
+     $ make
+     $ make install
 
     See INSTALL file for more installation details.
 
-
-4.2 Installation using package:
+3.2 Installation using package
 
     Tio comes prepackaged for various GNU/Linux distributions. Visit
     https://tio.github.io for package installation details.
 
 
-5. Contributing
+4. Contributing
 
-    Tio is open source. Any contributions (bug fixes, doc, ideas, etc.) are
+    Tio is open source. All contributions (bug fixes, doc, ideas, etc.) are
     welcome. Visit the tio GitHub page to access latest source code, create
     pull requests, add issues etc..
 
     GitHub: https://github.com/tio/tio
 
+    Also, if you find this free open source software useful please consider
+    making a donation: https://www.paypal.me/lundmar
 
-6. Support
+
+5. Support
 
     Submit bug reports via GitHub: https://github.com/tio/tio/issues
 
 
-7. Website
+6. Website
 
     Visit https://tio.github.io
 
 
-8. License
+7. License
 
     Tio is GPLv2+. See COPYING file for license details.
 
 
-9. Authors
+8. Authors
 
     Created by Martin Lund <martin.lund@keep-it-simple.com>
 
