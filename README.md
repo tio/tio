@@ -10,6 +10,10 @@ commandline interface to easily connect to TTY devices for basic input/output.
 It was created because the author needed a simple no-nonsense TTY terminal
 application to easily connect to various terminal TTY devices.
 
+<p align="center">
+<img src="https://tio.github.io/images/tio-demo.gif">
+</p>
+
 
 ## 2. Usage
 
