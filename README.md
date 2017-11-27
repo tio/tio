@@ -1,6 +1,7 @@
 # tio - a simple TTY terminal I/O application
 
 [![Build Status](https://travis-ci.org/tio/tio.svg?branch=master)](https://travis-ci.org/tio/tio)
+[![Snap Status](https://build.snapcraft.io/badge/tio/tio.snapcraft.svg)](https://build.snapcraft.io/user/tio/tio.snapcraft)
 
 ## 1. Introduction
 
