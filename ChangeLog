@@ -1,5 +1,30 @@
 
-=== tio v1.27 ===
+=== tio v1.28 ===
+
+
+Changes since tio v1.27:
+
+ * Update README
+
+ * Update AUTHORS
+
+ * Add snap status to README.md
+
+ * Add README.md to prettify GitHub page
+
+ * Add missing header
+
+Petr Vaněk:
+
+ * Add missing header file under musl-libc
+
+   Musl's inclusion tree slightly differs from glibc, therefore TCGETS2 is
+   not reachable through sys/ioctl.h, so asm/ioctls.h needs to be included
+   too.
+
+Jakub Wilk:
+
+ * Fix grammar and typos
 
 
 
