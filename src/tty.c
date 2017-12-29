@@ -649,8 +649,8 @@ int tty_connect(void)
                 if (forward)
                 {
                     /* Map output character */
-                    if ((output_char == '\b') && (map_obsdel))
-                        output_char = 127;
+                    if ((output_char == 127) && (map_obsdel))
+                        output_char = '\b';
 
                     /* Send output to tty device */
                     status = write(fd, &output_char, 1);
