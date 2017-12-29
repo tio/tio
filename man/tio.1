@@ -62,17 +62,21 @@ Log to file.
 Map (replace, translate) special characters on input or output. The following mapping flags are supported:
 
 .RS
-.TP 8n
+.TP 12n
 .IP "\fBINLCR"
 Map NL to CR on input.
+.IP "\fBINLCRNL"
+Map NL to CR-NL on input.
 .IP "\fBIGNCR"
 Ignore CR on input.
 .IP "\fBICRNL"
 Map CR to NL on input (unless IGNCR is set).
-.IP "\fBONLCR"
+.IP "\fBONLCRNL"
 Map NL to CR-NL on output.
 .IP "\fBOCRNL"
 Map CR to NL on output.
+.IP "\fBODELBS"
+Map DEL to BS on output.
 .P
 If defining more than one flag, the flags must be comma separated.
 .RE

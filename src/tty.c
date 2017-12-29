@@ -54,6 +54,8 @@ static bool print_mode = NORMAL;
 static bool standard_baudrate = true;
 static void (*print)(char c);
 static int fd;
+static bool map_inlcrnl = false;
+static bool map_odelbs = false;
 
 #define tio_printf(format, args...) \
 { \
@@ -395,7 +397,6 @@ void tty_configure(void)
     tio.c_cc[VMIN]  = 1; // Blocking read until 1 character received
 
     /* Configure any specified input or output mappings */
-
     buffer = strdup(option.map);
     while (token_found == true)
     {
@@ -412,10 +413,14 @@ void tty_configure(void)
                 tio.c_iflag |= IGNCR;
             else if (strcmp(token,"ICRNL") == 0)
                 tio.c_iflag |= ICRNL;
-            else if (strcmp(token,"ONLCR") == 0)
+            else if (strcmp(token,"ONLCRNL") == 0)
                 tio.c_oflag |= ONLCR;
             else if (strcmp(token,"OCRNL") == 0)
                 tio.c_oflag |= OCRNL;
+            else if (strcmp(token,"ODELBS") == 0)
+                map_odelbs = true;
+            else if (strcmp(token,"INLCRNL") == 0)
+                map_inlcrnl = true;
             else
             {
                 printf("Error: Unknown mapping flag %s\n", token);
@@ -596,8 +601,16 @@ int tty_connect(void)
                     /* Update receive statistics */
                     rx_total++;
 
-                    /* Print received tty character to stdout */
-                    print(input_char);
+                    /* Map input character */
+                    if ((input_char == '\n') && (map_inlcrnl))
+                    {
+                        print('\r');
+                        print('\n');
+                    } else
+                    {
+                        /* Print received tty character to stdout */
+                        print(input_char);
+                    }
                     fflush(stdout);
 
                     /* Write to log */
@@ -635,6 +648,10 @@ int tty_connect(void)
 
                 if (forward)
                 {
+                    /* Map output character */
+                    if ((output_char == 127) && (map_odelbs))
+                        output_char = '\b';
+
                     /* Send output to tty device */
                     status = write(fd, &output_char, 1);
                     if (status < 0)
