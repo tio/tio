@@ -1,5 +1,19 @@
 
-=== tio v1.28 ===
+=== tio v1.29 ===
+
+
+
+Changes since tio v1.28:
+
+ * Add mapping flags INLCRNL and ODELBS
+
+   The following new mapping flags are added:
+
+   INLCRNL: Map NL to CR-NL on input.
+   ODELBS: Map DEL to BS on output.
+
+   Flags requested and tested by Jan Ciger (janoc).
+
 
 
 Changes since tio v1.27:
@@ -558,3 +572,4 @@ Jakub Wilk:
  * Fixed silly "tio or tio" in man page
 
  * Fixed typo
+
