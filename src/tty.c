@@ -55,6 +55,7 @@ static bool standard_baudrate = true;
 static void (*print)(char c);
 static int fd;
 static bool map_inlcrnl = false;
+static bool map_onlcrnl = false;
 static bool map_odelbs = false;
 
 #define tio_printf(format, args...) \
@@ -413,14 +414,14 @@ void tty_configure(void)
                 tio.c_iflag |= IGNCR;
             else if (strcmp(token,"ICRNL") == 0)
                 tio.c_iflag |= ICRNL;
-            else if (strcmp(token,"ONLCRNL") == 0)
-                tio.c_oflag |= ONLCR;
             else if (strcmp(token,"OCRNL") == 0)
                 tio.c_oflag |= OCRNL;
             else if (strcmp(token,"ODELBS") == 0)
                 map_odelbs = true;
             else if (strcmp(token,"INLCRNL") == 0)
                 map_inlcrnl = true;
+            else if (strcmp(token, "ONLCRNL") == 0)
+                map_onlcrnl = true;
             else
             {
                 printf("Error: Unknown mapping flag %s\n", token);
@@ -651,6 +652,18 @@ int tty_connect(void)
                     /* Map output character */
                     if ((output_char == 127) && (map_odelbs))
                         output_char = '\b';
+
+                    /* Map newline character */
+                    if ((output_char == '\n') && (map_onlcrnl)) {
+                        char r = '\r';
+
+                        status = write(fd, &r, 1);
+                        if (status < 0)
+                            warning_printf("Could not write to tty device");
+
+                        tx_total++;
+                        delay(option.output_delay);
+                    }
 
                     /* Send output to tty device */
                     status = write(fd, &output_char, 1);
