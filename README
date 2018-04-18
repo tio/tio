@@ -57,6 +57,7 @@
 
     The latest release version is available at https://tio.github.io
 
+
 3.1 Installation using release tarball
 
     Install steps:
@@ -66,6 +67,7 @@
      $ make install
 
     See INSTALL file for more installation details.
+
 
 3.2 Installation using package
 
