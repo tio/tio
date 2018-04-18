@@ -1,4 +1,4 @@
-.TH "tio" "1" "November 2017"
+.TH "tio" "1" "April 2018"
 
 .SH "NAME"
 tio \- a simple TTY terminal I/O application
@@ -63,20 +63,20 @@ Map (replace, translate) special characters on input or output. The following ma
 
 .RS
 .TP 12n
+.IP "\fBICRNL"
+Map CR to NL on input (unless IGNCR is set).
+.IP "\fBIGNCR"
+Ignore CR on input.
 .IP "\fBINLCR"
 Map NL to CR on input.
 .IP "\fBINLCRNL"
 Map NL to CR-NL on input.
-.IP "\fBIGNCR"
-Ignore CR on input.
-.IP "\fBICRNL"
-Map CR to NL on input (unless IGNCR is set).
-.IP "\fBONLCRNL"
-Map NL to CR-NL on output.
 .IP "\fBOCRNL"
 Map CR to NL on output.
 .IP "\fBODELBS"
 Map DEL to BS on output.
+.IP "\fBONLCRNL"
+Map NL to CR-NL on output.
 .P
 If defining more than one flag, the flags must be comma separated.
 .RE
