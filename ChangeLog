@@ -1,5 +1,19 @@
 
-=== tio v1.29 ===
+=== tio v1.30 ===
+
+
+
+Changes since tio v1.29:
+
+ * Update README
+
+ * Update man page and bash completion
+
+ * Update AUTHORS
+
+qianfan Zhao:
+
+ * ONLCRNL: change the method to map NL to CR-NL
 
 
 
