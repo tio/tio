@@ -100,6 +100,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" ctrl-t ?   List available key commands");
                 tio_printf(" ctrl-t b   Send break");
                 tio_printf(" ctrl-t c   Show configuration");
+                tio_printf(" ctrl-t e   Toggle local echo mode");
                 tio_printf(" ctrl-t h   Toggle hexadecimal mode");
                 tio_printf(" ctrl-t l   Clear screen");
                 tio_printf(" ctrl-t q   Quit");
@@ -119,11 +120,16 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" Flow: %s", option.flow);
                 tio_printf(" Stopbits: %d", option.stopbits);
                 tio_printf(" Parity: %s", option.parity);
+                tio_printf(" Local Echo: %s", option.local_echo ? "yes":"no");
                 tio_printf(" Output delay: %d", option.output_delay);
                 if (option.map[0] != 0)
                     tio_printf(" Map flags: %s", option.map);
                 if (option.log)
                     tio_printf(" Log file: %s", option.log_filename);
+                break;
+
+            case KEY_E:
+                option.local_echo = !option.local_echo;
                 break;
 
             case KEY_H:
@@ -511,6 +517,15 @@ void tty_restore(void)
         tty_disconnect();
 }
 
+static void optional_local_echo(char c)
+{
+    if (!option.local_echo)
+        return;
+    print(c);
+    if (option.log)
+        log_write(c);
+}
+
 int tty_connect(void)
 {
     fd_set rdfs;           /* Read file descriptor set */
@@ -657,6 +672,7 @@ int tty_connect(void)
                     if ((output_char == '\n') && (map_onlcrnl)) {
                         char r = '\r';
 
+                        optional_local_echo(r);
                         status = write(fd, &r, 1);
                         if (status < 0)
                             warning_printf("Could not write to tty device");
@@ -666,6 +682,7 @@ int tty_connect(void)
                     }
 
                     /* Send output to tty device */
+                    optional_local_echo(output_char);
                     status = write(fd, &output_char, 1);
                     if (status < 0)
                         warning_printf("Could not write to tty device");

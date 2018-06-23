@@ -39,6 +39,7 @@ struct option_t
     int output_delay;
     bool no_autoconnect;
     bool log;
+    bool local_echo;
     const char *log_filename;
     const char *map;
 };

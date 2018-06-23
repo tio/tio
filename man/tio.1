@@ -52,6 +52,11 @@ However, if the
 option is provided, tio will exit if the device is not present or an established connection is lost.
 
 .TP
+.BR \-e ", " "\-\-local\-echo
+
+Enable local echo.
+
+.TP
 .BR \-l ", " "\-\-log " \fI<filename>
 
 Log to file.
@@ -100,6 +105,8 @@ List available key commands
 Send serial break (triggers SysRq on Linux, etc.)
 .IP "\fBctrl-t c"
 Show configuration (baudrate, databits, etc.)
+.IP "\fBctrl-t e"
+Toggle local echo mode
 .IP "\fBctrl-t h"
 Toggle hexadecimal mode
 .IP "\fBctrl-t l"
