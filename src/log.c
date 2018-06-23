@@ -40,6 +40,7 @@ void log_open(const char *filename)
         log_error = true;
         exit(EXIT_FAILURE);
     }
+    setvbuf(fp, NULL, _IONBF, 0);
 }
 
 void log_write(char c)
