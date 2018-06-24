@@ -54,10 +54,10 @@ static bool print_mode = NORMAL;
 static bool standard_baudrate = true;
 static void (*print)(char c);
 static int fd;
-static bool map_inlcrnl = false;
-static bool map_ocrnl = false;
-static bool map_onlcrnl = false;
-static bool map_odelbs = false;
+static bool map_i_nl_crnl = false;
+static bool map_o_cr_nl = false;
+static bool map_o_nl_crnl = false;
+static bool map_o_del_bs = false;
 
 #define tio_printf(format, args...) \
 { \
@@ -422,13 +422,13 @@ void tty_configure(void)
             else if (strcmp(token,"ICRNL") == 0)
                 tio.c_iflag |= ICRNL;
             else if (strcmp(token,"OCRNL") == 0)
-                map_ocrnl = true;
+                map_o_cr_nl = true;
             else if (strcmp(token,"ODELBS") == 0)
-                map_odelbs = true;
+                map_o_del_bs = true;
             else if (strcmp(token,"INLCRNL") == 0)
-                map_inlcrnl = true;
+                map_i_nl_crnl = true;
             else if (strcmp(token, "ONLCRNL") == 0)
-                map_onlcrnl = true;
+                map_o_nl_crnl = true;
             else
             {
                 printf("Error: Unknown mapping flag %s\n", token);
@@ -619,7 +619,7 @@ int tty_connect(void)
                     rx_total++;
 
                     /* Map input character */
-                    if ((input_char == '\n') && (map_inlcrnl))
+                    if ((input_char == '\n') && (map_i_nl_crnl))
                     {
                         print('\r');
                         print('\n');
@@ -666,13 +666,13 @@ int tty_connect(void)
                 if (forward)
                 {
                     /* Map output character */
-                    if ((output_char == 127) && (map_odelbs))
+                    if ((output_char == 127) && (map_o_del_bs))
                         output_char = '\b';
-                    if ((output_char == '\r') && (map_ocrnl))
+                    if ((output_char == '\r') && (map_o_cr_nl))
                         output_char = '\n';
 
                     /* Map newline character */
-                    if ((output_char == '\n') && (map_onlcrnl)) {
+                    if ((output_char == '\n') && (map_o_nl_crnl)) {
                         char r = '\r';
 
                         optional_local_echo(r);
