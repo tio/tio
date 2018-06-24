@@ -45,6 +45,7 @@ struct option_t option =
     0,        // No output delay
     false,    // No autoconnect
     false,    // No log
+    false,    // No local echo
     "",       // Log filename
     ""        // Map string
 };
@@ -61,6 +62,7 @@ void print_help(char *argv[])
     printf("  -p, --parity odd|even|none  Parity (default: none)\n");
     printf("  -o, --output-delay <ms>     Output delay (default: 0)\n");
     printf("  -n, --no-autoconnect        Disable automatic connect\n");
+    printf("  -e, --local-echo            Do local echo\n");
     printf("  -l, --log <filename>        Log to file\n");
     printf("  -m, --map <flags>           Map special characters\n");
     printf("  -v, --version               Display version\n");
@@ -109,6 +111,7 @@ void parse_options(int argc, char *argv[])
             {"parity",         required_argument, 0, 'p'},
             {"output-delay",   required_argument, 0, 'o'},
             {"no-autoconnect", no_argument,       0, 'n'},
+            {"local-echo",     no_argument,       0, 'e'},
             {"log",            required_argument, 0, 'l'},
             {"map",            required_argument, 0, 'm'},
             {"version",        no_argument,       0, 'v'},
@@ -120,7 +123,7 @@ void parse_options(int argc, char *argv[])
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:nl:m:vh", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:nel:m:vh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
@@ -164,6 +167,10 @@ void parse_options(int argc, char *argv[])
 
             case 'n':
                 option.no_autoconnect = true;
+                break;
+
+            case 'e':
+                option.local_echo = true;
                 break;
 
             case 'l':

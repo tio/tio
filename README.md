@@ -21,20 +21,23 @@ application to easily connect to various terminal TTY devices.
 The commandline interface is straightforward as reflected in the output from
 'tio --help':
 ```
-    Usage: tio [<options>] <tty device>
+    Usage: tio [<options>] <tty-device>
 
     Options:
       -b, --baudrate <bps>        Baud rate (default: 115200)
       -d, --databits 5|6|7|8      Data bits (default: 8)
       -f, --flow hard|soft|none   Flow control (default: none)
       -s, --stopbits 1|2          Stop bits (default: 1)
-      -p, --parity even|odd|none  Parity (default: none)
+      -p, --parity odd|even|none  Parity (default: none)
       -o, --output-delay <ms>     Output delay (default: 0)
       -n, --no-autoconnect        Disable automatic connect
+      -e, --local-echo            Do local echo
       -l, --log <filename>        Log to file
       -m, --map <flags>           Map special characters
       -v, --version               Display version
       -h, --help                  Display help
+
+    See the man page for list of supported mapping flags.
 
     In session, press ctrl-t q to quit.
 ```
