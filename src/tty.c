@@ -55,6 +55,7 @@ static bool standard_baudrate = true;
 static void (*print)(char c);
 static int fd;
 static bool map_inlcrnl = false;
+static bool map_ocrnl = false;
 static bool map_onlcrnl = false;
 static bool map_odelbs = false;
 
@@ -415,7 +416,7 @@ void tty_configure(void)
             else if (strcmp(token,"ICRNL") == 0)
                 tio.c_iflag |= ICRNL;
             else if (strcmp(token,"OCRNL") == 0)
-                tio.c_oflag |= OCRNL;
+                map_ocrnl = true;
             else if (strcmp(token,"ODELBS") == 0)
                 map_odelbs = true;
             else if (strcmp(token,"INLCRNL") == 0)
@@ -652,6 +653,8 @@ int tty_connect(void)
                     /* Map output character */
                     if ((output_char == 127) && (map_odelbs))
                         output_char = '\b';
+                    if ((output_char == '\r') && (map_ocrnl))
+                        output_char = '\n';
 
                     /* Map newline character */
                     if ((output_char == '\n') && (map_onlcrnl)) {
