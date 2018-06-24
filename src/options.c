@@ -110,8 +110,8 @@ void parse_options(int argc, char *argv[])
             {"stopbits",       required_argument, 0, 's'},
             {"parity",         required_argument, 0, 'p'},
             {"output-delay",   required_argument, 0, 'o'},
-            {"local-echo",     no_argument,       0, 'e'},
             {"no-autoconnect", no_argument,       0, 'n'},
+            {"local-echo",     no_argument,       0, 'e'},
             {"log",            required_argument, 0, 'l'},
             {"map",            required_argument, 0, 'm'},
             {"version",        no_argument,       0, 'v'},
@@ -123,7 +123,7 @@ void parse_options(int argc, char *argv[])
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:nl:m:vhe", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:nel:m:vh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
@@ -149,10 +149,6 @@ void parse_options(int argc, char *argv[])
                 option.databits = string_to_long(optarg);
                 break;
 
-            case 'e':
-		option.local_echo = true;
-                break;
-
             case 'f':
                 option.flow = optarg;
                 break;
@@ -171,6 +167,10 @@ void parse_options(int argc, char *argv[])
 
             case 'n':
                 option.no_autoconnect = true;
+                break;
+
+            case 'e':
+                option.local_echo = true;
                 break;
 
             case 'l':
