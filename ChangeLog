@@ -1,5 +1,44 @@
 
-=== tio v1.30 ===
+=== tio v1.31 ===
+
+
+
+Changes since tio v1.30:
+
+ * Update date
+
+ * Update AUTHORS
+
+Henner Zeller:
+
+ * Clarify the input/output variable names (No-op change)
+
+ * Organize options the same sequence they are mentiond in cmdline help.
+
+ * Update README.
+
+ * Map CR->NL locally on output instead of using tio.c_oflag |= OCRNL.
+
+   This mostly is intended to have local echo output exactly what is sent
+   to the remote endpoint.
+   A nice side-effect is, that it also fixes tty-implementations, that can't
+   deal with the OCRNL flag on tio.c_oflag.
+
+ * Provide local-echo option.
+
+   Can be switched on with -e on the command line.
+   Can be toggled with Ctrl t e while program is running.
+
+ * Write to logfile as soon as we have the data, don't buffer.
+
+   Logfiles are important to see what happend, in particular if something
+   unexpected happened; so we want to make sure that the logfile is flushed
+   to disk.
+
+   Before this change, the logfile was typically written at the end in
+   a large chunk as the default (large) buffering applied. Now, characters are
+   written out ASAP, so it is possible to get a live-view with a
+   tail -f <logfile>
 
 
 
