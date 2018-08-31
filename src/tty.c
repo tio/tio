@@ -537,7 +537,7 @@ int tty_connect(void)
     int    status;
 
     /* Open tty device */
-    fd = open(option.tty_device, O_RDWR | O_NOCTTY );
+    fd = open(option.tty_device, O_RDWR | O_NOCTTY | O_NONBLOCK );
     if (fd < 0)
     {
         error_printf_silent("Could not open tty device (%s)", strerror(errno));
