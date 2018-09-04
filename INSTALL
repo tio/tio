@@ -252,6 +252,11 @@ not `/usr/local'.  It is recommended to use the following options:
 
      ./configure --prefix=/boot/common
 
+   On macOS, automake and autoconf are not part of the default OS. In
+order to overcome this, you should install them manually. For example:
+
+     brew install automake autoconf
+
 Specifying the System Type
 ==========================
 
