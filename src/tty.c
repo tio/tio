@@ -537,7 +537,11 @@ int tty_connect(void)
     int    status;
 
     /* Open tty device */
+#ifdef __APPLE__
     fd = open(option.tty_device, O_RDWR | O_NOCTTY | O_NONBLOCK );
+#else
+    fd = open(option.tty_device, O_RDWR | O_NOCTTY);
+#endif
     if (fd < 0)
     {
         error_printf_silent("Could not open tty device (%s)", strerror(errno));
