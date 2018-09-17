@@ -13,7 +13,7 @@ Henner Zeller:
 
  * Clarify the input/output variable names (No-op change)
 
- * Organize options the same sequence they are mentiond in cmdline help.
+ * Organize options the same sequence they are mentioned in cmdline help.
 
  * Update README.
 
@@ -31,7 +31,7 @@ Henner Zeller:
 
  * Write to logfile as soon as we have the data, don't buffer.
 
-   Logfiles are important to see what happend, in particular if something
+   Logfiles are important to see what happened, in particular if something
    unexpected happened; so we want to make sure that the logfile is flushed
    to disk.
 
