@@ -693,6 +693,7 @@ int tty_connect(void)
                     status = write(fd, &output_char, 1);
                     if (status < 0)
                         warning_printf("Could not write to tty device");
+                    fsync(fd);
 
                     /* Update transmit statistics */
                     tx_total++;
