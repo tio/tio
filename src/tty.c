@@ -34,6 +34,7 @@
 #include <termios.h>
 #include <stdbool.h>
 #include <errno.h>
+#include <time.h>
 #include "config.h"
 #include "tio/tty.h"
 #include "tio/print.h"
@@ -107,6 +108,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" ctrl-t q   Quit");
                 tio_printf(" ctrl-t s   Show statistics");
                 tio_printf(" ctrl-t t   Send ctrl-t key code");
+                tio_printf(" ctrl-t T   Toggle timestamps");
                 break;
 
             case KEY_B:
@@ -122,6 +124,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" Stopbits: %d", option.stopbits);
                 tio_printf(" Parity: %s", option.parity);
                 tio_printf(" Local Echo: %s", option.local_echo ? "yes":"no");
+                tio_printf(" Timestamps: %s", option.timestamp ? "yes" : "no");
                 tio_printf(" Output delay: %d", option.output_delay);
                 if (option.map[0] != 0)
                     tio_printf(" Map flags: %s", option.map);
@@ -169,6 +172,10 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 /* Send ctrl-t key code upon ctrl-t t sequence */
                 *output_char = KEY_CTRL_T;
                 *forward = true;
+                break;
+
+            case KEY_SHIFT_T:
+                option.timestamp = !option.timestamp;
                 break;
 
             default:
@@ -535,6 +542,7 @@ int tty_connect(void)
     static char previous_char = 0;
     static bool first = true;
     int    status;
+    time_t next_timestamp = 0;
 
     /* Open tty device */
 #ifdef __APPLE__
@@ -570,6 +578,8 @@ int tty_connect(void)
     tio_printf("Connected");
     connected = true;
     tainted = false;
+
+    if (option.timestamp) next_timestamp = time(NULL);
 
     /* Save current port settings */
     if (tcgetattr(fd, &tio_old) < 0)
@@ -622,11 +632,18 @@ int tty_connect(void)
                     /* Update receive statistics */
                     rx_total++;
 
+                    /* Print timestamp on new line, if desired. */
+                    if (next_timestamp && input_char != '\n' && input_char != '\r') {
+                        fprintf(stdout, ANSI_COLOR_GRAY "[%s] " ANSI_COLOR_RESET, current_time());
+                        next_timestamp = 0;
+                    }
+
                     /* Map input character */
                     if ((input_char == '\n') && (map_i_nl_crnl))
                     {
                         print('\r');
                         print('\n');
+                        if (option.timestamp) next_timestamp = time(NULL);
                     } else
                     {
                         /* Print received tty character to stdout */
@@ -640,6 +657,7 @@ int tty_connect(void)
 
                     tainted = true;
 
+                    if (input_char == '\n' && option.timestamp) next_timestamp = time(NULL);
                 } else
                 {
                     /* Error reading - device is likely unplugged */

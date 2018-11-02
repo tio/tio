@@ -40,6 +40,7 @@ struct option_t
     bool no_autoconnect;
     bool log;
     bool local_echo;
+    bool timestamp;
     const char *log_filename;
     const char *map;
 };
