@@ -1,5 +1,39 @@
 
-=== tio v1.31 ===
+=== tio v1.32 ===
+
+
+
+Changes since tio v1.31:
+
+ * Update AUTHORS
+
+ * Minor code style cleanups
+
+ * Cleanup print macros
+
+ * Flush output
+
+   Make sure output is transmitted immediately by flushing the output.
+
+Robey Pointer:
+
+ * add optional timestamps
+
+   with "-t" or "C-t T", toggle a timestamp prefix to each line.
+
+Jakub Wilk:
+
+ * Fix typos
+
+Sylvain Lafrasse:
+
+ * Added macOS compatibility
+
+ * Made O_NONBLOCK flag to open() call specific to macOS only.
+
+ * Added macOS-related details.
+
+ * Added O_NONBLOCK flag to open() call for macOS (10.13.6) compatibility.
 
 
 
