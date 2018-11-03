@@ -579,7 +579,8 @@ int tty_connect(void)
     connected = true;
     tainted = false;
 
-    if (option.timestamp) next_timestamp = time(NULL);
+    if (option.timestamp)
+        next_timestamp = time(NULL);
 
     /* Save current port settings */
     if (tcgetattr(fd, &tio_old) < 0)
@@ -633,7 +634,8 @@ int tty_connect(void)
                     rx_total++;
 
                     /* Print timestamp on new line, if desired. */
-                    if (next_timestamp && input_char != '\n' && input_char != '\r') {
+                    if (next_timestamp && input_char != '\n' && input_char != '\r')
+                    {
                         fprintf(stdout, ANSI_COLOR_GRAY "[%s] " ANSI_COLOR_RESET, current_time());
                         next_timestamp = 0;
                     }
@@ -643,7 +645,8 @@ int tty_connect(void)
                     {
                         print('\r');
                         print('\n');
-                        if (option.timestamp) next_timestamp = time(NULL);
+                        if (option.timestamp)
+                            next_timestamp = time(NULL);
                     } else
                     {
                         /* Print received tty character to stdout */
@@ -657,7 +660,8 @@ int tty_connect(void)
 
                     tainted = true;
 
-                    if (input_char == '\n' && option.timestamp) next_timestamp = time(NULL);
+                    if (input_char == '\n' && option.timestamp)
+                        next_timestamp = time(NULL);
                 } else
                 {
                     /* Error reading - device is likely unplugged */
