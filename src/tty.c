@@ -109,6 +109,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" ctrl-t s   Show statistics");
                 tio_printf(" ctrl-t t   Send ctrl-t key code");
                 tio_printf(" ctrl-t T   Toggle timestamps");
+                tio_printf(" ctrl-t v   Show version");
                 break;
 
             case KEY_B:
@@ -176,6 +177,10 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
 
             case KEY_SHIFT_T:
                 option.timestamp = !option.timestamp;
+                break;
+
+            case KEY_V:
+                tio_printf("tio v%s", VERSION);
                 break;
 
             default:
