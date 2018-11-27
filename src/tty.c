@@ -63,7 +63,7 @@ static bool map_o_del_bs = false;
 #define tio_printf(format, args...) \
 { \
     if (tainted) putchar('\n'); \
-    color_printf("[tio %s] " format, current_time(), ## args); \
+    color_printf("[%s] " format, current_time(), ## args); \
     tainted = false; \
 }
 
