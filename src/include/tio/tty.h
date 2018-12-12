@@ -42,6 +42,7 @@ void stdout_configure(void);
 void stdout_restore(void);
 void stdin_configure(void);
 void stdin_restore(void);
+void tty_check(void);
 void tty_configure(void);
 int tty_connect(void);
 void tty_wait_for_device(void);

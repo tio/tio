@@ -276,6 +276,15 @@ void stdout_restore(void)
     tcsetattr(STDOUT_FILENO, TCSANOW, &stdout_old);
 }
 
+void tty_check(void)
+{
+    if (access(option.tty_device, R_OK) != 0)
+    {
+        error_printf("Could not access the TTY (%s)", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+}
+
 void tty_configure(void)
 {
     bool token_found = true;
@@ -504,10 +513,6 @@ void tty_wait_for_device(void)
             error_printf("select() failed (%s)", strerror(errno));
             exit(EXIT_FAILURE);
         }
-
-        /* Test for accessible device file */
-        if (access(option.tty_device, R_OK) == 0)
-            return;
     }
 }
 
