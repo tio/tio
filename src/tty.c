@@ -70,11 +70,13 @@ static bool map_o_del_bs = false;
 static void print_hex(char c)
 {
     printf("%02x ", (unsigned char) c);
+    fflush(stdout);
 }
 
 static void print_normal(char c)
 {
     putchar(c);
+    fflush(stdout);
 }
 
 void handle_command_sequence(char input_char, char previous_char, char *output_char, bool *forward)
