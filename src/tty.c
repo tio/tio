@@ -56,6 +56,7 @@ static bool standard_baudrate = true;
 static void (*print)(char c);
 static int fd;
 static bool map_i_nl_crnl = false;
+static bool map_i_cr_crnl = false;
 static bool map_o_cr_nl = false;
 static bool map_o_nl_crnl = false;
 static bool map_o_del_bs = false;
@@ -439,6 +440,8 @@ void tty_configure(void)
                 map_o_del_bs = true;
             else if (strcmp(token,"INLCRNL") == 0)
                 map_i_nl_crnl = true;
+            else if (strcmp(token,"ICRCRNL") == 0)
+                map_i_cr_crnl = true;
             else if (strcmp(token, "ONLCRNL") == 0)
                 map_o_nl_crnl = true;
             else
@@ -647,6 +650,12 @@ int tty_connect(void)
 
                     /* Map input character */
                     if ((input_char == '\n') && (map_i_nl_crnl))
+                    {
+                        print('\r');
+                        print('\n');
+                        if (option.timestamp)
+                            next_timestamp = time(NULL);
+                    } else if ((input_char == '\r') && (map_i_cr_crnl))
                     {
                         print('\r');
                         print('\n');
