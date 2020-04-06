@@ -1,3 +1,4 @@
+AM_CPPFLAGS = -I$(srcdir)/include
 AM_CFLAGS = -Wall
 bin_PROGRAMS = tio
 tio_SOURCES = tty.c \
