@@ -535,6 +535,7 @@ static void optional_local_echo(char c)
     if (!option.local_echo)
         return;
     print(c);
+    fflush(stdout);
     if (option.log)
         log_write(c);
 }
