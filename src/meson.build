@@ -13,6 +13,14 @@ tio_sources = [
   'print.c'
 ]
 
+# dependencies
+if get_option('conffile')
+    inih = meson.get_compiler('c').find_library('inih')
+    tio_sources += 'conffile.c'
+else
+    inih = dependency()
+endif
+
 tio_c_args = []
 
 if enable_setspeed2
@@ -28,6 +36,7 @@ endif
 executable('tio',
   tio_sources,
   c_args: tio_c_args,
+  dependencies: inih,
   install: true )
 
 subdir('bash-completion')

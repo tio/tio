@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "options.h"
+#include "conffile.h"
 #include "tty.h"
 #include "log.h"
 #include "error.h"
@@ -35,6 +36,10 @@ int main(int argc, char *argv[])
 
     /* Add error exit handler */
     atexit(&error_exit);
+
+    /* Parse configuration file */
+    conf_parse_file(argc, argv);
+    atexit(&conf_exit);
 
     /* Parse options */
     parse_options(argc, argv);
