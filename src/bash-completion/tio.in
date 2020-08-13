@@ -4,7 +4,7 @@
 
 _tio()
 {
-    local cur prev opts base
+    local cur prev opts base ttys
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
@@ -76,9 +76,20 @@ _tio()
         *)
         ;;
     esac
+    case "${cur}" in
+        -*)
+            COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+            return 0
+            ;;
+    esac
 
-   COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
-   return 0
+    if [ -d /dev/serial/by-id ]; then
+        ttys=$(printf '%s\n' /dev/tty* /dev/serial/by-id/*)
+    else
+        ttys=$(printf '%s\n' /dev/tty*)
+    fi
+    COMPREPLY=( $(compgen -W "${ttys}" -- ${cur}) )
+    return 0
 }
 
 # Bind completion to tio command
