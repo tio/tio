@@ -35,6 +35,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <time.h>
+#include <sys/time.h>
 #include "config.h"
 #include "tio/tty.h"
 #include "tio/print.h"
@@ -641,8 +642,16 @@ int tty_connect(void)
                     /* Print timestamp on new line, if desired. */
                     if (next_timestamp && input_char != '\n' && input_char != '\r')
                     {
-                        fprintf(stdout, ANSI_COLOR_GRAY "[%s] " ANSI_COLOR_RESET, current_time());
+                        char current_str[128];
+                        struct timeval tv;
+                        struct tm *tm;
+                        gettimeofday(&tv, NULL);
+                        tm = localtime(&tv.tv_sec);
+                        sprintf(current_str, "[%-2d:%02d:%02d.%03ld] ",  tm->tm_hour,  tm->tm_min, tm->tm_sec, tv.tv_usec/1000);
+                        fprintf(stdout, ANSI_COLOR_GRAY "%s" ANSI_COLOR_RESET, current_str);
                         next_timestamp = 0;
+                        if (option.log && option.timestamp)
+                            log_write_str(current_str);
                     }
 
                     /* Map input character */

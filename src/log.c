@@ -49,6 +49,13 @@ void log_write(char c)
         fputc(c, fp);
 }
 
+void log_write_str(const char * str)
+{
+    if (fp != NULL)
+        fputs(str, fp);
+}
+
+
 void log_close(void)
 {
     if (fp != NULL)

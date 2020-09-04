@@ -24,6 +24,7 @@
 
 void log_open(const char *filename);
 void log_write(char c);
+void log_write_str(const char * str);
 void log_close(void);
 void log_exit(void);
 
