@@ -70,12 +70,14 @@ static bool map_o_del_bs = false;
 
 static void print_hex(char c)
 {
-    printf("%02x ", (unsigned char)c);
+    printf("%02x ", (unsigned char) c);
+    fflush(stdout);
 }
 
 static void print_normal(char c)
 {
     putchar(c);
+    fflush(stdout);
 }
 
 static void toggle_line(const char *line_name, int mask)
