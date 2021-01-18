@@ -20,6 +20,7 @@ _tio()
           -l --log \
           -m --map \
           -v --version \
+          -t --timestamp \
           -h --help"
 
     #  Complete the arguments to the options.
@@ -63,6 +64,10 @@ _tio()
             ;;
         -m | --map)
             COMPREPLY=( $(compgen -W "ICRNL IGNCR INLCR INLCRNL OCRNL ODELBS ONLCRNL" -- ${cur}) )
+            return 0
+            ;;
+        -t | --timestamp)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
         -v | --version)
