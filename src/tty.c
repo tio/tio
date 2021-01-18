@@ -381,7 +381,7 @@ void tty_configure(void)
         }
 
         // Set output speed
-        cfsetospeed(&tio, baudrate);
+        status = cfsetospeed(&tio, baudrate);
         if (status == -1)
         {
             error_printf("Could not configure output speed (%s)", strerror(errno));
