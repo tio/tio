@@ -518,6 +518,7 @@ void tty_wait_for_device(void)
     struct timeval tv;
     static char input_char, previous_char = 0;
     static bool first = true;
+    static int last_errno = 0;
 
     /* Loop until device pops up */
     while (true)
@@ -564,8 +565,15 @@ void tty_wait_for_device(void)
         }
 
         /* Test for accessible device file */
-        if (access(option.tty_device, R_OK) == 0)
+        int rc = access(option.tty_device, R_OK);
+        if (rc == 0) {
+            last_errno = 0;
             return;
+        }
+        else if (last_errno != errno) {
+            tio_printf("%s: %s. Waiting...", option.tty_device, strerror(errno));
+            last_errno = errno;
+        }
     }
 }
 
