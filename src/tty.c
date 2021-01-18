@@ -30,6 +30,7 @@
 #include <sys/stat.h>
 #include <sys/param.h>
 #include <sys/file.h>
+#include <sys/ioctl.h>
 #include <fcntl.h>
 #include <termios.h>
 #include <stdbool.h>
@@ -69,7 +70,7 @@ static bool map_o_del_bs = false;
 
 static void print_hex(char c)
 {
-    printf("%02x ", (unsigned char) c);
+    printf("%02x ", (unsigned char)c);
 }
 
 static void print_normal(char c)
@@ -77,10 +78,36 @@ static void print_normal(char c)
     putchar(c);
 }
 
+static void toggle_line(const char *line_name, int mask)
+{
+    int state;
+
+    if (ioctl(fd, TIOCMGET, &state) < 0)
+    {
+        error_printf("Could not get line state: %s", strerror(errno));
+    }
+    else
+    {
+        if (state & mask)
+        {
+            state &= ~mask;
+            tio_printf("set %s to LOW", line_name);
+        }
+        else
+        {
+            state |= mask;
+            tio_printf("set %s to HIGH", line_name);
+        }
+        if (ioctl(fd, TIOCMSET, &state) < 0)
+            error_printf("Could not set line state: %s", strerror(errno));
+    }
+}
+
 void handle_command_sequence(char input_char, char previous_char, char *output_char, bool *forward)
 {
     char unused_char;
     bool unused_bool;
+    int state;
 
     /* Ignore unused arguments */
     if (output_char == NULL)
@@ -109,7 +136,32 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" ctrl-t s   Show statistics");
                 tio_printf(" ctrl-t t   Send ctrl-t key code");
                 tio_printf(" ctrl-t T   Toggle timestamps");
+                tio_printf(" ctrl-t L   Show lines");
+                tio_printf(" ctrl-t d   Toggle DTR");
+                tio_printf(" ctrl-t r   Toggle RTS");
                 tio_printf(" ctrl-t v   Show version");
+                break;
+
+            case KEY_SHIFT_L:
+                if (ioctl(fd, TIOCMGET, &state) < 0)
+                {
+                    error_printf("Could not get line state: %s", strerror(errno));
+                    break;
+                }
+                tio_printf("Lines state:");
+                tio_printf(" DTR: %s", (state & TIOCM_DTR) ? "HIGH" : "LOW");
+                tio_printf(" RTS: %s", (state & TIOCM_RTS) ? "HIGH" : "LOW");
+                tio_printf(" CTS: %s", (state & TIOCM_CTS) ? "HIGH" : "LOW");
+                tio_printf(" DSR: %s", (state & TIOCM_DSR) ? "HIGH" : "LOW");
+                tio_printf(" DCD: %s", (state & TIOCM_CD) ? "HIGH" : "LOW");
+                tio_printf(" RI : %s", (state & TIOCM_RI) ? "HIGH" : "LOW");
+                break;
+            case KEY_D:
+                toggle_line("DTR", TIOCM_DTR);
+                break;
+
+            case KEY_R:
+                toggle_line("RTS", TIOCM_RTS);
                 break;
 
             case KEY_B:
