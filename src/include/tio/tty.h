@@ -34,6 +34,9 @@
 #define KEY_SHIFT_T 0x54
 #define KEY_CTRL_T 0x14
 #define KEY_V 0x76
+#define KEY_D 0x64
+#define KEY_R 0x72
+#define KEY_SHIFT_L 0x4C
 
 #define NORMAL 0
 #define HEX 1
