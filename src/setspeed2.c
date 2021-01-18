@@ -20,8 +20,8 @@
  */
 
 #include <sys/ioctl.h>
-#include <asm/ioctls.h>
-#include <asm/termbits.h>
+#include <asm-generic/ioctls.h>
+#include <asm-generic/termbits.h>
 
 int setspeed2(int fd, int baudrate)
 {
