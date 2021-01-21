@@ -70,7 +70,12 @@ static bool map_o_del_bs = false;
 
 static void print_hex(char c)
 {
-    printf("%02x ", (unsigned char) c);
+
+    if ((c == '\n') || (c == '\r'))
+        printf("%c", c);
+    else
+        printf("%02x ", (unsigned char) c);
+
     fflush(stdout);
 }
 
