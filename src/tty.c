@@ -44,6 +44,8 @@
 #include "tio/log.h"
 #include "tio/error.h"
 
+#define BUFFER_LEN 4096
+
 #ifdef HAVE_TERMIOS2
 extern int setspeed2(int fd, int baudrate);
 #endif
@@ -60,6 +62,7 @@ static bool map_i_nl_crnl = false;
 static bool map_o_cr_nl = false;
 static bool map_o_nl_crnl = false;
 static bool map_o_del_bs = false;
+static char line_buf[BUFFER_LEN];
 
 #define tio_printf(format, args...) \
 { \
@@ -616,6 +619,7 @@ int tty_connect(void)
     int    status;
     time_t next_timestamp = 0;
     char*  now = NULL;
+    int    line_cur = 0;
 
     /* Open tty device */
 #ifdef __APPLE__
@@ -711,17 +715,7 @@ int tty_connect(void)
                     {
                         now = current_time();
                         fprintf(stdout, ANSI_COLOR_GRAY "[%s] " ANSI_COLOR_RESET, now);
-                        if (option.log)
-                        {
-                            log_write('[');
-                            while (*now != '\0')
-                            {
-                                log_write(*now);
-                                ++now;
-                            }
-                            log_write(']');
-                            log_write(' ');
-                        }
+                        line_cur = snprintf(line_buf, BUFFER_LEN, "[%s] " ANSI_COLOR_RESET, now);
                         next_timestamp = 0;
                     }
 
@@ -736,17 +730,27 @@ int tty_connect(void)
                     {
                         /* Print received tty character to stdout */
                         print(input_char);
+
+                        /* Avoid out bound access of line_buf */
+                        if (line_cur < BUFFER_LEN - 1)
+                            line_buf[line_cur++] = input_char;
                     }
                     fflush(stdout);
 
-                    /* Write to log */
-                    if (option.log)
-                        log_write(input_char);
-
                     tainted = true;
 
-                    if (input_char == '\n' && option.timestamp)
+                    if (input_char == '\n' && option.timestamp) {
+                        /* No risk out bound access of line_buf */
+                        line_buf[line_cur] = '\0';
+
+                        if (option.log && (strlen(line_buf) > 0)) {
+                            bool esc_strip = (option.strip_esc == true);
+                            log_writeline(line_buf, BUFFER_LEN, esc_strip);
+                        }
+
+                        line_cur = 0;
                         next_timestamp = time(NULL);
+                    }
                 } else
                 {
                     /* Error reading - device is likely unplugged */

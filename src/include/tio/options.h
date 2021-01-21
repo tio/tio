@@ -42,6 +42,7 @@ struct option_t
     bool local_echo;
     bool timestamp;
     const char *log_filename;
+    bool strip_esc;
     const char *map;
 };
 

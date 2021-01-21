@@ -48,6 +48,7 @@ struct option_t option =
     false,    // No local echo
     false,    // No timestamp
     "",       // Log filename
+    false,    // Strip esc charaters from log file
     ""        // Map string
 };
 
@@ -67,6 +68,7 @@ void print_help(char *argv[])
     printf("  -t, --timestamp             Prefix each new line with a timestamp\n");
     printf("  -l, --log <filename>        Log to file\n");
     printf("  -m, --map <flags>           Map special characters\n");
+    printf("  -S, --strip-esc             Strip esc characters from log file\n");
     printf("  -v, --version               Display version\n");
     printf("  -h, --help                  Display help\n");
     printf("\n");
@@ -117,6 +119,7 @@ void parse_options(int argc, char *argv[])
             {"timestamp",      no_argument,       0, 't'},
             {"log",            required_argument, 0, 'l'},
             {"map",            required_argument, 0, 'm'},
+            {"strip-esc",      no_argument,       0, 'S'},
             {"version",        no_argument,       0, 'v'},
             {"help",           no_argument,       0, 'h'},
             {0,                0,                 0,  0 }
@@ -126,7 +129,7 @@ void parse_options(int argc, char *argv[])
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:netl:m:vh", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:netl:m:Svh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
@@ -187,6 +190,10 @@ void parse_options(int argc, char *argv[])
 
             case 'm':
                 option.map = optarg;
+                break;
+
+            case 'S':
+                option.strip_esc = true;
                 break;
 
             case 'v':
