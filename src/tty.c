@@ -44,8 +44,10 @@
 #include "tio/log.h"
 #include "tio/error.h"
 
-#ifdef HAVE_TERMIOS2
+#if defined(HAVE_TERMIOS2)
 extern int setspeed2(int fd, int baudrate);
+#elif defined(__APPLE__)
+#include <IOKit/serial/ioss.h>
 #endif
 
 static struct termios tio, tio_old, stdout_new, stdout_old, stdin_new, stdin_old;
@@ -366,8 +368,15 @@ void tty_configure(void)
         AUTOCONF_BAUDRATE_CASES
 
         default:
-#ifdef HAVE_TERMIOS2
+#if defined(HAVE_TERMIOS2)
             standard_baudrate = false;
+            break;
+#elif defined(__APPLE__)
+            standard_baudrate = false;
+            // We need to set *something* in tio here, otherwise the later
+            // tcsetattr will fail. We'll override this with ioctl.
+            cfsetispeed(&tio, B9600);
+            cfsetospeed(&tio, B9600);
             break;
 #else
             error_printf("Invalid baud rate");
@@ -679,13 +688,23 @@ int tty_connect(void)
         goto error_tcsetattr;
     }
 
-#ifdef HAVE_TERMIOS2
+#if defined(HAVE_TERMIOS2)
     if (!standard_baudrate)
     {
         if (setspeed2(fd, option.baudrate) != 0)
         {
             error_printf_silent("Could not set baudrate speed (%s)", strerror(errno));
             goto error_setspeed2;
+        }
+    }
+#elif defined(__APPLE__)
+    if (!standard_baudrate)
+    {
+        speed_t baud = option.baudrate;
+        if (ioctl(fd, IOSSIOSPEED, &baud) == -1)
+        {
+            error_printf_silent("Could not set baudrate speed (%s)", strerror(errno));
+            goto error_iokit;
         }
     }
 #endif
@@ -827,8 +846,10 @@ int tty_connect(void)
 
     return TIO_SUCCESS;
 
-#ifdef HAVE_TERMIOS2
+#if defined(HAVE_TERMIOS2)
 error_setspeed2:
+#elif defined(__APPLE__)
+error_iokit:
 #endif
 error_tcsetattr:
 error_tcgetattr:
