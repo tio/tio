@@ -24,6 +24,7 @@
 
 #define KEY_QUESTION 0x3f
 #define KEY_B 0x62
+#define KEY_SHIFT_B 0x42
 #define KEY_C 0x63
 #define KEY_E 0x65
 #define KEY_H 0x68

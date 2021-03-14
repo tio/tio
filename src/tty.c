@@ -44,6 +44,10 @@
 #include "tio/log.h"
 #include "tio/error.h"
 
+#ifdef __APPLE__
+#include <IOKit/serial/ioss.h>
+#endif
+
 #ifdef HAVE_TERMIOS2
 extern int setspeed2(int fd, int baudrate);
 #endif
@@ -60,6 +64,8 @@ static bool map_i_nl_crnl = false;
 static bool map_o_cr_nl = false;
 static bool map_o_nl_crnl = false;
 static bool map_o_del_bs = false;
+
+static bool break_state = false;
 
 #define tio_printf(format, args...) \
 { \
@@ -135,6 +141,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf("Key commands:");
                 tio_printf(" ctrl-t ?   List available key commands");
                 tio_printf(" ctrl-t b   Send break");
+                tio_printf(" ctrl-t B   Send break and clear manually");
                 tio_printf(" ctrl-t c   Show configuration");
                 tio_printf(" ctrl-t e   Toggle local echo mode");
                 tio_printf(" ctrl-t h   Toggle hexadecimal mode");
@@ -173,6 +180,12 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
 
             case KEY_B:
                 tcsendbreak(fd, 0);
+                break_state = false;
+                break;
+
+            case KEY_SHIFT_B:
+                break_state = !break_state;
+                ioctl(fd, break_state ? TIOCSBRK : TIOCCBRK, NULL);
                 break;
 
             case KEY_C:
@@ -366,7 +379,7 @@ void tty_configure(void)
         AUTOCONF_BAUDRATE_CASES
 
         default:
-#ifdef HAVE_TERMIOS2
+#if defined HAVE_TERMIOS2 || __APPLE__
             standard_baudrate = false;
             break;
 #else
@@ -671,6 +684,13 @@ int tty_connect(void)
         first = false;
     }
 
+    /* Initially set old speed instead of zero in case of non standard baudrate */
+    if (!standard_baudrate)
+    {
+        cfsetispeed(&tio, cfgetispeed(&tio_old));
+        cfsetospeed(&tio, cfgetospeed(&tio_old));
+    }
+
     /* Activate new port settings */
     status = tcsetattr(fd, TCSANOW, &tio);
     if (status == -1)
@@ -679,16 +699,17 @@ int tty_connect(void)
         goto error_tcsetattr;
     }
 
-#ifdef HAVE_TERMIOS2
     if (!standard_baudrate)
     {
+#ifdef HAVE_TERMIOS2
         if (setspeed2(fd, option.baudrate) != 0)
-        {
-            error_printf_silent("Could not set baudrate speed (%s)", strerror(errno));
             goto error_setspeed2;
-        }
-    }
+#elif defined __APPLE__
+        speed_t speed = option.baudrate;
+        if (ioctl(fd, IOSSIOSPEED, &speed) == -1)
+            goto error_setspeed2;
 #endif
+    }
 
     maxfd = MAX(fd, STDIN_FILENO) + 1;  /* Maximum bit entry (fd) to test */
 
@@ -827,8 +848,9 @@ int tty_connect(void)
 
     return TIO_SUCCESS;
 
-#ifdef HAVE_TERMIOS2
+#if defined HAVE_TERMIOS2 || defined __APPLE__
 error_setspeed2:
+    error_printf_silent("Could not set baudrate speed (%s)", strerror(errno));
 #endif
 error_tcsetattr:
 error_tcgetattr:
