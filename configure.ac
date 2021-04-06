@@ -88,6 +88,9 @@ AC_DEFINE_UNQUOTED([AUTOCONF_BAUDRATE_CASES],[$BAUDRATE_CASES],[Switch cases for
 AC_CHECK_DECL([TCGETS2], [AC_DEFINE([HAVE_TERMIOS2],[1],[Define if termios2 exists.]) have_termios2=yes], , [[#include <asm/termios.h>]])
 AM_CONDITIONAL([ADD_SETSPEED2],[test "x$have_termios2" = "xyes"])
 
+AC_CHECK_DECL([IOSSIOSPEED], [AC_DEFINE([HAVE_IOSSIOSPEED],[1],[Define if IOKit exists.]) have_iossiospeed=yes], , [[#include <IOKit/serial/ioss.h>]])
+AM_CONDITIONAL([ADD_IOSSIOSPEED],[test "x$have_iossiospeed" = "xyes"])
+
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([src/Makefile])
 AC_CONFIG_FILES([src/bash-completion/tio])

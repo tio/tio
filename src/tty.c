@@ -48,6 +48,10 @@
 extern int setspeed2(int fd, int baudrate);
 #endif
 
+#ifdef HAVE_IOSSIOSPEED
+extern int iossiospeed(int fd, int baudrate);
+#endif
+
 static struct termios tio, tio_old, stdout_new, stdout_old, stdin_new, stdin_old;
 static unsigned long rx_total = 0, tx_total = 0;
 static bool connected = false;
@@ -366,7 +370,7 @@ void tty_configure(void)
         AUTOCONF_BAUDRATE_CASES
 
         default:
-#ifdef HAVE_TERMIOS2
+#if defined(HAVE_TERMIOS2) || defined(HAVE_IOSSIOSPEED)
             standard_baudrate = false;
             break;
 #else
@@ -663,6 +667,11 @@ int tty_connect(void)
     /* Save current port settings */
     if (tcgetattr(fd, &tio_old) < 0)
         goto error_tcgetattr;
+#ifdef HAVE_IOSSIOSPEED
+    /* OS X wants these fields left alone. We'll set baudrate with iossiospeed below. */
+    tio.c_ispeed = tio_old.c_ispeed;
+    tio.c_ospeed = tio_old.c_ospeed;
+#endif
 
     /* Make sure we restore tty settings on exit */
     if (first)
@@ -683,6 +692,16 @@ int tty_connect(void)
     if (!standard_baudrate)
     {
         if (setspeed2(fd, option.baudrate) != 0)
+        {
+            error_printf_silent("Could not set baudrate speed (%s)", strerror(errno));
+            goto error_setspeed2;
+        }
+    }
+#endif
+#ifdef HAVE_IOSSIOSPEED
+    if (!standard_baudrate)
+    {
+        if (iossiospeed(fd, option.baudrate) != 0)
         {
             error_printf_silent("Could not set baudrate speed (%s)", strerror(errno));
             goto error_setspeed2;
@@ -827,7 +846,7 @@ int tty_connect(void)
 
     return TIO_SUCCESS;
 
-#ifdef HAVE_TERMIOS2
+#if defined(HAVE_TERMIOS2) || defined(HAVE_IOSSIOSPEED)
 error_setspeed2:
 #endif
 error_tcsetattr:
