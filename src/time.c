@@ -23,24 +23,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <sys/time.h>
 #include "tio/error.h"
 #include "tio/print.h"
 
 char * current_time(void)
 {
     static char time_string[20];
-    time_t t;
     struct tm *tmp;
+    struct timeval tv;
 
-    t = time(NULL);
-    tmp = localtime(&t);
+    gettimeofday(&tv, NULL);
+    tmp = localtime(&tv.tv_sec);
     if (tmp == NULL)
     {
         error_printf("Retrieving local time failed");
         exit(EXIT_FAILURE);
     }
 
-    strftime(time_string, sizeof(time_string), "%H:%M:%S", tmp);
+    sprintf(time_string, "%2d:%02d:%02d.%03d",  tmp->tm_hour,  tmp->tm_min, tmp->tm_sec, tv.tv_usec/1000);
 
     return time_string;
 }
