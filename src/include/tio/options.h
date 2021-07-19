@@ -27,6 +27,8 @@
 #include <termios.h>
 #include <sys/param.h>
 
+#define OPT_NEWLINE_IN_HEX	1000	// "short" option for --newline-in-hex	
+
 /* Options */
 struct option_t
 {
@@ -41,6 +43,8 @@ struct option_t
     bool log;
     bool local_echo;
     bool timestamp;
+    bool hex_mode;
+    bool newline_in_hex;
     const char *log_filename;
     const char *map;
 };

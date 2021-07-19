@@ -47,6 +47,8 @@ struct option_t option =
     false,    // No log
     false,    // No local echo
     false,    // No timestamp
+    false,    // Not starting in hex mode
+    false,    // No newlines in hex mode
     "",       // Log filename
     ""        // Map string
 };
@@ -67,6 +69,8 @@ void print_help(char *argv[])
     printf("  -t, --timestamp             Prefix each new line with a timestamp\n");
     printf("  -l, --log <filename>        Log to file\n");
     printf("  -m, --map <flags>           Map special characters\n");
+    printf("  -x, --hex                   Start in hexadecimal mode\n");
+    printf("      --newline-in-hex        Interpret new line characters in hex mode\n");
     printf("  -v, --version               Display version\n");
     printf("  -h, --help                  Display help\n");
     printf("\n");
@@ -117,6 +121,8 @@ void parse_options(int argc, char *argv[])
             {"timestamp",      no_argument,       0, 't'},
             {"log",            required_argument, 0, 'l'},
             {"map",            required_argument, 0, 'm'},
+            {"hex",            no_argument,       0, 'x'},
+            {"newline-in-hex", no_argument,       0, OPT_NEWLINE_IN_HEX },
             {"version",        no_argument,       0, 'v'},
             {"help",           no_argument,       0, 'h'},
             {0,                0,                 0,  0 }
@@ -126,7 +132,7 @@ void parse_options(int argc, char *argv[])
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:netl:m:vh", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:netl:m:xvh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
@@ -188,6 +194,14 @@ void parse_options(int argc, char *argv[])
             case 'm':
                 option.map = optarg;
                 break;
+                
+            case 'x':
+                option.hex_mode = true;
+                break;
+                
+            case OPT_NEWLINE_IN_HEX:
+            	option.newline_in_hex = true;
+            	break;
 
             case 'v':
                 printf("tio v%s\n", VERSION);

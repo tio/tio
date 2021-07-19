@@ -1,4 +1,4 @@
-.TH "tio" "1" "June 2018"
+.TH "tio" "1" "July 2021"
 
 .SH "NAME"
 tio \- a simple TTY terminal I/O application
@@ -57,6 +57,11 @@ option is provided, tio will exit if the device is not present or an established
 Enable local echo.
 
 .TP
+.BR \-t ", " "\-\-timestamp
+
+Prefix each new line with a timestamp.
+
+.TP
 .BR \-l ", " "\-\-log " \fI<filename>
 
 Log to file.
@@ -87,9 +92,20 @@ If defining more than one flag, the flags must be comma separated.
 .RE
 
 .TP
+.BR \-x ", " \-\-hex
+
+Start in hexadecimal mode.
+
+.TP
+.BR \-\-newline-in-hex
+
+Interpret new line characters ('\\r', '\\n') in hexadecimal mode.
+
+.TP
 .BR \-v ", " \-\-version
 
 Display program version.
+
 .TP
 .BR \-h ", " \-\-help
 
@@ -125,6 +141,14 @@ Toggle DTR
 Toggle RTS
 .IP "\fBctrl-t v"
 Show version
+
+.SH "HEXADECIMAL MODE"
+.TP
+In hexadecimal mode each incoming byte is printed out as a hexadecimal value. 
+.TP
+By default there is \fBno new line\fR in this mode, but it can be turned on using the \fB--newline-in-hex\fR option.
+.TP
+Bytes can be sent in this mode by typing the \fBtwo-character hexadecimal\fR representation of the value, e.g.: to send \fI0xA\fR you must type \fI0a\fR or \fI0A\fR.
 
 .SH "EXAMPLES"
 .TP

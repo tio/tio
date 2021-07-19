@@ -60,6 +60,8 @@ static bool map_i_nl_crnl = false;
 static bool map_o_cr_nl = false;
 static bool map_o_nl_crnl = false;
 static bool map_o_del_bs = false;
+static char hex_chars[2];
+static unsigned char hex_char_index = 0;
 
 #define tio_printf(format, args...) \
 { \
@@ -68,10 +70,58 @@ static bool map_o_del_bs = false;
     tainted = false; \
 }
 
+static void optional_local_echo(char c)
+{
+    if (!option.local_echo)
+        return;
+    print(c);
+    fflush(stdout);
+    if (option.log)
+        log_write(c);
+}
+
+inline static bool is_valid_hex(char c) 
+{
+    return ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'));
+}
+    
+inline static unsigned char char_to_nibble(char c)
+{
+    if(c >= '0' && c <= '9'){
+        return c - '0';
+    } else if(c >= 'a' && c <= 'f'){
+        return c - 'a' + 10;
+    } else if(c >= 'A' && c <= 'F'){
+        return c - 'A' + 10;
+    } else {
+        return 0;
+    }
+}
+
+static void output_hex(char c)
+{
+	hex_chars[hex_char_index++] = c;
+
+	if(hex_char_index == 2){
+        unsigned char hex_value = char_to_nibble(hex_chars[0]) << 4 | (char_to_nibble(hex_chars[1]) & 0x0F);
+        hex_char_index = 0;
+        
+        optional_local_echo(hex_value);
+        
+        ssize_t status = write(fd, &hex_value, 1);
+        if (status < 0){
+            warning_printf("Could not write to tty device");
+        } else {
+            tx_total++;
+        }
+            
+        fsync(fd);
+    }
+}
+
 static void print_hex(char c)
 {
-
-    if ((c == '\n') || (c == '\r'))
+    if (((c == '\n') || (c == '\r')) && option.newline_in_hex)
         printf("%c", c);
     else
         printf("%02x ", (unsigned char) c);
@@ -601,16 +651,6 @@ void tty_restore(void)
         tty_disconnect();
 }
 
-static void optional_local_echo(char c)
-{
-    if (!option.local_echo)
-        return;
-    print(c);
-    fflush(stdout);
-    if (option.log)
-        log_write(c);
-}
-
 int tty_connect(void)
 {
     fd_set rdfs;           /* Read file descriptor set */
@@ -659,6 +699,19 @@ int tty_connect(void)
 
     if (option.timestamp)
         next_timestamp = time(NULL);
+        
+    if (option.hex_mode)
+	{
+	    print = print_hex;
+	    print_mode = HEX;
+	    tio_printf("Switched to hexadecimal mode");
+	}
+	else
+	{
+	    print = print_normal;
+	    print_mode = NORMAL;
+	    tio_printf("Switched to normal mode");
+	}
 
     /* Save current port settings */
     if (tcgetattr(fd, &tio_old) < 0)
@@ -759,6 +812,7 @@ int tty_connect(void)
                     goto error_read;
                 }
             }
+            
             if (FD_ISSET(STDIN_FILENO, &rdfs))
             {
                 bool forward = true;
@@ -781,6 +835,13 @@ int tty_connect(void)
 
                 if (forward)
                 {
+                    if(print_mode == HEX){
+                        if(!is_valid_hex(input_char)){
+                            warning_printf("Invalid hex character: '%c' (0x%02x)", input_char, input_char);
+                            continue;        
+                        }
+                    }
+
                     /* Map output character */
                     if ((output_char == 127) && (map_o_del_bs))
                         output_char = '\b';
@@ -799,16 +860,21 @@ int tty_connect(void)
                         tx_total++;
                         delay(option.output_delay);
                     }
+                    
+                    if(print_mode == HEX){
+                        output_hex(output_char);
+                    } else {
+                        /* Send output to tty device */
+                        optional_local_echo(output_char);
+                        
+                        status = write(fd, &output_char, 1);
+                        if (status < 0)
+                            warning_printf("Could not write to tty device");
+                        fsync(fd);
 
-                    /* Send output to tty device */
-                    optional_local_echo(output_char);
-                    status = write(fd, &output_char, 1);
-                    if (status < 0)
-                        warning_printf("Could not write to tty device");
-                    fsync(fd);
-
-                    /* Update transmit statistics */
-                    tx_total++;
+                        /* Update transmit statistics */
+                        tx_total++;
+                    }
 
                     /* Insert output delay */
                     delay(option.output_delay);
