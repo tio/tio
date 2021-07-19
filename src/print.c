@@ -29,7 +29,7 @@ char ansi_format[30];
 
 void print_hex(char c)
 {
-  if ((c == '\n') || (c == '\r'))
+  if (((c == '\n') || (c == '\r')) && option.newline_in_hex)
   {
     printf("%c", c);
   }
