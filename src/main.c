@@ -28,6 +28,7 @@
 #include "tio/log.h"
 #include "tio/error.h"
 #include "tio/print.h"
+#include "tio/lineedit.h"
 
 int main(int argc, char *argv[])
 {
@@ -50,7 +51,10 @@ int main(int argc, char *argv[])
 
     /* Install log exit handler */
     atexit(&log_exit);
-
+    
+    if(option.line_edit)
+    	 lineedit_configure(">", 100);
+    	
     /* Create log file */
     if (option.log)
         log_open(option.log_filename);

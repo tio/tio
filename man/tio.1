@@ -99,7 +99,17 @@ Start in hexadecimal mode.
 .TP
 .BR \-\-newline-in-hex
 
-Interpret new line characters ('\\r', '\\n') in hexadecimal mode.
+Interpret new line characters ('\er', '\en') in hexadecimal mode.
+
+.TP
+.BR \-\-line-edit
+
+Start in line editing mode.
+
+.TP
+.BR \-\-no-newline-in-line-edit
+
+Does not append "\er\en" after a line in line editing mode.
 
 .TP
 .BR \-v ", " \-\-version
@@ -149,6 +159,62 @@ In hexadecimal mode each incoming byte is printed out as a hexadecimal value.
 By default there is \fBno new line\fR in this mode, but it can be turned on using the \fB--newline-in-hex\fR option.
 .TP
 Bytes can be sent in this mode by typing the \fBtwo-character hexadecimal\fR representation of the value, e.g.: to send \fI0xA\fR you must type \fI0a\fR or \fI0A\fR.
+
+.SH "LINE EDIT"
+The program can be started in line editing mode using the \fB--line-edot\fR option. In this mode, the current line can be edited by inserting/deleting characters. Escape values can be used for bytes.
+.PP
+.TP 16n
+The following keys can be used:
+
+.IP "\fB<ASCII>"
+Add character to the position of the cursor.
+
+.IP "\fBRIGHT\fR, \fBLEFT\fR"
+Move cursor in the line.
+
+.IP "\fBUP\fR, \fBDOWN\fR"
+Get prevoiusly sent lines from the history.
+
+.IP "\fBBACKSPACE\fR"
+Delete character before the cursor.
+
+.IP "\fBENTER\fR"
+Send line.
+
+.PP
+.TP 16n
+The following commands can be used:
+
+.IP "\fB:?\fR"
+List available commands.
+
+.IP "\fB:q\fR"
+Quit.
+
+.IP "\fB:v\fR"
+Show version.
+
+.IP "\fB::\fR"
+Send ':'.
+
+.PP
+.TP 16n
+Escape bytes:
+
+.IP \fB\edNNN\fR
+Send NNN as a decimal value. NNN must be 3 characters and less than or equal to 255. For example: \ed023 = 23.
+
+.IP \fB\exNN\fR
+Send NN as a hexadecimal value. NN must be 2 characters. For example: \exff = 255.
+
+.IP \fB\ebNNNNNNNN\fR
+Send NNNNNNNN as a binary value. NNNNNNNN must be 8 characters. For example: \eb0000001 = 1.
+
+.TP 7n
+The following line sends the ASCII string \fI"Hello"\fR:
+
+H\ed101\ex6c\eb01101100o
+
 
 .SH "EXAMPLES"
 .TP

@@ -17,8 +17,14 @@ _tio()
           -p --parity \
           -o --output-delay \
           -n --no-autoconnect \
+          -e --local-echo \
+          -t --timestamp \
           -l --log \
           -m --map \
+          -x --hex \
+          --newline-in-hex \
+          --line-edit \
+          --no-newline-in-line-edit \
           -v --version \
           -t --timestamp \
           -h --help"
@@ -67,6 +73,22 @@ _tio()
             return 0
             ;;
         -t | --timestamp)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        -x | --hex)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        --newline-in-hex)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        --line-edit)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        --no-newline-in-line-edit)
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;

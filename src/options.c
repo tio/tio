@@ -49,6 +49,8 @@ struct option_t option =
     false,    // No timestamp
     false,    // Not starting in hex mode
     false,    // No newlines in hex mode
+    false,    // Not starting in line edit mode
+    false,    // Send new line in line edit mode
     "",       // Log filename
     ""        // Map string
 };
@@ -70,13 +72,16 @@ void print_help(char *argv[])
     printf("  -l, --log <filename>        Log to file\n");
     printf("  -m, --map <flags>           Map special characters\n");
     printf("  -x, --hex                   Start in hexadecimal mode\n");
-    printf("      --newline-in-hex        Interpret new line characters in hex mode\n");
+    printf("  --newline-in-hex            Interpret new line characters in hex mode\n");
+    printf("  --line-edit                 Start in line edit mode\n");
+    printf("  --no-newline-in-line-edit   Don't send newline after a line in line edit mode\n");
     printf("  -v, --version               Display version\n");
     printf("  -h, --help                  Display help\n");
     printf("\n");
     printf("See the man page for list of supported mapping flags.\n");
     printf("\n");
-    printf("In session, press ctrl-t q to quit.\n");
+    printf("In session, press ctrl-t q to quit.\n"); 
+    printf("In line edit mode, type :q to quit.\n");
     printf("\n");
 }
 
@@ -110,23 +115,27 @@ void parse_options(int argc, char *argv[])
     {
         static struct option long_options[] =
         {
-            {"baudrate",       required_argument, 0, 'b'},
-            {"databits",       required_argument, 0, 'd'},
-            {"flow",           required_argument, 0, 'f'},
-            {"stopbits",       required_argument, 0, 's'},
-            {"parity",         required_argument, 0, 'p'},
-            {"output-delay",   required_argument, 0, 'o'},
-            {"no-autoconnect", no_argument,       0, 'n'},
-            {"local-echo",     no_argument,       0, 'e'},
-            {"timestamp",      no_argument,       0, 't'},
-            {"log",            required_argument, 0, 'l'},
-            {"map",            required_argument, 0, 'm'},
-            {"hex",            no_argument,       0, 'x'},
-            {"newline-in-hex", no_argument,       0, OPT_NEWLINE_IN_HEX },
-            {"version",        no_argument,       0, 'v'},
-            {"help",           no_argument,       0, 'h'},
-            {0,                0,                 0,  0 }
+            {"baudrate",       	required_argument, 0, 'b'},
+            {"databits",       	required_argument, 0, 'd'},
+            {"flow",           	required_argument, 0, 'f'},
+            {"stopbits",       	required_argument, 0, 's'},
+            {"parity",         	required_argument, 0, 'p'},
+            {"output-delay",   	required_argument, 0, 'o'},
+            {"no-autoconnect", 	no_argument,       0, 'n'},
+            {"local-echo",     	no_argument,       0, 'e'},
+            {"timestamp",      	no_argument,       0, 't'},
+            {"log",            	required_argument, 0, 'l'},
+            {"map",            	required_argument, 0, 'm'},
+            {"hex",            	no_argument,       0, 'x'},
+            {"newline-in-hex", 	no_argument,       0, OPT_NEWLINE_IN_HEX },
+            {"line-edit",      	no_argument,       0, OPT_LINE_EDIT },
+            {"no-newline-in-line-edit", no_argument,	0, OPT_NO_NEWLINE_LINE_EDIT },
+            {"version",        	no_argument,       0, 'v'},
+            {"help",           	no_argument,       0, 'h'},
+            {0,                	0,                 0,  0 }
         };
+        
+        #define OPT_NO_NEWLINE_LINE_EDIT	1002	// "short" option for --no-newline-in-line-edit
 
         /* getopt_long stores the option index here */
         int option_index = 0;
@@ -201,6 +210,14 @@ void parse_options(int argc, char *argv[])
                 
             case OPT_NEWLINE_IN_HEX:
             	option.newline_in_hex = true;
+            	break;
+            	
+            case OPT_LINE_EDIT:
+            	option.line_edit = true;
+            	break;
+            	
+            case OPT_NO_NEWLINE_LINE_EDIT:
+            	option.no_newline_in_line_edit = true;
             	break;
 
             case 'v':
