@@ -1,6 +1,9 @@
 Maintainer:
 Martin Lund <martin.lund@keep-it-simple.com>
 
+Co-maintainer:
+Sylvain LAFRASSE <slymacdev@free.fr>
+
 Contributors:
 Jesper Larsen <knorr.jesper@gmail.com>
 Jeppe Ledet-Pedersen <jlp@gomspace.com>
@@ -15,7 +18,6 @@ Daniel Engberg <daniel.engberg.lists@pyret.net>
 Petr Vaněk <pv@excello.cz>
 qianfan Zhao <qianfanguijin@163.com>
 Henner Zeller <h.zeller@acm.org>
-Sylvain LAFRASSE <slymacdev@free.fr>
 Robey Pointer <robey@afero.io>
 Lars Kellogg-Stedman <lars@oddbit.com>
 arichi <sergey.korabanov@gmail.com>
