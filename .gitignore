@@ -1,6 +1,7 @@
 *.tar.xz
 src/*.o
 src/tio
+src/tionc
 Makefile.in
 Makefile
 aclocal.m4
@@ -22,3 +23,4 @@ src/include/stamp-h1
 *.swp
 /tio-*
 /src/bash-completion/tio
+\#*

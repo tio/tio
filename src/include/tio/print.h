@@ -22,6 +22,17 @@
 #ifndef PRINT_H
 #define PRINT_H
 
+#ifdef TIO_NOCOLOR
+#define ANSI_COLOR_GRAY      ""
+#define ANSI_COLOR_RED       ""
+#define ANSI_COLOR_GREEN     ""
+#define ANSI_COLOR_YELLOW    ""
+#define ANSI_COLOR_BLUE      ""
+#define ANSI_COLOR_PINK      ""
+#define ANSI_COLOR_CYAN      ""
+#define ANSI_COLOR_WHITE     ""
+#define ANSI_COLOR_RESET     ""
+#else
 #define ANSI_COLOR_GRAY      "\x1b[1;30m"
 #define ANSI_COLOR_RED       "\x1b[1;31m"
 #define ANSI_COLOR_GREEN     "\x1b[1;32m"
@@ -31,6 +42,7 @@
 #define ANSI_COLOR_CYAN      "\x1b[1;36m"
 #define ANSI_COLOR_WHITE     "\x1b[1;37m"
 #define ANSI_COLOR_RESET     "\x1b[0m"
+#endif
 
 #define color_printf(format, args...) \
    { \
