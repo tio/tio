@@ -790,30 +790,32 @@ int tty_connect(void)
                         output_char = '\n';
 
                     /* Map newline character */
-                    if ((output_char == '\n') && (map_o_nl_crnl)) {
-                        char r = '\r';
+                    if ((output_char == '\n' || output_char == '\r') && (map_o_nl_crnl)) {
+                        const char *crlf = "\r\n";
 
-                        optional_local_echo(r);
-                        status = write(fd, &r, 1);
+                        optional_local_echo(crlf[0]);
+                        optional_local_echo(crlf[1]);
+                        status = write(fd, crlf, 2);
                         if (status < 0)
                             warning_printf("Could not write to tty device");
 
+                        tx_total += 2;
+                        delay(option.output_delay);
+                    } else
+                    {
+                        /* Send output to tty device */
+                        optional_local_echo(output_char);
+                        status = write(fd, &output_char, 1);
+                        if (status < 0)
+                            warning_printf("Could not write to tty device");
+                        fsync(fd);
+
+                        /* Update transmit statistics */
                         tx_total++;
+
+                        /* Insert output delay */
                         delay(option.output_delay);
                     }
-
-                    /* Send output to tty device */
-                    optional_local_echo(output_char);
-                    status = write(fd, &output_char, 1);
-                    if (status < 0)
-                        warning_printf("Could not write to tty device");
-                    fsync(fd);
-
-                    /* Update transmit statistics */
-                    tx_total++;
-
-                    /* Insert output delay */
-                    delay(option.output_delay);
                 }
 
                 /* Save previous key */
