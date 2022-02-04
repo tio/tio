@@ -47,7 +47,7 @@ char * current_time(void)
 
     size_t len = strftime(time_string, sizeof(time_string), "%H:%M:%S", tmp);
     if (len) {
-        len = snprintf(time_string + len, TIME_STRING_SIZE - len, ".%03ld", tv.tv_usec / 1000);
+        len = snprintf(time_string + len, TIME_STRING_SIZE - len, ".%03ld", (long)tv.tv_usec / 1000);
     }
 
     return (len >= 0) && (len < TIME_STRING_SIZE) ? time_string : NULL;
