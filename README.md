@@ -1,24 +1,20 @@
-# tio - a simple TTY terminal I/O application
+# tio - a simple TTY terminal I/O tool
 
 [![Build Status](https://travis-ci.org/tio/tio.svg?branch=master)](https://travis-ci.org/tio/tio)
-[![Snap Status](https://build.snapcraft.io/badge/tio/tio.snapcraft.svg)](https://build.snapcraft.io/user/tio/tio.snapcraft)
 
 ## 1. Introduction
 
-tio is a simple TTY terminal application which features a straightforward
-commandline interface to easily connect to TTY devices for basic input/output.
-
-It was created because the author needed a simple no-nonsense TTY terminal
-application to easily connect to various terminal TTY devices.
+tio is a simple TTY terminal tool which features a straightforward command-line
+interface to easily connect to TTY devices for basic I/O operations.
 
 <p align="center">
-<img src="https://tio.github.io/images/tio-demo.gif">
+<img src="images/tio-demo.gif">
 </p>
 
 
 ## 2. Usage
 
-The commandline interface is straightforward as reflected in the output from
+The command-line interface is straightforward as reflected in the output from
 'tio --help':
 ```
     Usage: tio [<options>] <tty-device>
@@ -62,9 +58,23 @@ See the tio man page for more details.
 
 ## 3. Installation
 
-The latest release version is available at https://tio.github.io
+### 3.1 Installation using package manager
+tio comes prepackaged for various GNU/Linux distributions. Please consult your package manager tool to find and install tio.
 
-### 3.1 Installation using release tarball
+### 3.2 Installation using snap
+
+Install latest stable version:
+```
+    $ snap install tio
+```
+Install bleeding edge:
+```
+    $ snap install tio --edge
+```
+
+### 3.3 Installation from source
+
+The latest source releases can be found [here](https://github.com/tio/tio/releases).
 
 Install steps:
 ```
@@ -73,11 +83,6 @@ Install steps:
      $ make install
 ```
 See INSTALL file for more installation details.
-
-### 3.2 Installation using package
-
-Tio comes prepackaged for various GNU/Linux distributions. Visit
-https://tio.github.io for package installation details.
 
 
 ## 4. Contributing
@@ -89,9 +94,9 @@ requests, add issues etc..
 GitHub: https://github.com/tio/tio
 
 Also, if you find this free open source software useful please consider making
-a donation:
+a donation of your choice:
 
-[![Donate](https://www.paypal.com/en_US/i/btn/x-click-but21.gif)](https://www.paypal.me/lundmar)
+[![Donate](images/paypal.png)](https://www.paypal.me/lundmar)
 
 
 ## 5. Support
@@ -101,7 +106,7 @@ Submit bug reports via GitHub: https://github.com/tio/tio/issues
 
 ## 6. Website
 
-Visit https://tio.github.io
+Visit [tio.github.io](https://tio.github.io)
 
 
 ## 7. License
@@ -113,4 +118,4 @@ Tio is GPLv2+. See COPYING file for license details.
 
 Created by Martin Lund \<martin.lund@keep-it-simple.com>
 
-See the AUTHORS file for full list of authors.
+See the AUTHORS file for full list of contributors.
