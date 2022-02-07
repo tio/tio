@@ -619,7 +619,7 @@ int tty_connect(void)
     static char previous_char = 0;
     static bool first = true;
     int    status;
-    time_t next_timestamp = 0;
+    bool next_timestamp = false;
     char*  now = NULL;
 
     /* Open tty device */
@@ -658,7 +658,7 @@ int tty_connect(void)
     tainted = false;
 
     if (option.timestamp)
-        next_timestamp = time(NULL);
+        next_timestamp = true;
 
     /* Save current port settings */
     if (tcgetattr(fd, &tio_old) < 0)
@@ -715,19 +715,21 @@ int tty_connect(void)
                     if (next_timestamp && input_char != '\n' && input_char != '\r')
                     {
                         now = current_time();
-                        fprintf(stdout, ANSI_COLOR_GRAY "[%s] " ANSI_COLOR_RESET, now);
-                        if (option.log)
-                        {
-                            log_write('[');
-                            while (*now != '\0')
+                        if (now) {
+                            fprintf(stdout, ANSI_COLOR_GRAY "[%s] " ANSI_COLOR_RESET, now);
+                            if (option.log)
                             {
-                                log_write(*now);
-                                ++now;
+                                log_write('[');
+                                while (*now != '\0')
+                                {
+                                    log_write(*now);
+                                    ++now;
+                                }
+                                log_write(']');
+                                log_write(' ');
                             }
-                            log_write(']');
-                            log_write(' ');
+                            next_timestamp = false;
                         }
-                        next_timestamp = 0;
                     }
 
                     /* Map input character */
@@ -736,7 +738,7 @@ int tty_connect(void)
                         print('\r');
                         print('\n');
                         if (option.timestamp)
-                            next_timestamp = time(NULL);
+                            next_timestamp = true;
                     } else
                     {
                         /* Print received tty character to stdout */
@@ -751,7 +753,7 @@ int tty_connect(void)
                     tainted = true;
 
                     if (input_char == '\n' && option.timestamp)
-                        next_timestamp = time(NULL);
+                        next_timestamp = true;
                 } else
                 {
                     /* Error reading - device is likely unplugged */
