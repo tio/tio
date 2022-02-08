@@ -36,19 +36,19 @@
 /* Default options */
 struct option_t option =
 {
-    "",       // Device name
-    115200,   // Baudrate
-    8,        // Databits
-    "none",   // Flow
-    1,        // Stopbits
-    "none",   // Parity
-    0,        // No output delay
-    false,    // No autoconnect
-    false,    // No log
-    false,    // No local echo
-    false,    // No timestamp
-    "",       // Log filename
-    ""        // Map string
+    .tty_device = "",
+    .baudrate = 115200,
+    .databits = 8,
+    .flow = "none",
+    .stopbits = 1,
+    .parity = "none",
+    .output_delay = 0,
+    .no_autoconnect = false,
+    .log = false,
+    .local_echo = false,
+    .timestamp = false,
+    .log_filename = "",
+    .map = ""
 };
 
 void print_help(char *argv[])
