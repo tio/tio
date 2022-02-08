@@ -22,27 +22,36 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
+#include <sys/time.h>
 #include "tio/error.h"
 #include "tio/print.h"
 
+// "YYYY-MM-DDThh:mm:ss.sss" (ISO-8601 format).
+#define TIME_STRING_SIZE 24
+
 char * current_time(void)
 {
-    static char time_string[20];
-    time_t t;
+    static char time_string[TIME_STRING_SIZE];
     struct tm *tmp;
 
-    t = time(NULL);
-    tmp = localtime(&t);
+    struct timeval tv;
+    gettimeofday(&tv,NULL);
+
+    tmp = localtime(&tv.tv_sec);
     if (tmp == NULL)
     {
         error_printf("Retrieving local time failed");
         exit(EXIT_FAILURE);
     }
 
-    strftime(time_string, sizeof(time_string), "%H:%M:%S", tmp);
+    size_t len = strftime(time_string, sizeof(time_string), "%Y-%m-%dT%H:%M:%S", tmp);
+    if (len) {
+        len = snprintf(time_string + len, TIME_STRING_SIZE - len, ".%03ld", (long)tv.tv_usec / 1000);
+    }
 
-    return time_string;
+    return (len >= 0) && (len < TIME_STRING_SIZE) ? time_string : NULL;
 }
 
 void delay(long ms)

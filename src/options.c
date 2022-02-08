@@ -36,19 +36,19 @@
 /* Default options */
 struct option_t option =
 {
-    "",       // Device name
-    115200,   // Baudrate
-    8,        // Databits
-    "none",   // Flow
-    1,        // Stopbits
-    "none",   // Parity
-    0,        // No output delay
-    false,    // No autoconnect
-    false,    // No log
-    false,    // No local echo
-    false,    // No timestamp
-    "",       // Log filename
-    ""        // Map string
+    .tty_device = "",
+    .baudrate = 115200,
+    .databits = 8,
+    .flow = "none",
+    .stopbits = 1,
+    .parity = "none",
+    .output_delay = 0,
+    .no_autoconnect = false,
+    .log = false,
+    .local_echo = false,
+    .timestamp = false,
+    .log_filename = "",
+    .map = ""
 };
 
 void print_help(char *argv[])
@@ -64,7 +64,7 @@ void print_help(char *argv[])
     printf("  -o, --output-delay <ms>     Output delay (default: 0)\n");
     printf("  -n, --no-autoconnect        Disable automatic connect\n");
     printf("  -e, --local-echo            Do local echo\n");
-    printf("  -t, --timestamp             Prefix each new line with a timestamp\n");
+    printf("  -t, --timestamp             Timestamp lines\n");
     printf("  -l, --log <filename>        Log to file\n");
     printf("  -m, --map <flags>           Map special characters\n");
     printf("  -v, --version               Display version\n");
