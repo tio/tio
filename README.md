@@ -28,6 +28,7 @@ The command-line interface is straightforward as reflected in the output from
       -o, --output-delay <ms>     Output delay (default: 0)
       -n, --no-autoconnect        Disable automatic connect
       -e, --local-echo            Do local echo
+      -t, --timestamp             Prefix each new line with a timestamp
       -l, --log <filename>        Log to file
       -m, --map <flags>           Map special characters
       -v, --version               Display version
