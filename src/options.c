@@ -64,7 +64,7 @@ void print_help(char *argv[])
     printf("  -o, --output-delay <ms>     Output delay (default: 0)\n");
     printf("  -n, --no-autoconnect        Disable automatic connect\n");
     printf("  -e, --local-echo            Do local echo\n");
-    printf("  -t, --timestamp             Prefix each new line with a timestamp\n");
+    printf("  -t, --timestamp             Timestamp lines\n");
     printf("  -l, --log <filename>        Log to file\n");
     printf("  -m, --map <flags>           Map special characters\n");
     printf("  -v, --version               Display version\n");
