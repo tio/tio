@@ -29,6 +29,7 @@ The command-line interface is straightforward as reflected in the output from
       -n, --no-autoconnect        Disable automatic connect
       -e, --local-echo            Do local echo
       -t, --timestamp             Timestamp lines
+      -i, --list-devices          List available serial devices
       -l, --log <filename>        Log to file
       -m, --map <flags>           Map special characters
       -v, --version               Display version

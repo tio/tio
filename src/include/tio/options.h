@@ -41,6 +41,7 @@ struct option_t
     bool log;
     bool local_echo;
     bool timestamp;
+    bool list_devices;
     const char *log_filename;
     const char *map;
 };

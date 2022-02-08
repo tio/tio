@@ -31,13 +31,20 @@
 
 int main(int argc, char *argv[])
 {
-    int status;
+    int status = 0;
 
     /* Install error exit handler */
     atexit(&error_exit);
 
     /* Parse options */
     parse_options(argc, argv);
+
+    /* List available serial devices */
+    if (option.list_devices)
+    {
+        list_serial_devices();
+        return status;
+    }
 
     /* Configure tty device */
     tty_configure();

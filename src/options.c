@@ -47,6 +47,7 @@ struct option_t option =
     .log = false,
     .local_echo = false,
     .timestamp = false,
+    .list_devices = false,
     .log_filename = "",
     .map = ""
 };
@@ -65,6 +66,7 @@ void print_help(char *argv[])
     printf("  -n, --no-autoconnect        Disable automatic connect\n");
     printf("  -e, --local-echo            Do local echo\n");
     printf("  -t, --timestamp             Timestamp lines\n");
+    printf("  -i, --list-devices          List available serial devices\n");
     printf("  -l, --log <filename>        Log to file\n");
     printf("  -m, --map <flags>           Map special characters\n");
     printf("  -v, --version               Display version\n");
@@ -115,6 +117,7 @@ void parse_options(int argc, char *argv[])
             {"no-autoconnect", no_argument,       0, 'n'},
             {"local-echo",     no_argument,       0, 'e'},
             {"timestamp",      no_argument,       0, 't'},
+            {"list-devices",   no_argument,       0, 'i'},
             {"log",            required_argument, 0, 'l'},
             {"map",            required_argument, 0, 'm'},
             {"version",        no_argument,       0, 'v'},
@@ -126,7 +129,7 @@ void parse_options(int argc, char *argv[])
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:netl:m:vh", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:netil:m:vh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
@@ -180,6 +183,10 @@ void parse_options(int argc, char *argv[])
                 option.timestamp = true;
                 break;
 
+            case 'i':
+                option.list_devices = true;
+                break;
+
             case 'l':
                 option.log = true;
                 option.log_filename = optarg;
@@ -212,6 +219,11 @@ void parse_options(int argc, char *argv[])
             default:
                 exit(EXIT_FAILURE);
         }
+    }
+
+    if (option.list_devices)
+    {
+        return;
     }
 
     /* Assume first non-option is the tty device name */

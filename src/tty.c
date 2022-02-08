@@ -36,6 +36,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <time.h>
+#include <dirent.h>
 #include "config.h"
 #include "tio/tty.h"
 #include "tio/print.h"
@@ -47,6 +48,8 @@
 #ifdef HAVE_TERMIOS2
 extern int setspeed2(int fd, int baudrate);
 #endif
+
+#define PATH_SERIAL_DEVICES "/dev/serial/by-id/"
 
 static struct termios tio, tio_old, stdout_new, stdout_old, stdin_new, stdin_old;
 static unsigned long rx_total = 0, tx_total = 0;
@@ -840,4 +843,22 @@ error_read:
     tty_disconnect();
 error_open:
     return TIO_ERROR;
+}
+
+void list_serial_devices(void)
+{
+    DIR *d;
+    struct dirent *dir;
+    d = opendir(PATH_SERIAL_DEVICES);
+
+    if (d)
+    {
+        while ((dir = readdir(d)) != NULL)
+        {
+            if ((strcmp(dir->d_name, ".")) && (strcmp(dir->d_name, "..")))
+                printf("%s%s\n", PATH_SERIAL_DEVICES, dir->d_name);
+        }
+
+        closedir(d);
+    }
 }

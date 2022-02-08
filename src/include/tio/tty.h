@@ -48,5 +48,6 @@ void stdin_restore(void);
 void tty_configure(void);
 int tty_connect(void);
 void tty_wait_for_device(void);
+void list_serial_devices(void);
 
 #endif
