@@ -30,8 +30,8 @@
 #include <getopt.h>
 #include <termios.h>
 #include <limits.h>
-#include "tio/options.h"
-#include "tio/error.h"
+#include "options.h"
+#include "error.h"
 
 /* Default options */
 struct option_t option =

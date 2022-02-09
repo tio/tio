@@ -25,8 +25,8 @@
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
-#include "tio/error.h"
-#include "tio/print.h"
+#include "error.h"
+#include "print.h"
 
 // "YYYY-MM-DDThh:mm:ss.sss" (ISO-8601 format).
 #define TIME_STRING_SIZE 24
@@ -51,7 +51,7 @@ char * current_time(void)
         len = snprintf(time_string + len, TIME_STRING_SIZE - len, ".%03ld", (long)tv.tv_usec / 1000);
     }
 
-    return (len >= 0) && (len < TIME_STRING_SIZE) ? time_string : NULL;
+    return (len < TIME_STRING_SIZE) ? time_string : NULL;
 }
 
 void delay(long ms)

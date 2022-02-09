@@ -27,7 +27,7 @@ _tio()
     #  Complete the arguments to the options.
     case "${prev}" in
         -b | --baudrate)
-            local baudrates="@BAUDRATES@"
+            local baudrates="@baudrates@"
             COMPREPLY=( $(compgen -W "$baudrates" -- ${cur}) )
             return 0
             ;;

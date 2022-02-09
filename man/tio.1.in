@@ -1,4 +1,4 @@
-.TH "tio" "1" "June 2018"
+.TH "tio" "1" "@version_date@" "tio @version@" "User Commands"
 
 .SH "NAME"
 tio \- a simple TTY terminal I/O application

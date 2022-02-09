@@ -23,11 +23,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "tio/options.h"
-#include "tio/tty.h"
-#include "tio/log.h"
-#include "tio/error.h"
-#include "tio/print.h"
+#include "options.h"
+#include "tty.h"
+#include "log.h"
+#include "error.h"
+#include "print.h"
 
 int main(int argc, char *argv[])
 {

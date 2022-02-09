@@ -1,0 +1,65 @@
+project('tio', 'c',
+    version : '1.33',
+    license : [ 'GPL-2'],
+    meson_version : '>= 0.53.2',
+    default_options : [ 'warning_level=2', 'buildtype=release', 'c_std=gnu17' ]
+)
+
+# The tag date of the project_version(), update when the version bumps.
+version_date = '2022-02-10'
+
+# Test for dynamic baudrate configuration interface
+compiler = meson.get_compiler('c')
+tcgets2 = compiler.get_define('TCGETS2', prefix: '#include <asm/termios.h>')
+
+# Test for supported baudrates
+test_baudrates = [
+    0,
+    50,
+    75,
+    110,
+    134,
+    150,
+    200,
+    300,
+    600,
+    1200,
+    1800,
+    2400,
+    4800,
+    7200,
+    9600,
+    14400,
+    19200,
+    28800,
+    38400,
+    57600,
+    76800,
+    115200,
+    230400,
+    460800,
+    500000,
+    576000,
+    921600,
+    1000000,
+    1152000,
+    1500000,
+    2000000,
+    2500000,
+    3000000,
+    3500000,
+    4000000 ]
+
+baudrates = ''
+baudrate_cases = ''
+foreach rate : test_baudrates
+  baudrate = rate.to_string()
+  value = compiler.get_define('B' + baudrate, prefix: '#include <termios.h>')
+  if value != ''
+    baudrates = baudrates + baudrate + ' '
+    baudrate_cases = baudrate_cases + ' case ' + baudrate + ': baudrate = B' + baudrate + '; break;'
+  endif
+endforeach
+
+subdir('src')
+subdir('man')

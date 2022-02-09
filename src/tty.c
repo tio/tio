@@ -38,12 +38,12 @@
 #include <time.h>
 #include <dirent.h>
 #include "config.h"
-#include "tio/tty.h"
-#include "tio/print.h"
-#include "tio/options.h"
-#include "tio/time.h"
-#include "tio/log.h"
-#include "tio/error.h"
+#include "tty.h"
+#include "print.h"
+#include "options.h"
+#include "misc.h"
+#include "log.h"
+#include "error.h"
 
 #ifdef HAVE_TERMIOS2
 extern int setspeed2(int fd, int baudrate);
@@ -364,9 +364,9 @@ void tty_configure(void)
          * Only switch cases for baud rates detected supported by the host
          * system are inserted.
          *
-         * To see which baud rates are being probed see configure.ac
+         * To see which baud rates are being probed see meson.build
          */
-        AUTOCONF_BAUDRATE_CASES
+        BAUDRATE_CASES
 
         default:
 #ifdef HAVE_TERMIOS2

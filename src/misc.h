@@ -19,10 +19,7 @@
  * 02110-1301, USA.
  */
 
-#ifndef TIME_H
-#define TIME_H
+#pragma once
 
 char * current_time(void);
 void delay(long ms);
-
-#endif

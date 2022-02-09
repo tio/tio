@@ -24,9 +24,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "tio/options.h"
-#include "tio/print.h"
-#include "tio/error.h"
+#include "options.h"
+#include "print.h"
+#include "error.h"
 
 char error[2][1000];
 
