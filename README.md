@@ -93,14 +93,15 @@ how to build stuff using meson.
 
 ## 4. Contributing
 
-Tio is open source. All contributions (bug fixes, doc, ideas, etc.) are
-welcome. Visit the tio GitHub page to access latest source code, create pull
-requests, add issues etc..
+tio is open source. If you want to help out with the project please feel free
+to join in.
 
-GitHub: https://github.com/tio/tio
+All contributions (bug reports, code, doc, ideas, etc.) are welcome.
 
-Also, if you find this free open source software useful please consider making
-a donation of your choice:
+Please use the github issue tracker and pull request features.
+
+Also, if you find this free open source software useful please feel free to
+consider making a donation of your choice:
 
 [![Donate](images/paypal.png)](https://www.paypal.me/lundmar)
 
