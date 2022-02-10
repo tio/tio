@@ -62,7 +62,7 @@ Enable local echo.
 Timestamp lines.
 
 .TP
-.BR \-i ", " \-\-list\-devices
+.BR \-L ", " \-\-list\-devices
 
 List available serial devices.
 
