@@ -28,8 +28,8 @@
 #include "error.h"
 #include "print.h"
 
-// "YYYY-MM-DDThh:mm:ss.sss" (ISO-8601 format).
-#define TIME_STRING_SIZE 24
+// "hh:mm:ss.sss"
+#define TIME_STRING_SIZE 15
 
 char * current_time(void)
 {
@@ -46,7 +46,7 @@ char * current_time(void)
         exit(EXIT_FAILURE);
     }
 
-    size_t len = strftime(time_string, sizeof(time_string), "%Y-%m-%dT%H:%M:%S", tmp);
+    size_t len = strftime(time_string, sizeof(time_string), "%H:%M:%S", tmp);
     if (len) {
         len = snprintf(time_string + len, TIME_STRING_SIZE - len, ".%03ld", (long)tv.tv_usec / 1000);
     }
