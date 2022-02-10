@@ -80,11 +80,15 @@ The latest source releases can be found [here](https://github.com/tio/tio/releas
 
 Install steps:
 ```
-     $ ./configure
-     $ make
-     $ make install
+    $ meson build
+    $ meson compile -C build
+    $ meson install -C build
 ```
-See INSTALL file for more installation details.
+
+See meson\_options.txt for tio specific build options.
+
+Note: Please do no try to install from source if you are not familiar with
+how to build stuff using meson.
 
 
 ## 4. Contributing
