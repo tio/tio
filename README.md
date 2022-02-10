@@ -1,6 +1,6 @@
 # tio - a simple TTY terminal I/O tool
 
-[![Build Status](https://travis-ci.org/tio/tio.svg?branch=master)](https://travis-ci.org/tio/tio)
+[![CircleCI](https://circleci.com/gh/tio/tio/tree/master.svg?style=shield)](https://circleci.com/gh/tio/tio/tree/master)
 
 ## 1. Introduction
 
