@@ -59,7 +59,7 @@ Enable local echo.
 .TP
 .BR \-t ", " \-\-timestamp
 
-Timestamp lines.
+Enable line timestamp.
 
 .TP
 .BR \-L ", " \-\-list\-devices

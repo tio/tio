@@ -64,8 +64,8 @@ void print_help(char *argv[])
     printf("  -p, --parity odd|even|none  Parity (default: none)\n");
     printf("  -o, --output-delay <ms>     Output delay (default: 0)\n");
     printf("  -n, --no-autoconnect        Disable automatic connect\n");
-    printf("  -e, --local-echo            Do local echo\n");
-    printf("  -t, --timestamp             Timestamp lines\n");
+    printf("  -e, --local-echo            Enable local echo\n");
+    printf("  -t, --timestamp             Enable line timestamp\n");
     printf("  -L, --list-devices          List available serial devices\n");
     printf("  -l, --log <filename>        Log to file\n");
     printf("  -m, --map <flags>           Map special characters\n");

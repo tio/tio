@@ -139,16 +139,16 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" ctrl-t ?   List available key commands");
                 tio_printf(" ctrl-t b   Send break");
                 tio_printf(" ctrl-t c   Show configuration");
+                tio_printf(" ctrl-t d   Toggle DTR line");
                 tio_printf(" ctrl-t e   Toggle local echo mode");
                 tio_printf(" ctrl-t h   Toggle hexadecimal mode");
                 tio_printf(" ctrl-t l   Clear screen");
+                tio_printf(" ctrl-t L   Show lines state");
                 tio_printf(" ctrl-t q   Quit");
+                tio_printf(" ctrl-t r   Toggle RTS line");
                 tio_printf(" ctrl-t s   Show statistics");
                 tio_printf(" ctrl-t t   Send ctrl-t key code");
-                tio_printf(" ctrl-t T   Toggle timestamps");
-                tio_printf(" ctrl-t L   Show lines");
-                tio_printf(" ctrl-t d   Toggle DTR");
-                tio_printf(" ctrl-t r   Toggle RTS");
+                tio_printf(" ctrl-t T   Toggle line timestamp mode");
                 tio_printf(" ctrl-t v   Show version");
                 break;
 
@@ -186,8 +186,8 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" Flow: %s", option.flow);
                 tio_printf(" Stopbits: %d", option.stopbits);
                 tio_printf(" Parity: %s", option.parity);
-                tio_printf(" Local Echo: %s", option.local_echo ? "yes":"no");
-                tio_printf(" Timestamps: %s", option.timestamp ? "yes" : "no");
+                tio_printf(" Local echo: %s", option.local_echo ? "enabled" : "disabled");
+                tio_printf(" Timestamps: %s", option.timestamp ? "enabled" : "disabled");
                 tio_printf(" Output delay: %d", option.output_delay);
                 if (option.map[0] != 0)
                     tio_printf(" Map flags: %s", option.map);
@@ -228,7 +228,8 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
             case KEY_S:
                 /* Show tx/rx statistics upon ctrl-t s sequence */
                 tio_printf("Statistics:");
-                tio_printf(" Sent %lu bytes, received %lu bytes", tx_total, rx_total);
+                tio_printf(" Sent %lu bytes", tx_total);
+                tio_printf(" Received %lu bytes", rx_total);
                 break;
 
             case KEY_T:
