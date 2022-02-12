@@ -19,8 +19,7 @@
  * 02110-1301, USA.
  */
 
-#ifndef TTY_H
-#define TTY_H
+#pragma once
 
 #define KEY_QUESTION 0x3f
 #define KEY_B 0x62
@@ -49,5 +48,3 @@ void tty_configure(void);
 int tty_connect(void);
 void tty_wait_for_device(void);
 void list_serial_devices(void);
-
-#endif

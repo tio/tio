@@ -19,12 +19,9 @@
  * 02110-1301, USA.
  */
 
-#ifndef LOG_H
-#define LOG_H
+#pragma once
 
 void log_open(const char *filename);
 void log_write(char c);
 void log_close(void);
 void log_exit(void);
-
-#endif

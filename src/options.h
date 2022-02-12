@@ -19,8 +19,7 @@
  * 02110-1301, USA.
  */
 
-#ifndef OPTIONS_H
-#define OPTIONS_H
+#pragma once
 
 #include <stdbool.h>
 #include <limits.h>
@@ -49,5 +48,3 @@ struct option_t
 extern struct option_t option;
 
 void parse_options(int argc, char *argv[]);
-
-#endif
