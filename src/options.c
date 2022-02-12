@@ -87,7 +87,7 @@ long string_to_long(char *string)
     result = strtol(string, &end_token, 10);
     if ((errno != 0) || (*end_token != 0))
     {
-        error_printf("Invalid digit");
+        printf("Error: Invalid digit\n");
         exit(EXIT_FAILURE);
     }
 
@@ -232,7 +232,7 @@ void parse_options(int argc, char *argv[])
 
     if (strlen(option.tty_device) == 0)
     {
-        error_printf("Missing device name");
+        printf("Error: Missing device name\n");
         exit(EXIT_FAILURE);
     }
 

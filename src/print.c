@@ -1,7 +1,7 @@
 /*
  * tio - a simple TTY terminal I/O application
  *
- * Copyright (c) 2014-2017  Martin Lund
+ * Copyright (c) 2014-2022  Martin Lund
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,27 +19,35 @@
  * 02110-1301, USA.
  */
 
-#include "config.h"
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include "options.h"
+#include <stdbool.h>
 #include "print.h"
-#include "error.h"
 
-char error[2][1000];
+bool print_tainted = false;
+bool print_color_mode = false;
+const char *print_color = ANSI_COLOR_YELLOW;
 
-void error_exit(void)
+void print_hex(char c)
 {
-  if (error[0][0] != 0)
+  if ((c == '\n') || (c == '\r'))
   {
-    /* Print error */
-    tio_printf("Error: %s", error[0]);
+    printf("%c", c);
   }
-  else if ((error[1][0] != 0) && (option.no_autoconnect))
+  else
   {
-    /* Print silent error */
-    tio_printf("Error: %s", error[1]);
+    printf("%02x ", (unsigned char) c);
   }
+
+  fflush(stdout);
+}
+
+void print_normal(char c)
+{
+  putchar(c);
+  fflush(stdout);
+}
+
+void print_set_color_mode(bool mode)
+{
+  print_color_mode = mode;
 }

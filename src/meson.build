@@ -9,7 +9,8 @@ tio_sources = [
   'main.c',
   'options.c',
   'misc.c',
-  'tty.c'
+  'tty.c',
+  'print.c'
   ]
 
 if tcgets2 != ''

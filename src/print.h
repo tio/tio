@@ -19,8 +19,15 @@
  * 02110-1301, USA.
  */
 
-#ifndef PRINT_H
-#define PRINT_H
+#pragma once
+
+#include <stdbool.h>
+#include "misc.h"
+#include "error.h"
+
+extern bool print_tainted;
+extern bool print_color_mode;
+extern const char *print_color;
 
 #define ANSI_COLOR_GRAY      "\x1b[1;30m"
 #define ANSI_COLOR_RED       "\x1b[1;31m"
@@ -33,25 +40,44 @@
 #define ANSI_COLOR_RESET     "\x1b[0m"
 
 #define color_printf(format, args...) \
-   { \
-     fprintf (stdout, "\r" ANSI_COLOR_YELLOW format ANSI_COLOR_RESET "\r\n", ## args); \
-     fflush(stdout); \
-   }
+{ \
+  if (print_color_mode) \
+    fprintf (stdout, "\r%s" format ANSI_COLOR_RESET "\r\n", print_color, ## args); \
+  else \
+    fprintf (stdout, "\r" format "\r\n", ## args); \
+  fflush(stdout); \
+}
 
 #define warning_printf(format, args...) \
-   { \
-     fprintf (stdout, "\rWarning: " format "\r\n", ## args); \
-     fflush(stdout); \
-   }
+{ \
+  color_printf("[%s] Warning: " format, current_time(), ## args); \
+  fflush(stdout); \
+}
+
+#define tio_printf(format, args...) \
+{ \
+  if (print_tainted) \
+    putchar('\n'); \
+  color_printf("[%s] " format, current_time(), ## args); \
+  print_tainted = false; \
+}
+
+#define error_printf(format, args...) \
+  snprintf(error[0], 1000, format, ## args);
+
+#define error_printf_silent(format, args...) \
+  snprintf(error[1], 1000, format, ## args);
 
 #ifdef DEBUG
 #define debug_printf(format, args...) \
-   fprintf (stdout, "[debug] " format, ## args)
+  fprintf (stdout, "[debug] " format, ## args)
 #define debug_printf_raw(format, args...) \
-   fprintf (stdout, "" format, ## args)
+  fprintf (stdout, "" format, ## args)
 #else
 #define debug_printf(format, args...)
 #define debug_printf_raw(format, args...)
 #endif
 
-#endif
+void print_hex(char c);
+void print_normal(char c);
+void print_set_color_mode(bool mode);

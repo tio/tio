@@ -54,7 +54,6 @@ extern int setspeed2(int fd, int baudrate);
 static struct termios tio, tio_old, stdout_new, stdout_old, stdin_new, stdin_old;
 static unsigned long rx_total = 0, tx_total = 0;
 static bool connected = false;
-static bool tainted = false;
 static bool print_mode = NORMAL;
 static bool standard_baudrate = true;
 static void (*print)(char c);
@@ -64,29 +63,6 @@ static bool map_o_cr_nl = false;
 static bool map_o_nl_crnl = false;
 static bool map_o_del_bs = false;
 
-#define tio_printf(format, args...) \
-{ \
-    if (tainted) putchar('\n'); \
-    color_printf("[%s] " format, current_time(), ## args); \
-    tainted = false; \
-}
-
-static void print_hex(char c)
-{
-
-    if ((c == '\n') || (c == '\r'))
-        printf("%c", c);
-    else
-        printf("%02x ", (unsigned char) c);
-
-    fflush(stdout);
-}
-
-static void print_normal(char c)
-{
-    putchar(c);
-    fflush(stdout);
-}
 
 static void toggle_line(const char *line_name, int mask)
 {
@@ -326,10 +302,6 @@ void stdout_configure(void)
         error_printf("Could not apply new stdout settings (%s)", strerror(errno));
         exit(EXIT_FAILURE);
     }
-
-    /* Print launch hints */
-    tio_printf("tio v%s", VERSION);
-    tio_printf("Press ctrl-t q to quit");
 
     /* At start use normal print function */
     print = print_normal;
@@ -579,8 +551,10 @@ void tty_wait_for_device(void)
             last_errno = 0;
             return;
         }
-        else if (last_errno != errno) {
-            tio_printf("%s: %s. Waiting...", option.tty_device, strerror(errno));
+        else if (last_errno != errno)
+        {
+            warning_printf("Could not open tty device (%s)", strerror(errno));
+            tio_printf("Waiting for tty device..");
             last_errno = errno;
         }
     }
@@ -659,7 +633,7 @@ int tty_connect(void)
     /* Print connect status */
     tio_printf("Connected");
     connected = true;
-    tainted = false;
+    print_tainted = false;
 
     if (option.timestamp)
         next_timestamp = true;
@@ -754,7 +728,7 @@ int tty_connect(void)
                     if (option.log)
                         log_write(input_char);
 
-                    tainted = true;
+                    print_tainted = true;
 
                     if (input_char == '\n' && option.timestamp)
                         next_timestamp = true;

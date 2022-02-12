@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 {
     int status = 0;
 
-    /* Install error exit handler */
+    /* Add error exit handler */
     atexit(&error_exit);
 
     /* Parse options */
@@ -55,12 +55,19 @@ int main(int argc, char *argv[])
     /* Configure output terminal */
     stdout_configure();
 
-    /* Install log exit handler */
+    /* Add log exit handler */
     atexit(&log_exit);
 
     /* Create log file */
     if (option.log)
         log_open(option.log_filename);
+
+    /* Enable color printing */
+    print_set_color_mode(true);
+
+    /* Print launch hints */
+    tio_printf("tio v%s", VERSION);
+    tio_printf("Press ctrl-t q to quit");
 
     /* Connect to tty device */
     if (option.no_autoconnect)
