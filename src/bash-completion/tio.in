@@ -21,7 +21,7 @@ _tio()
           -m --map \
           -v --version \
           -t --timestamp \
-          -i --list-devices \
+          -L --list-devices \
           -h --help"
 
     #  Complete the arguments to the options.
@@ -71,7 +71,7 @@ _tio()
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
-        -i | --list-devices)
+        -L | --list-devices)
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
