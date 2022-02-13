@@ -1,9 +1,10 @@
-
 === tio v1.33 ===
 
 
 
 Changes since tio v1.32:
+
+ * Show auto connect status in show configuration
 
  * Use '#pragma once' in all headers
 
