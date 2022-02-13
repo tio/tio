@@ -165,6 +165,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" Local echo: %s", option.local_echo ? "enabled" : "disabled");
                 tio_printf(" Timestamps: %s", option.timestamp ? "enabled" : "disabled");
                 tio_printf(" Output delay: %d", option.output_delay);
+                tio_printf(" Auto connect: %s", option.no_autoconnect ? "disabled" : "enabled");
                 if (option.map[0] != 0)
                     tio_printf(" Map flags: %s", option.map);
                 if (option.log)
