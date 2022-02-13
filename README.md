@@ -11,6 +11,11 @@ interface to easily connect to TTY devices for basic I/O operations.
 <img src="images/tio-demo.gif">
 </p>
 
+### 1.1 Motivation
+
+To make a simpler TTY terminal tool for talking with TTY devices with less
+focus on classic terminal/modem features and more focus on the needs of
+embedded developers and hackers.
 
 ## 2. Usage
 
