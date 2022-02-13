@@ -1,5 +1,161 @@
 
-=== tio v1.32 ===
+=== tio v1.33 ===
+
+
+
+Changes since tio v1.32:
+
+ * Use '#pragma once' in all headers
+
+ * Improve printed output
+
+   Get rid of inconsistencies in the printed output (error printing,
+   colors, etc.).
+
+   Prepare for user configurable color.
+
+ * Rename option -i to -L
+
+ * Shorten timestamp
+ 
+ * Shorten timestamp description
+
+   We do not need the date part of the timestamp. It simply takes up too
+   much precious line space. In case of logging to file, one can easily
+   conclude the date from the file date information.
+
+ * Replace Travis with circleCI
+
+ * Replace autotools with meson
+
+   To introduce much simpler build configuration which is also easier to
+   maintain.
+
+ * Add list serial devices feature
+
+   For convenience, add a --list-devices option which lists the available
+   serial devices.
+
+ * Cleanup: Use dot notation for default options struct
+
+ * Update AUTHORS
+
+ * Add command to show version
+
+   The key sequence ctrl-t v will now show the version of tio.
+
+ * Align format of timestamps
+ 
+ * Add Sylvain as official co-maintainer
+
+Sylvain LAFRASSE:
+
+ * Add '-t' option description for time stamping.
+
+ * Add description for time stamping.
+
+ * Resolved tio/tio#84: Added timestamps in log file if enabled.
+
+attila-v:
+
+ * Refine timestamps with milliseconds and ISO-8601 format (#129).
+
+   * Show milliseconds too in the timestamp (#114) and log file (#124)
+   * Change timestamp format to ISO-8601.
+
+Yin Fengwei:
+
+ * Output newline on stdout with hex print mode
+
+   This is to fix the issue #104. The timestamp will always be
+   printed at the beginning of line:
+
+   [10:25:56] Switched to hexadecimal mode
+   0d 0a 0d [10:25:57] 41 43 52 4e 3a 5c 3e 0d 0a 0d [10:25:58] 41
+
+   is changed to:
+
+   [12:34:56] 45 72 72 6f 72 3a 20 49 6e 76 61 6c 69 64 20
+   [12:34:56] 41 43 52 4e 3a 5c 3e
+   [12:34:56] 41 43 52 4e 3a 5c 3e
+   [12:34:57] 41 43 52 4e 3a 5c 3e 6c 73
+
+Jakob Haufe:
+
+ * Make comparison POSIX compliant
+
+   String comparison with == is not POSIX compliant and can fail with e.g.
+   dash.
+
+Henrik Brix Andersen:
+
+ * Add bash completion of tty devices.
+
+ * Add -t/--timestamp to bash completion script.
+
+Henner Zeller:
+
+ * Local echo: show character by character even if stdout buffered.
+
+Björn Stenberg:
+
+ * Show error when failing to open a tty
+
+Alban Bedel:
+
+ * Fix out of tree builds
+
+   Out of tree builds are currently broken because $(top_srcdir)src/include
+   is not in the search path. In tree builds are working because autconf add
+   $(top_builddir)/src/include to the search path for the generated config.h.
+   As $(top_builddir) and $(top_srcdir) are identical during in tree builds
+   the search path still end up beeing somehow correct.
+
+   To fix this add -I$(srcdir)/include to the CPPFLAGS in Makefile.am.
+
+Fabrice Fontaine:
+
+ * src/setspeed2.c: fix redefinition of termio
+
+   Include ioctls.h and termbits.h from asm-generic instead of asm to avoid
+   build failures.
+
+Erik Moqvist
+
+ * Exit if output speed cannot be set.
+
+Lars Kellogg-Stedman:
+
+ * fflush() after putchar() for print_hex and print_normal
+
+   In order for local echo to work properly, we have to either call
+   fflush(stdout) after every character or just disable line buffering.
+   This change calls fflush() after putchar().
+
+ * Disable line buffering in stdout
+
+   In order for local echo to work properly, we have to either call
+   fflush(stdout) after every character or just disable line buffering.
+   This change uses setbuf(stdout, NULL) to do the latter.
+
+George Stark:
+
+ * dont show line state if ioctl failed
+
+ * add serial lines manual control
+
+arichi:
+
+ * Flush every local echo char
+
+   Flush stdout at every char in case it
+   happens to be buffered.
+
+Mariusz Midor:
+
+ * Newline: handle booth NL and CR
+
+   Flag ONLCRNL expects code \n after press Enter, but on some systems \r is send instead.
 
 
 
