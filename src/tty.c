@@ -546,8 +546,8 @@ void tty_wait_for_device(void)
         }
 
         /* Test for accessible device file */
-        int rc = access(option.tty_device, R_OK);
-        if (rc == 0) {
+        status = access(option.tty_device, R_OK);
+        if (status == 0) {
             last_errno = 0;
             return;
         }
