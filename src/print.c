@@ -1,5 +1,5 @@
 /*
- * tio - a simple TTY terminal I/O application
+ * tio - a simple TTY terminal I/O tool
  *
  * Copyright (c) 2014-2022  Martin Lund
  *

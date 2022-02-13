@@ -1,7 +1,7 @@
 .TH "tio" "1" "@version_date@" "tio @version@" "User Commands"
 
 .SH "NAME"
-tio \- a simple TTY terminal I/O application
+tio \- a simple TTY terminal I/O tool
 
 .SH "SYNOPSIS"
 .PP
@@ -11,8 +11,8 @@ tio \- a simple TTY terminal I/O application
 .SH "DESCRIPTION"
 .PP
 .B tio
-is a simple TTY terminal application which features a straightforward
-commandline interface to easily connect to TTY devices for basic input/output.
+is a simple TTY terminal tool which features a straightforward commandline
+interface to easily connect to TTY devices for basic I/O operations.
 
 .SH "OPTIONS"
 
