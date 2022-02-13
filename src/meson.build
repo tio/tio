@@ -11,7 +11,7 @@ tio_sources = [
   'misc.c',
   'tty.c',
   'print.c'
-  ]
+]
 
 if tcgets2 != ''
   tio_sources += 'setspeed2.c'
@@ -19,7 +19,6 @@ endif
 
 executable('tio',
   tio_sources,
-  install: true,
-)
+  install: true )
 
 subdir('bash-completion')

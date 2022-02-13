@@ -3,8 +3,7 @@ conf.set('baudrates', baudrates)
 
 completion_file = configure_file( input: files('tio.in'),
                                   output: 'tio',
-                                  configuration: conf,
-                                )
+                                  configuration: conf )
 
 bashcompletiondir = get_option('bashcompletiondir')
 if bashcompletiondir == ''

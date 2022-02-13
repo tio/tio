@@ -8,10 +8,8 @@ conf.set('version_date', version_date)
 manpage = configure_file(
      input: files('tio.1.in'),
      output: 'tio.1',
-     configuration: conf,
-)
+     configuration: conf)
 
 install_man(
      manpage,
-     install_dir: man1dir,
-)
+     install_dir: man1dir)
