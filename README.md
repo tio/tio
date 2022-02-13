@@ -1,6 +1,7 @@
 # tio - a simple TTY terminal I/O tool
 
 [![CircleCI](https://circleci.com/gh/tio/tio/tree/master.svg?style=shield)](https://circleci.com/gh/tio/tio/tree/master)
+[![tio](https://snapcraft.io/tio/badge.svg)](https://snapcraft.io/tio)
 
 ## 1. Introduction
 
