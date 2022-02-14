@@ -10,7 +10,10 @@ version_date = '2022-02-13'
 
 # Test for dynamic baudrate configuration interface
 compiler = meson.get_compiler('c')
-tcgets2 = compiler.get_define('TCGETS2', prefix: '#include <asm/termios.h>')
+tcgets2 = ''
+if compiler.check_header('<asm/termios.h>')
+    tcgets2 = compiler.get_define('TCGETS2', prefix: '#include <asm/termios.h>')
+endif
 
 # Test for supported baudrates
 test_baudrates = [
