@@ -13,7 +13,7 @@ tio_sources = [
   'print.c'
 ]
 
-if tcgets2 != ''
+if enable_setspeed2
   tio_sources += 'setspeed2.c'
 endif
 
