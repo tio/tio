@@ -11,7 +11,7 @@ tio \- a simple TTY terminal I/O tool
 .SH "DESCRIPTION"
 .PP
 .B tio
-is a simple TTY terminal tool which features a straightforward commandline
+is a simple TTY terminal tool which features a straightforward command-line
 interface to easily connect to TTY devices for basic I/O operations.
 
 .SH "OPTIONS"
@@ -95,6 +95,13 @@ Map NL to CR-NL on output.
 .P
 If defining more than one flag, the flags must be comma separated.
 .RE
+
+.TP
+.BR \-c ", " "\-\-color " \fI<0..255>
+
+Colorize tio text using ANSI color code (default: 15).
+
+If color code is negative a list of available ANSI colors will be printed.
 
 .TP
 .BR \-v ", " \-\-version

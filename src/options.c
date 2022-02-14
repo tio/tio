@@ -49,7 +49,8 @@ struct option_t option =
     .timestamp = false,
     .list_devices = false,
     .log_filename = "",
-    .map = ""
+    .map = "",
+    .color = 15,
 };
 
 void print_help(char *argv[])
@@ -69,6 +70,7 @@ void print_help(char *argv[])
     printf("  -L, --list-devices          List available serial devices\n");
     printf("  -l, --log <filename>        Log to file\n");
     printf("  -m, --map <flags>           Map special characters\n");
+    printf("  -c, --color <0..255>        Colorize tio text (default: 15)\n");
     printf("  -v, --version               Display version\n");
     printf("  -h, --help                  Display help\n");
     printf("\n");
@@ -120,6 +122,7 @@ void parse_options(int argc, char *argv[])
             {"list-devices",   no_argument,       0, 'L'},
             {"log",            required_argument, 0, 'l'},
             {"map",            required_argument, 0, 'm'},
+            {"color",          required_argument, 0, 'c'},
             {"version",        no_argument,       0, 'v'},
             {"help",           no_argument,       0, 'h'},
             {0,                0,                 0,  0 }
@@ -129,7 +132,7 @@ void parse_options(int argc, char *argv[])
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:netLl:m:vh", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:netLl:m:c:vh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
@@ -194,6 +197,25 @@ void parse_options(int argc, char *argv[])
 
             case 'm':
                 option.map = optarg;
+                break;
+
+            case 'c':
+                option.color = string_to_long(optarg);
+                if (option.color > 255)
+                {
+                    printf("Error: Invalid color code\n");
+                    exit(EXIT_FAILURE);
+                }
+                if (option.color < 0)
+                {
+                    // Print available color codes
+                    printf("Available color codes:\n");
+                    for (int i=0; i<=255; i++)
+                    {
+                        printf(" \e[1;38;5;%dmThis is color code %d\e[0m\n", i, i);
+                    }
+                    exit(EXIT_SUCCESS);
+                }
                 break;
 
             case 'v':

@@ -694,8 +694,9 @@ int tty_connect(void)
                     if (next_timestamp && input_char != '\n' && input_char != '\r')
                     {
                         now = current_time();
-                        if (now) {
-                            fprintf(stdout, ANSI_COLOR_GRAY "[%s] " ANSI_COLOR_RESET, now);
+                        if (now)
+                        {
+                            color_printf_raw("[%s] ", now);
                             if (option.log)
                             {
                                 log_write('[');

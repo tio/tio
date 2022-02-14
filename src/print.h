@@ -27,17 +27,9 @@
 
 extern bool print_tainted;
 extern bool print_color_mode;
-extern const char *print_color;
+extern char print_color[];
 
-#define ANSI_COLOR_GRAY      "\x1b[1;30m"
-#define ANSI_COLOR_RED       "\x1b[1;31m"
-#define ANSI_COLOR_GREEN     "\x1b[1;32m"
-#define ANSI_COLOR_YELLOW    "\x1b[1;33m"
-#define ANSI_COLOR_BLUE      "\x1b[1;34m"
-#define ANSI_COLOR_PINK      "\x1b[1;35m"
-#define ANSI_COLOR_CYAN      "\x1b[1;36m"
-#define ANSI_COLOR_WHITE     "\x1b[1;37m"
-#define ANSI_COLOR_RESET     "\x1b[0m"
+#define ANSI_COLOR_RESET     "\e[0m"
 
 #define color_printf(format, args...) \
 { \
@@ -45,6 +37,15 @@ extern const char *print_color;
     fprintf (stdout, "\r%s" format ANSI_COLOR_RESET "\r\n", print_color, ## args); \
   else \
     fprintf (stdout, "\r" format "\r\n", ## args); \
+  fflush(stdout); \
+}
+
+#define color_printf_raw(format, args...) \
+{ \
+  if (print_color_mode) \
+    fprintf (stdout, "%s" format ANSI_COLOR_RESET, print_color, ## args); \
+  else \
+    fprintf (stdout, format, ## args); \
   fflush(stdout); \
 }
 

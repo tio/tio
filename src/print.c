@@ -21,11 +21,12 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include "options.h"
 #include "print.h"
 
 bool print_tainted = false;
 bool print_color_mode = false;
-const char *print_color = ANSI_COLOR_YELLOW;
+char print_color[20];
 
 void print_hex(char c)
 {
@@ -50,4 +51,5 @@ void print_normal(char c)
 void print_set_color_mode(bool mode)
 {
   print_color_mode = mode;
+  sprintf(print_color, "\e[1;38;5;%dm", option.color);
 }

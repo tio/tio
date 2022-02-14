@@ -43,6 +43,7 @@ struct option_t
     bool list_devices;
     const char *log_filename;
     const char *map;
+    int color;
 };
 
 extern struct option_t option;
