@@ -26,32 +26,25 @@
 #include "error.h"
 
 extern bool print_tainted;
-extern bool print_color_mode;
-extern char print_color[];
+extern char ansi_format[];
 
-#define ANSI_COLOR_RESET     "\e[0m"
+#define ANSI_RESET "\e[0m"
 
-#define color_printf(format, args...) \
+#define ansi_printf(format, args...) \
 { \
-  if (print_color_mode) \
-    fprintf (stdout, "\r%s" format ANSI_COLOR_RESET "\r\n", print_color, ## args); \
-  else \
-    fprintf (stdout, "\r" format "\r\n", ## args); \
+  fprintf (stdout, "\r%s" format ANSI_RESET "\r\n", ansi_format, ## args); \
   fflush(stdout); \
 }
 
-#define color_printf_raw(format, args...) \
+#define ansi_printf_raw(format, args...) \
 { \
-  if (print_color_mode) \
-    fprintf (stdout, "%s" format ANSI_COLOR_RESET, print_color, ## args); \
-  else \
-    fprintf (stdout, format, ## args); \
+  fprintf (stdout, "%s" format ANSI_RESET, ansi_format, ## args); \
   fflush(stdout); \
 }
 
 #define warning_printf(format, args...) \
 { \
-  color_printf("[%s] Warning: " format, current_time(), ## args); \
+  ansi_printf("[%s] Warning: " format, current_time(), ## args); \
   fflush(stdout); \
 }
 
@@ -59,7 +52,7 @@ extern char print_color[];
 { \
   if (print_tainted) \
     putchar('\n'); \
-  color_printf("[%s] " format, current_time(), ## args); \
+  ansi_printf("[%s] " format, current_time(), ## args); \
   print_tainted = false; \
 }
 
@@ -81,4 +74,4 @@ extern char print_color[];
 
 void print_hex(char c);
 void print_normal(char c);
-void print_set_color_mode(bool mode);
+void print_enable_ansi_formatting(void);

@@ -50,7 +50,7 @@ struct option_t option =
     .list_devices = false,
     .log_filename = "",
     .map = "",
-    .color = 15,
+    .color = -1,
 };
 
 void print_help(char *argv[])
@@ -70,7 +70,7 @@ void print_help(char *argv[])
     printf("  -L, --list-devices          List available serial devices\n");
     printf("  -l, --log <filename>        Log to file\n");
     printf("  -m, --map <flags>           Map special characters\n");
-    printf("  -c, --color <0..255>        Colorize tio text (default: 15)\n");
+    printf("  -c, --color <0..255>        Colorize tio text\n");
     printf("  -v, --version               Display version\n");
     printf("  -h, --help                  Display help\n");
     printf("\n");

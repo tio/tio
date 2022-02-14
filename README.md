@@ -38,7 +38,7 @@ The command-line interface is straightforward as reflected in the output from
       -L, --list-devices          List available serial devices
       -l, --log <filename>        Log to file
       -m, --map <flags>           Map special characters
-      -c, --color <0..255>        Colorize tio text (default: 15)
+      -c, --color <0..255>        Colorize tio text
       -v, --version               Display version
       -h, --help                  Display help
 

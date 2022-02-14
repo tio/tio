@@ -696,7 +696,7 @@ int tty_connect(void)
                         now = current_time();
                         if (now)
                         {
-                            color_printf_raw("[%s] ", now);
+                            ansi_printf_raw("[%s] ", now);
                             if (option.log)
                             {
                                 log_write('[');

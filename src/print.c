@@ -25,8 +25,7 @@
 #include "print.h"
 
 bool print_tainted = false;
-bool print_color_mode = false;
-char print_color[20];
+char ansi_format[30];
 
 void print_hex(char c)
 {
@@ -48,8 +47,16 @@ void print_normal(char c)
   fflush(stdout);
 }
 
-void print_set_color_mode(bool mode)
+void print_enable_ansi_formatting()
 {
-  print_color_mode = mode;
-  sprintf(print_color, "\e[1;38;5;%dm", option.color);
+  if (option.color < 0)
+  {
+    // Enable bold text
+    sprintf(ansi_format, "\e[1m");
+  }
+  else
+  {
+    // Enable bold text with user defined ANSI color
+    sprintf(ansi_format, "\e[1;38;5;%dm", option.color);
+  }
 }

@@ -62,8 +62,8 @@ int main(int argc, char *argv[])
     if (option.log)
         log_open(option.log_filename);
 
-    /* Enable color printing */
-    print_set_color_mode(true);
+    /* Enable ANSI text formatting (colors etc.) */
+    print_enable_ansi_formatting();
 
     /* Print launch hints */
     tio_printf("tio v%s", VERSION);
