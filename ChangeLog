@@ -1,4 +1,52 @@
-=== tio v1.33 ===
+=== tio v1.34 ===
+
+
+
+Changes since tio v1.33:
+
+ * Fix setspeed2 compilation
+
+ * Only apply color formatting when using color option
+
+   To help the color blind who may use custom terminal foreground /
+   background colors.
+
+ * Update README
+
+ * Add '-c, --color' option
+
+   Allow user to select which ANSI color code to use to colorize the tio
+   text. To successfully set the color the color code must be in the range
+   0..255.
+
+   If color code is negative tio will print all available ANSI colors.
+
+   The default color is changed to bold white to make tio defaults usable
+   for most users, including color blind users.
+
+ * Fix setspeed2 check
+
+ * Fix meson header check string
+
+ * Reintroduce long timestamp format
+
+   But make the timestamp format RFC3339 compliant instead. The RFC states:
+
+   NOTE: ISO 8601 defines date and time separated by "T".
+         Applications using this syntax may choose, for the sake of
+         readability, to specify a full-date and full-time separated by
+         (say) a space character.
+
+   This way we keep the information specified by ISO 8601 but make it more
+   human readable which is better for the console output.
+
+ * Update version year
+
+Sylvain LAFRASSE:
+
+ * Fix TTY device listing on Darwin. (#136)
+
+ * Fix TCGETS2 search on Darwin.
 
 
 
@@ -816,4 +864,3 @@ Jakub Wilk:
  * Fixed silly "tio or tio" in man page
 
  * Fixed typo
-
