@@ -49,7 +49,11 @@
 extern int setspeed2(int fd, int baudrate);
 #endif
 
+#ifdef __APPLE__
+#define PATH_SERIAL_DEVICES "/dev/"
+#else
 #define PATH_SERIAL_DEVICES "/dev/serial/by-id/"
+#endif
 
 static struct termios tio, tio_old, stdout_new, stdout_old, stdin_new, stdin_old;
 static unsigned long rx_total = 0, tx_total = 0;
@@ -824,18 +828,21 @@ error_open:
 
 void list_serial_devices(void)
 {
-    DIR *d;
-    struct dirent *dir;
-    d = opendir(PATH_SERIAL_DEVICES);
-
+    DIR *d = opendir(PATH_SERIAL_DEVICES);
     if (d)
     {
+        struct dirent *dir;
         while ((dir = readdir(d)) != NULL)
         {
             if ((strcmp(dir->d_name, ".")) && (strcmp(dir->d_name, "..")))
+            {
+#ifdef __APPLE__
+#define TTY_DEVICES_PREFIX "tty."
+                if (!strncmp(dir->d_name, TTY_DEVICES_PREFIX, sizeof(TTY_DEVICES_PREFIX) - 1))
+#endif
                 printf("%s%s\n", PATH_SERIAL_DEVICES, dir->d_name);
+            }
         }
-
         closedir(d);
     }
 }
