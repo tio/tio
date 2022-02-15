@@ -13,12 +13,16 @@ tio_sources = [
   'print.c'
 ]
 
+tio_c_args = []
+
 if enable_setspeed2
   tio_sources += 'setspeed2.c'
+  tio_c_args += '-DHAVE_TERMIOS2'
 endif
 
 executable('tio',
   tio_sources,
+  c_args: tio_c_args,
   install: true )
 
 subdir('bash-completion')
