@@ -19,8 +19,9 @@
  * 02110-1301, USA.
  */
 
+#define termios asmtermios
 #include <sys/ioctl.h>
-#include <asm-generic/ioctls.h>
+#undef termios
 #include <asm-generic/termbits.h>
 
 int setspeed2(int fd, int baudrate)
