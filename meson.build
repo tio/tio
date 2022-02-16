@@ -11,8 +11,15 @@ version_date = '2022-02-15'
 # Test for dynamic baudrate configuration interface
 compiler = meson.get_compiler('c')
 enable_setspeed2 = false
-if compiler.check_header('asm-generic/ioctls.h')
-  enable_setspeed2 = compiler.has_header_symbol('asm-generic/ioctls.h', 'TCGETS2')
+enable_iossiospeed = false
+if host_machine.system() != 'darwin'
+  if compiler.check_header('asm-generic/ioctls.h')
+    enable_setspeed2 = compiler.has_header_symbol('asm-generic/ioctls.h', 'TCGETS2')
+  endif
+else
+  if compiler.check_header('IOKit/serial/ioss.h')
+    enable_iossiospeed = compiler.has_header_symbol('IOKit/serial/ioss.h', 'IOSSIOSPEED')
+  endif
 endif
 
 # Test for supported baudrates

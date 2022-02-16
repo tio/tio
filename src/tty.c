@@ -49,6 +49,10 @@
 extern int setspeed2(int fd, int baudrate);
 #endif
 
+#ifdef HAVE_IOSSIOSPEED
+extern int iossiospeed(int fd, int baudrate);
+#endif
+
 #ifdef __APPLE__
 #define PATH_SERIAL_DEVICES "/dev/"
 #else
@@ -347,7 +351,7 @@ void tty_configure(void)
         BAUDRATE_CASES
 
         default:
-#ifdef HAVE_TERMIOS2
+#if defined (HAVE_TERMIOS2) || defined (HAVE_IOSSIOSPEED)
             standard_baudrate = false;
             break;
 #else
@@ -647,6 +651,15 @@ int tty_connect(void)
     if (tcgetattr(fd, &tio_old) < 0)
         goto error_tcgetattr;
 
+#ifdef HAVE_IOSSIOSPEED
+    if (!standard_baudrate)
+    {
+        /* OS X wants these fields left alone. We'll set baudrate with iossiospeed below. */
+        tio.c_ispeed = tio_old.c_ispeed;
+        tio.c_ospeed = tio_old.c_ospeed;
+    }
+#endif
+
     /* Make sure we restore tty settings on exit */
     if (first)
     {
@@ -668,7 +681,18 @@ int tty_connect(void)
         if (setspeed2(fd, option.baudrate) != 0)
         {
             error_printf_silent("Could not set baudrate speed (%s)", strerror(errno));
-            goto error_setspeed2;
+            goto error_setspeed;
+        }
+    }
+#endif
+
+#ifdef HAVE_IOSSIOSPEED
+    if (!standard_baudrate)
+    {
+        if (iossiospeed(fd, option.baudrate) != 0)
+        {
+            error_printf_silent("Could not set baudrate speed (%s)", strerror(errno));
+            goto error_setspeed;
         }
     }
 #endif
@@ -815,8 +839,8 @@ int tty_connect(void)
 
     return TIO_SUCCESS;
 
-#ifdef HAVE_TERMIOS2
-error_setspeed2:
+#if defined (HAVE_TERMIOS2) || defined (HAVE_IOSSIOSPEED)
+error_setspeed:
 #endif
 error_tcsetattr:
 error_tcgetattr:

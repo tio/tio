@@ -20,6 +20,11 @@ if enable_setspeed2
   tio_c_args += '-DHAVE_TERMIOS2'
 endif
 
+if enable_iossiospeed
+  tio_sources += 'iossiospeed.c'
+  tio_c_args += '-DHAVE_IOSSIOSPEED'
+endif
+
 executable('tio',
   tio_sources,
   c_args: tio_c_args,
