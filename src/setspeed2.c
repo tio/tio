@@ -22,6 +22,7 @@
 #define termios asmtermios
 #include <sys/ioctl.h>
 #undef termios
+#include <asm-generic/ioctls.h>
 #include <asm-generic/termbits.h>
 
 int setspeed2(int fd, int baudrate)
