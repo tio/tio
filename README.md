@@ -33,8 +33,8 @@ The command-line interface is straightforward as reflected in the output from
       -p, --parity odd|even|none  Parity (default: none)
       -o, --output-delay <ms>     Output delay (default: 0)
       -n, --no-autoconnect        Disable automatic connect
-      -e, --local-echo            Do local echo
-      -t, --timestamp             Timestamp lines
+      -e, --local-echo            Enable local echo
+      -t, --timestamp             Enable line timestamp
       -L, --list-devices          List available serial devices
       -l, --log <filename>        Log to file
       -m, --map <flags>           Map special characters
