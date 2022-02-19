@@ -26,6 +26,14 @@
 #include <termios.h>
 #include <sys/param.h>
 
+enum timestamp_t
+{
+    TIMESTAMP_NONE,
+    TIMESTAMP_24HOUR,
+    TIMESTAMP_24HOUR_START,
+    TIMESTAMP_ISO8601,
+};
+
 /* Options */
 struct option_t
 {
@@ -39,7 +47,7 @@ struct option_t
     bool no_autoconnect;
     bool log;
     bool local_echo;
-    bool timestamp;
+    enum timestamp_t timestamp;
     bool list_devices;
     const char *log_filename;
     const char *map;

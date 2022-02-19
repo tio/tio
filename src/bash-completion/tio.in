@@ -69,7 +69,7 @@ _tio()
             return 0
             ;;
         -t | --timestamp)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            COMPREPLY=( $(compgen -W "24hour 24hour-start iso8601" -- ${cur}) )
             return 0
             ;;
         -L | --list-devices)

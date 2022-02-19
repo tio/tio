@@ -34,7 +34,7 @@ The command-line interface is straightforward as reflected in the output from
       -o, --output-delay <ms>     Output delay (default: 0)
       -n, --no-autoconnect        Disable automatic connect
       -e, --local-echo            Enable local echo
-      -t, --timestamp             Enable line timestamp
+      -t, --timestamp[=<format>]  Enable timestamp (default: 24hour)
       -L, --list-devices          List available serial devices
       -l, --log <filename>        Log to file
       -m, --map <flags>           Map special characters
@@ -42,7 +42,7 @@ The command-line interface is straightforward as reflected in the output from
       -v, --version               Display version
       -h, --help                  Display help
 
-    See the man page for list of supported mapping flags.
+    See the man page for more details.
 
     In session, press ctrl-t q to quit.
 ```

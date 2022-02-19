@@ -27,31 +27,59 @@
 #include <sys/time.h>
 #include "error.h"
 #include "print.h"
+#include "options.h"
 
-// "YYYY-MM-DD hh:mm:ss.sss" (ISO-8601/RFC3339 format)
-#define TIME_STRING_SIZE 24
+#define TIME_STRING_SIZE_MAX 24
 
-char * current_time(void)
+char *current_time(void)
 {
-    static char time_string[TIME_STRING_SIZE];
-    struct tm *tmp;
-
+    static char time_string[TIME_STRING_SIZE_MAX];
+    static struct timeval tv_start;
+    static bool first = true;
+    struct tm *tm;
     struct timeval tv;
-    gettimeofday(&tv,NULL);
+    size_t len;
 
-    tmp = localtime(&tv.tv_sec);
-    if (tmp == NULL)
+    gettimeofday(&tv, NULL);
+
+    if (first)
     {
-        error_printf("Retrieving local time failed");
-        exit(EXIT_FAILURE);
+        tv_start = tv;
+        first = false;
     }
 
-    size_t len = strftime(time_string, sizeof(time_string), "%Y-%m-%d %H:%M:%S", tmp);
-    if (len) {
-        len = snprintf(time_string + len, TIME_STRING_SIZE - len, ".%03ld", (long)tv.tv_usec / 1000);
+    // Add formatted timestap
+    switch (option.timestamp)
+    {
+        case TIMESTAMP_NONE:
+        case TIMESTAMP_24HOUR:
+            // "hh:mm:ss.sss" (24 hour format)
+            tm = localtime(&tv.tv_sec);
+            len = strftime(time_string, sizeof(time_string), "%H:%M:%S", tm);
+            break;
+        case TIMESTAMP_24HOUR_START:
+            // "hh:mm:ss.sss" (24 hour format relative to start time)
+            timersub(&tv, &tv_start, &tv);
+            tv.tv_sec -= 3600; // Why is this needed??
+            tm = localtime(&tv.tv_sec);
+            len = strftime(time_string, sizeof(time_string), "%H:%M:%S", tm);
+            break;
+        case TIMESTAMP_ISO8601:
+            // "YYYY-MM-DDThh:mm:ss.sss" (ISO-8601)
+            tm = localtime(&tv.tv_sec);
+            len = strftime(time_string, sizeof(time_string), "%Y-%m-%dT%H:%M:%S", tm);
+            break;
+        default:
+            return NULL;
     }
 
-    return (len < TIME_STRING_SIZE) ? time_string : NULL;
+    // Append milliseconds to all timestamps
+    if (len)
+    {
+        len = snprintf(time_string + len, TIME_STRING_SIZE_MAX - len, ".%03ld", (long)tv.tv_usec / 1000);
+    }
+
+    return (len < TIME_STRING_SIZE_MAX) ? time_string : NULL;
 }
 
 void delay(long ms)

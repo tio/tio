@@ -46,7 +46,7 @@ struct option_t option =
     .no_autoconnect = false,
     .log = false,
     .local_echo = false,
-    .timestamp = false,
+    .timestamp = TIMESTAMP_NONE,
     .list_devices = false,
     .log_filename = "",
     .map = "",
@@ -66,7 +66,7 @@ void print_help(char *argv[])
     printf("  -o, --output-delay <ms>     Output delay (default: 0)\n");
     printf("  -n, --no-autoconnect        Disable automatic connect\n");
     printf("  -e, --local-echo            Enable local echo\n");
-    printf("  -t, --timestamp             Enable line timestamp\n");
+    printf("  -t, --timestamp[=<format>]  Enable timestamp (default: 24hour)\n");
     printf("  -L, --list-devices          List available serial devices\n");
     printf("  -l, --log <filename>        Log to file\n");
     printf("  -m, --map <flags>           Map special characters\n");
@@ -118,7 +118,7 @@ void parse_options(int argc, char *argv[])
             {"output-delay",   required_argument, 0, 'o'},
             {"no-autoconnect", no_argument,       0, 'n'},
             {"local-echo",     no_argument,       0, 'e'},
-            {"timestamp",      no_argument,       0, 't'},
+            {"timestamp",      optional_argument, 0, 't'},
             {"list-devices",   no_argument,       0, 'L'},
             {"log",            required_argument, 0, 'l'},
             {"map",            required_argument, 0, 'm'},
@@ -132,7 +132,7 @@ void parse_options(int argc, char *argv[])
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:netLl:m:c:vh", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:net::Ll:m:c:vh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
@@ -183,7 +183,27 @@ void parse_options(int argc, char *argv[])
                 break;
 
             case 't':
-                option.timestamp = true;
+                option.timestamp = TIMESTAMP_24HOUR; // Default
+                if (optarg != NULL)
+                {
+                    if (strcmp(optarg, "24hour") == 0)
+                    {
+                        option.timestamp = TIMESTAMP_24HOUR;
+                    }
+                    else if (strcmp(optarg, "24hour-start") == 0)
+                    {
+                        option.timestamp = TIMESTAMP_24HOUR_START;
+                    }
+                    else if (strcmp(optarg, "iso8601") == 0)
+                    {
+                        option.timestamp = TIMESTAMP_ISO8601;
+                    }
+                    else
+                    {
+                        printf("Error: Unknown timestamp type\n");
+                        exit(EXIT_FAILURE);
+                    }
+                }
                 break;
 
             case 'L':

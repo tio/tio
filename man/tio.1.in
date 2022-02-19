@@ -57,9 +57,21 @@ option is provided, tio will exit if the device is not present or an established
 Enable local echo.
 
 .TP
-.BR \-t ", " \-\-timestamp
+.BR \-t ", " \-\-timestamp[=<format>]
 
-Enable line timestamp.
+Enable timestamp. Optionally you can specify any of the following timestamp formats:
+.RS
+.TP 16n
+.IP "\fB24hour"
+24-hour format ("hh:mm:ss.sss")
+.IP "\fB24hour-start"
+24-hour format relative to start time
+.IP "\fBiso8601"
+ISO8601 format ("YYYY-MM-DDThh:mm:ss.sss")
+.P
+Default format is
+.B 24hour
+.RE
 
 .TP
 .BR \-L ", " \-\-list\-devices
@@ -75,7 +87,6 @@ Log to file.
 .BR \-m ", " "\-\-map " \fI<flags>
 
 Map (replace, translate) special characters on input or output. The following mapping flags are supported:
-
 .RS
 .TP 12n
 .IP "\fBICRNL"
