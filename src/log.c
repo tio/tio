@@ -97,7 +97,7 @@ void log_exit(void)
     {
         error_printf("Could not open log file %s (%s)", option.log_filename, strerror(errno));
     }
-    else
+    else if (option.log)
     {
         tio_printf("Saved log to file %s", option.log_filename);
     }
