@@ -108,9 +108,9 @@ If defining more than one flag, the flags must be comma separated.
 .RE
 
 .TP
-.BR \-c ", " "\-\-color " \fI<0..255>
+.BR \-c ", " "\-\-color " \fI<code>
 
-Colorize tio text using ANSI color code.
+Colorize tio text using ANSI color code ranging from 0 to 255.
 
 If color code is negative a list of available ANSI colors will be printed.
 

@@ -70,7 +70,7 @@ void print_help(char *argv[])
     printf("  -L, --list-devices          List available serial devices\n");
     printf("  -l, --log[=<filename>]      Log to file\n");
     printf("  -m, --map <flags>           Map special characters\n");
-    printf("  -c, --color <0..255>        Colorize tio text\n");
+    printf("  -c, --color <code>          Colorize tio text\n");
     printf("  -v, --version               Display version\n");
     printf("  -h, --help                  Display help\n");
     printf("\n");
