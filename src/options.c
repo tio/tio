@@ -68,7 +68,7 @@ void print_help(char *argv[])
     printf("  -e, --local-echo            Enable local echo\n");
     printf("  -t, --timestamp[=<format>]  Enable timestamp (default: 24hour)\n");
     printf("  -L, --list-devices          List available serial devices\n");
-    printf("  -l, --log <filename>        Log to file\n");
+    printf("  -l, --log[=<filename>]      Log to file\n");
     printf("  -m, --map <flags>           Map special characters\n");
     printf("  -c, --color <0..255>        Colorize tio text\n");
     printf("  -v, --version               Display version\n");
@@ -120,7 +120,7 @@ void parse_options(int argc, char *argv[])
             {"local-echo",     no_argument,       0, 'e'},
             {"timestamp",      optional_argument, 0, 't'},
             {"list-devices",   no_argument,       0, 'L'},
-            {"log",            required_argument, 0, 'l'},
+            {"log",            optional_argument, 0, 'l'},
             {"map",            required_argument, 0, 'm'},
             {"color",          required_argument, 0, 'c'},
             {"version",        no_argument,       0, 'v'},
@@ -132,7 +132,7 @@ void parse_options(int argc, char *argv[])
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:net::Ll:m:c:vh", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:net::Ll::m:c:vh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)

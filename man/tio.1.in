@@ -57,7 +57,7 @@ option is provided, tio will exit if the device is not present or an established
 Enable local echo.
 
 .TP
-.BR \-t ", " \-\-timestamp[=<format>]
+.BR \-t ", " \-\-timestamp[=\fI<format>\fR\fB]
 
 Enable timestamp. Optionally you can specify any of the following timestamp formats:
 .RS
@@ -79,9 +79,9 @@ Default format is
 List available serial devices.
 
 .TP
-.BR \-l ", " "\-\-log " \fI<filename>
+.BR \-l ", " \-\-log[=\fI<filename>\fR\fB]
 
-Log to file.
+Log to file. If no filename is provided the filename will be automatically generated.
 
 .TP
 .BR \-m ", " "\-\-map " \fI<flags>
