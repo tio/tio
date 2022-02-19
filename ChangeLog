@@ -1,4 +1,34 @@
-=== tio v1.34 ===
+=== tio v1.35 ===
+
+
+
+Changes since tio v1.34:
+
+ * Add support for automatically generated log filename
+
+   Automatically generate log filename if none is provided.
+
+   The auto generated file name is on the form:
+   "tio_DEVICE_YYYY-MM-DDTHH:MM:SS.log"
+
+ * Add support for configurable timestamp format
+
+   Also changes default timestamp format from ISO8601 to classic 24-hour
+   format as this is assumed to be the format that most users would prefer.
+
+   And reintroduces strict but optional ISO8601 format.
+
+   This feature allows to easily add more timestamp formats in the future.
+
+ * Reintroduce asm-generic/ioctls.h
+
+   It is needed for ppc builds.
+
+ * Add macro hack to workaround older buggy glibc
+
+Robey Pointer:
+
+ * Add support for high bps on OS X
 
 
 
