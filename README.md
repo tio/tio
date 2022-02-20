@@ -125,7 +125,7 @@ Visit [tio.github.io](https://tio.github.io)
 
 ## 7. License
 
-Tio is GPLv2+. See COPYING file for license details.
+Tio is GPLv2+. See LICENSE file for more details.
 
 
 ## 8. Authors
