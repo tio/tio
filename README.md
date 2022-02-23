@@ -1,12 +1,13 @@
-# tio - a simple TTY terminal I/O tool
+# tio - a simple serial terminal I/O tool
 
 [![CircleCI](https://circleci.com/gh/tio/tio/tree/master.svg?style=shield)](https://circleci.com/gh/tio/tio/tree/master)
 [![tio](https://snapcraft.io/tio/badge.svg)](https://snapcraft.io/tio)
 
 ## 1. Introduction
 
-tio is a simple TTY terminal tool which features a straightforward command-line
-interface to easily connect to TTY devices for basic I/O operations.
+tio is a simple serial terminal tool which features a straightforward
+command-line interface to easily connect to TTY devices for basic I/O
+operations.
 
 <p align="center">
 <img src="images/tio-demo.gif">
@@ -14,7 +15,7 @@ interface to easily connect to TTY devices for basic I/O operations.
 
 ### 1.1 Motivation
 
-To make a simpler TTY terminal tool for talking with TTY devices with less
+To make a simpler serial terminal tool for talking with TTY devices with less
 focus on classic terminal/modem features and more focus on the needs of
 embedded developers and hackers.
 
