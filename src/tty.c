@@ -142,7 +142,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                     error_printf("Could not get line state: %s", strerror(errno));
                     break;
                 }
-                tio_printf("Lines state:");
+                tio_printf("Line states:");
                 tio_printf(" DTR: %s", (state & TIOCM_DTR) ? "HIGH" : "LOW");
                 tio_printf(" RTS: %s", (state & TIOCM_RTS) ? "HIGH" : "LOW");
                 tio_printf(" CTS: %s", (state & TIOCM_CTS) ? "HIGH" : "LOW");
