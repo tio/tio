@@ -127,7 +127,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" ctrl-t e   Toggle local echo mode");
                 tio_printf(" ctrl-t h   Toggle hexadecimal mode");
                 tio_printf(" ctrl-t l   Clear screen");
-                tio_printf(" ctrl-t L   Show lines state");
+                tio_printf(" ctrl-t L   Show line states");
                 tio_printf(" ctrl-t q   Quit");
                 tio_printf(" ctrl-t r   Toggle RTS line");
                 tio_printf(" ctrl-t s   Show statistics");

@@ -146,7 +146,7 @@ Show TX/RX statistics
 .IP "\fBctrl-t t"
 Send ctrl-t key code
 .IP "\fBctrl-t L"
-Show lines state (DTR, RTS, CTS, DSR, DCD, RI)
+Show line states (DTR, RTS, CTS, DSR, DCD, RI)
 .IP "\fBctrl-t d"
 Toggle DTR
 .IP "\fBctrl-t r"
