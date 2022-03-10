@@ -20,6 +20,7 @@
  */
 
 #pragma once
+#define _unused(x) (void)(x)
 
 char * current_time(void);
 void delay(long ms);
