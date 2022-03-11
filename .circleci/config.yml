@@ -15,7 +15,7 @@ jobs:
     steps:
       - checkout
       - run: sudo apt-get -qq update
-      - run: sudo apt-get install -y bash-completion git meson
+      - run: sudo apt-get install -y bash-completion git meson libinih-dev
       - run: git clone https://github.com/tio/tio.git
       - run: cd tio && meson build --prefix $HOME/test/tio && ninja -C build install
 
