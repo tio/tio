@@ -10,16 +10,11 @@ tio_sources = [
   'options.c',
   'misc.c',
   'tty.c',
-  'print.c'
+  'print.c',
+  'configfile.c'
 ]
 
-# dependencies
-if get_option('configfile')
-    inih = meson.get_compiler('c').find_library('inih')
-    tio_sources += 'configfile.c'
-else
-    inih = dependency()
-endif
+tio_dep = dependency('inih', required: true)
 
 tio_c_args = []
 
@@ -36,7 +31,7 @@ endif
 executable('tio',
   tio_sources,
   c_args: tio_c_args,
-  dependencies: inih,
+  dependencies: tio_dep,
   install: true )
 
 subdir('bash-completion')
