@@ -146,6 +146,10 @@ static int data_handler(void *user, const char *section, const char *name,
         asprintf(&c->map, "%s", value);
         option.map = c->map;
     }
+    else if (!strcmp(name, "color"))
+    {
+        option.color = atoi(value);
+    }
 
     return 0;
 }

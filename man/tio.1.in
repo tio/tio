@@ -167,7 +167,7 @@ Sections can be used to group settings and their names are only used for readabi
 tio will try to match the user input to a section pattern to get the tty and other options.
 
 .TP
-The following options are available:
+The following configuration file options are available:
 
 .IP "\fBpattern"
 pattern matching user input. This pattern can be an extended regular expression with a single group.
@@ -197,6 +197,8 @@ Prefix each new line with a timestamp
 Set log filename
 .IP "\fBmap"
 Map special characters on input or output
+.IP "\fBcolor"
+Colorize tio text using ANSI color code ranging from 0 to 255.
 
 .SH "CONFIGURATION EXAMPLES"
 
@@ -210,6 +212,7 @@ A Typical section used as a short-hand would be defined as such:
 pattern=ftdi
 baudrate=115200
 tty=/dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+color=11
 .ec
 .fi
 .RE
