@@ -154,6 +154,92 @@ Toggle RTS
 .IP "\fBctrl-t v"
 Show version
 
+.SH "CONFIGURATION"
+.PP
+.TP 16n
+Default tty options can be set in ~/.tiorc using the INI format. Section are used to group settings and their names are only used for readability.
+
+.TP
+.TP
+tio will try to match the user input to a section pattern to get the tty and
+other options.
+
+.TP
+The following options are available:
+
+.IP "\fBpattern"
+pattern matching user input. This pattern ca be an extended regular expression with a single group.
+.IP "\fBtty"
+tty device to open. If tty contains a "%s" it will be substituted with the first group match.
+.IP "\fBbaudrate"
+Set baud rate
+.IP "\fBdatabits"
+Set data bits
+.IP "\fBflow"
+Set flow control
+.IP "\fBstopbits"
+Set stop bits
+.IP "\fBparity"
+Set parity
+.IP "\fBoutput-delay"
+Set output delay
+.IP "\fBno-autoconnect"
+Disable automatic connect
+.IP "\fBlog"
+Log to file
+.IP "\fBlocal-echo"
+Enable local echo
+.IP "\fBtimestamp"
+Prefix each new line with a timestamp
+.IP "\fBlog-filename"
+Set log filename
+.IP "\fBmap"
+Map special characters on input or output
+
+.SH "CONFIGURATION EXAMPLES"
+
+.TP
+A Typical section used as a short-hand would be defined as such
+
+.RS
+.nf
+.eo
+[ftdi device]
+pattern=ftdi
+baudrate=115200
+tty=/dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+.ec
+.fi
+.RE
+
+.TP
+With this section defined in the configuration file the following commands would be equivalent
+
+tio ftdi
+
+tio -b 115200 /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+
+.TP
+a pattern ca also be a regular expression.
+
+.RS
+.nf
+.eo
+[ftdi match]
+pattern=usb([0-9]*)
+baudrate=115200
+tty=/dev/ttyUSB%s
+.ec
+.fi
+.RE
+
+.TP
+Making the following commands equivalent
+
+tio usb12
+
+tio -b 115200 /dev/ttyUSB12
+
 .SH "EXAMPLES"
 .TP
 Typical use is without options. For example:

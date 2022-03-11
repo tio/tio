@@ -269,7 +269,9 @@ void parse_options(int argc, char *argv[])
     }
 
     /* Assume first non-option is the tty device name */
-    if (optind < argc)
+    if (strcmp(option.tty_device, ""))
+	    optind++;
+    else if (optind < argc)
         option.tty_device = argv[optind++];
 
     if (strlen(option.tty_device) == 0)

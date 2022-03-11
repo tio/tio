@@ -1,7 +1,7 @@
 /*
- * tio - a simple TTY terminal I/O tool
+ * tio - a simple TTY terminal I/O application
  *
- * Copyright (c) 2014-2022  Martin Lund
+ * Copyright (c) 2020       Liam Beguin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,8 +19,24 @@
  * 02110-1301, USA.
  */
 
-#pragma once
-#define _unused(x) (void)(x)
+#ifndef CONFFILE_H
+#define CONFFILE_H
 
-char * current_time(void);
-void delay(long ms);
+struct conf_data {
+	const char *user;
+
+	char *path;
+	char *section_name;
+	char *match;
+
+	char *tty;
+	char *flow;
+	char *parity;
+	char *log_filename;
+	char *map;
+};
+
+void conf_parse_file(const int argc, char *argv[]);
+void conf_exit(void);
+
+#endif /* CONFFILE_H */
