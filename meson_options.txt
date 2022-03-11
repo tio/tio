@@ -1,6 +1,6 @@
 option('bashcompletiondir',
        type : 'string',
        description : 'Directory for bash completion scripts ["no" disables]')
-option('conffile',
+option('configfile',
        type: 'boolean', value: true,
        description: 'Enable configuration file support')

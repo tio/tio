@@ -1,8 +1,8 @@
-// vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
 /*
- * tio - a simple TTY terminal I/O application
+ * tio - a simple serial terminal I/O application
  *
  * Copyright (c) 2020-2022  Liam Beguin
+ * Copyright (c) 2022  Martin Lund
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -34,13 +34,13 @@
 #include <unistd.h>
 #include <regex.h>
 #include <ini.h>
-#include "conffile.h"
+#include "configfile.h"
 #include "misc.h"
 #include "options.h"
 #include "error.h"
 #include "print.h"
 
-static struct conf_data *d;
+static struct config_t *c;
 
 static int get_match(const char *input, const char *pattern, char **match)
 {
@@ -52,7 +52,8 @@ static int get_match(const char *input, const char *pattern, char **match)
 
     /* compile a regex with the pattern */
     ret = regcomp(&re, pattern, REG_EXTENDED);
-    if (ret) {
+    if (ret)
+    {
         regerror(ret, &re, err, sizeof(err));
         printf("reg error: %s\n", err);
         return ret;
@@ -61,12 +62,16 @@ static int get_match(const char *input, const char *pattern, char **match)
     /* try to match on input */
     ret = regexec(&re, input, 2, m, 0);
     if (!ret)
+    {
         len = m[1].rm_eo - m[1].rm_so;
+    }
 
     regfree(&re);
 
     if (len)
+    {
         asprintf(match, "%s", &input[m[1].rm_so]);
+    }
 
     return len;
 }
@@ -79,42 +84,67 @@ static int get_match(const char *input, const char *pattern, char **match)
 static int data_handler(void *user, const char *section, const char *name,
                         const char *value)
 {
-    _unused(user);
+    UNUSED(user);
 
-    if (strcmp(section, d->section_name))
+    if (strcmp(section, c->section_name))
         return 0;
 
-    if (!strcmp(name, "tty")) {
-        asprintf(&d->tty, value, d->match);
-        option.tty_device = d->tty;
-    } else if (!strcmp(name, "baudrate")) {
+    if (!strcmp(name, "tty"))
+    {
+        asprintf(&c->tty, value, c->match);
+        option.tty_device = c->tty;
+    }
+    else if (!strcmp(name, "baudrate"))
+    {
         option.baudrate = string_to_long((char *)value);
-    } else if (!strcmp(name, "databits")) {
+    }
+    else if (!strcmp(name, "databits"))
+    {
         option.databits = atoi(value);
-    } else if (!strcmp(name, "flow")) {
-        asprintf(&d->flow, "%s", value);
-        option.flow = d->flow;
-    } else if (!strcmp(name, "stopbits")) {
+    }
+    else if (!strcmp(name, "flow"))
+    {
+        asprintf(&c->flow, "%s", value);
+        option.flow = c->flow;
+    }
+    else if (!strcmp(name, "stopbits"))
+    {
         option.stopbits = atoi(value);
-    } else if (!strcmp(name, "parity")) {
-        asprintf(&d->parity, "%s", value);
-        option.parity = d->parity;
-    } else if (!strcmp(name, "output-delay")) {
+    }
+    else if (!strcmp(name, "parity"))
+    {
+        asprintf(&c->parity, "%s", value);
+        option.parity = c->parity;
+    }
+    else if (!strcmp(name, "output-delay"))
+    {
         option.output_delay = atoi(value);
-    } else if (!strcmp(name, "no-autoconnect")) {
+    }
+    else if (!strcmp(name, "no-autoconnect"))
+    {
         option.no_autoconnect = atoi(value);
-    } else if (!strcmp(name, "log")) {
+    }
+    else if (!strcmp(name, "log"))
+    {
         option.log = atoi(value);
-    } else if (!strcmp(name, "local-echo")) {
+    }
+    else if (!strcmp(name, "local-echo"))
+    {
         option.local_echo = atoi(value);
-    } else if (!strcmp(name, "timestamp")) {
+    }
+    else if (!strcmp(name, "timestamp"))
+    {
         option.timestamp = atoi(value);
-    } else if (!strcmp(name, "log-filename")) {
-        asprintf(&d->log_filename, "%s", value);
-        option.log_filename = d->log_filename;
-    } else if (!strcmp(name, "map")) {
-        asprintf(&d->map, "%s", value);
-        option.map = d->map;
+    }
+    else if (!strcmp(name, "log-filename"))
+    {
+        asprintf(&c->log_filename, "%s", value);
+        option.log_filename = c->log_filename;
+    }
+    else if (!strcmp(name, "map"))
+    {
+        asprintf(&c->map, "%s", value);
+        option.map = c->map;
     }
 
     return 0;
@@ -130,83 +160,98 @@ static int data_handler(void *user, const char *section, const char *name,
 static int section_search_handler(void *user, const char *section, const char
                                   *varname, const char *varval)
 {
-    _unused(user);
+    UNUSED(user);
 
     if (strcmp(varname, "pattern"))
         return 0;
 
-    if (!strcmp(varval, d->user)) {
+    if (!strcmp(varval, c->user))
+    {
         /* pattern matches as plain text */
-        asprintf(&d->section_name, "%s", section);
-    } else if (get_match(d->user, varval, &d->match) > 0) {
+        asprintf(&c->section_name, "%s", section);
+    }
+    else if (get_match(c->user, varval, &c->match) > 0)
+    {
         /* pattern matches as regex */
-        asprintf(&d->section_name, "%s", section);
+        asprintf(&c->section_name, "%s", section);
     }
 
     return 0;
 }
 
-int resolve_conf_file(void)
+static int resolve_config_file(void)
 {
-    asprintf(&d->path, "%s/tio/tiorc", getenv("XDG_CONFIG_HOME"));
-    if (!access(d->path, F_OK))
+    asprintf(&c->path, "%s/tio/tiorc", getenv("XDG_CONFIG_HOME"));
+    if (!access(c->path, F_OK))
+    {
         return 0;
+    }
 
-    asprintf(&d->path, "%s/.config/tio/tiorc", getenv("HOME"));
-    if (!access(d->path, F_OK))
+    asprintf(&c->path, "%s/.config/tio/tiorc", getenv("HOME"));
+    if (!access(c->path, F_OK))
+    {
         return 0;
+    }
 
-    asprintf(&d->path, "%s/.tiorc", getenv("HOME"));
-    if (!access(d->path, F_OK))
+    asprintf(&c->path, "%s/.tiorc", getenv("HOME"));
+    if (!access(c->path, F_OK))
+    {
         return 0;
+    }
 
     return -EINVAL;
 }
 
-void conf_parse_file(const int argc, char *argv[])
+void config_file_parse(const int argc, char *argv[])
 {
     int ret;
     int i;
 
-    d = malloc(sizeof(struct conf_data));
-    memset(d, 0, sizeof(struct conf_data));
+    c = malloc(sizeof(struct config_t));
+    memset(c, 0, sizeof(struct config_t));
 
-    resolve_conf_file();
+    resolve_config_file();
 
-    for (i = 1; i < argc; i++) {
-        if (argv[i][0] != '-') {
-            d->user = argv[i];
+    for (i = 1; i < argc; i++)
+    {
+        if (argv[i][0] != '-')
+        {
+            c->user = argv[i];
             break;
         }
     }
 
-    if (!d->user)
-            return;
+    if (!c->user)
+    {
+        return;
+    }
 
-    ret = ini_parse(d->path, section_search_handler, NULL);
-    if (!d->section_name) {
+    ret = ini_parse(c->path, section_search_handler, NULL);
+    if (!c->section_name)
+    {
         debug_printf("unable to match user input to configuration section (%d)\n", ret);
         return;
     }
 
-    ret = ini_parse(d->path, data_handler, NULL);
-    if (ret < 0) {
+    ret = ini_parse(c->path, data_handler, NULL);
+    if (ret < 0)
+    {
         fprintf(stderr, "Error: unable to parse configuration file (%d)\n", ret);
         exit(EXIT_FAILURE);
     }
 }
 
-void conf_exit(void)
+void config_exit(void)
 {
-    free(d->tty);
-    free(d->flow);
-    free(d->parity);
-    free(d->log_filename);
-    free(d->map);
+    free(c->tty);
+    free(c->flow);
+    free(c->parity);
+    free(c->log_filename);
+    free(c->map);
 
-    free(d->match);
-    free(d->section_name);
-    free(d->path);
+    free(c->match);
+    free(c->section_name);
+    free(c->path);
 
-    free(d);
+    free(c);
 }

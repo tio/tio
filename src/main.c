@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "options.h"
-#include "conffile.h"
+#include "configfile.h"
 #include "tty.h"
 #include "log.h"
 #include "error.h"
@@ -38,11 +38,11 @@ int main(int argc, char *argv[])
     atexit(&error_exit);
 
     /* Parse configuration file */
-    conf_parse_file(argc, argv);
-    atexit(&conf_exit);
+    config_file_parse(argc, argv);
+    atexit(&config_exit);
 
-    /* Parse options */
-    parse_options(argc, argv);
+    /* Parse command-line options */
+    options_parse(argc, argv);
 
     /* List available serial devices */
     if (option.list_devices)

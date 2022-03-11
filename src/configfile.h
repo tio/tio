@@ -1,7 +1,8 @@
 /*
- * tio - a simple TTY terminal I/O application
+ * tio - a simple serial terminal I/O application
  *
- * Copyright (c) 2020       Liam Beguin
+ * Copyright (c) 2020  Liam Beguin
+ * Copyright (c) 2022  Martin Lund
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,10 +20,10 @@
  * 02110-1301, USA.
  */
 
-#ifndef CONFFILE_H
-#define CONFFILE_H
+#pragma once
 
-struct conf_data {
+struct config_t
+{
 	const char *user;
 
 	char *path;
@@ -36,7 +37,5 @@ struct conf_data {
 	char *map;
 };
 
-void conf_parse_file(const int argc, char *argv[]);
-void conf_exit(void);
-
-#endif /* CONFFILE_H */
+void config_file_parse(const int argc, char *argv[]);
+void config_exit(void);

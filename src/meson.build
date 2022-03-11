@@ -14,9 +14,9 @@ tio_sources = [
 ]
 
 # dependencies
-if get_option('conffile')
+if get_option('configfile')
     inih = meson.get_compiler('c').find_library('inih')
-    tio_sources += 'conffile.c'
+    tio_sources += 'configfile.c'
 else
     inih = dependency()
 endif

@@ -56,4 +56,4 @@ struct option_t
 
 extern struct option_t option;
 
-void parse_options(int argc, char *argv[]);
+void options_parse(int argc, char *argv[]);

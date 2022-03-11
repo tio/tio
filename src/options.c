@@ -1,5 +1,5 @@
 /*
- * tio - a simple TTY terminal I/O tool
+ * tio - a simple serial terminal I/O tool
  *
  * Copyright (c) 2014-2022  Martin Lund
  *
@@ -81,7 +81,7 @@ void print_help(char *argv[])
     printf("\n");
 }
 
-void parse_options(int argc, char *argv[])
+void options_parse(int argc, char *argv[])
 {
     int c;
 
