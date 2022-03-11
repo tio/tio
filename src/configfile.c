@@ -1,5 +1,5 @@
 /*
- * tio - a simple serial terminal I/O application
+ * tio - a simple serial terminal I/O tool
  *
  * Copyright (c) 2020-2022  Liam Beguin
  * Copyright (c) 2022  Martin Lund
