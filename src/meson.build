@@ -16,7 +16,7 @@ tio_sources = [
 
 tio_dep = dependency('inih', required: true)
 
-tio_c_args = []
+tio_c_args = ['-Wno-unused-result']
 
 if enable_setspeed2
   tio_sources += 'setspeed2.c'
