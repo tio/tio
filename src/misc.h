@@ -24,3 +24,4 @@
 
 char * current_time(void);
 void delay(long ms);
+long string_to_long(char *string);

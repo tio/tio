@@ -32,6 +32,7 @@
 #include <limits.h>
 #include "options.h"
 #include "error.h"
+#include "misc.h"
 
 /* Default options */
 struct option_t option =
@@ -78,22 +79,6 @@ void print_help(char *argv[])
     printf("\n");
     printf("In session, press ctrl-t q to quit.\n");
     printf("\n");
-}
-
-long string_to_long(char *string)
-{
-    long result;
-    char *end_token;
-
-    errno = 0;
-    result = strtol(string, &end_token, 10);
-    if ((errno != 0) || (*end_token != 0))
-    {
-        printf("Error: Invalid digit\n");
-        exit(EXIT_FAILURE);
-    }
-
-    return result;
 }
 
 void parse_options(int argc, char *argv[])

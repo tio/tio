@@ -25,6 +25,7 @@
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
+#include <errno.h>
 #include "error.h"
 #include "print.h"
 #include "options.h"
@@ -90,4 +91,20 @@ void delay(long ms)
     ts.tv_nsec = (ms % 1000) * 1000000;
 
     nanosleep(&ts, NULL);
+}
+
+long string_to_long(char *string)
+{
+    long result;
+    char *end_token;
+
+    errno = 0;
+    result = strtol(string, &end_token, 10);
+    if ((errno != 0) || (*end_token != 0))
+    {
+        printf("Error: Invalid digit\n");
+        exit(EXIT_FAILURE);
+    }
+
+    return result;
 }
