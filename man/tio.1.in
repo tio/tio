@@ -157,7 +157,7 @@ Show version
 .SH "CONFIGURATION"
 .PP
 .TP 16n
-Options can be set via a configuration file using the INI format. tio uses the configuration file first found in the following locations in the order listed: $XDG_CONFIG_HOME/tio/tiorc, ~/.config/tio/tiorc, ~/.tiorc
+Options can be set via a configuration file using the INI format. tio uses the configuration file first found in the following locations in the order listed: $XDG_CONFIG_HOME/tio/tiorc, $HOME/.config/tio/tiorc, $HOME/.tiorc
 
 .TP
 Sections can be used to group settings and their names are only used for readability.
