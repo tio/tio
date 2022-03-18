@@ -11,7 +11,8 @@ tio_sources = [
   'misc.c',
   'tty.c',
   'print.c',
-  'configfile.c'
+  'configfile.c',
+  'signals.c'
 ]
 
 tio_dep = dependency('inih', required: true)

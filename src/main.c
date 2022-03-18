@@ -29,10 +29,14 @@
 #include "log.h"
 #include "error.h"
 #include "print.h"
+#include "signals.h"
 
 int main(int argc, char *argv[])
 {
     int status = 0;
+
+    /* Handle received signals */
+    signal_handlers_install();
 
     /* Add error exit handler */
     atexit(&error_exit);
