@@ -86,71 +86,72 @@ static int data_handler(void *user, const char *section, const char *name,
 {
     UNUSED(user);
 
-    if (strcmp(section, c->section_name))
-        return 0;
-
-    if (!strcmp(name, "tty"))
+    // If section matches user input or unnamed section
+    if ((!strcmp(section, c->section_name)) || (!strcmp(section, "")))
     {
-        asprintf(&c->tty, value, c->match);
-        option.tty_device = c->tty;
+        // Set configuration parameter if found
+        if (!strcmp(name, "tty"))
+        {
+            asprintf(&c->tty, value, c->match);
+            option.tty_device = c->tty;
+        }
+        else if (!strcmp(name, "baudrate"))
+        {
+            option.baudrate = string_to_long((char *)value);
+        }
+        else if (!strcmp(name, "databits"))
+        {
+            option.databits = atoi(value);
+        }
+        else if (!strcmp(name, "flow"))
+        {
+            asprintf(&c->flow, "%s", value);
+            option.flow = c->flow;
+        }
+        else if (!strcmp(name, "stopbits"))
+        {
+            option.stopbits = atoi(value);
+        }
+        else if (!strcmp(name, "parity"))
+        {
+            asprintf(&c->parity, "%s", value);
+            option.parity = c->parity;
+        }
+        else if (!strcmp(name, "output-delay"))
+        {
+            option.output_delay = atoi(value);
+        }
+        else if (!strcmp(name, "no-autoconnect"))
+        {
+            option.no_autoconnect = atoi(value);
+        }
+        else if (!strcmp(name, "log"))
+        {
+            option.log = atoi(value);
+        }
+        else if (!strcmp(name, "local-echo"))
+        {
+            option.local_echo = atoi(value);
+        }
+        else if (!strcmp(name, "timestamp"))
+        {
+            option.timestamp = atoi(value);
+        }
+        else if (!strcmp(name, "log-filename"))
+        {
+            asprintf(&c->log_filename, "%s", value);
+            option.log_filename = c->log_filename;
+        }
+        else if (!strcmp(name, "map"))
+        {
+            asprintf(&c->map, "%s", value);
+            option.map = c->map;
+        }
+        else if (!strcmp(name, "color"))
+        {
+            option.color = atoi(value);
+        }
     }
-    else if (!strcmp(name, "baudrate"))
-    {
-        option.baudrate = string_to_long((char *)value);
-    }
-    else if (!strcmp(name, "databits"))
-    {
-        option.databits = atoi(value);
-    }
-    else if (!strcmp(name, "flow"))
-    {
-        asprintf(&c->flow, "%s", value);
-        option.flow = c->flow;
-    }
-    else if (!strcmp(name, "stopbits"))
-    {
-        option.stopbits = atoi(value);
-    }
-    else if (!strcmp(name, "parity"))
-    {
-        asprintf(&c->parity, "%s", value);
-        option.parity = c->parity;
-    }
-    else if (!strcmp(name, "output-delay"))
-    {
-        option.output_delay = atoi(value);
-    }
-    else if (!strcmp(name, "no-autoconnect"))
-    {
-        option.no_autoconnect = atoi(value);
-    }
-    else if (!strcmp(name, "log"))
-    {
-        option.log = atoi(value);
-    }
-    else if (!strcmp(name, "local-echo"))
-    {
-        option.local_echo = atoi(value);
-    }
-    else if (!strcmp(name, "timestamp"))
-    {
-        option.timestamp = atoi(value);
-    }
-    else if (!strcmp(name, "log-filename"))
-    {
-        asprintf(&c->log_filename, "%s", value);
-        option.log_filename = c->log_filename;
-    }
-    else if (!strcmp(name, "map"))
-    {
-        asprintf(&c->map, "%s", value);
-        option.map = c->map;
-    }
-    else if (!strcmp(name, "color"))
-    {
-        option.color = atoi(value);
-    }
-
     return 0;
 }
 
