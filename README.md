@@ -58,10 +58,10 @@ to reappear and then reconnect. However, if the `--no-autoconnect` option is
 provided, tio will exit if the device is not present or an established
 connection is lost.
 
-Tio features full bash autocompletion support.
+Tio supports various in session key commands. Press ctrl-t ? to list the
+available key commands.
 
-Tio also supports various key commands. Press ctrl-t ? to list the available
-key commands.
+Tio also features full bash autocompletion support and configuration via ~/.tiorc.
 
 See the tio man page for more details.
 
