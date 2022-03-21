@@ -1,4 +1,62 @@
-=== tio v1.35 ===
+=== tio v1.36 ===
+
+
+
+Changes since tio v1.35:
+
+ * Add support for defaults in config file
+
+   If no section name is specified the configuration will be considered the
+   default one.
+
+   This allows to set e.g. a default color code for sections which do not
+   configure a color code.
+
+ * Handle SIGHUP
+
+   Handle SIGHUP so that the registered exit handlers are called to restore
+   the terminal back to its orignal state.
+
+ * Add color configuration support
+
+ * Bypass unused result warnings
+
+ * Force dependency on libinih
+
+   Configuration file support is considered a mandatory feature.
+
+ * Update headers
+
+ * Update AUTHORS
+
+ * Update man page
+
+ * Move string_to_long() to misc.c
+
+ * Update CircleCI config
+
+ * Update tio gif
+
+ * Update README
+
+ * Update LICENSE date
+
+ * Remove redundant COPYING file
+
+Liam Beguin:
+
+ * Document configuration file options
+
+ * Add support for a configuration file
+
+ * misc: add _unused macro
+
+   Some parameters are expected to be unused.
+   Add a basic macro to mute these compiler warnings.
+
+ * options: expose string_to_long()
+
+   Expose string_to_long() so that other source files can use it.
 
 
 
@@ -894,3 +952,4 @@ Jakub Wilk:
  * Fixed silly "tio or tio" in man page
 
  * Fixed typo
+
