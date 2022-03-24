@@ -167,6 +167,9 @@ Sections can be used to group settings and their names are only used for readabi
 tio will try to match the user input to a section pattern to get the tty and other options.
 
 .TP
+Options without any section name sets the default options.
+
+.TP
 The following configuration file options are available:
 
 .IP "\fBpattern"
