@@ -33,7 +33,7 @@
 #include <limits.h>
 #include <unistd.h>
 #include <regex.h>
-#include <ini.h>
+#include "ini.h"
 #include "configfile.h"
 #include "misc.h"
 #include "options.h"

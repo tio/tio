@@ -12,10 +12,9 @@ tio_sources = [
   'tty.c',
   'print.c',
   'configfile.c',
-  'signals.c'
+  'signals.c',
+  'ini.c'
 ]
-
-tio_dep = dependency('inih', required: true)
 
 tio_c_args = ['-Wno-unused-result']
 
@@ -32,7 +31,6 @@ endif
 executable('tio',
   tio_sources,
   c_args: tio_c_args,
-  dependencies: tio_dep,
   install: true )
 
 subdir('bash-completion')
