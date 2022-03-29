@@ -15,7 +15,9 @@ tio_sources = [
   'signals.c'
 ]
 
-tio_dep = dependency('inih', required: true)
+tio_dep = dependency('inih', required: true,
+                     fallback : ['libinih', 'inih_dep'],
+                     default_options: ['default_library=static', 'distro_install=false'])
 
 tio_c_args = ['-Wno-unused-result']
 
