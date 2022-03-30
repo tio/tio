@@ -34,6 +34,7 @@
 #include <unistd.h>
 #include <regex.h>
 #include <ini.h>
+#include "options.h"
 #include "configfile.h"
 #include "misc.h"
 #include "options.h"
@@ -135,7 +136,7 @@ static int data_handler(void *user, const char *section, const char *name,
         }
         else if (!strcmp(name, "timestamp"))
         {
-            option.timestamp = atoi(value);
+            option.timestamp = timestamp_option_parse(value);
         }
         else if (!strcmp(name, "log-filename"))
         {
@@ -259,4 +260,12 @@ void config_exit(void)
     free(c->path);
 
     free(c);
+}
+
+void config_file_print()
+{
+    tio_printf("INI:");
+    tio_printf(" path: %s", c->path);
+    tio_printf(" searched section: %s", c->user);
+    tio_printf(" found section: %s", c->section_name);
 }

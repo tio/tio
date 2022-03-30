@@ -37,5 +37,6 @@ struct config_t
 	char *map;
 };
 
+void config_file_print();
 void config_file_parse(const int argc, char *argv[]);
 void config_exit(void);

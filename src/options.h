@@ -33,6 +33,8 @@ enum timestamp_t
     TIMESTAMP_24HOUR_START,
     TIMESTAMP_ISO8601,
 };
+const char* timestamp_token(enum timestamp_t timestamp);
+enum timestamp_t timestamp_option_parse(const char *arg);
 
 /* Options */
 struct option_t
@@ -52,8 +54,10 @@ struct option_t
     const char *log_filename;
     const char *map;
     int color;
+    bool debug;
 };
 
 extern struct option_t option;
 
+void options_print();
 void options_parse(int argc, char *argv[]);

@@ -33,6 +33,7 @@
 #include "options.h"
 #include "error.h"
 #include "misc.h"
+#include "print.h"
 
 /* Default options */
 struct option_t option =
@@ -52,6 +53,7 @@ struct option_t option =
     .log_filename = "",
     .map = "",
     .color = -1,
+    .debug = false,
 };
 
 void print_help(char *argv[])
@@ -79,6 +81,74 @@ void print_help(char *argv[])
     printf("\n");
     printf("In session, press ctrl-t q to quit.\n");
     printf("\n");
+}
+
+const char* timestamp_token(enum timestamp_t timestamp)
+{
+    switch (timestamp)
+    {
+        case TIMESTAMP_NONE:
+            return "none";
+            break;
+
+        case TIMESTAMP_24HOUR:
+            return "24hour";
+            break;
+
+        case TIMESTAMP_24HOUR_START:
+            return "24hour-start";
+            break;
+
+        case TIMESTAMP_ISO8601:
+            return "iso8601";
+            break;
+
+        default:
+            return "unknown";
+            break;
+    }
+}
+
+enum timestamp_t timestamp_option_parse(const char *arg)
+{
+    enum timestamp_t timestamp = TIMESTAMP_24HOUR; // Default
+    
+    if (arg != NULL)
+    {
+        if (strcmp(arg, "24hour-start") == 0)
+        {
+            return TIMESTAMP_24HOUR_START;
+        }
+        else if (strcmp(arg, "iso8601") == 0)
+        {
+            return TIMESTAMP_ISO8601;
+        }
+        else
+        {
+            printf("Warning: Unknown timestamp type, falling back to '24hour' default format\n");
+        }
+    }
+
+    return timestamp;
+}
+
+void options_print()
+{
+    tio_printf("Configuration:");
+    tio_printf(" TTY device: %s", option.tty_device);
+    tio_printf(" Baudrate: %u", option.baudrate);
+    tio_printf(" Databits: %d", option.databits);
+    tio_printf(" Flow: %s", option.flow);
+    tio_printf(" Stopbits: %d", option.stopbits);
+    tio_printf(" Parity: %s", option.parity);
+    tio_printf(" Local echo: %s", option.local_echo ? "enabled" : "disabled");
+    tio_printf(" Timestamps: %s", timestamp_token(option.timestamp));
+    tio_printf(" Output delay: %d", option.output_delay);
+    tio_printf(" Auto connect: %s", option.no_autoconnect ? "disabled" : "enabled");
+    if (option.map[0] != 0)
+        tio_printf(" Map flags: %s", option.map);
+    if (option.log)
+        tio_printf(" Log file: %s", option.log_filename);
 }
 
 void options_parse(int argc, char *argv[])
@@ -110,6 +180,7 @@ void options_parse(int argc, char *argv[])
             {"color",          required_argument, 0, 'c'},
             {"version",        no_argument,       0, 'v'},
             {"help",           no_argument,       0, 'h'},
+            {"V",              no_argument,       0, 'V'},
             {0,                0,                 0,  0 }
         };
 
@@ -117,7 +188,7 @@ void options_parse(int argc, char *argv[])
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:net::Ll::m:c:vh", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:net::Ll::m:c:vhV", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
@@ -168,27 +239,7 @@ void options_parse(int argc, char *argv[])
                 break;
 
             case 't':
-                option.timestamp = TIMESTAMP_24HOUR; // Default
-                if (optarg != NULL)
-                {
-                    if (strcmp(optarg, "24hour") == 0)
-                    {
-                        option.timestamp = TIMESTAMP_24HOUR;
-                    }
-                    else if (strcmp(optarg, "24hour-start") == 0)
-                    {
-                        option.timestamp = TIMESTAMP_24HOUR_START;
-                    }
-                    else if (strcmp(optarg, "iso8601") == 0)
-                    {
-                        option.timestamp = TIMESTAMP_ISO8601;
-                    }
-                    else
-                    {
-                        printf("Error: Unknown timestamp type\n");
-                        exit(EXIT_FAILURE);
-                    }
-                }
+                option.timestamp = timestamp_option_parse(optarg);
                 break;
 
             case 'L':
@@ -238,6 +289,10 @@ void options_parse(int argc, char *argv[])
                 exit(EXIT_SUCCESS);
                 break;
 
+            case 'V':
+                option.debug = true;
+                break;
+
             case '?':
                 /* getopt_long already printed an error message */
                 exit(EXIT_FAILURE);
@@ -268,7 +323,7 @@ void options_parse(int argc, char *argv[])
     /* Print any remaining command line arguments (unknown options) */
     if (optind < argc)
     {
-        printf("Error: unknown arguments: ");
+        printf("Error: Unknown argument ");
         while (optind < argc)
             printf("%s ", argv[optind++]);
         printf("\n");
