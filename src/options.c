@@ -76,6 +76,7 @@ void print_help(char *argv[])
     printf("  -c, --color <code>          Colorize tio text\n");
     printf("  -v, --version               Display version\n");
     printf("  -h, --help                  Display help\n");
+    printf("  -V, --verbose               Display extended configuration\n");
     printf("\n");
     printf("See the man page for more details.\n");
     printf("\n");
@@ -180,7 +181,7 @@ void options_parse(int argc, char *argv[])
             {"color",          required_argument, 0, 'c'},
             {"version",        no_argument,       0, 'v'},
             {"help",           no_argument,       0, 'h'},
-            {"V",              no_argument,       0, 'V'},
+            {"verbose",        no_argument,       0, 'V'},
             {0,                0,                 0,  0 }
         };
 
