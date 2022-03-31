@@ -163,21 +163,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 break;
 
             case KEY_C:
-                tio_printf("Configuration:");
-                tio_printf(" TTY device: %s", option.tty_device);
-                tio_printf(" Baudrate: %u", option.baudrate);
-                tio_printf(" Databits: %d", option.databits);
-                tio_printf(" Flow: %s", option.flow);
-                tio_printf(" Stopbits: %d", option.stopbits);
-                tio_printf(" Parity: %s", option.parity);
-                tio_printf(" Local echo: %s", option.local_echo ? "enabled" : "disabled");
-                tio_printf(" Timestamps: %s", option.timestamp ? "enabled" : "disabled");
-                tio_printf(" Output delay: %d", option.output_delay);
-                tio_printf(" Auto connect: %s", option.no_autoconnect ? "disabled" : "enabled");
-                if (option.map[0] != 0)
-                    tio_printf(" Map flags: %s", option.map);
-                if (option.log)
-                    tio_printf(" Log file: %s", option.log_filename);
+                options_print();
                 break;
 
             case KEY_E:

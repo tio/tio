@@ -122,7 +122,10 @@ Display program version.
 .BR \-h ", " \-\-help
 
 Display help.
+.TP
+.BR \-V ", " \-\-verbose
 
+Enable verbose output.
 .SH "KEYS"
 .PP
 .TP 16n
