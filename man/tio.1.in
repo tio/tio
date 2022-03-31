@@ -125,7 +125,7 @@ Display help.
 .TP
 .BR \-V ", " \-\-verbose
 
-Display extended configuration.
+Enable verbose output.
 .SH "KEYS"
 .PP
 .TP 16n

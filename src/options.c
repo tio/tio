@@ -76,7 +76,7 @@ void print_help(char *argv[])
     printf("  -c, --color <code>          Colorize tio text\n");
     printf("  -v, --version               Display version\n");
     printf("  -h, --help                  Display help\n");
-    printf("  -V, --verbose               Display extended configuration\n");
+    printf("  -V, --verbose               Enable verbose output\n");
     printf("\n");
     printf("See the man page for more details.\n");
     printf("\n");
