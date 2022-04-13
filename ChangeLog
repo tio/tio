@@ -1,4 +1,22 @@
-=== tio v1.36 ===
+=== tio v1.37 ===
+
+
+
+Changes since tio v1.36:
+
+ * Make libinih a fallback dependency
+
+   This means that in case meson does not find libinih it will
+   automatically clone libinih and include it in the build.
+
+   The libinih library is reconfigured to be statically built so that no
+   shared object will be installed.
+
+Sylvain LAFRASSE:
+
+ * Fix timestamp parsing in INI conf
+
+ * Factorize timestamp parsing to be coherent with command line format in configuration file.
 
 
 
