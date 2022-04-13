@@ -264,8 +264,12 @@ void config_exit(void)
 
 void config_file_print()
 {
-    tio_printf("INI:");
-    tio_printf(" path: %s", c->path);
-    tio_printf(" searched section: %s", c->user);
-    tio_printf(" found section: %s", c->section_name);
+    if (c->path != NULL)
+    {
+        tio_printf(" Path: %s", c->path);
+        if (c->section_name != NULL)
+        {
+            tio_printf(" Active config section: %s", c->section_name);
+        }
+    }
 }

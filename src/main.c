@@ -77,11 +77,6 @@ int main(int argc, char *argv[])
     /* Print launch hints */
     tio_printf("tio v%s", VERSION);
     tio_printf("Press ctrl-t q to quit");
-    if (option.debug)
-    {
-        config_file_print();
-        options_print();
-    }
 
     /* Connect to tty device */
     if (option.no_autoconnect)

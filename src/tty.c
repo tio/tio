@@ -38,6 +38,7 @@
 #include <time.h>
 #include <dirent.h>
 #include "config.h"
+#include "configfile.h"
 #include "tty.h"
 #include "print.h"
 #include "options.h"
@@ -163,6 +164,8 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 break;
 
             case KEY_C:
+                tio_printf("Configuraiton:");
+                config_file_print();
                 options_print();
                 break;
 

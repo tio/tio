@@ -23,8 +23,7 @@ _tio()
           -t --timestamp \
           -L --list-devices \
           -c --color \
-          -h --help" \
-          -V --verbose \
+          -h --help"
 
     #  Complete the arguments to the options.
     case "${prev}" in
@@ -86,10 +85,6 @@ _tio()
             return 0
             ;;
         -h | --help)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-            return 0
-            ;;
-        -V | --verbose)
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;

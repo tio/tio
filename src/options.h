@@ -54,7 +54,6 @@ struct option_t
     const char *log_filename;
     const char *map;
     int color;
-    bool debug;
 };
 
 extern struct option_t option;

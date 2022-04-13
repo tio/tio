@@ -53,7 +53,6 @@ struct option_t option =
     .log_filename = "",
     .map = "",
     .color = -1,
-    .debug = false,
 };
 
 void print_help(char *argv[])
@@ -76,7 +75,6 @@ void print_help(char *argv[])
     printf("  -c, --color <code>          Colorize tio text\n");
     printf("  -v, --version               Display version\n");
     printf("  -h, --help                  Display help\n");
-    printf("  -V, --verbose               Enable verbose output\n");
     printf("\n");
     printf("See the man page for more details.\n");
     printf("\n");
@@ -135,7 +133,6 @@ enum timestamp_t timestamp_option_parse(const char *arg)
 
 void options_print()
 {
-    tio_printf("Configuration:");
     tio_printf(" TTY device: %s", option.tty_device);
     tio_printf(" Baudrate: %u", option.baudrate);
     tio_printf(" Databits: %d", option.databits);
@@ -181,7 +178,6 @@ void options_parse(int argc, char *argv[])
             {"color",          required_argument, 0, 'c'},
             {"version",        no_argument,       0, 'v'},
             {"help",           no_argument,       0, 'h'},
-            {"verbose",        no_argument,       0, 'V'},
             {0,                0,                 0,  0 }
         };
 
@@ -189,7 +185,7 @@ void options_parse(int argc, char *argv[])
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:net::Ll::m:c:vhV", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:net::Ll::m:c:vh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
@@ -288,10 +284,6 @@ void options_parse(int argc, char *argv[])
             case 'h':
                 print_help(argv);
                 exit(EXIT_SUCCESS);
-                break;
-
-            case 'V':
-                option.debug = true;
                 break;
 
             case '?':
