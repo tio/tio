@@ -30,6 +30,7 @@
 #include "error.h"
 #include "print.h"
 #include "signals.h"
+#include "socket.h"
 
 int main(int argc, char *argv[])
 {
@@ -70,6 +71,9 @@ int main(int argc, char *argv[])
     /* Create log file */
     if (option.log)
         log_open(option.log_filename);
+
+    /* Open socket */
+    socket_configure();
 
     /* Enable ANSI text formatting (colors etc.) */
     print_enable_ansi_formatting();

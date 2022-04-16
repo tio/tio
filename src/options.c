@@ -51,6 +51,7 @@ struct option_t option =
     .timestamp = TIMESTAMP_NONE,
     .list_devices = false,
     .log_filename = "",
+    .socket = NULL,
     .map = "",
     .color = -1,
 };
@@ -73,6 +74,7 @@ void print_help(char *argv[])
     printf("  -l, --log[=<filename>]      Log to file\n");
     printf("  -m, --map <flags>           Map special characters\n");
     printf("  -c, --color <code>          Colorize tio text\n");
+    printf("  -S, --socket <filename>     Listen on domain socket\n");
     printf("  -v, --version               Display version\n");
     printf("  -h, --help                  Display help\n");
     printf("\n");
@@ -174,6 +176,7 @@ void options_parse(int argc, char *argv[])
             {"timestamp",      optional_argument, 0, 't'},
             {"list-devices",   no_argument,       0, 'L'},
             {"log",            optional_argument, 0, 'l'},
+            {"socket",         required_argument, 0, 'S'},
             {"map",            required_argument, 0, 'm'},
             {"color",          required_argument, 0, 'c'},
             {"version",        no_argument,       0, 'v'},
@@ -185,7 +188,7 @@ void options_parse(int argc, char *argv[])
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:net::Ll::m:c:vh", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:net::Ll:S::m:c:vh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
@@ -246,6 +249,10 @@ void options_parse(int argc, char *argv[])
             case 'l':
                 option.log = true;
                 option.log_filename = optarg;
+                break;
+
+            case 'S':
+                option.socket = optarg;
                 break;
 
             case 'm':

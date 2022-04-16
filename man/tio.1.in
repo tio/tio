@@ -115,6 +115,17 @@ Colorize tio text using ANSI color code ranging from 0 to 255.
 If color code is negative a list of available ANSI colors will be printed.
 
 .TP
+.BR \-S ", " "\-\-socket unix:\fI<filename>\fR\fB
+
+Listen on a Unix domain socket at the specified path. Any input from clients connected to the socket is sent on the serial port as if entered at the terminal where tio is running (except that
+.B ctrl-t
+sequences are not recognized), and any input from the serial port is multiplexed to the terminal and all connected clients.
+
+Sockets remain open while the serial port is disconnected, and writes will block.
+
+At present there is a hardcoded limit of 16 clients connected at one time.
+
+.TP
 .BR \-v ", " \-\-version
 
 Display program version.
@@ -201,6 +212,9 @@ Set log filename
 Map special characters on input or output
 .IP "\fBcolor"
 Colorize tio text using ANSI color code ranging from 0 to 255.
+.IP "\fBsocket"
+Set socket path (must include
+.BR unix: ).
 
 .SH "CONFIGURATION EXAMPLES"
 

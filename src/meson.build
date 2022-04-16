@@ -12,7 +12,8 @@ tio_sources = [
   'tty.c',
   'print.c',
   'configfile.c',
-  'signals.c'
+  'signals.c',
+  'socket.c'
 ]
 
 tio_dep = dependency('inih', required: true,

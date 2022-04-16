@@ -53,6 +53,7 @@ struct option_t
     bool list_devices;
     const char *log_filename;
     const char *map;
+    const char *socket;
     int color;
 };
 
