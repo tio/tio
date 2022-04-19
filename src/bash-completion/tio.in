@@ -80,6 +80,10 @@ _tio()
             COMPREPLY=( $(compgen -W "$(seq 0 255)" -- ${cur}) )
             return 0
             ;;
+        -S | --socket)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
         -v | --version)
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0

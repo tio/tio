@@ -152,6 +152,11 @@ static int data_handler(void *user, const char *section, const char *name,
         {
             option.color = atoi(value);
         }
+        else if (!strcmp(name, "socket"))
+        {
+            asprintf(&c->socket, "%s", value);
+            option.socket = c->socket;
+        }
     }
     return 0;
 }

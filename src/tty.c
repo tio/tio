@@ -31,6 +31,8 @@
 #include <sys/param.h>
 #include <sys/file.h>
 #include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 #include <fcntl.h>
 #include <termios.h>
 #include <stdbool.h>
@@ -45,6 +47,7 @@
 #include "misc.h"
 #include "log.h"
 #include "error.h"
+#include "socket.h"
 
 #ifdef HAVE_TERMIOS2
 extern int setspeed2(int fd, int baudrate);
@@ -494,6 +497,7 @@ void tty_wait_for_device(void)
 {
     fd_set rdfs;
     int    status;
+    int    maxfd;
     struct timeval tv;
     static char input_char, previous_char = 0;
     static bool first = true;
@@ -517,26 +521,30 @@ void tty_wait_for_device(void)
 
         FD_ZERO(&rdfs);
         FD_SET(STDIN_FILENO, &rdfs);
+        maxfd = MAX(STDIN_FILENO, socket_add_fds(&rdfs, false));
 
         /* Block until input becomes available or timeout */
-        status = select(STDIN_FILENO + 1, &rdfs, NULL, NULL, &tv);
+        status = select(maxfd + 1, &rdfs, NULL, NULL, &tv);
         if (status > 0)
         {
-            /* Input from stdin ready */
-
-            /* Read one character */
-            status = read(STDIN_FILENO, &input_char, 1);
-            if (status <= 0)
+            if (FD_ISSET(STDIN_FILENO, &rdfs))
             {
-                error_printf("Could not read from stdin");
-                exit(EXIT_FAILURE);
+                /* Input from stdin ready */
+
+                /* Read one character */
+                status = read(STDIN_FILENO, &input_char, 1);
+                if (status <= 0)
+                {
+                    error_printf("Could not read from stdin");
+                    exit(EXIT_FAILURE);
+                }
+
+                /* Handle commands */
+                handle_command_sequence(input_char, previous_char, NULL, NULL);
+
+                previous_char = input_char;
             }
-
-            /* Handle commands */
-            handle_command_sequence(input_char, previous_char, NULL, NULL);
-
-            previous_char = input_char;
-
+            socket_handle_input(&rdfs, NULL);
         } else if (status == -1)
         {
             error_printf("select() failed (%s)", strerror(errno));
@@ -686,19 +694,20 @@ int tty_connect(void)
     }
 #endif
 
-    maxfd = MAX(fd, STDIN_FILENO) + 1;  /* Maximum bit entry (fd) to test */
-
     /* Input loop */
     while (true)
     {
         FD_ZERO(&rdfs);
         FD_SET(fd, &rdfs);
         FD_SET(STDIN_FILENO, &rdfs);
+        maxfd = MAX(fd, STDIN_FILENO);
+        maxfd = MAX(maxfd, socket_add_fds(&rdfs, true));
 
         /* Block until input becomes available */
-        status = select(maxfd, &rdfs, NULL, NULL, NULL);
+        status = select(maxfd + 1, &rdfs, NULL, NULL, NULL);
         if (status > 0)
         {
+            bool forward = false;
             if (FD_ISSET(fd, &rdfs))
             {
                 /* Input from tty device ready */
@@ -747,6 +756,8 @@ int tty_connect(void)
                     if (option.log)
                         log_write(input_char);
 
+                    socket_write(input_char);
+
                     print_tainted = true;
 
                     if (input_char == '\n' && option.timestamp)
@@ -760,7 +771,7 @@ int tty_connect(void)
             }
             if (FD_ISSET(STDIN_FILENO, &rdfs))
             {
-                bool forward = true;
+                forward = true;
 
                 /* Input from stdin ready */
                 status = read(STDIN_FILENO, &input_char, 1);
@@ -778,46 +789,50 @@ int tty_connect(void)
                 /* Handle commands */
                 handle_command_sequence(input_char, previous_char, &output_char, &forward);
 
-                if (forward)
-                {
-                    /* Map output character */
-                    if ((output_char == 127) && (map_o_del_bs))
-                        output_char = '\b';
-                    if ((output_char == '\r') && (map_o_cr_nl))
-                        output_char = '\n';
-
-                    /* Map newline character */
-                    if ((output_char == '\n' || output_char == '\r') && (map_o_nl_crnl)) {
-                        const char *crlf = "\r\n";
-
-                        optional_local_echo(crlf[0]);
-                        optional_local_echo(crlf[1]);
-                        status = write(fd, crlf, 2);
-                        if (status < 0)
-                            warning_printf("Could not write to tty device");
-
-                        tx_total += 2;
-                        delay(option.output_delay);
-                    } else
-                    {
-                        /* Send output to tty device */
-                        optional_local_echo(output_char);
-                        status = write(fd, &output_char, 1);
-                        if (status < 0)
-                            warning_printf("Could not write to tty device");
-                        fsync(fd);
-
-                        /* Update transmit statistics */
-                        tx_total++;
-
-                        /* Insert output delay */
-                        delay(option.output_delay);
-                    }
-                }
-
                 /* Save previous key */
                 previous_char = input_char;
 
+            }
+            else
+            {
+                forward = socket_handle_input(&rdfs, &output_char);
+            }
+
+            if (forward)
+            {
+                /* Map output character */
+                if ((output_char == 127) && (map_o_del_bs))
+                    output_char = '\b';
+                if ((output_char == '\r') && (map_o_cr_nl))
+                    output_char = '\n';
+
+                /* Map newline character */
+                if ((output_char == '\n' || output_char == '\r') && (map_o_nl_crnl)) {
+                    const char *crlf = "\r\n";
+
+                    optional_local_echo(crlf[0]);
+                    optional_local_echo(crlf[1]);
+                    status = write(fd, crlf, 2);
+                    if (status < 0)
+                        warning_printf("Could not write to tty device");
+
+                    tx_total += 2;
+                    delay(option.output_delay);
+                } else
+                {
+                    /* Send output to tty device */
+                    optional_local_echo(output_char);
+                    status = write(fd, &output_char, 1);
+                    if (status < 0)
+                        warning_printf("Could not write to tty device");
+                    fsync(fd);
+
+                    /* Update transmit statistics */
+                    tx_total++;
+
+                    /* Insert output delay */
+                    delay(option.output_delay);
+                }
             }
         } else if (status == -1)
         {
