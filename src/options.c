@@ -149,6 +149,8 @@ void options_print()
         tio_printf(" Map flags: %s", option.map);
     if (option.log)
         tio_printf(" Log file: %s", option.log_filename);
+    if (option.socket)
+        tio_printf(" Socket: %s", option.socket);
 }
 
 void options_parse(int argc, char *argv[])
