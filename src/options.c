@@ -188,7 +188,7 @@ void options_parse(int argc, char *argv[])
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:net::Ll:S::m:c:vh", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:net::Ll::S:m:c:vh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
