@@ -162,14 +162,14 @@ static int data_handler(void *user, const char *section, const char *name,
 }
 
 /**
- * section_search_handler() - walk config file to find section matching user input
+ * section_pattern_search_handler() - walk config file to find section matching user input
  *
  * INIH handler used to resolve the section matching the user's input.
  * This will look for the pattern element of each section and try to match it
  * with the user input.
  */
-static int section_search_handler(void *user, const char *section, const char
-                                  *varname, const char *varval)
+static int section_pattern_search_handler(void *user, const char *section, const char *varname,
+                                          const char *varval)
 {
     UNUSED(user);
 
@@ -184,6 +184,28 @@ static int section_search_handler(void *user, const char *section, const char
     else if (get_match(c->user, varval, &c->match) > 0)
     {
         /* pattern matches as regex */
+        asprintf(&c->section_name, "%s", section);
+    }
+
+    return 0;
+}
+
+/**
+ * section_pattern_search_handler() - walk config file to find section matching user input
+ *
+ * INIH handler used to resolve the section matching the user's input.
+ * This will try to match the user input against a section with the name of the user input.
+ */
+static int section_name_search_handler(void *user, const char *section, const char *varname,
+                                       const char *varval)
+{
+    UNUSED(user);
+    UNUSED(varname);
+    UNUSED(varval);
+
+    if (!strcmp(section, c->user))
+    {
+        /* section name matches as plain text */
         asprintf(&c->section_name, "%s", section);
     }
 
@@ -237,11 +259,15 @@ void config_file_parse(const int argc, char *argv[])
         return;
     }
 
-    ret = ini_parse(c->path, section_search_handler, NULL);
+    ret = ini_parse(c->path, section_pattern_search_handler, NULL);
     if (!c->section_name)
     {
-        debug_printf("unable to match user input to configuration section (%d)\n", ret);
-        return;
+        ret = ini_parse(c->path, section_name_search_handler, NULL);
+        if (!c->section_name)
+        {
+            debug_printf("unable to match user input to configuration section (%d)\n", ret);
+            return;
+        }
     }
 
     ret = ini_parse(c->path, data_handler, NULL);
