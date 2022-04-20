@@ -92,6 +92,8 @@ void socket_configure(void)
 
     memset(clientfds, -1, sizeof(clientfds));
     atexit(socket_exit);
+
+    tio_printf("Listening on socket %s", socket_filename());
 }
 
 void socket_write(char input_char)

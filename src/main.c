@@ -72,15 +72,15 @@ int main(int argc, char *argv[])
     if (option.log)
         log_open(option.log_filename);
 
-    /* Open socket */
-    socket_configure();
-
     /* Enable ANSI text formatting (colors etc.) */
     print_enable_ansi_formatting();
 
     /* Print launch hints */
     tio_printf("tio v%s", VERSION);
     tio_printf("Press ctrl-t q to quit");
+
+    /* Open socket */
+    socket_configure();
 
     /* Connect to tty device */
     if (option.no_autoconnect)
