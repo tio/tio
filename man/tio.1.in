@@ -115,13 +115,19 @@ Colorize tio text using ANSI color code ranging from 0 to 255.
 If color code is negative a list of available ANSI colors will be printed.
 
 .TP
-.BR \-S ", " "\-\-socket unix:\fI<filename>\fR\fB
+.BR \-S ", " "\-\-socket \fI<socket>\fR\fB
 
-Listen on a Unix domain socket at the specified path. Any input from clients connected to the socket is sent on the serial port as if entered at the terminal where tio is running (except that
+Listen on socket. Any input from clients connected to the socket is sent on the serial port as if entered at the terminal where tio is running (except that
 .B ctrl-t
 sequences are not recognized), and any input from the serial port is multiplexed to the terminal and all connected clients.
 
 Sockets remain open while the serial port is disconnected, and writes will block.
+
+Two socket types are supported using different prefixes in the socket field:
+
+unix:<filename> - Unix Domain Socket (file)
+
+inet:<IP>:<port> - Internet Socket (network) (NOT YET SUPPORTED)
 
 At present there is a hardcoded limit of 16 clients connected at one time.
 

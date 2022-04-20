@@ -74,7 +74,7 @@ void print_help(char *argv[])
     printf("  -l, --log[=<filename>]      Log to file\n");
     printf("  -m, --map <flags>           Map special characters\n");
     printf("  -c, --color <code>          Colorize tio text\n");
-    printf("  -S, --socket <filename>     Listen on domain socket\n");
+    printf("  -S, --socket <socket>       Listen on socket\n");
     printf("  -v, --version               Display version\n");
     printf("  -h, --help                  Display help\n");
     printf("\n");
