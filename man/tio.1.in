@@ -176,14 +176,11 @@ Show version
 Options can be set via a configuration file using the INI format. tio uses the configuration file first found in the following locations in the order listed: $XDG_CONFIG_HOME/tio/tiorc, $HOME/.config/tio/tiorc, $HOME/.tiorc
 
 .TP
-Sections can be used to group settings and their names are only used for readability.
+Sections can be used to group settings.
 
 .TP
 .TP
-tio will try to match the user input to a section pattern to get the tty and other options.
-
-.TP
-If pattern matching fails, tio will try to match the user input to a section name.
+tio will try to match the user input to a section by name or by pattern to get the tty and other options.
 
 .TP
 Options without any section name sets the default options.
@@ -228,13 +225,12 @@ Set socket path (must include
 .SH "CONFIGURATION EXAMPLES"
 
 .TP
-A Typical section used as a short-hand would be defined as such:
+A typical section used as a short-hand would be defined as such:
 
 .RS
 .nf
 .eo
-[ftdi device]
-pattern=ftdi
+[ftdi]
 baudrate=115200
 tty=/dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 color=11
@@ -250,7 +246,7 @@ tio ftdi
 tio -b 115200 /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 
 .TP
-A pattern can also be a regular expression:
+A section can also be matched by its pattern which supports regular expressions:
 
 .RS
 .nf
@@ -293,4 +289,4 @@ Visit https://tio.github.io
 
 .SH "AUTHOR"
 .PP
-Written by Martin Lund <martin.lund@keep\-it\-simple.com>.
+Created by Martin Lund <martin.lund@keep\-it\-simple.com>.
