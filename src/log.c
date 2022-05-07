@@ -60,7 +60,7 @@ void log_open(const char *filename)
         option.log_filename = automatic_filename;
     }
 
-    fp = fopen(filename, "w+");
+    fp = fopen(filename, "a+");
 
     if (fp == NULL)
     {
