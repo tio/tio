@@ -167,7 +167,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 break;
 
             case KEY_C:
-                tio_printf("Configuraiton:");
+                tio_printf("Configuration:");
                 config_file_print();
                 options_print();
                 break;
