@@ -259,6 +259,17 @@ void config_file_parse(const int argc, char *argv[])
         return;
     }
 
+    // Parse default (unnamed) settings
+    asprintf(&c->section_name, "%s", "");
+    ret = ini_parse(c->path, data_handler, NULL);
+    if (ret < 0)
+    {
+        fprintf(stderr, "Error: unable to parse configuration file (%d)\n", ret);
+        exit(EXIT_FAILURE);
+    }
+    c->section_name = NULL;
+
+    // Find matching section
     ret = ini_parse(c->path, section_pattern_search_handler, NULL);
     if (!c->section_name)
     {
@@ -270,6 +281,7 @@ void config_file_parse(const int argc, char *argv[])
         }
     }
 
+    // Parse settings of found section
     ret = ini_parse(c->path, data_handler, NULL);
     if (ret < 0)
     {
