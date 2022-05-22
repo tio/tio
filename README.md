@@ -2,6 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/tio/tio/tree/master.svg?style=shield)](https://circleci.com/gh/tio/tio/tree/master)
 [![tio](https://snapcraft.io/tio/badge.svg)](https://snapcraft.io/tio)
+[![Packaging status](https://repology.org/badge/tiny-repos/tio.svg)](https://repology.org/project/tio/versions)
 
 ## 1. Introduction
 
