@@ -35,11 +35,11 @@ void error_exit(void)
   if (error[0][0] != 0)
   {
     /* Print error */
-    tio_printf("Error: %s", error[0]);
+    tio_error_printf("Error: %s", error[0]);
   }
   else if ((error[1][0] != 0) && (option.no_autoconnect))
   {
     /* Print silent error */
-    tio_printf("Error: %s", error[1]);
+    tio_error_printf("Error: %s", error[1]);
   }
 }
