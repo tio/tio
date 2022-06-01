@@ -56,7 +56,7 @@ static int get_match(const char *input, const char *pattern, char **match)
     if (ret)
     {
         regerror(ret, &re, err, sizeof(err));
-        error_printf("regex error: %s", err);
+        fprintf(stderr, "regex error: %s", err);
         return ret;
     }
 
@@ -269,7 +269,7 @@ void config_file_parse(const int argc, char *argv[])
     ret = ini_parse(c->path, data_handler, NULL);
     if (ret < 0)
     {
-        error_printf("Unable to parse configuration file (%d)", ret);
+        fprintf(stderr, "Error: Unable to parse configuration file (%d)", ret);
         exit(EXIT_FAILURE);
     }
     c->section_name = NULL;
@@ -290,7 +290,7 @@ void config_file_parse(const int argc, char *argv[])
     ret = ini_parse(c->path, data_handler, NULL);
     if (ret < 0)
     {
-        error_printf("Unable to parse configuration file (%d)", ret);
+        fprintf(stderr, "Error: Unable to parse configuration file (%d)", ret);
         exit(EXIT_FAILURE);
     }
 }
