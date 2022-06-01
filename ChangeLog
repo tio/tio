@@ -1,4 +1,86 @@
-=== tio v1.37 ===
+=== tio v1.38 ===
+
+
+
+Changes since tio v1.37:
+
+ * Redirect error messages to stderr
+
+ * Improve help and man page
+
+ * Fix running without config file
+
+ * Fix config file error messages
+
+ * Redirect error messages to stderr
+
+ * Add repology packaging status
+
+ * Fix parsing of default settings
+
+   Default configuration file settings were not parsed in case a section
+   was matched. Now we make sure that the default (unnamed) settings are
+   always parsed.
+
+ * Append to existing log file (no truncation)
+
+ * Add socket info to show configuration
+
+ * Print socket info at startup
+
+ * Fix socket option parsing
+
+Peter Collingbourne:
+
+ * Match user input against config section names if pattern matching was unsuccessful.
+
+   This allows for better config file ergonomics if the user has a diverse
+   set of serial devices as the name does not need to be specified in
+   the config file twice.
+
+ * Add support for external control via a Unix domain socket.
+
+   This feature allows an external program to inject output into and
+   listen to input from a serial port via a Unix domain socket (path
+   specified via the -S/--socket command line flag, or the socket
+   config file option) while tio is running. This is useful for ad-hoc
+   scripting of serial port interactions while still permitting manual
+   control. Since many serial devices (at least on Linux) get confused
+   when opened by multiple processes, and most commands do not know
+   how to correctly open a serial device, this allows a more convenient
+   usage model than directly writing to the device node from an external
+   program.
+
+   Any input from clients connected to the socket is sent on the serial
+   port as if entered at the terminal where tio is running (except that
+   ctrl-t sequences are not recognized), and any input from the serial
+   port is multiplexed to the terminal and all connected clients.
+
+   Sockets remain open while the serial port is disconnected, and writes
+   will block.
+
+   Example usage 1 (issue a command):
+
+     echo command | nc -UN /path/to/socket > /dev/null
+
+   Example usage 2 (use the expect command to script an interaction):
+
+     #!/usr/bin/expect -f
+
+     set timeout -1
+     log_user 0
+
+     spawn nc -UN /path/to/socket
+     set uart $spawn_id
+
+     send -i $uart "command1\n"
+     expect -i $uart "prompt> "
+     send -i $uart "command2\n"
+     expect -i $uart "prompt> "
+
+lexaone:
+
+ * fix for using option 'log' without 'log-filename' in config file
 
 
 
