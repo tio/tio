@@ -243,7 +243,12 @@ void config_file_parse(const int argc, char *argv[])
     c = malloc(sizeof(struct config_t));
     memset(c, 0, sizeof(struct config_t));
 
-    resolve_config_file();
+    // Find config file
+    if (resolve_config_file() != 0)
+    {
+        // None found - stop parsing
+        return;
+    }
 
     for (i = 1; i < argc; i++)
     {
