@@ -8,6 +8,8 @@ Changes since tio v1.37:
 
  * Improve help and man page
 
+ * Mention config file in --help
+
  * Fix running without config file
 
  * Fix config file error messages
