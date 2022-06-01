@@ -41,6 +41,7 @@ The command-line interface is straightforward as reflected in the output from
       -l, --log <filename>        Log to file
       -m, --map <flags>           Map special characters
       -c, --color <0..255>        Colorize tio text
+      -S, --socket <socket>       Listen on socket
       -v, --version               Display version
       -h, --help                  Display help
 
