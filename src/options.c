@@ -162,8 +162,7 @@ void options_parse(int argc, char *argv[])
 
     if (argc == 1)
     {
-        printf("Please provide tty device or name of configuration to use\n\n");
-        printf("See %s --help for more details\n\n", *argv);
+        print_help(argv);
         exit(EXIT_SUCCESS);
     }
 
