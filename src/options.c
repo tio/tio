@@ -58,7 +58,7 @@ struct option_t option =
 
 void print_help(char *argv[])
 {
-    printf("Usage: %s [<options>] <tty-device>\n", argv[0]);
+    printf("Usage: %s [<options>] <tty-device/config>\n", argv[0]);
     printf("\n");
     printf("Options:\n");
     printf("  -b, --baudrate <bps>        Baud rate (default: 115200)\n");
@@ -159,7 +159,8 @@ void options_parse(int argc, char *argv[])
 
     if (argc == 1)
     {
-        print_help(argv);
+        printf("Please provide tty device or name of configuration to use\n\n");
+        printf("See %s --help for more details\n\n", *argv);
         exit(EXIT_SUCCESS);
     }
 

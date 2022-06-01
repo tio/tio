@@ -6,13 +6,13 @@ tio \- a simple serial terminal I/O tool
 .SH "SYNOPSIS"
 .PP
 .B tio
-.RI "[" <options> "] " "<tty-device>"
+.RI "[" <options> "] " "<tty-device/config>"
 
 .SH "DESCRIPTION"
 .PP
 .B tio
 is a simple serial terminal tool which features a straightforward command-line
-interface to easily connect to serial/TTY devices for basic I/O operations.
+interface to easily connect to serial TTY devices for basic I/O operations.
 
 .SH "OPTIONS"
 
@@ -176,14 +176,14 @@ Show version
 Options can be set via a configuration file using the INI format. tio uses the configuration file first found in the following locations in the order listed: $XDG_CONFIG_HOME/tio/tiorc, $HOME/.config/tio/tiorc, $HOME/.tiorc
 
 .TP
-Sections can be used to group settings.
+Config sections can be used to group settings.
 
 .TP
 .TP
-tio will try to match the user input to a section by name or by pattern to get the tty and other options.
+tio will try to match the user input to a config section by name or by pattern to get the tty and other options.
 
 .TP
-Options without any section name sets the default options.
+Options without any config section name sets the default options.
 
 .TP
 The following configuration file options are available:
@@ -225,7 +225,7 @@ Set socket path (must include
 .SH "CONFIGURATION EXAMPLES"
 
 .TP
-A typical section used as a short-hand would be defined as such:
+A typical config section used as a short-hand would be defined as such:
 
 .RS
 .nf
@@ -239,14 +239,14 @@ color=11
 .RE
 
 .TP
-With this section defined in the configuration file the following commands would be equivalent:
+With this config section defined in the configuration file the following commands would be equivalent:
 
 tio ftdi
 
 tio -b 115200 /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 
 .TP
-A section can also be matched by its pattern which supports regular expressions:
+A config section can also be matched by its pattern which supports regular expressions:
 
 .RS
 .nf
