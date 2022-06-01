@@ -25,7 +25,7 @@ embedded developers and hackers.
 The command-line interface is straightforward as reflected in the output from
 'tio --help':
 ```
-    Usage: tio [<options>] <tty-device>
+    Usage: tio [<options>] <tty-device|config>
 
     Options:
       -b, --baudrate <bps>        Baud rate (default: 115200)
@@ -45,9 +45,11 @@ The command-line interface is straightforward as reflected in the output from
       -v, --version               Display version
       -h, --help                  Display help
 
-    See the man page for more details.
+    Options may be set via configuration file.
 
     In session, press ctrl-t q to quit.
+
+    See the man page for more details.
 ```
 
 The only option which requires a bit of elaboration is perhaps the

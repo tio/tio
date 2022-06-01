@@ -58,7 +58,7 @@ struct option_t option =
 
 void print_help(char *argv[])
 {
-    printf("Usage: %s [<options>] <tty-device/config>\n", argv[0]);
+    printf("Usage: %s [<options>] <tty-device|config>\n", argv[0]);
     printf("\n");
     printf("Options:\n");
     printf("  -b, --baudrate <bps>        Baud rate (default: 115200)\n");
@@ -78,10 +78,13 @@ void print_help(char *argv[])
     printf("  -v, --version               Display version\n");
     printf("  -h, --help                  Display help\n");
     printf("\n");
-    printf("See the man page for more details.\n");
+    printf("Options may be set via configuration file.\n");
     printf("\n");
     printf("In session, press ctrl-t q to quit.\n");
     printf("\n");
+    printf("See the man page for more details.\n");
+    printf("\n");
+
 }
 
 const char* timestamp_token(enum timestamp_t timestamp)

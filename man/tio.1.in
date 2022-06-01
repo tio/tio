@@ -6,7 +6,7 @@ tio \- a simple serial terminal I/O tool
 .SH "SYNOPSIS"
 .PP
 .B tio
-.RI "[" <options> "] " "<tty-device/config>"
+.RI "[" <options> "] " "<tty-device|config>"
 
 .SH "DESCRIPTION"
 .PP
