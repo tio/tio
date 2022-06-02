@@ -1,5 +1,5 @@
 project('tio', 'c',
-    version : '1.38',
+    version : '1.39',
     license : [ 'GPL-2'],
     meson_version : '>= 0.53.2',
     default_options : [ 'warning_level=2', 'buildtype=release', 'c_std=gnu99' ]
