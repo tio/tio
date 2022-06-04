@@ -208,12 +208,12 @@ Set output delay
 Disable automatic connect
 .IP "\fBlog"
 Log to file
+.IP "\fBlog-filename"
+Set log filename
 .IP "\fBlocal-echo"
 Enable local echo
 .IP "\fBtimestamp"
 Prefix each new line with a timestamp
-.IP "\fBlog-filename"
-Set log filename
 .IP "\fBmap"
 Map special characters on input or output
 .IP "\fBcolor"
