@@ -236,17 +236,25 @@ static int resolve_config_file(void)
         return 0;
     }
 
+    free(c->path);
+
     asprintf(&c->path, "%s/.config/tio/tiorc", getenv("HOME"));
     if (!access(c->path, F_OK))
     {
         return 0;
     }
 
+    free(c->path);
+
     asprintf(&c->path, "%s/.tiorc", getenv("HOME"));
     if (!access(c->path, F_OK))
     {
         return 0;
     }
+
+    free(c->path);
+
+    c->path = NULL;
 
     return -EINVAL;
 }
@@ -333,7 +341,7 @@ void config_file_print()
         tio_printf(" Path: %s", c->path);
         if (c->section_name != NULL)
         {
-            tio_printf(" Active config section: %s", c->section_name);
+            tio_printf(" Active sub-configuration: %s", c->section_name);
         }
     }
 }
