@@ -18,9 +18,11 @@ _tio()
           -o --output-delay \
           -n --no-autoconnect \
           -l --log \
+             --log-filename \
           -m --map \
           -v --version \
           -t --timestamp \
+             --timestamp-format \
           -L --list-devices \
           -c --color \
           -h --help"
@@ -69,6 +71,10 @@ _tio()
             return 0
             ;;
         -t | --timestamp)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        --timestamp-format)
             COMPREPLY=( $(compgen -W "24hour 24hour-start iso8601" -- ${cur}) )
             return 0
             ;;
