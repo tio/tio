@@ -22,6 +22,8 @@ embedded developers and hackers.
 
 ## 2. Usage
 
+### 2.1 Command-line
+
 The command-line interface is straightforward as reflected in the output from
 'tio --help':
 ```
@@ -33,12 +35,12 @@ The command-line interface is straightforward as reflected in the output from
       -f, --flow hard|soft|none   Flow control (default: none)
       -s, --stopbits 1|2          Stop bits (default: 1)
       -p, --parity odd|even|none  Parity (default: none)
-      -o, --output-delay <ms>     Output delay (default: 0)
+      -o, --output-delay <ms>     Character output delay (default: 0)
       -n, --no-autoconnect        Disable automatic connect
       -e, --local-echo            Enable local echo
       -t, --timestamp[=<format>]  Enable timestamp (default: 24hour)
       -L, --list-devices          List available serial devices
-      -l, --log <filename>        Log to file
+      -l, --log[=<filename>]      Log to file
       -m, --map <flags>           Map special characters
       -c, --color <0..255>        Colorize tio text
       -S, --socket <socket>       Listen on socket
@@ -65,9 +67,53 @@ connection is lost.
 Tio supports various in session key commands. Press ctrl-t ? to list the
 available key commands.
 
-Tio also features full bash autocompletion support and configuration via ~/.tiorc.
+Tio also features full bash autocompletion and configuration file support.
 
 See the tio man page for more details.
+
+### 2.2 Configuration file
+
+Options can be set via a configuration file first found in the following
+locations in the order listed:
+ - $XDG_CONFIG_HOME/tio/tiorc
+ - $HOME/.config/tio/tiorc
+ - $HOME/.tiorc
+
+The configuration file supports sub-configurations by named sections which can
+be activated via the command-line.
+
+Example configuration file:
+
+```
+# Defaults
+baudrate = 115200
+databits = 8
+parity = none
+stopbits = 1
+color = 46
+
+[ftdi]
+tty = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+baudrate = 9600
+no-autoconnect = 1
+color = 12
+
+[usb devices]
+pattern=usb([0-9]*)
+tty = /dev/ttyUSB%s
+log = 1
+log-filename = usb.log
+color = 13
+```
+
+To use a specific sub-configuration simply start tio like so:
+```
+$ tio ftdi
+```
+or
+```
+$ tio usb12
+```
 
 
 ## 3. Installation
