@@ -145,6 +145,13 @@ static int data_handler(void *user, const char *section, const char *name,
         }
         else if (!strcmp(name, "timestamp"))
         {
+            if (!strcmp(value, "enable"))
+            {
+                option.timestamp = TIMESTAMP_24HOUR;
+            }
+        }
+        else if (!strcmp(name, "timestamp-format"))
+        {
             option.timestamp = timestamp_option_parse(value);
         }
         else if (!strcmp(name, "log-filename"))

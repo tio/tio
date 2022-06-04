@@ -57,9 +57,14 @@ option is provided, tio will exit if the device is not present or an established
 Enable local echo.
 
 .TP
-.BR \-t ", " \-\-timestamp[=\fI<format>\fR\fB]
+.BR \-t ", " \-\-timestamp
 
-Enable timestamp. Optionally you can specify any of the following timestamp formats:
+Enable line timestamp.
+
+.TP
+.BR "    \-\-timestamp-format \fI<format>
+
+Set timestamp format to any of the following timestamp formats:
 .RS
 .TP 16n
 .IP "\fB24hour"
@@ -79,9 +84,14 @@ Default format is
 List available serial devices.
 
 .TP
-.BR \-l ", " \-\-log[=\fI<filename>\fR\fB]
+.BR \-l ", " \-\-log
 
-Log to file. If no filename is provided the filename will be automatically generated.
+Enable log to file. If no filename is provided the filename will be automatically generated.
+
+.TP
+.BR "    \-\-log-filename \fI<filename>
+
+Set log filename.
 
 .TP
 .BR \-m ", " "\-\-map " \fI<flags>
@@ -188,6 +198,7 @@ Options without any config section name sets the default options.
 .TP
 The following configuration file options are available:
 
+.TP 20n
 .IP "\fBpattern"
 pattern matching user input. This pattern can be an extended regular expression with a single group.
 .IP "\fBtty"
@@ -207,13 +218,15 @@ Set output delay
 .IP "\fBno-autoconnect"
 Disable automatic connect
 .IP "\fBlog"
-Log to file
+Enable log to file
 .IP "\fBlog-filename"
 Set log filename
 .IP "\fBlocal-echo"
 Enable local echo
 .IP "\fBtimestamp"
-Prefix each new line with a timestamp
+Enable line timestamp
+.IP "\fBtimestamp-format"
+Set timestamp format
 .IP "\fBmap"
 Map special characters on input or output
 .IP "\fBcolor"

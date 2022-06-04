@@ -35,6 +35,13 @@
 #include "misc.h"
 #include "print.h"
 
+enum opt_t
+{
+    OPT_NONE,
+    OPT_TIMESTAMP_FORMAT,
+    OPT_LOG_FILENAME,
+};
+
 /* Default options */
 struct option_t option =
 {
@@ -61,22 +68,24 @@ void print_help(char *argv[])
     printf("Usage: %s [<options>] <tty-device|config>\n", argv[0]);
     printf("\n");
     printf("Options:\n");
-    printf("  -b, --baudrate <bps>        Baud rate (default: 115200)\n");
-    printf("  -d, --databits 5|6|7|8      Data bits (default: 8)\n");
-    printf("  -f, --flow hard|soft|none   Flow control (default: none)\n");
-    printf("  -s, --stopbits 1|2          Stop bits (default: 1)\n");
-    printf("  -p, --parity odd|even|none  Parity (default: none)\n");
-    printf("  -o, --output-delay <ms>     Output delay (default: 0)\n");
-    printf("  -n, --no-autoconnect        Disable automatic connect\n");
-    printf("  -e, --local-echo            Enable local echo\n");
-    printf("  -t, --timestamp[=<format>]  Enable timestamp (default: 24hour)\n");
-    printf("  -L, --list-devices          List available serial devices\n");
-    printf("  -l, --log[=<filename>]      Log to file\n");
-    printf("  -m, --map <flags>           Map special characters\n");
-    printf("  -c, --color <code>          Colorize tio text\n");
-    printf("  -S, --socket <socket>       Listen on socket\n");
-    printf("  -v, --version               Display version\n");
-    printf("  -h, --help                  Display help\n");
+    printf("  -b, --baudrate <bps>             Baud rate (default: 115200)\n");
+    printf("  -d, --databits 5|6|7|8           Data bits (default: 8)\n");
+    printf("  -f, --flow hard|soft|none        Flow control (default: none)\n");
+    printf("  -s, --stopbits 1|2               Stop bits (default: 1)\n");
+    printf("  -p, --parity odd|even|none       Parity (default: none)\n");
+    printf("  -o, --output-delay <ms>          Output delay (default: 0)\n");
+    printf("  -n, --no-autoconnect             Disable automatic connect\n");
+    printf("  -e, --local-echo                 Enable local echo\n");
+    printf("  -t, --timestamp                  Enable line timestamp\n");
+    printf("      --timestamp-format <format>  Set timestamp format (default: 24hour)\n");
+    printf("  -L, --list-devices               List available serial devices\n");
+    printf("  -l, --log                        Enable log to file\n");
+    printf("      --log-filename <filename>    Set log filename\n");
+    printf("  -m, --map <flags>                Map special characters\n");
+    printf("  -c, --color <code>               Colorize tio text\n");
+    printf("  -S, --socket <socket>            Listen on socket\n");
+    printf("  -v, --version                    Display version\n");
+    printf("  -h, --help                       Display help\n");
     printf("\n");
     printf("Options may be set via configuration file.\n");
     printf("\n");
@@ -129,7 +138,7 @@ enum timestamp_t timestamp_option_parse(const char *arg)
         }
         else
         {
-            printf("Warning: Unknown timestamp type, falling back to '24hour' default format\n");
+            warning_printf("Unknown timestamp type, falling back to '24hour' default format");
         }
     }
 
@@ -170,30 +179,32 @@ void options_parse(int argc, char *argv[])
     {
         static struct option long_options[] =
         {
-            {"baudrate",       required_argument, 0, 'b'},
-            {"databits",       required_argument, 0, 'd'},
-            {"flow",           required_argument, 0, 'f'},
-            {"stopbits",       required_argument, 0, 's'},
-            {"parity",         required_argument, 0, 'p'},
-            {"output-delay",   required_argument, 0, 'o'},
-            {"no-autoconnect", no_argument,       0, 'n'},
-            {"local-echo",     no_argument,       0, 'e'},
-            {"timestamp",      optional_argument, 0, 't'},
-            {"list-devices",   no_argument,       0, 'L'},
-            {"log",            optional_argument, 0, 'l'},
-            {"socket",         required_argument, 0, 'S'},
-            {"map",            required_argument, 0, 'm'},
-            {"color",          required_argument, 0, 'c'},
-            {"version",        no_argument,       0, 'v'},
-            {"help",           no_argument,       0, 'h'},
-            {0,                0,                 0,  0 }
+            {"baudrate",         required_argument, 0, 'b'                  },
+            {"databits",         required_argument, 0, 'd'                  },
+            {"flow",             required_argument, 0, 'f'                  },
+            {"stopbits",         required_argument, 0, 's'                  },
+            {"parity",           required_argument, 0, 'p'                  },
+            {"output-delay",     required_argument, 0, 'o'                  },
+            {"no-autoconnect",   no_argument,       0, 'n'                  },
+            {"local-echo",       no_argument,       0, 'e'                  },
+            {"timestamp",        no_argument,       0, 't'                  },
+            {"timestamp-format", required_argument, 0, OPT_TIMESTAMP_FORMAT },
+            {"list-devices",     no_argument,       0, 'L'                  },
+            {"log",              no_argument,       0, 'l'                  },
+            {"log-filename",     required_argument, 0, OPT_LOG_FILENAME     },
+            {"socket",           required_argument, 0, 'S'                  },
+            {"map",              required_argument, 0, 'm'                  },
+            {"color",            required_argument, 0, 'c'                  },
+            {"version",          no_argument,       0, 'v'                  },
+            {"help",             no_argument,       0, 'h'                  },
+            {0,                  0,                 0,  0                   }
         };
 
         /* getopt_long stores the option index here */
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:net::Ll::S:m:c:vh", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:netLlS:m:c:vh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
@@ -244,6 +255,10 @@ void options_parse(int argc, char *argv[])
                 break;
 
             case 't':
+                option.timestamp = TIMESTAMP_24HOUR;
+                break;
+
+            case OPT_TIMESTAMP_FORMAT:
                 option.timestamp = timestamp_option_parse(optarg);
                 break;
 
@@ -253,6 +268,9 @@ void options_parse(int argc, char *argv[])
 
             case 'l':
                 option.log = true;
+                break;
+
+            case OPT_LOG_FILENAME:
                 option.log_filename = optarg;
                 break;
 

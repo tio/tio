@@ -33,6 +33,7 @@ enum timestamp_t
     TIMESTAMP_24HOUR_START,
     TIMESTAMP_ISO8601,
 };
+
 const char* timestamp_token(enum timestamp_t timestamp);
 enum timestamp_t timestamp_option_parse(const char *arg);
 

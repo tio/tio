@@ -30,22 +30,24 @@ The command-line interface is straightforward as reflected in the output from
     Usage: tio [<options>] <tty-device|config>
 
     Options:
-      -b, --baudrate <bps>        Baud rate (default: 115200)
-      -d, --databits 5|6|7|8      Data bits (default: 8)
-      -f, --flow hard|soft|none   Flow control (default: none)
-      -s, --stopbits 1|2          Stop bits (default: 1)
-      -p, --parity odd|even|none  Parity (default: none)
-      -o, --output-delay <ms>     Character output delay (default: 0)
-      -n, --no-autoconnect        Disable automatic connect
-      -e, --local-echo            Enable local echo
-      -t, --timestamp[=<format>]  Enable timestamp (default: 24hour)
-      -L, --list-devices          List available serial devices
-      -l, --log[=<filename>]      Log to file
-      -m, --map <flags>           Map special characters
-      -c, --color <0..255>        Colorize tio text
-      -S, --socket <socket>       Listen on socket
-      -v, --version               Display version
-      -h, --help                  Display help
+      -b, --baudrate <bps>             Baud rate (default: 115200)
+      -d, --databits 5|6|7|8           Data bits (default: 8)
+      -f, --flow hard|soft|none        Flow control (default: none)
+      -s, --stopbits 1|2               Stop bits (default: 1)
+      -p, --parity odd|even|none       Parity (default: none)
+      -o, --output-delay <ms>          Character output delay (default: 0)
+      -n, --no-autoconnect             Disable automatic connect
+      -e, --local-echo                 Enable local echo
+      -t, --timestamp                  Enable line timestamp
+          --timestamp-format <format>  Set timestamp format (default: 24hour)
+      -L, --list-devices               List available serial devices
+      -l, --log                        Enable log to file
+          --log-filename <filename>    Set log filename
+      -m, --map <flags>                Map special characters
+      -c, --color <0..255>             Colorize tio text
+      -S, --socket <socket>            Listen on socket
+      -v, --version                    Display version
+      -h, --help                       Display help
 
     Options may be set via configuration file.
 
@@ -95,13 +97,13 @@ color = 46
 [ftdi]
 tty = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 baudrate = 9600
-no-autoconnect = 1
+no-autoconnect = enable
 color = 12
 
 [usb devices]
 pattern=usb([0-9]*)
 tty = /dev/ttyUSB%s
-log = 1
+log = enable
 log-filename = usb.log
 color = 13
 ```
