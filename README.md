@@ -75,14 +75,14 @@ See the tio man page for more details.
 
 ### 2.2 Configuration file
 
-Options can be set via a configuration file first found in the following
-locations in the order listed:
+Options can be set via the configuration file first found in any of the
+following locations in the order listed:
  - $XDG_CONFIG_HOME/tio/tiorc
  - $HOME/.config/tio/tiorc
  - $HOME/.tiorc
 
-The configuration file supports sub-configurations by named sections which can
-be activated via the command-line.
+The configuration file supports sub-configurations using named sections which can
+be activated via the command-line by name or pattern.
 
 Example configuration file:
 
@@ -101,7 +101,7 @@ no-autoconnect = enable
 color = 12
 
 [usb devices]
-pattern=usb([0-9]*)
+pattern = usb([0-9]*)
 tty = /dev/ttyUSB%s
 log = enable
 log-filename = usb.log
