@@ -124,15 +124,24 @@ static int data_handler(void *user, const char *section, const char *name,
         }
         else if (!strcmp(name, "no-autoconnect"))
         {
-            option.no_autoconnect = atoi(value);
+            if (!strcmp(value, "enable"))
+            {
+                option.no_autoconnect = true;
+            }
         }
         else if (!strcmp(name, "log"))
         {
-            option.log = atoi(value);
+            if (!strcmp(value, "enable"))
+            {
+                option.log = true;
+            }
         }
         else if (!strcmp(name, "local-echo"))
         {
-            option.local_echo = atoi(value);
+            if (!strcmp(value, "enable"))
+            {
+                option.local_echo = true;
+            }
         }
         else if (!strcmp(name, "timestamp"))
         {
