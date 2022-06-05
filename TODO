@@ -1,3 +1,8 @@
 
  * Improve error/warning messaging when parsing configuration file
 
+ * Add internet socket feature
+
+   Add support for internet sockets by specifying the socket string in the
+   following format: inet:<ip>:<port>
+
