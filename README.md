@@ -57,15 +57,12 @@ The command-line interface is straightforward as reflected in the output from
     See the man page for more details.
 ```
 
-The only option which requires a bit of elaboration is perhaps the
-`--no-autoconnect` option.
-
-By default tio automatically connects to the provided device if present.  If
-the device is not present, it will wait for it to appear and then connect. If
-the connection is lost (eg. device is unplugged), it will wait for the device
-to reappear and then reconnect. However, if the `--no-autoconnect` option is
-provided, tio will exit if the device is not present or an established
-connection is lost.
+By default tio automatically connects to the provided TTY device if present.
+If the device is not present, it will wait for it to appear and then connect.
+If the connection is lost (eg. device is unplugged), it will wait for the
+device to reappear and then reconnect. However, if the `--no-autoconnect`
+option is provided, tio will exit if the device is not present or an
+established connection is lost.
 
 Tio features full bash autocompletion.
 
