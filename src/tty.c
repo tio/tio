@@ -687,6 +687,7 @@ int tty_connect(void)
     if (option.timestamp)
         next_timestamp = true;
 
+    /* Manage print output mode */
     if (option.hex_mode)
     {
         print = print_hex;
@@ -697,7 +698,6 @@ int tty_connect(void)
     {
         print = print_normal;
         print_mode = NORMAL;
-        tio_printf("Switched to normal mode");
     }
 
     /* Save current port settings */

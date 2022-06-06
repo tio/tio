@@ -37,8 +37,6 @@ enum timestamp_t
 const char* timestamp_token(enum timestamp_t timestamp);
 enum timestamp_t timestamp_option_parse(const char *arg);
 
-#define OPT_NEWLINE_IN_HEX	1000	// "short" option for --newline-in-hex
-
 /* Options */
 struct option_t
 {
@@ -59,7 +57,6 @@ struct option_t
     const char *socket;
     int color;
     bool hex_mode;
-    bool newline_in_hex;
 };
 
 extern struct option_t option;

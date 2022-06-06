@@ -62,7 +62,6 @@ struct option_t option =
     .map = "",
     .color = -1,
     .hex_mode = false,
-    .newline_in_hex = false,
 };
 
 void print_help(char *argv[])
@@ -86,8 +85,7 @@ void print_help(char *argv[])
     printf("  -m, --map <flags>                Map special characters\n");
     printf("  -c, --color <code>               Colorize tio text\n");
     printf("  -S, --socket <socket>            Listen on socket\n");
-    printf("  -x, --hex                        Start in hexadecimal mode\n");
-    printf("      --newline-in-hex             Interpret new line characters in hex mode\n");
+    printf("  -x, --hex                        Enable hexadecimal mode\n");
     printf("  -v, --version                    Display version\n");
     printf("  -h, --help                       Display help\n");
     printf("\n");
@@ -200,7 +198,6 @@ void options_parse(int argc, char *argv[])
             {"map",              required_argument, 0, 'm'                  },
             {"color",            required_argument, 0, 'c'                  },
             {"hex",              no_argument,       0, 'x'                  },
-            {"newline-in-hex",   no_argument,       0, OPT_NEWLINE_IN_HEX   },
             {"version",          no_argument,       0, 'v'                  },
             {"help",             no_argument,       0, 'h'                  },
             {0,                  0,                 0,  0                   }
@@ -309,10 +306,6 @@ void options_parse(int argc, char *argv[])
 
             case 'x':
                 option.hex_mode = true;
-                break;
-
-            case OPT_NEWLINE_IN_HEX:
-                option.newline_in_hex = true;
                 break;
 
             case 'v':

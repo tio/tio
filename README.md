@@ -46,6 +46,7 @@ The command-line interface is straightforward as reflected in the output from
       -m, --map <flags>                Map special characters
       -c, --color <code>               Colorize tio text
       -S, --socket <socket>            Listen on socket
+      -x, --hex                        Enable hexadecimal mode
       -v, --version                    Display version
       -h, --help                       Display help
 

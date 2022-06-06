@@ -120,12 +120,7 @@ If defining more than one flag, the flags must be comma separated.
 .TP
 .BR \-x ", " \-\-hex
 
-Start in hexadecimal mode.
-
-.TP
-.BR \-\-newline-in-hex
-
-Interpret new line characters ('\\r', '\\n') in hexadecimal mode.
+Enable hexadecimal mode.
 
 .TP
 .BR \-c ", " "\-\-color " \fI<code>
@@ -193,8 +188,6 @@ Show version
 .SH "HEXADECIMAL MODE"
 .TP
 In hexadecimal mode each incoming byte is printed out as a hexadecimal value.
-.TP
-By default there is \fBno new line\fR in this mode, but it can be turned on using the \fB--newline-in-hex\fR option.
 .TP
 Bytes can be sent in this mode by typing the \fBtwo-character hexadecimal\fR representation of the value, e.g.: to send \fI0xA\fR you must type \fI0a\fR or \fI0A\fR.
 
