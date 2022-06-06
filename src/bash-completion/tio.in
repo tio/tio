@@ -20,11 +20,12 @@ _tio()
           -l --log \
              --log-filename \
           -m --map \
-          -v --version \
           -t --timestamp \
              --timestamp-format \
           -L --list-devices \
           -c --color \
+          -x --hex \
+          -v --version \
           -h --help"
 
     #  Complete the arguments to the options.
@@ -87,6 +88,10 @@ _tio()
             return 0
             ;;
         -S | --socket)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        -x | --hex)
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
