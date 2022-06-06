@@ -92,7 +92,7 @@ baudrate = 115200
 databits = 8
 parity = none
 stopbits = 1
-color = 46
+color = 10
 
 [ftdi]
 tty = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
@@ -108,11 +108,11 @@ log-filename = usb.log
 color = 13
 ```
 
-To use a specific sub-configuration simply start tio like so:
+To use a specific sub-configuration by name simply start tio like so:
 ```
 $ tio ftdi
 ```
-or
+Or by pattern match:
 ```
 $ tio usb12
 ```
