@@ -68,8 +68,8 @@ Tio features full bash autocompletion.
 
 ### 2.2 Key commands
 
-Tio supports various in session key commands. When tio is started, press ctrl-t
-? to list the available key commands.
+Various in session key commands are supported. When tio is started, press
+ctrl-t ? to list the available key commands.
 
 ```
 [20:19:12.040] Key commands:
@@ -137,7 +137,8 @@ $ tio usb12
 ## 3. Installation
 
 ### 3.1 Installation using package manager
-tio comes prepackaged for various GNU/Linux distributions. Please consult your package manager tool to find and install tio.
+Packages for various GNU/Linux distributions are available. Please consult your
+package manager tool to find and install tio.
 
 ### 3.2 Installation using snap
 
