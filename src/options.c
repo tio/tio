@@ -94,8 +94,6 @@ void print_help(char *argv[])
     printf("In session, press ctrl-t q to quit.\n");
     printf("\n");
     printf("See the man page for more details.\n");
-    printf("\n");
-
 }
 
 const char* timestamp_token(enum timestamp_t timestamp)

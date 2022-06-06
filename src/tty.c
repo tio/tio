@@ -692,7 +692,6 @@ int tty_connect(void)
     {
         print = print_hex;
         print_mode = HEX;
-        tio_printf("Switched to hexadecimal mode");
     }
     else
     {
