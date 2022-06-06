@@ -67,14 +67,32 @@ to reappear and then reconnect. However, if the `--no-autoconnect` option is
 provided, tio will exit if the device is not present or an established
 connection is lost.
 
-Tio supports various in session key commands. Press ctrl-t ? to list the
-available key commands.
+Tio features full bash autocompletion.
 
-Tio also features full bash autocompletion and configuration file support.
+### 2.2 Key commands
 
-See the tio man page for more details.
+Tio supports various in session key commands. When tio is started, press ctrl-t
+? to list the available key commands.
 
-### 2.2 Configuration file
+```
+[20:19:12.040] Key commands:
+[20:19:12.040]  ctrl-t ?   List available key commands
+[20:19:12.040]  ctrl-t b   Send break
+[20:19:12.040]  ctrl-t c   Show configuration
+[20:19:12.040]  ctrl-t d   Toggle DTR line
+[20:19:12.040]  ctrl-t e   Toggle local echo mode
+[20:19:12.040]  ctrl-t h   Toggle hexadecimal mode
+[20:19:12.040]  ctrl-t l   Clear screen
+[20:19:12.040]  ctrl-t L   Show line states
+[20:19:12.040]  ctrl-t q   Quit
+[20:19:12.040]  ctrl-t r   Toggle RTS line
+[20:19:12.041]  ctrl-t s   Show statistics
+[20:19:12.041]  ctrl-t t   Send ctrl-t key code
+[20:19:12.041]  ctrl-t T   Toggle line timestamp mode
+[20:19:12.041]  ctrl-t v   Show version
+```
+
+### 2.3 Configuration file
 
 Options can be set via the configuration file first found in any of the
 following locations in the order listed:
