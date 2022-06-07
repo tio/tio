@@ -20,6 +20,9 @@ To make a simpler serial terminal tool for talking with TTY devices with less
 focus on classic terminal/modem features and more focus on the needs of
 embedded developers and hackers.
 
+tio was originally created to replace screen for connecting to serial uarts
+when used in combination with tmux.
+
 ## 2. Usage
 
 ### 2.1 Command-line
