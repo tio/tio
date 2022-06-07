@@ -6,3 +6,4 @@
    Add support for internet sockets by specifying the socket string in the
    following format: inet:<ip>:<port>
 
+ * Rework coloring to also support no coloring
