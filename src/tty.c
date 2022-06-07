@@ -583,15 +583,12 @@ void tty_wait_for_device(void)
             if (FD_ISSET(STDIN_FILENO, &rdfs))
             {
                 /* Input from stdin ready */
-                printf(".\n");
-                fflush(stdout);
 
                 /* Read one character */
                 status = read(STDIN_FILENO, &input_char, 1);
                 if (status <= 0)
                 {
-                    error_printf("Could not read from stdin 0");
-                    error_printf("Could not read from stdin 0 (%s)", strerror(errno));
+                    error_printf("Could not read from stdin");
                     exit(EXIT_FAILURE);
                 }
 
@@ -823,7 +820,7 @@ int tty_connect(void)
                 } else
                 {
                     /* Error reading - device is likely unplugged */
-                    error_printf_silent("Could not read from tty device 1");
+                    error_printf_silent("Could not read from tty device");
                     goto error_read;
                 }
             }
@@ -835,7 +832,7 @@ int tty_connect(void)
                 status = read(STDIN_FILENO, &input_char, 1);
                 if (status <= 0)
                 {
-                    error_printf_silent("Could not read from stdin 2");
+                    error_printf_silent("Could not read from stdin");
                     goto error_read;
                 }
 
