@@ -60,10 +60,16 @@ int main(int argc, char *argv[])
     tty_configure();
 
     /* Configure input terminal */
-    stdin_configure();
+    if (isatty(fileno(stdin)))
+    {
+       stdin_configure();
+    }
 
     /* Configure output terminal */
-    stdout_configure();
+    if (isatty(fileno(stdout)))
+    {
+        stdout_configure();
+    }
 
     /* Add log exit handler */
     atexit(&log_exit);

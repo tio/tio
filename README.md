@@ -114,13 +114,13 @@ color = 10
 tty = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 baudrate = 9600
 no-autoconnect = enable
+log = enable
+log-filename = ftdi.log
 color = 12
 
 [usb devices]
 pattern = usb([0-9]*)
 tty = /dev/ttyUSB%s
-log = enable
-log-filename = usb.log
 color = 13
 ```
 
