@@ -7,3 +7,5 @@
    following format: inet:<ip>:<port>
 
  * Rework coloring to also support no coloring
+
+ * Add support for piping to tio
