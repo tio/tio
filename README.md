@@ -47,7 +47,7 @@ The command-line interface is straightforward as reflected in the output from
       -l, --log                        Enable log to file
           --log-filename <filename>    Set log filename
       -m, --map <flags>                Map special characters
-      -c, --color <code>               Colorize tio text
+      -c, --color 0..255|none|list     Colorize tio text (default: 15)
       -S, --socket <socket>            Listen on socket
       -x, --hex                        Enable hexadecimal mode
       -v, --version                    Display version

@@ -60,7 +60,7 @@ struct option_t option =
     .log_filename = NULL,
     .socket = NULL,
     .map = "",
-    .color = -1,
+    .color = 15,
     .hex_mode = false,
 };
 
@@ -83,7 +83,7 @@ void print_help(char *argv[])
     printf("  -l, --log                        Enable log to file\n");
     printf("      --log-filename <filename>    Set log filename\n");
     printf("  -m, --map <flags>                Map special characters\n");
-    printf("  -c, --color <code>               Colorize tio text\n");
+    printf("  -c, --color 0..255|none|list     Colorize tio text (default: 15)\n");
     printf("  -S, --socket <socket>            Listen on socket\n");
     printf("  -x, --hex                        Enable hexadecimal mode\n");
     printf("  -v, --version                    Display version\n");
@@ -284,13 +284,7 @@ void options_parse(int argc, char *argv[])
                 break;
 
             case 'c':
-                option.color = string_to_long(optarg);
-                if (option.color > 255)
-                {
-                    printf("Error: Invalid color code\n");
-                    exit(EXIT_FAILURE);
-                }
-                if (option.color < 0)
+                if (!strcmp(optarg, "list"))
                 {
                     // Print available color codes
                     printf("Available color codes:\n");
@@ -299,6 +293,19 @@ void options_parse(int argc, char *argv[])
                         printf(" \e[1;38;5;%dmThis is color code %d\e[0m\n", i, i);
                     }
                     exit(EXIT_SUCCESS);
+                }
+
+                if (!strcmp(optarg, "none"))
+                {
+                    option.color = -1;
+                    break;
+                }
+
+                option.color = string_to_long(optarg);
+                if ((option.color < 0) || (option.color > 255))
+                {
+                    printf("Error: Invalid color code\n");
+                    exit(EXIT_FAILURE);
                 }
                 break;
 

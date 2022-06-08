@@ -166,7 +166,23 @@ static int data_handler(void *user, const char *section, const char *name,
         }
         else if (!strcmp(name, "color"))
         {
+            if (!strcmp(value, "list"))
+            {
+                // Ignore
+                return 0;
+            }
+
+            if (!strcmp(value, "none"))
+            {
+                option.color = -1; // No color
+                return 0;
+            }
+
             option.color = atoi(value);
+            if ((option.color < 0) || (option.color > 255))
+            {
+                option.color = -1; // No color
+            }
         }
         else if (!strcmp(name, "socket"))
         {

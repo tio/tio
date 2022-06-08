@@ -24,6 +24,7 @@
 #include <stdbool.h>
 #include "misc.h"
 #include "error.h"
+#include "options.h"
 
 extern bool print_tainted;
 extern char ansi_format[];
@@ -32,25 +33,37 @@ extern char ansi_format[];
 
 #define ansi_printf(format, args...) \
 { \
-  fprintf (stdout, "\r%s" format ANSI_RESET "\r\n", ansi_format, ## args); \
+  if (option.color < 0) \
+    fprintf (stdout, "\r" format "\r\n", ## args); \
+  else \
+    fprintf (stdout, "\r%s" format ANSI_RESET "\r\n", ansi_format, ## args); \
   fflush(stdout); \
 }
 
 #define ansi_error_printf(format, args...) \
 { \
-  fprintf (stderr, "\r%s" format ANSI_RESET "\r\n", ansi_format, ## args); \
+  if (option.color < 0) \
+    fprintf (stdout, "\r" format "\r\n", ## args); \
+  else \
+    fprintf (stderr, "\r%s" format ANSI_RESET "\r\n", ansi_format, ## args); \
   fflush(stderr); \
 }
 
 #define ansi_printf_raw(format, args...) \
 { \
-  fprintf (stdout, "%s" format ANSI_RESET, ansi_format, ## args); \
+  if (option.color < 0) \
+    fprintf (stdout, "\r" format "\r\n", ## args); \
+  else \
+    fprintf (stdout, "%s" format ANSI_RESET, ansi_format, ## args); \
   fflush(stdout); \
 }
 
 #define warning_printf(format, args...) \
 { \
-  ansi_printf("[%s] Warning: " format, current_time(), ## args); \
+  if (option.color < 0) \
+    fprintf (stdout, "\r[%s] Warning: " format "\r\n", current_time(), ## args); \
+  else \
+    ansi_printf("[%s] Warning: " format, current_time(), ## args); \
   fflush(stdout); \
 }
 
@@ -88,4 +101,4 @@ extern char ansi_format[];
 
 void print_hex(char c);
 void print_normal(char c);
-void print_enable_ansi_formatting(void);
+void print_init_ansi_formatting(void);

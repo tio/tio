@@ -84,7 +84,7 @@ _tio()
             return 0
             ;;
         -c | --color)
-            COMPREPLY=( $(compgen -W "$(seq 0 255)" -- ${cur}) )
+            COMPREPLY=( $(compgen -W "$(seq 0 255) none list" -- ${cur}) )
             return 0
             ;;
         -S | --socket)

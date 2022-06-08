@@ -47,16 +47,8 @@ void print_normal(char c)
   fflush(stdout);
 }
 
-void print_enable_ansi_formatting()
+void print_init_ansi_formatting()
 {
-  if (option.color < 0)
-  {
-    // Enable bold text
-    sprintf(ansi_format, "\e[1m");
-  }
-  else
-  {
-    // Enable bold text with user defined ANSI color
-    sprintf(ansi_format, "\e[1;38;5;%dm", option.color);
-  }
+  // Set bold text with user defined ANSI color
+  sprintf(ansi_format, "\e[1;38;5;%dm", option.color);
 }

@@ -70,6 +70,11 @@ int main(int argc, char *argv[])
     {
         stdout_configure();
     }
+    else
+    {
+        // No color when piping
+        option.color = -1;
+    }
 
     /* Add log exit handler */
     atexit(&log_exit);
@@ -78,8 +83,8 @@ int main(int argc, char *argv[])
     if (option.log)
         log_open(option.log_filename);
 
-    /* Enable ANSI text formatting (colors etc.) */
-    print_enable_ansi_formatting();
+    /* Initialize ANSI text formatting (colors etc.) */
+    print_init_ansi_formatting();
 
     /* Print launch hints */
     tio_printf("tio v%s", VERSION);
