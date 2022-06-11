@@ -128,12 +128,21 @@ static int data_handler(void *user, const char *section, const char *name,
             {
                 option.no_autoconnect = true;
             }
+            else if (!strcmp(value, "disable"))
+            {
+                option.no_autoconnect = false;
+            }
         }
         else if (!strcmp(name, "log"))
         {
+            printf("Parsing log \n");
             if (!strcmp(value, "enable"))
             {
                 option.log = true;
+            }
+            else if (!strcmp(value, "disable"))
+            {
+                option.log = false;
             }
         }
         else if (!strcmp(name, "local-echo"))
@@ -142,12 +151,21 @@ static int data_handler(void *user, const char *section, const char *name,
             {
                 option.local_echo = true;
             }
+            else if (!strcmp(value, "disable"))
+            {
+                option.local_echo = false;
+            }
+
         }
         else if (!strcmp(name, "timestamp"))
         {
             if (!strcmp(value, "enable"))
             {
                 option.timestamp = TIMESTAMP_24HOUR;
+            }
+            else if (!strcmp(value, "disable"))
+            {
+                option.timestamp = TIMESTAMP_NONE;
             }
         }
         else if (!strcmp(name, "timestamp-format"))
