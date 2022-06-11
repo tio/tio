@@ -77,7 +77,6 @@ void socket_configure(void)
         exit(EXIT_FAILURE);
     }
 
-    unlink(socket_filename());
     if (bind(sockfd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0)
     {
         error_printf("Failed to bind to socket %s: %s", socket_filename(), strerror(errno));
