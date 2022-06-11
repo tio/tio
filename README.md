@@ -20,7 +20,8 @@ To make a simpler serial device tool for talking with TTY devices with less
 focus on classic terminal/modem features and more focus on the needs of
 embedded developers and hackers.
 
-tio was originally created to replace screen for connecting to serial devices
+tio was originally created to replace
+[screen](https://www.gnu.org/software/screen) for connecting to serial devices
 when used in combination with [tmux](https://tmux.github.io).
 
 ## 2. Usage
