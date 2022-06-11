@@ -1,4 +1,100 @@
-=== tio v1.38 ===
+=== tio v1.39 ===
+
+
+
+Changes since tio v1.38:
+
+ * Make sure only matched config section is parsed
+
+ * Add support for "disable" keyword in config file
+
+ * Unify error message formating
+
+ * Cleanup list devices code
+
+ * Fix command-line tty-device|config parsing
+
+   Allow user to add options on both sides of the provided config argument.
+
+   For example:
+
+    $ tio -b 9600 am64-evm -e
+
+   Before, tio only allowed adding arguments after the config argument.
+
+   Implemented as simple as possible by introducing two stage option parsing.
+
+ * Update bash completion
+
+ * Add support for IPv4 and IPv6 network sockets
+
+   Add support for IPv4 and IPv6 network sockets via socket syntax
+   "inet:<port>" and "inet6:<port>" respectively.
+
+   For example, to listen and redirect serial device I/O to a host bound
+   IPv4 socket simply do:
+
+    $ tio /dev/ttyUSB0 --socket inet:4444
+
+   To connect do e.g.:
+
+    $ nc 127.0.0.1 4444
+
+   Likewise, for IPv6 do:
+
+    $ tio /dev/ttyUSB0 --socket inet6:4444
+
+   To connect do e.g.:
+
+    $ nc ::1 4444
+
+   If port is 0 or no port is provided default port 3333 is used.
+
+ * Fix tio deleting unix socket file
+
+   If tio has a unix file socket open, a second tio instance of tio may
+   delete the socket file. This change fixes so that it will not be deleted
+   and tio will instead error and complain about conflicting socket file.
+
+ * Rework color option
+
+   Rework the color option to support setting ANSI color code values
+   ranging from 0..255 or "none" for no color or "list" to print a list of
+   available ANSI colors codes.
+
+   Also, disables color when piping.
+
+ * Remove print of hex mode status at startup
+
+ * Remove newline option in hex mode
+
+ * Fix configfile memory leaks
+
+ * Remove command-line option inconsistencies
+
+   Optional arguments, as parsed by the getopt_long mechanism, are
+   inherently inconsistent with how you define required arguments.
+
+   To avoid confusion we decide to avoid this inconsistency by replacing
+   optional options with additional options with required argmuments.
+
+ * Replace '1' with 'enable' in config files
+
+ * Convert errors to warnings
+
+g0mb4:
+
+ * Extended hexadecimal mode.
+
+   While in hex mode (ctrl-t h) you can output hexadecimal values.
+   E.g.: to send 0x0A you have to type 0A (always 2 characters).
+
+   Added option -x, --hex to start in hexadecimal mode.
+
+   Added option --newline-in-hex to interpret newline characters in hex mode.
+   This is disabled by default, because, in my opinion, hex stream is
+   fundamentally different from text, so a "new line" is meaningless in this
+   context.
 
 
 
