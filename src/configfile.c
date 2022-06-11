@@ -275,10 +275,9 @@ static int resolve_config_file(void)
     return -EINVAL;
 }
 
-void config_file_parse(const int argc, char *argv[])
+void config_file_parse(void)
 {
     int ret;
-    int i;
 
     c = malloc(sizeof(struct config_t));
     memset(c, 0, sizeof(struct config_t));
@@ -290,14 +289,8 @@ void config_file_parse(const int argc, char *argv[])
         return;
     }
 
-    for (i = 1; i < argc; i++)
-    {
-        if (argv[i][0] != '-')
-        {
-            c->user = argv[i];
-            break;
-        }
-    }
+    // Set user input which may be tty device or sub config
+    c->user = option.tty_device;
 
     if (!c->user)
     {
@@ -333,6 +326,8 @@ void config_file_parse(const int argc, char *argv[])
         fprintf(stderr, "Error: Unable to parse configuration file (%d)", ret);
         exit(EXIT_FAILURE);
     }
+
+    atexit(&config_exit);
 }
 
 void config_exit(void)
@@ -350,7 +345,7 @@ void config_exit(void)
     free(c);
 }
 
-void config_file_print()
+void config_file_print(void)
 {
     if (c->path != NULL)
     {

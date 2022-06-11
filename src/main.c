@@ -42,12 +42,14 @@ int main(int argc, char *argv[])
     /* Add error exit handler */
     atexit(&error_exit);
 
-    /* Parse configuration file */
-    config_file_parse(argc, argv);
-    atexit(&config_exit);
-
-    /* Parse command-line options */
+    /* Parse command-line options (1st pass) */
     options_parse(argc, argv);
+
+    /* Parse configuration file */
+    config_file_parse();
+
+    /* Parse command-line options (2nd pass) */
+    options_parse_final(argc, argv);
 
     /* List available serial devices */
     if (option.list_devices)

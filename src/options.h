@@ -63,3 +63,4 @@ extern struct option_t option;
 
 void options_print();
 void options_parse(int argc, char *argv[]);
+void options_parse_final(int argc, char *argv[]);

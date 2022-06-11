@@ -351,7 +351,7 @@ void options_parse(int argc, char *argv[])
 
     if (strlen(option.tty_device) == 0)
     {
-        printf("Error: Missing device name\n");
+        printf("Error: Missing device or config name\n");
         exit(EXIT_FAILURE);
     }
 
@@ -364,4 +364,17 @@ void options_parse(int argc, char *argv[])
         printf("\n");
         exit(EXIT_FAILURE);
     }
+}
+
+void options_parse_final(int argc, char *argv[])
+{
+    /* Preserve tty device which may have been set by configuration file */
+    const char *tty_device = option.tty_device;
+
+    /* Do 2nd pass to override settings set by configuration file */
+    optind = 1; // Reset option index to restart scanning of argv
+    options_parse(argc, argv);
+
+    /* Restore tty device */
+    option.tty_device = tty_device;
 }
