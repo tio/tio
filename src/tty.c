@@ -135,7 +135,7 @@ static void toggle_line(const char *line_name, int mask)
 
     if (ioctl(fd, TIOCMGET, &state) < 0)
     {
-        warning_printf("Could not get line state: %s", strerror(errno));
+        warning_printf("Could not get line state (%s)", strerror(errno));
     }
     else
     {
@@ -150,7 +150,7 @@ static void toggle_line(const char *line_name, int mask)
             tio_printf("set %s to HIGH", line_name);
         }
         if (ioctl(fd, TIOCMSET, &state) < 0)
-            warning_printf("Could not set line state: %s", strerror(errno));
+            warning_printf("Could not set line state (%s)", strerror(errno));
     }
 }
 
@@ -196,7 +196,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
             case KEY_SHIFT_L:
                 if (ioctl(fd, TIOCMGET, &state) < 0)
                 {
-                    warning_printf("Could not get line state: %s", strerror(errno));
+                    warning_printf("Could not get line state (%s)", strerror(errno));
                     break;
                 }
                 tio_printf("Line states:");
