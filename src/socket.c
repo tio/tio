@@ -163,7 +163,7 @@ void socket_configure(void)
     if (socket_family == AF_INET6)
     {
         sockaddr_inet6.sin6_family = AF_INET6;
-        inet_pton(AF_INET6, "::1", &sockaddr_inet6.sin6_addr);
+        sockaddr_inet6.sin6_addr = in6addr_any;
         sockaddr_inet6.sin6_port = htons(port_number);
         sockaddr_p = (struct sockaddr *) &sockaddr_inet6;
         socklen = sizeof(sockaddr_inet6);
