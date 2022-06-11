@@ -277,7 +277,7 @@ With this config section defined in the configuration file the following command
 
 tio ftdi
 
-tio -b 115200 /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+tio -b 115200 -c 11 /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 
 .TP
 A config section can also be matched by its pattern which supports regular expressions:
