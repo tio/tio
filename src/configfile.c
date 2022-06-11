@@ -323,6 +323,7 @@ void config_file_parse(void)
         fprintf(stderr, "Error: Unable to parse configuration file (%d)", ret);
         exit(EXIT_FAILURE);
     }
+    free(c->section_name);
     c->section_name = NULL;
 
     // Find matching section
