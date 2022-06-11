@@ -87,8 +87,8 @@ static int data_handler(void *user, const char *section, const char *name,
 {
     UNUSED(user);
 
-    // If section matches user input or unnamed section
-    if ((!strcmp(section, c->section_name)) || (!strcmp(section, "")))
+    // If section matches current section being parsed
+    if (!strcmp(section, c->section_name))
     {
         // Set configuration parameter if found
         if (!strcmp(name, "tty"))
@@ -337,7 +337,7 @@ void config_file_parse(void)
         }
     }
 
-    // Parse settings of found section
+    // Parse settings of found section (sub config)
     ret = ini_parse(c->path, data_handler, NULL);
     if (ret < 0)
     {
