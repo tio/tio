@@ -24,6 +24,7 @@ _tio()
              --timestamp-format \
           -L --list-devices \
           -c --color \
+          -S --socket \
           -x --hex \
           -v --version \
           -h --help"
@@ -88,7 +89,7 @@ _tio()
             return 0
             ;;
         -S | --socket)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            COMPREPLY=( $(compgen -W "unix: inet: inet6:" -- ${cur}) )
             return 0
             ;;
         -x | --hex)
