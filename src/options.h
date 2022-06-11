@@ -51,7 +51,6 @@ struct option_t
     bool log;
     bool local_echo;
     enum timestamp_t timestamp;
-    bool list_devices;
     const char *log_filename;
     const char *map;
     const char *socket;

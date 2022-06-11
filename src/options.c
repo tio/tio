@@ -34,6 +34,7 @@
 #include "error.h"
 #include "misc.h"
 #include "print.h"
+#include "tty.h"
 
 enum opt_t
 {
@@ -56,7 +57,6 @@ struct option_t option =
     .log = false,
     .local_echo = false,
     .timestamp = TIMESTAMP_NONE,
-    .list_devices = false,
     .log_filename = NULL,
     .socket = NULL,
     .map = "",
@@ -264,7 +264,8 @@ void options_parse(int argc, char *argv[])
                 break;
 
             case 'L':
-                option.list_devices = true;
+                list_serial_devices();
+                exit(EXIT_SUCCESS);
                 break;
 
             case 'l':
@@ -336,11 +337,6 @@ void options_parse(int argc, char *argv[])
             default:
                 exit(EXIT_FAILURE);
         }
-    }
-
-    if (option.list_devices)
-    {
-        return;
     }
 
     /* Assume first non-option is the tty device name */

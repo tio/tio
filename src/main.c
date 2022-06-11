@@ -51,13 +51,6 @@ int main(int argc, char *argv[])
     /* Parse command-line options (2nd pass) */
     options_parse_final(argc, argv);
 
-    /* List available serial devices */
-    if (option.list_devices)
-    {
-        list_serial_devices();
-        return status;
-    }
-
     /* Configure tty device */
     tty_configure();
 
