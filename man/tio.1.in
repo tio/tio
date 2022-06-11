@@ -275,9 +275,9 @@ color=11
 .TP
 With this config section defined in the configuration file the following commands would be equivalent:
 
-tio ftdi
+$ tio ftdi
 
-tio -b 115200 -c 11 /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+$ tio -b 115200 -c 11 /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 
 .TP
 A config section can also be matched by its pattern which supports regular expressions:
@@ -296,26 +296,30 @@ tty=/dev/ttyUSB%s
 .TP
 Making the following commands equivalent:
 
-tio usb12
+$ tio usb12
 
-tio -b 115200 /dev/ttyUSB12
+$ tio -b 115200 /dev/ttyUSB12
 
 .SH "EXAMPLES"
 .TP
 Typical use is without options. For example:
 
-tio /dev/ttyUSB0
+$ tio /dev/ttyUSB0
 .TP
 Which corresponds to the commonly used options:
 
-tio \-b 115200 \-d 8 \-f none \-s 1 \-p none /dev/ttyUSB0
+$ tio \-b 115200 \-d 8 \-f none \-s 1 \-p none /dev/ttyUSB0
 .TP
 It is recommended to connect serial tty devices by ID. For example:
 
-tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
+$ tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
 .PP
 Using serial devices by ID ensures that tio automatically reconnects to the
 correct serial device if the device is disconnected and then reconnected.
+.TP
+To listen and redirect serial device I/O to network socket on port 4444 do:
+
+$ tio -S inet:4444 /dev/ttyUSB0
 
 .SH "WEBSITE"
 .PP
