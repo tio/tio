@@ -27,14 +27,19 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <netinet/in.h>
 #include <unistd.h>
 
 #define MAX_SOCKET_CLIENTS 16
+#define SOCKET_PORT_DEFAULT 3333
 
 static int sockfd;
 static int clientfds[MAX_SOCKET_CLIENTS];
+static int socket_family = AF_UNSPEC;
+static int port_number = SOCKET_PORT_DEFAULT;
 
 static const char *socket_filename(void)
 {
@@ -42,57 +47,161 @@ static const char *socket_filename(void)
     return option.socket + 5;
 }
 
+static int socket_inet_port(void)
+{
+    /* skip 'inet:' */
+    int port_number = atoi(option.socket + 5);
+    if (port_number == 0)
+    {
+        port_number = SOCKET_PORT_DEFAULT;
+    }
+    return port_number;
+}
+
+static int socket_inet6_port(void)
+{
+    /* skip 'inet6:' */
+    int port_number = atoi(option.socket + 6);
+    if (port_number == 0)
+    {
+        port_number = SOCKET_PORT_DEFAULT;
+    }
+    return port_number;
+}
+
 static void socket_exit(void)
 {
-    unlink(socket_filename());
+    if (socket_family == AF_UNIX)
+    {
+        unlink(socket_filename());
+    }
 }
 
 void socket_configure(void)
 {
+    struct sockaddr_un sockaddr_unix = {};
+    struct sockaddr_in sockaddr_inet = {};
+    struct sockaddr_in6 sockaddr_inet6 = {};
+    struct sockaddr *sockaddr_p;
+    socklen_t socklen;
+
     if (!option.socket)
     {
         return;
     }
 
-    if (strncmp(option.socket, "unix:", 5) != 0)
+    /* Parse socket string */
+
+    if (strncmp(option.socket, "unix:", 5) == 0)
     {
-        error_printf("%s: Invalid socket scheme, must be 'unix:'", option.socket);
-        exit(EXIT_FAILURE);
+        socket_family = AF_UNIX;
+
+        if (strlen(socket_filename()) == 0)
+        {
+            error_printf("Missing socket filename");
+            exit(EXIT_FAILURE);
+        }
+
+        if (strlen(socket_filename()) > sizeof(sockaddr_unix.sun_path) - 1)
+        {
+            error_printf("Socket file path %s too long", option.socket);
+            exit(EXIT_FAILURE);
+        }
     }
 
-    struct sockaddr_un sockaddr = {};
-    if (strlen(socket_filename()) > sizeof(sockaddr.sun_path) - 1)
+    if (strncmp(option.socket, "inet:", 5) == 0)
     {
-        error_printf("Socket file path %s too long", option.socket);
+        socket_family = AF_INET;
+
+        port_number = socket_inet_port();
+
+        if (port_number < 0)
+        {
+            error_printf("Invalid port number: %d", port_number);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    if (strncmp(option.socket, "inet6:", 6) == 0)
+    {
+        socket_family = AF_INET6;
+
+        port_number = socket_inet6_port();
+
+        if (port_number < 0)
+        {
+            error_printf("Invalid port number: %d", port_number);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    if (socket_family == AF_UNSPEC)
+    {
+        error_printf("%s: Invalid socket scheme, must be prefixed with 'unix:', 'inet:', or 'inet6:'", option.socket);
         exit(EXIT_FAILURE);
     }
  
-    sockaddr.sun_family = AF_UNIX;
-    strncpy(sockaddr.sun_path, socket_filename(), sizeof(sockaddr.sun_path) - 1);
+    /* Configure socket */
 
-    sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (socket_family == AF_UNIX)
+    {
+        sockaddr_unix.sun_family = AF_UNIX;
+        strncpy(sockaddr_unix.sun_path, socket_filename(), sizeof(sockaddr_unix.sun_path) - 1);
+        sockaddr_p = (struct sockaddr *) &sockaddr_unix;
+        socklen = sizeof(sockaddr_unix);
+    }
+
+    if (socket_family == AF_INET)
+    {
+        sockaddr_inet.sin_family = AF_INET;
+        sockaddr_inet.sin_addr.s_addr = INADDR_ANY;
+        sockaddr_inet.sin_port = htons(port_number);
+        sockaddr_p = (struct sockaddr *) &sockaddr_inet;
+        socklen = sizeof(sockaddr_inet);
+    }
+
+    if (socket_family == AF_INET6)
+    {
+        sockaddr_inet6.sin6_family = AF_INET6;
+        inet_pton(AF_INET6, "::1", &sockaddr_inet6.sin6_addr);
+        sockaddr_inet6.sin6_port = htons(port_number);
+        sockaddr_p = (struct sockaddr *) &sockaddr_inet6;
+        socklen = sizeof(sockaddr_inet6);
+    }
+
+    /* Create socket */
+    sockfd = socket(socket_family, SOCK_STREAM, 0);
     if (sockfd < 0)
     {
         error_printf("Failed to create socket: %s", strerror(errno));
         exit(EXIT_FAILURE);
     }
 
-    if (bind(sockfd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0)
+    /* Bind */
+    if (bind(sockfd, sockaddr_p, socklen) < 0)
     {
-        error_printf("Failed to bind to socket %s: %s", socket_filename(), strerror(errno));
+        error_printf("Failed to bind to socket %s", strerror(errno));
         exit(EXIT_FAILURE);
     }
 
+    /* Listen */
     if (listen(sockfd, MAX_SOCKET_CLIENTS) < 0)
     {
-        error_printf("Failed to listen on socket %s: %s", socket_filename(), strerror(errno));
+        error_printf("Failed to listen on socket %s", strerror(errno));
         exit(EXIT_FAILURE);
     }
 
     memset(clientfds, -1, sizeof(clientfds));
     atexit(socket_exit);
 
-    tio_printf("Listening on socket %s", socket_filename());
+    if (socket_family == AF_UNIX)
+    {
+        tio_printf("Listening on socket %s", socket_filename());
+    }
+    else
+    {
+        tio_printf("Listening on socket port %d", port_number);
+    }
 }
 
 void socket_write(char input_char)

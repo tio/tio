@@ -140,13 +140,21 @@ sequences are not recognized), and any input from the serial port is multiplexed
 
 Sockets remain open while the serial port is disconnected, and writes will block.
 
-Two socket types are supported using different prefixes in the socket field:
+The following socket types are supported using different prefixes in the socket field:
 
-unix:<filename> - Unix Domain Socket (file)
-
-inet:<IP>:<port> - Internet Socket (network) (NOT YET SUPPORTED)
-
+.RS
+.TP 20n
+.IP "\fBunix:<filename>"
+Unix Domain Socket (file)
+.IP "\fBinet:<port>"
+Internet Socket (network)
+.IP "\fBinet6:<port>"
+Internet IPv6 Socket (network)
+.P
+If port is 0 or no port is provided default port 3333 is used.
+.P
 At present there is a hardcoded limit of 16 clients connected at one time.
+.RE
 
 .TP
 .BR \-v ", " \-\-version
