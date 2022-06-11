@@ -135,7 +135,6 @@ static int data_handler(void *user, const char *section, const char *name,
         }
         else if (!strcmp(name, "log"))
         {
-            printf("Parsing log \n");
             if (!strcmp(value, "enable"))
             {
                 option.log = true;
