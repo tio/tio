@@ -68,7 +68,7 @@ device to reappear and then reconnect. However, if the `--no-autoconnect`
 option is provided, tio will exit if the device is not present or an
 established connection is lost.
 
-Tio features full bash autocompletion.
+tio features full bash autocompletion.
 
 ### 2.2 Key commands
 
@@ -199,7 +199,7 @@ Visit [tio.github.io](https://tio.github.io)
 
 ## 7. License
 
-Tio is GPLv2+. See LICENSE file for more details.
+tio is GPLv2+. See LICENSE file for more details.
 
 
 ## 8. Authors
