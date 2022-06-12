@@ -859,7 +859,7 @@ int tty_connect(void)
                 {
                     if (!is_valid_hex(input_char))
                     {
-                        warning_printf("Invalid hex character: '%c' (0x%02x)", input_char, input_char);
+                        warning_printf("Invalid hex character: '%d' (0x%02x)", input_char, input_char);
                         continue;
                     }
                 }
