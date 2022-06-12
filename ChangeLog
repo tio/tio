@@ -4,6 +4,8 @@
 
 Changes since tio v1.38:
 
+ * Fix invalid hex character error message
+
  * Make sure only matched config section is parsed
 
  * Add support for "disable" keyword in config file
