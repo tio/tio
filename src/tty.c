@@ -227,6 +227,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
 
             case KEY_E:
                 option.local_echo = !option.local_echo;
+                tio_printf("Switched local echo %s", option.local_echo ? "on" : "off");
                 break;
 
             case KEY_H:
@@ -269,7 +270,25 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 break;
 
             case KEY_SHIFT_T:
-                option.timestamp = !option.timestamp;
+                option.timestamp += 1;
+                switch (option.timestamp)
+                {
+                    case TIMESTAMP_NONE:
+                        break;
+                    case TIMESTAMP_24HOUR:
+                        tio_printf("Switched to 24hour timestamp mode");
+                        break;
+                    case TIMESTAMP_24HOUR_START:
+                        tio_printf("Switched to 24hour-start timestamp mode");
+                        break;
+                    case TIMESTAMP_ISO8601:
+                        tio_printf("Switched to iso8601 timestamp mode");
+                        break;
+                    case TIMESTAMP_END:
+                        option.timestamp = TIMESTAMP_NONE;
+                        tio_printf("Switched timestamp off");
+                        break;
+                }
                 break;
 
             case KEY_V:

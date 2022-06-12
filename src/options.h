@@ -32,6 +32,7 @@ enum timestamp_t
     TIMESTAMP_24HOUR,
     TIMESTAMP_24HOUR_START,
     TIMESTAMP_ISO8601,
+    TIMESTAMP_END,
 };
 
 const char* timestamp_token(enum timestamp_t timestamp);
