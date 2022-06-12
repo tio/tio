@@ -4,6 +4,8 @@
 
 Changes since tio v1.38:
 
+ * Improve key command response for local echo and timestamp
+
  * Fix invalid hex character error message
 
  * Make sure only matched config section is parsed
