@@ -171,7 +171,7 @@ static int data_handler(void *user, const char *section, const char *name,
         {
             option.timestamp = timestamp_option_parse(value);
         }
-        else if (!strcmp(name, "log-filename"))
+        else if (!strcmp(name, "log-file"))
         {
             asprintf(&c->log_filename, "%s", value);
             option.log_filename = c->log_filename;
