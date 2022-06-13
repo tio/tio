@@ -89,7 +89,7 @@ List available serial devices.
 Enable log to file. If no filename is provided the filename will be automatically generated.
 
 .TP
-.BR "    \-\-log-filename \fI<filename>
+.BR "    \-\-log-file \fI<filename>
 
 Set log filename.
 

@@ -40,7 +40,7 @@ enum opt_t
 {
     OPT_NONE,
     OPT_TIMESTAMP_FORMAT,
-    OPT_LOG_FILENAME,
+    OPT_LOG_FILE,
 };
 
 /* Default options */
@@ -81,7 +81,7 @@ void print_help(char *argv[])
     printf("      --timestamp-format <format>  Set timestamp format (default: 24hour)\n");
     printf("  -L, --list-devices               List available serial devices\n");
     printf("  -l, --log                        Enable log to file\n");
-    printf("      --log-filename <filename>    Set log filename\n");
+    printf("      --log-file <filename>        Set log filename\n");
     printf("  -m, --map <flags>                Map special characters\n");
     printf("  -c, --color 0..255|none|list     Colorize tio text (default: 15)\n");
     printf("  -S, --socket <socket>            Listen on socket\n");
@@ -191,7 +191,7 @@ void options_parse(int argc, char *argv[])
             {"timestamp-format", required_argument, 0, OPT_TIMESTAMP_FORMAT },
             {"list-devices",     no_argument,       0, 'L'                  },
             {"log",              no_argument,       0, 'l'                  },
-            {"log-filename",     required_argument, 0, OPT_LOG_FILENAME     },
+            {"log-file",         required_argument, 0, OPT_LOG_FILE         },
             {"socket",           required_argument, 0, 'S'                  },
             {"map",              required_argument, 0, 'm'                  },
             {"color",            required_argument, 0, 'c'                  },
@@ -272,7 +272,7 @@ void options_parse(int argc, char *argv[])
                 option.log = true;
                 break;
 
-            case OPT_LOG_FILENAME:
+            case OPT_LOG_FILE:
                 option.log_filename = optarg;
                 break;
 
