@@ -46,7 +46,7 @@ The command-line interface is straightforward as reflected in the output from
           --timestamp-format <format>  Set timestamp format (default: 24hour)
       -L, --list-devices               List available serial devices
       -l, --log                        Enable log to file
-          --log-filename <filename>    Set log filename
+          --log-file <filename>        Set log filename
       -m, --map <flags>                Map special characters
       -c, --color 0..255|none|list     Colorize tio text (default: 15)
       -S, --socket <socket>            Listen on socket
