@@ -143,30 +143,35 @@ void socket_configure(void)
  
     /* Configure socket */
 
-    if (socket_family == AF_UNIX)
+    switch (socket_family)
     {
-        sockaddr_unix.sun_family = AF_UNIX;
-        strncpy(sockaddr_unix.sun_path, socket_filename(), sizeof(sockaddr_unix.sun_path) - 1);
-        sockaddr_p = (struct sockaddr *) &sockaddr_unix;
-        socklen = sizeof(sockaddr_unix);
-    }
+        case AF_UNIX:
+            sockaddr_unix.sun_family = AF_UNIX;
+            strncpy(sockaddr_unix.sun_path, socket_filename(), sizeof(sockaddr_unix.sun_path) - 1);
+            sockaddr_p = (struct sockaddr *) &sockaddr_unix;
+            socklen = sizeof(sockaddr_unix);
+            break;
 
-    if (socket_family == AF_INET)
-    {
-        sockaddr_inet.sin_family = AF_INET;
-        sockaddr_inet.sin_addr.s_addr = INADDR_ANY;
-        sockaddr_inet.sin_port = htons(port_number);
-        sockaddr_p = (struct sockaddr *) &sockaddr_inet;
-        socklen = sizeof(sockaddr_inet);
-    }
+        case AF_INET:
+            sockaddr_inet.sin_family = AF_INET;
+            sockaddr_inet.sin_addr.s_addr = INADDR_ANY;
+            sockaddr_inet.sin_port = htons(port_number);
+            sockaddr_p = (struct sockaddr *) &sockaddr_inet;
+            socklen = sizeof(sockaddr_inet);
+            break;
 
-    if (socket_family == AF_INET6)
-    {
-        sockaddr_inet6.sin6_family = AF_INET6;
-        sockaddr_inet6.sin6_addr = in6addr_any;
-        sockaddr_inet6.sin6_port = htons(port_number);
-        sockaddr_p = (struct sockaddr *) &sockaddr_inet6;
-        socklen = sizeof(sockaddr_inet6);
+        case AF_INET6:
+            sockaddr_inet6.sin6_family = AF_INET6;
+            sockaddr_inet6.sin6_addr = in6addr_any;
+            sockaddr_inet6.sin6_port = htons(port_number);
+            sockaddr_p = (struct sockaddr *) &sockaddr_inet6;
+            socklen = sizeof(sockaddr_inet6);
+            break;
+
+        default:
+            error_printf("Invalid socket family (%d)", socket_family);
+            exit(EXIT_FAILURE);
+            break;
     }
 
     /* Create socket */
