@@ -41,6 +41,7 @@ enum opt_t
     OPT_NONE,
     OPT_TIMESTAMP_FORMAT,
     OPT_LOG_FILE,
+    OPT_LOG_STRIP,
 };
 
 /* Default options */
@@ -55,9 +56,10 @@ struct option_t option =
     .output_delay = 0,
     .no_autoconnect = false,
     .log = false,
+    .log_filename = NULL,
+    .log_strip = false,
     .local_echo = false,
     .timestamp = TIMESTAMP_NONE,
-    .log_filename = NULL,
     .socket = NULL,
     .map = "",
     .color = 15,
@@ -82,6 +84,7 @@ void print_help(char *argv[])
     printf("  -L, --list-devices               List available serial devices\n");
     printf("  -l, --log                        Enable log to file\n");
     printf("      --log-file <filename>        Set log filename\n");
+    printf("      --log-strip                  Strip control characters and escape sequences\n");
     printf("  -m, --map <flags>                Map special characters\n");
     printf("  -c, --color 0..255|none|list     Colorize tio text (default: 15)\n");
     printf("  -S, --socket <socket>            Listen on socket\n");
@@ -192,6 +195,7 @@ void options_parse(int argc, char *argv[])
             {"list-devices",     no_argument,       0, 'L'                  },
             {"log",              no_argument,       0, 'l'                  },
             {"log-file",         required_argument, 0, OPT_LOG_FILE         },
+            {"log-strip",        no_argument,       0, OPT_LOG_STRIP        },
             {"socket",           required_argument, 0, 'S'                  },
             {"map",              required_argument, 0, 'm'                  },
             {"color",            required_argument, 0, 'c'                  },
@@ -274,6 +278,10 @@ void options_parse(int argc, char *argv[])
 
             case OPT_LOG_FILE:
                 option.log_filename = optarg;
+                break;
+
+            case OPT_LOG_STRIP:
+                option.log_strip = true;
                 break;
 
             case 'S':

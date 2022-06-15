@@ -50,6 +50,7 @@ struct option_t
     int output_delay;
     bool no_autoconnect;
     bool log;
+    bool log_strip;
     bool local_echo;
     enum timestamp_t timestamp;
     const char *log_filename;

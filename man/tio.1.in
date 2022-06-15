@@ -94,6 +94,11 @@ Enable log to file. If no filename is provided the filename will be automaticall
 Set log filename.
 
 .TP
+.BR "    \-\-log-strip
+
+Strip control characters and escape sequences from log.
+
+.TP
 .BR \-m ", " "\-\-map " \fI<flags>
 
 Map (replace, translate) special characters on input or output. The following mapping flags are supported:
