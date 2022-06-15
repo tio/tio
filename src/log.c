@@ -31,6 +31,10 @@
 #include "print.h"
 #include "error.h"
 
+#define IS_ESC_CSI_INTERMEDIATE_CHAR(c) ((c >= 0x20) && (c <= 0x3F))
+#define IS_ESC_END_CHAR(c)              ((c >= 0x30) && (c <= 0x7E))
+#define IS_CTRL_CHAR(c)                 ((c >= 0x00) && (c <= 0x1F))
+
 static FILE *fp;
 static bool log_error = false;
 
@@ -70,11 +74,84 @@ void log_open(const char *filename)
     setvbuf(fp, NULL, _IONBF, 0);
 }
 
+bool log_strip(char c)
+{
+    static char previous_char = 0;
+    static bool esc_sequence = false;
+    bool strip = false;
+
+    /* Detect if character should be stripped or not */
+    switch (c)
+    {
+        case 0x8:
+            /* Backspace */
+            break;
+
+        case 0xa:
+            /* Line feed */
+            /* Reset ESC sequence just in case something went wrong with the
+             * escape sequence parsing. */
+            esc_sequence = false;
+            break;
+
+        case 0x1b:
+            /* Escape */
+            strip = true;
+            break;
+
+        case 0x5b:
+            /* Left bracket */
+            if (previous_char == 0x1b)
+            {
+                // Start of ESC sequence
+                esc_sequence = true;
+                strip = true;
+            }
+            break;
+
+        default:
+            if (IS_CTRL_CHAR(c))
+            {
+                /* Strip ASCII control characters */
+                strip = true;
+                break;
+            }
+            else
+            if ((esc_sequence) && (IS_ESC_CSI_INTERMEDIATE_CHAR(c)))
+            {
+                strip = true;
+                break;
+            }
+            else
+            if ((esc_sequence) && (IS_ESC_END_CHAR(c)))
+            {
+                esc_sequence = false;
+                strip = true;
+                break;
+            }
+            break;
+    }
+
+    previous_char = c;
+
+    return strip;
+}
+
 void log_write(char c)
 {
     if (fp != NULL)
     {
-        fputc(c, fp);
+        if (option.log_strip)
+        {
+            if (!log_strip(c))
+            {
+                fputc(c, fp);
+            }
+        }
+        else
+        {
+            fputc(c, fp);
+        }
     }
 }
 

@@ -19,6 +19,7 @@ _tio()
           -n --no-autoconnect \
           -l --log \
              --log-file \
+             --log-strip \
           -m --map \
           -t --timestamp \
              --timestamp-format \
@@ -69,6 +70,10 @@ _tio()
             return 0
             ;;
         -l | --log-file)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        -l | --log-strip)
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
