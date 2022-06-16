@@ -76,7 +76,9 @@ int main(int argc, char *argv[])
 
     /* Create log file */
     if (option.log)
+    {
         log_open(option.log_filename);
+    }
 
     /* Initialize ANSI text formatting (colors etc.) */
     print_init_ansi_formatting();
@@ -86,11 +88,16 @@ int main(int argc, char *argv[])
     tio_printf("Press ctrl-t q to quit");
 
     /* Open socket */
-    socket_configure();
+    if (option.socket)
+    {
+        socket_configure();
+    }
 
     /* Connect to tty device */
     if (option.no_autoconnect)
+    {
         status = tty_connect();
+    }
     else
     {
         /* Enter connect loop */

@@ -85,11 +85,6 @@ void socket_configure(void)
     struct sockaddr *sockaddr_p;
     socklen_t socklen;
 
-    if (!option.socket)
-    {
-        return;
-    }
-
     /* Parse socket string */
 
     if (strncmp(option.socket, "unix:", 5) == 0)
