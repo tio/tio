@@ -83,12 +83,8 @@ bool log_strip(char c)
     /* Detect if character should be stripped or not */
     switch (c)
     {
-        case 0x8:
-            /* Backspace */
-            break;
-
         case 0xa:
-            /* Line feed */
+            /* Line feed / new line */
             /* Reset ESC sequence just in case something went wrong with the
              * escape sequence parsing. */
             esc_sequence = false;
