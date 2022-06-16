@@ -59,6 +59,11 @@ int main(int argc, char *argv[])
     {
        stdin_configure();
     }
+    else
+    {
+        // Enter non interactive mode
+        interactive_mode = false;
+    }
 
     /* Configure output terminal */
     if (isatty(fileno(stdout)))
@@ -85,7 +90,10 @@ int main(int argc, char *argv[])
 
     /* Print launch hints */
     tio_printf("tio v%s", VERSION);
-    tio_printf("Press ctrl-t q to quit");
+    if (interactive_mode)
+    {
+        tio_printf("Press ctrl-t q to quit");
+    }
 
     /* Open socket */
     if (option.socket)
@@ -94,7 +102,7 @@ int main(int argc, char *argv[])
     }
 
     /* Connect to tty device */
-    if (option.no_autoconnect)
+    if ((option.no_autoconnect) || (!interactive_mode))
     {
         status = tty_connect();
     }

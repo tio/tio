@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <stdbool.h>
+
 #define KEY_QUESTION 0x3f
 #define KEY_B 0x62
 #define KEY_C 0x63
@@ -48,3 +50,5 @@ void tty_configure(void);
 int tty_connect(void);
 void tty_wait_for_device(void);
 void list_serial_devices(void);
+
+extern bool interactive_mode;

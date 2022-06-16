@@ -63,6 +63,8 @@ extern int iossiospeed(int fd, int baudrate);
 #define PATH_SERIAL_DEVICES "/dev/serial/by-id/"
 #endif
 
+bool interactive_mode = true;
+
 static struct termios tio, tio_old, stdout_new, stdout_old, stdin_new, stdin_old;
 static unsigned long rx_total = 0, tx_total = 0;
 static bool connected = false;
@@ -855,17 +857,21 @@ int tty_connect(void)
                     goto error_read;
                 }
 
-                /* Forward input to output except ctrl-t key */
+                /* Forward input to output */
                 output_char = input_char;
-                if (input_char == KEY_CTRL_T)
-                    forward = false;
 
-                /* Handle commands */
-                handle_command_sequence(input_char, previous_char, &output_char, &forward);
+                if (interactive_mode)
+                {
+                    /* Do not forward ctrl-t key */
+                    if (input_char == KEY_CTRL_T)
+                        forward = false;
 
-                /* Save previous key */
-                previous_char = input_char;
+                    /* Handle commands */
+                    handle_command_sequence(input_char, previous_char, &output_char, &forward);
 
+                    /* Save previous key */
+                    previous_char = input_char;
+                }
             }
             else
             {
