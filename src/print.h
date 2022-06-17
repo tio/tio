@@ -60,6 +60,8 @@ extern char ansi_format[];
 
 #define warning_printf(format, args...) \
 { \
+  if (print_tainted) \
+    putchar('\n'); \
   if (option.color < 0) \
     fprintf (stdout, "\r[%s] Warning: " format "\r\n", current_time(), ## args); \
   else \
