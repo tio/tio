@@ -154,7 +154,17 @@ static int data_handler(void *user, const char *section, const char *name,
             {
                 option.local_echo = false;
             }
-
+        }
+        else if (!strcmp(name, "hex-mode"))
+        {
+            if (!strcmp(value, "enable"))
+            {
+                option.hex_mode = true;
+            }
+            else if (!strcmp(value, "disable"))
+            {
+                option.hex_mode = false;
+            }
         }
         else if (!strcmp(name, "timestamp"))
         {

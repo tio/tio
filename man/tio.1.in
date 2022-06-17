@@ -257,6 +257,8 @@ Set timestamp format
 Map special characters on input or output
 .IP "\fBcolor"
 Colorize tio text using ANSI color code ranging from 0 to 255.
+.IP "\fBhex-mode"
+Enable hexadecimal mode
 .IP "\fBsocket"
 Set socket path (must include
 .BR unix: ).
