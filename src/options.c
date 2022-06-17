@@ -82,7 +82,7 @@ void print_help(char *argv[])
     printf("  -t, --timestamp                  Enable line timestamp\n");
     printf("      --timestamp-format <format>  Set timestamp format (default: 24hour)\n");
     printf("  -L, --list-devices               List available serial devices\n");
-    printf("  -l, --log                        Enable log to file\n");
+    printf("  -l, --log                        Enable logging to file\n");
     printf("      --log-file <filename>        Set log filename\n");
     printf("      --log-strip                  Strip control characters and escape sequences\n");
     printf("  -m, --map <flags>                Map special characters\n");
