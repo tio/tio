@@ -1,4 +1,3 @@
 
  * Improve error/warning messaging when parsing configuration file
 
- * Add support for piping to tio
