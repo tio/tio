@@ -144,6 +144,22 @@ static int data_handler(void *user, const char *section, const char *name,
                 option.log = false;
             }
         }
+        else if (!strcmp(name, "log-file"))
+        {
+            asprintf(&c->log_filename, "%s", value);
+            option.log_filename = c->log_filename;
+        }
+        else if (!strcmp(name, "log-strip"))
+        {
+            if (!strcmp(value, "enable"))
+            {
+                option.log_strip = true;
+            }
+            else if (!strcmp(value, "disable"))
+            {
+                option.log_strip = false;
+            }
+        }
         else if (!strcmp(name, "local-echo"))
         {
             if (!strcmp(value, "enable"))
@@ -180,11 +196,6 @@ static int data_handler(void *user, const char *section, const char *name,
         else if (!strcmp(name, "timestamp-format"))
         {
             option.timestamp = timestamp_option_parse(value);
-        }
-        else if (!strcmp(name, "log-file"))
-        {
-            asprintf(&c->log_filename, "%s", value);
-            option.log_filename = c->log_filename;
         }
         else if (!strcmp(name, "map"))
         {

@@ -247,6 +247,8 @@ Disable automatic connect
 Enable log to file
 .IP "\fBlog-filename"
 Set log filename
+.IP "\fBlog-strip"
+Enable strip of control and escape sequences from log
 .IP "\fBlocal-echo"
 Enable local echo
 .IP "\fBtimestamp"
