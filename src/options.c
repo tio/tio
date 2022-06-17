@@ -88,7 +88,7 @@ void print_help(char *argv[])
     printf("  -m, --map <flags>                Map special characters\n");
     printf("  -c, --color 0..255|none|list     Colorize tio text (default: 15)\n");
     printf("  -S, --socket <socket>            Listen on socket\n");
-    printf("  -x, --hex                        Enable hexadecimal mode\n");
+    printf("  -x, --hex-mode                   Enable hexadecimal mode\n");
     printf("  -v, --version                    Display version\n");
     printf("  -h, --help                       Display help\n");
     printf("\n");
@@ -199,7 +199,7 @@ void options_parse(int argc, char *argv[])
             {"socket",           required_argument, 0, 'S'                  },
             {"map",              required_argument, 0, 'm'                  },
             {"color",            required_argument, 0, 'c'                  },
-            {"hex",              no_argument,       0, 'x'                  },
+            {"hex-mode",         no_argument,       0, 'x'                  },
             {"version",          no_argument,       0, 'v'                  },
             {"help",             no_argument,       0, 'h'                  },
             {0,                  0,                 0,  0                   }

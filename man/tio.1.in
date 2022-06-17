@@ -123,7 +123,7 @@ If defining more than one flag, the flags must be comma separated.
 .RE
 
 .TP
-.BR \-x ", " \-\-hex
+.BR \-x ", " \-\-hex\-mode
 
 Enable hexadecimal mode.
 
