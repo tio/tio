@@ -6,7 +6,7 @@ project('tio', 'c',
 )
 
 # The tag date of the project_version(), update when the version bumps.
-version_date = '2022-06-12'
+version_date = '2022-06-17'
 
 # Test for dynamic baudrate configuration interface
 compiler = meson.get_compiler('c')
