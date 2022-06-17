@@ -17,6 +17,7 @@ _tio()
           -p --parity \
           -o --output-delay \
           -n --no-autoconnect \
+          -e --local-echo \
           -l --log \
              --log-file \
              --log-strip \
@@ -41,10 +42,6 @@ _tio()
             COMPREPLY=( $(compgen -W "5 6 7 8" -- ${cur}) )
             return 0
             ;;
-        -h | --local-echo)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-            return 0
-            ;;
         -f | --flow)
             COMPREPLY=( $(compgen -W "hard soft none" -- ${cur}) )
             return 0
@@ -62,6 +59,10 @@ _tio()
             return 0
             ;;
         -n | --no-autoconnect)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        -e | --local-echo)
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
