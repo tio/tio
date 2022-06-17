@@ -45,12 +45,12 @@ The command-line interface is straightforward as reflected in the output from
       -t, --timestamp                  Enable line timestamp
           --timestamp-format <format>  Set timestamp format (default: 24hour)
       -L, --list-devices               List available serial devices
-      -l, --log                        Enable log to file
+      -l, --log                        Enable logging to file
           --log-file <filename>        Set log filename
           --log-strip                  Strip control characters and escape sequences
       -m, --map <flags>                Map special characters
       -c, --color 0..255|none|list     Colorize tio text (default: 15)
-      -S, --socket <socket>            Listen on socket
+      -S, --socket <socket>            Redirect I/O to socket
       -x, --hex                        Enable hexadecimal mode
       -v, --version                    Display version
       -h, --help                       Display help
