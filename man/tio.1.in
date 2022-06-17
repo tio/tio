@@ -12,7 +12,8 @@ tio \- a simple serial device I/O tool
 .PP
 .B tio
 is a simple serial device tool which features a straightforward command-line
-interface to easily connect to serial TTY devices for basic I/O operations.
+and configuration file interface to easily connect to serial TTY devices for
+basic I/O operations.
 
 .SH "OPTIONS"
 

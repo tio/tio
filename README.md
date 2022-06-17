@@ -7,8 +7,8 @@
 ## 1. Introduction
 
 tio is a simple serial device tool which features a straightforward
-command-line interface to easily connect to TTY devices for basic I/O
-operations.
+command-line and configuration file interface to easily connect to serial TTY
+devices for basic I/O operations.
 
 <p align="center">
 <img src="images/tio-demo.gif">
