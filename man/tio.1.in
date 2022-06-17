@@ -226,7 +226,7 @@ The following configuration file options are available:
 
 .TP 20n
 .IP "\fBpattern"
-pattern matching user input. This pattern can be an extended regular expression with a single group.
+Pattern matching user input. This pattern can be an extended regular expression with a single group.
 .IP "\fBtty"
 tty device to open. If tty contains a "%s" it will be substituted with the first group match.
 .IP "\fBbaudrate"
@@ -245,7 +245,7 @@ Set output delay
 Disable automatic connect
 .IP "\fBlog"
 Enable log to file
-.IP "\fBlog-filename"
+.IP "\fBlog-file"
 Set log filename
 .IP "\fBlog-strip"
 Enable strip of control and escape sequences from log
@@ -258,12 +258,11 @@ Set timestamp format
 .IP "\fBmap"
 Map special characters on input or output
 .IP "\fBcolor"
-Colorize tio text using ANSI color code ranging from 0 to 255.
+Colorize tio text using ANSI color code ranging from 0 to 255
 .IP "\fBhex-mode"
 Enable hexadecimal mode
 .IP "\fBsocket"
-Set socket path (must include
-.BR unix: ).
+Set socket to listen on
 
 .SH "CONFIGURATION EXAMPLES"
 
