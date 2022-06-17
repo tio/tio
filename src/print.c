@@ -29,14 +29,7 @@ char ansi_format[30];
 
 void print_hex(char c)
 {
-  if ((c == '\n') || (c == '\r'))
-  {
-    printf("%c", c);
-  }
-  else
-  {
-    printf("%02x ", (unsigned char) c);
-  }
+  printf("%02x ", (unsigned char) c);
 
   fflush(stdout);
 }
