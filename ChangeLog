@@ -1,4 +1,77 @@
-=== tio v1.39 ===
+=== tio v1.40 ===
+
+
+
+Changes since tio v1.39:
+
+ * Add config support for log-strip
+
+ * Add config support for hex-mode
+
+ * Rename --hex to --hex-mode
+
+ * Fix completion for -e, --local-echo
+
+ * Ignore newlines in hex output
+
+ * Fix newline in warning_printf()
+
+ * Fix ansi_printf_raw() in no color mode
+
+ * Enter non-interactive mode when piping to tio
+
+   Add support for a non interactive mode which allows other application to
+   pipe data to tio which then forwards the data to the connected serial
+   device.
+
+   Non ineractive means that tio does not react to interactive key commands
+   in the incoming stream. This allows users to pipe binary data directly
+   to the connected serial device.
+
+   Example use:
+
+   $ cat commands.txt | tio /dev/ttyUSB0
+
+ * Also strip backspace from log
+
+   To make log strip feature consistent so that we remove all unprintable
+   control characters and escape sequences.
+
+ * Socket code cleanup
+
+ * Cleanup man page
+
+ * Rename --log-filename to --log-file
+
+Yin Fengwei:
+
+ * Allow strip escape sequence characters from log file
+
+   The log without escape key stripped is like:
+
+    ^M[12:47:17] ACRN:\>
+    ^M[12:47:17] ACRN:\>lasdfjklsdjf
+    ^M
+    ^M[12:47:18] Error: Invalid command.
+    ^M[12:47:19] ACRN:\>
+    ^M[12:47:26] ACRN:\>
+    ^M[12:47:26] ACRN:\>sdafkljsdkaljfklsadjflksdjafjsda^H ^H^H...
+    ^M
+    ^M[12:47:31] Error: Invalid command.
+
+   After strip escape key, the log is like:
+
+    [12:49:18] ACRN:\>
+    [12:49:19] ACRN:\>
+    [12:49:19] ACRN:\>ls
+
+    [12:49:19] Error: Invalid command.
+    [12:49:19] ACRN:\>
+    [12:49:19] ACRN:\>dfaslhj
+
+    [12:49:24] Error: Invalid command.
+
+   Beside escape key, it also handle backspace key as well.
 
 
 
