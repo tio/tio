@@ -52,7 +52,7 @@ extern char ansi_format[];
 #define ansi_printf_raw(format, args...) \
 { \
   if (option.color < 0) \
-    fprintf (stdout, "\r" format "\r\n", ## args); \
+    fprintf (stdout, format, ## args); \
   else \
     fprintf (stdout, "%s" format ANSI_RESET, ansi_format, ## args); \
   fflush(stdout); \
