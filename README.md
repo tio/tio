@@ -24,9 +24,31 @@ tio was originally created to replace
 [screen](https://www.gnu.org/software/screen) for connecting to serial devices
 when used in combination with [tmux](https://tmux.github.io).
 
-## 2. Usage
+## 2. Features
 
-### 2.1 Command-line
+ * Easily connect to serial TTY devices
+ * Automatic re-connect
+ * Support for arbitrary baud rates
+ * List available serial devices
+ * Show RX/TX statistics
+ * Toggle serial lines
+ * Local echo support
+ * Remap special characters (nl, cr-nl, bs, etc.)
+ * Line timestamps
+ * Support for delayed output
+ * Hexadecimal mode
+ * Log to file
+ * Configuration file support
+ * Select subconfigurations by name or pattern
+ * Redirect I/O to socket for scripting or TTY sharing
+ * Pipe input and/or output
+ * Bash completion
+ * Color support
+ * Man page documentation
+
+## 3. Usage
+
+### 3.1 Command-line
 
 The command-line interface is straightforward as reflected in the output from
 'tio --help':
@@ -71,7 +93,7 @@ established connection is lost.
 
 tio features full bash autocompletion.
 
-### 2.2 Key commands
+### 3.2 Key commands
 
 Various in session key commands are supported. When tio is started, press
 ctrl-t ? to list the available key commands.
@@ -94,7 +116,7 @@ ctrl-t ? to list the available key commands.
 [20:19:12.041]  ctrl-t v   Show version
 ```
 
-### 2.3 Configuration file
+### 3.3 Configuration file
 
 Options can be set via the configuration file first found in any of the
 following locations in the order listed:
@@ -139,13 +161,13 @@ $ tio usb12
 ```
 
 
-## 3. Installation
+## 4. Installation
 
-### 3.1 Installation using package manager
+### 4.1 Installation using package manager
 Packages for various GNU/Linux distributions are available. Please consult your
 package manager tool to find and install tio.
 
-### 3.2 Installation using snap
+### 4.2 Installation using snap
 
 Install latest stable version:
 ```
@@ -156,7 +178,7 @@ Install bleeding edge:
     $ snap install tio --edge
 ```
 
-### 3.3 Installation from source
+### 4.3 Installation from source
 
 The latest source releases can be found [here](https://github.com/tio/tio/releases).
 
@@ -173,7 +195,7 @@ Note: Please do no try to install from source if you are not familiar with
 how to build stuff using meson.
 
 
-## 4. Contributing
+## 5. Contributing
 
 tio is open source. If you want to help out with the project please feel free
 to join in.
@@ -188,22 +210,22 @@ consider making a donation of your choice:
 [![Donate](images/paypal.png)](https://www.paypal.me/lundmar)
 
 
-## 5. Support
+## 6. Support
 
 Submit bug reports via GitHub: https://github.com/tio/tio/issues
 
 
-## 6. Website
+## 7. Website
 
 Visit [tio.github.io](https://tio.github.io)
 
 
-## 7. License
+## 8. License
 
 tio is GPLv2+. See LICENSE file for more details.
 
 
-## 8. Authors
+## 9. Authors
 
 Created by Martin Lund \<martin.lund@keep-it-simple.com>
 
