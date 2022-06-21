@@ -361,8 +361,7 @@ void stdout_configure(void)
     memcpy(&stdout_new, &stdout_old, sizeof(stdout_old));
 
     /* Reconfigure stdout (RAW configuration) */
-    stdout_new.c_oflag &= ~(OPOST);
-    stdout_new.c_lflag &= ~(ECHO|ICANON|ISIG|ECHOE|ECHOK|ECHONL);
+    cfmakeraw(&stdout_new);
 
     /* Control characters */
     stdout_new.c_cc[VTIME] = 0; /* Inter-character timer unused */
