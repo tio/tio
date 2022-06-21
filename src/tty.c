@@ -664,15 +664,11 @@ int tty_connect(void)
     static char previous_char = 0;
     static bool first = true;
     int    status;
-    bool next_timestamp = false;
+    bool   next_timestamp = false;
     char*  now = NULL;
 
     /* Open tty device */
-#ifdef __APPLE__
-    fd = open(option.tty_device, O_RDWR | O_NOCTTY | O_NONBLOCK );
-#else
-    fd = open(option.tty_device, O_RDWR | O_NOCTTY);
-#endif
+    fd = open(option.tty_device, O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (fd < 0)
     {
         error_printf_silent("Could not open tty device (%s)", strerror(errno));
@@ -789,7 +785,7 @@ int tty_connect(void)
                     /* Update receive statistics */
                     rx_total++;
 
-                    /* Print timestamp on new line, if desired. */
+                    /* Print timestamp on new line if enabled */
                     if (next_timestamp && input_char != '\n' && input_char != '\r')
                     {
                         now = current_time();
