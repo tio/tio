@@ -213,7 +213,7 @@ Bytes can be sent in this mode by typing the \fBtwo-character hexadecimal\fR rep
 Options can be set via a configuration file using the INI format. tio uses the configuration file first found in the following locations in the order listed: $XDG_CONFIG_HOME/tio/tiorc, $HOME/.config/tio/tiorc, $HOME/.tiorc
 
 .TP
-Config sections can be used to group settings.
+Config sections (subconfigurations) can be used to group settings.
 
 .TP
 .TP
@@ -229,7 +229,7 @@ The following configuration file options are available:
 .IP "\fBpattern"
 Pattern matching user input. This pattern can be an extended regular expression with a single group.
 .IP "\fBtty"
-tty device to open. If tty contains a "%s" it will be substituted with the first group match.
+tty device to open. If it contains a "%s" it is substituted with the first group match.
 .IP "\fBbaudrate"
 Set baud rate
 .IP "\fBdatabits"
