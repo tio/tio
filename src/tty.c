@@ -319,9 +319,7 @@ void stdin_configure(void)
     memcpy(&stdin_new, &stdin_old, sizeof(stdin_old));
 
     /* Reconfigure stdin (RAW configuration) */
-    stdin_new.c_iflag &= ~(ICRNL); // Do not translate CR -> NL on input
-    stdin_new.c_oflag &= ~(OPOST);
-    stdin_new.c_lflag &= ~(ECHO|ICANON|ISIG|ECHOE|ECHOK|ECHONL);
+    cfmakeraw(&stdin_new);
 
     /* Control characters */
     stdin_new.c_cc[VTIME] = 0; /* Inter-character timer unused */
