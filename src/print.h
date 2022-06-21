@@ -37,7 +37,6 @@ extern char ansi_format[];
     fprintf (stdout, "\r" format "\r\n", ## args); \
   else \
     fprintf (stdout, "\r%s" format ANSI_RESET "\r\n", ansi_format, ## args); \
-  fflush(stdout); \
 }
 
 #define ansi_error_printf(format, args...) \
@@ -55,7 +54,6 @@ extern char ansi_format[];
     fprintf (stdout, format, ## args); \
   else \
     fprintf (stdout, "%s" format ANSI_RESET, ansi_format, ## args); \
-  fflush(stdout); \
 }
 
 #define warning_printf(format, args...) \
@@ -66,7 +64,6 @@ extern char ansi_format[];
     fprintf (stdout, "\r[%s] Warning: " format "\r\n", current_time(), ## args); \
   else \
     ansi_printf("[%s] Warning: " format, current_time(), ## args); \
-  fflush(stdout); \
 }
 
 #define tio_printf(format, args...) \

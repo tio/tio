@@ -86,7 +86,6 @@ static void optional_local_echo(char c)
         return;
     }
     print(c);
-    fflush(stdout);
     if (option.log)
     {
         log_putc(c);
@@ -255,7 +254,6 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
             case KEY_L:
                 /* Clear screen using ANSI/VT100 escape code */
                 printf("\033c");
-                fflush(stdout);
                 break;
 
             case KEY_Q:
@@ -352,7 +350,7 @@ void stdout_configure(void)
 
     /* Disable line buffering in stdout. This is necessary if we
      * want things like local echo to work correctly. */
-    setbuf(stdout, NULL);
+    setvbuf(stdout, NULL, _IONBF, 0);
 
     /* Save current stdout settings */
     if (tcgetattr(STDOUT_FILENO, &stdout_old) < 0)
@@ -816,7 +814,6 @@ int tty_connect(void)
                         /* Print received tty character to stdout */
                         print(input_char);
                     }
-                    fflush(stdout);
 
                     /* Write to log */
                     if (option.log)

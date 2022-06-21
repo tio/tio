@@ -175,7 +175,6 @@ void log_close(void)
 {
     if (fp != NULL)
     {
-        fflush(fp);
         fclose(fp);
     }
 }

@@ -30,14 +30,11 @@ char ansi_format[30];
 void print_hex(char c)
 {
   printf("%02x ", (unsigned char) c);
-
-  fflush(stdout);
 }
 
 void print_normal(char c)
 {
   putchar(c);
-  fflush(stdout);
 }
 
 void print_init_ansi_formatting()
