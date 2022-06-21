@@ -19,9 +19,12 @@
  * 02110-1301, USA.
  */
 
+#define __STDC_WANT_LIB_EXT2__ 1   // To access vasprintf
+
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include <errno.h>
 #include <time.h>
@@ -37,6 +40,7 @@
 
 static FILE *fp;
 static bool log_error = false;
+static char file_buffer[BUFSIZ];
 
 static char *date_time(void)
 {
@@ -64,14 +68,16 @@ void log_open(const char *filename)
         option.log_filename = automatic_filename;
     }
 
+    // Open log file in append write mode
     fp = fopen(filename, "a+");
-
     if (fp == NULL)
     {
         log_error = true;
         exit(EXIT_FAILURE);
     }
-    setvbuf(fp, NULL, _IONBF, 0);
+
+    // Enable full buffering
+    setvbuf(fp, file_buffer, _IOFBF, BUFSIZ);
 }
 
 bool log_strip(char c)
@@ -133,7 +139,21 @@ bool log_strip(char c)
     return strip;
 }
 
-void log_write(char c)
+void log_printf(const char *format, ...)
+{
+    char *line;
+
+    va_list(args);
+    va_start(args, format);
+    vasprintf(&line, format, args);
+    va_end(args);
+
+    fwrite(line, strlen(line), 1, fp);
+
+    free(line);
+}
+
+void log_putc(char c)
 {
     if (fp != NULL)
     {
@@ -155,6 +175,7 @@ void log_close(void)
 {
     if (fp != NULL)
     {
+        fflush(fp);
         fclose(fp);
     }
 }

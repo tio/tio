@@ -82,11 +82,15 @@ static unsigned char hex_char_index = 0;
 static void optional_local_echo(char c)
 {
     if (!option.local_echo)
+    {
         return;
+    }
     print(c);
     fflush(stdout);
     if (option.log)
-        log_write(c);
+    {
+        log_putc(c);
+    }
 }
 
 inline static bool is_valid_hex(char c)
@@ -794,14 +798,7 @@ int tty_connect(void)
                             ansi_printf_raw("[%s] ", now);
                             if (option.log)
                             {
-                                log_write('[');
-                                while (*now != '\0')
-                                {
-                                    log_write(*now);
-                                    ++now;
-                                }
-                                log_write(']');
-                                log_write(' ');
+                                log_printf("[%s] ", now);
                             }
                             next_timestamp = false;
                         }
@@ -823,7 +820,9 @@ int tty_connect(void)
 
                     /* Write to log */
                     if (option.log)
-                        log_write(input_char);
+                    {
+                        log_putc(input_char);
+                    }
 
                     socket_write(input_char);
 
