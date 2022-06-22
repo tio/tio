@@ -834,6 +834,7 @@ int tty_connect(void)
                     goto error_read;
                 }
             }
+            else
             if (FD_ISSET(STDIN_FILENO, &rdfs))
             {
                 forward = true;
