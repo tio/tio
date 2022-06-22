@@ -42,13 +42,11 @@
 #define NORMAL 0
 #define HEX 1
 
+extern bool interactive_mode;
+
 void stdout_configure(void);
-void stdout_restore(void);
 void stdin_configure(void);
-void stdin_restore(void);
 void tty_configure(void);
 int tty_connect(void);
 void tty_wait_for_device(void);
 void list_serial_devices(void);
-
-extern bool interactive_mode;

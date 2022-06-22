@@ -306,6 +306,11 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
     }
 }
 
+void stdin_restore(void)
+{
+    tcsetattr(STDIN_FILENO, TCSANOW, &stdin_old);
+}
+
 void stdin_configure(void)
 {
     int status;
@@ -339,9 +344,9 @@ void stdin_configure(void)
     atexit(&stdin_restore);
 }
 
-void stdin_restore(void)
+void stdout_restore(void)
 {
-    tcsetattr(STDIN_FILENO, TCSANOW, &stdin_old);
+    tcsetattr(STDOUT_FILENO, TCSANOW, &stdout_old);
 }
 
 void stdout_configure(void)
@@ -382,11 +387,6 @@ void stdout_configure(void)
 
     /* Make sure we restore old stdout settings on exit */
     atexit(&stdout_restore);
-}
-
-void stdout_restore(void)
-{
-    tcsetattr(STDOUT_FILENO, TCSANOW, &stdout_old);
 }
 
 void tty_configure(void)
