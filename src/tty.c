@@ -99,13 +99,20 @@ inline static bool is_valid_hex(char c)
 
 inline static unsigned char char_to_nibble(char c)
 {
-    if(c >= '0' && c <= '9'){
+    if(c >= '0' && c <= '9')
+    {
         return c - '0';
-    } else if(c >= 'a' && c <= 'f'){
+    }
+    else if (c >= 'a' && c <= 'f')
+    {
         return c - 'a' + 10;
-    } else if(c >= 'A' && c <= 'F'){
+    }
+    else if (c >= 'A' && c <= 'F')
+    {
         return c - 'A' + 10;
-    } else {
+    }
+    else
+    {
         return 0;
     }
 }
@@ -125,7 +132,8 @@ static void output_hex(char c)
         if (status < 0)
         {
             warning_printf("Could not write to tty device");
-        } else
+        }
+        else
         {
             tx_total++;
         }
@@ -513,7 +521,9 @@ void tty_configure(void)
         tio.c_cflag &= ~PARODD;
     }
     else if (strcmp("none", option.parity) == 0)
+    {
         tio.c_cflag &= ~PARENB;
+    }
     else
     {
         error_printf("Invalid parity");
@@ -534,26 +544,44 @@ void tty_configure(void)
     while (token_found == true)
     {
         if (token == NULL)
+        {
             token = strtok(buffer,",");
+        }
         else
+        {
             token = strtok(NULL, ",");
+        }
 
         if (token != NULL)
         {
             if (strcmp(token,"INLCR") == 0)
+            {
                 tio.c_iflag |= INLCR;
+            }
             else if (strcmp(token,"IGNCR") == 0)
+            {
                 tio.c_iflag |= IGNCR;
+            }
             else if (strcmp(token,"ICRNL") == 0)
+            {
                 tio.c_iflag |= ICRNL;
+            }
             else if (strcmp(token,"OCRNL") == 0)
+            {
                 map_o_cr_nl = true;
+            }
             else if (strcmp(token,"ODELBS") == 0)
+            {
                 map_o_del_bs = true;
+            }
             else if (strcmp(token,"INLCRNL") == 0)
+            {
                 map_i_nl_crnl = true;
+            }
             else if (strcmp(token, "ONLCRNL") == 0)
+            {
                 map_o_nl_crnl = true;
+            }
             else
             {
                 printf("Error: Unknown mapping flag %s\n", token);
@@ -561,7 +589,9 @@ void tty_configure(void)
             }
         }
         else
+        {
             token_found = false;
+        }
     }
     free(buffer);
 }
@@ -585,7 +615,8 @@ void tty_wait_for_device(void)
             tv.tv_sec = 0;
             tv.tv_usec = 1;
             first = false;
-        } else
+        }
+        else
         {
             /* Wait up to 1 second */
             tv.tv_sec = 1;
@@ -618,7 +649,8 @@ void tty_wait_for_device(void)
                 previous_char = input_char;
             }
             socket_handle_input(&rdfs, NULL);
-        } else if (status == -1)
+        }
+        else if (status == -1)
         {
             error_printf("select() failed (%s)", strerror(errno));
             exit(EXIT_FAILURE);
@@ -626,7 +658,8 @@ void tty_wait_for_device(void)
 
         /* Test for accessible device file */
         status = access(option.tty_device, R_OK);
-        if (status == 0) {
+        if (status == 0)
+        {
             last_errno = 0;
             return;
         }
@@ -655,7 +688,9 @@ void tty_restore(void)
     tcsetattr(fd, TCSANOW, &tio_old);
 
     if (connected)
+    {
         tty_disconnect();
+    }
 }
 
 int tty_connect(void)
@@ -701,7 +736,9 @@ int tty_connect(void)
     print_tainted = false;
 
     if (option.timestamp)
+    {
         next_timestamp = true;
+    }
 
     /* Manage print output mode */
     if (option.hex_mode)
@@ -717,7 +754,9 @@ int tty_connect(void)
 
     /* Save current port settings */
     if (tcgetattr(fd, &tio_old) < 0)
+    {
         goto error_tcgetattr;
+    }
 
 #ifdef HAVE_IOSSIOSPEED
     if (!standard_baudrate)
@@ -809,7 +848,8 @@ int tty_connect(void)
                         print('\n');
                         if (option.timestamp)
                             next_timestamp = true;
-                    } else
+                    }
+                    else
                     {
                         /* Print received tty character to stdout */
                         print(input_char);
@@ -826,16 +866,18 @@ int tty_connect(void)
                     print_tainted = true;
 
                     if (input_char == '\n' && option.timestamp)
+                    {
                         next_timestamp = true;
-                } else
+                    }
+                }
+                else
                 {
                     /* Error reading - device is likely unplugged */
                     error_printf_silent("Could not read from tty device");
                     goto error_read;
                 }
             }
-            else
-            if (FD_ISSET(STDIN_FILENO, &rdfs))
+            else if (FD_ISSET(STDIN_FILENO, &rdfs))
             {
                 forward = true;
 
@@ -854,13 +896,24 @@ int tty_connect(void)
                 {
                     /* Do not forward ctrl-t key */
                     if (input_char == KEY_CTRL_T)
+                    {
                         forward = false;
+                    }
 
                     /* Handle commands */
                     handle_command_sequence(input_char, previous_char, &output_char, &forward);
 
                     /* Save previous key */
                     previous_char = input_char;
+                }
+
+                if (print_mode == HEX)
+                {
+                    if (!is_valid_hex(input_char))
+                    {
+                        warning_printf("Invalid hex character: '%d' (0x%02x)", input_char, input_char);
+                        continue;
+                    }
                 }
             }
             else
@@ -870,34 +923,33 @@ int tty_connect(void)
 
             if (forward)
             {
-                if (print_mode == HEX)
-                {
-                    if (!is_valid_hex(input_char))
-                    {
-                        warning_printf("Invalid hex character: '%d' (0x%02x)", input_char, input_char);
-                        continue;
-                    }
-                }
-
                 /* Map output character */
                 if ((output_char == 127) && (map_o_del_bs))
+                {
                     output_char = '\b';
+                }
                 if ((output_char == '\r') && (map_o_cr_nl))
+                {
                     output_char = '\n';
+                }
 
                 /* Map newline character */
-                if ((output_char == '\n' || output_char == '\r') && (map_o_nl_crnl)) {
+                if ((output_char == '\n' || output_char == '\r') && (map_o_nl_crnl))
+                {
                     const char *crlf = "\r\n";
 
                     optional_local_echo(crlf[0]);
                     optional_local_echo(crlf[1]);
                     status = write(fd, crlf, 2);
                     if (status < 0)
+                    {
                         warning_printf("Could not write to tty device");
+                    }
 
                     tx_total += 2;
                     delay(option.output_delay);
-                } else
+                }
+                else
                 {
                     if (print_mode == HEX)
                     {
@@ -909,7 +961,9 @@ int tty_connect(void)
                         optional_local_echo(output_char);
                         status = write(fd, &output_char, 1);
                         if (status < 0)
+                        {
                             warning_printf("Could not write to tty device");
+                        }
                         fsync(fd);
 
                         /* Update transmit statistics */
@@ -920,7 +974,8 @@ int tty_connect(void)
                     delay(option.output_delay);
                 }
             }
-        } else if (status == -1)
+        }
+        else if (status == -1)
         {
             error_printf("Error: select() failed (%s)", strerror(errno));
             exit(EXIT_FAILURE);
