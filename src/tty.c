@@ -754,6 +754,7 @@ int tty_connect(void)
     fd_set rdfs;           /* Read file descriptor set */
     int    maxfd;          /* Maximum file descriptor used */
     char   input_char, output_char;
+    char   input_buffer[BUFSIZ];
     static char previous_char = 0;
     static bool first = true;
     int    status;
@@ -877,10 +878,21 @@ int tty_connect(void)
             if (FD_ISSET(fd, &rdfs))
             {
                 /* Input from tty device ready */
-                if (read(fd, &input_char, 1) > 0)
+                ssize_t bytes_read = read(fd, input_buffer, BUFSIZ);
+                if (bytes_read <= 0)
                 {
-                    /* Update receive statistics */
-                    rx_total++;
+                    /* Error reading - device is likely unplugged */
+                    error_printf_silent("Could not read from tty device");
+                    goto error_read;
+                }
+
+                /* Update receive statistics */
+                rx_total += bytes_read;
+
+                /* Process input byte by byte */
+                for (int i=0; i<bytes_read; i++)
+                {
+                    input_char = input_buffer[i];
 
                     /* Print timestamp on new line if enabled */
                     if (next_timestamp && input_char != '\n' && input_char != '\r')
@@ -903,7 +915,9 @@ int tty_connect(void)
                         print('\r');
                         print('\n');
                         if (option.timestamp)
+                        {
                             next_timestamp = true;
+                        }
                     }
                     else
                     {
@@ -926,55 +940,54 @@ int tty_connect(void)
                         next_timestamp = true;
                     }
                 }
-                else
-                {
-                    /* Error reading - device is likely unplugged */
-                    error_printf_silent("Could not read from tty device");
-                    goto error_read;
-                }
             }
             else if (FD_ISSET(STDIN_FILENO, &rdfs))
             {
                 /* Input from stdin ready */
-                status = read(STDIN_FILENO, &input_char, 1);
-                if (status <= 0)
+                ssize_t bytes_read = read(STDIN_FILENO, input_buffer, BUFSIZ);
+                if (bytes_read <= 0)
                 {
                     error_printf_silent("Could not read from stdin");
                     goto error_read;
                 }
 
-                /* Forward input to output */
-                output_char = input_char;
-                forward = true;
-                output_char = input_char;
-
-                if (interactive_mode)
+                /* Process input byte by byte */
+                for (int i=0; i<bytes_read; i++)
                 {
-                    /* Do not forward ctrl-t key */
-                    if (input_char == KEY_CTRL_T)
+                    input_char = input_buffer[i];
+
+                    /* Forward input to output */
+                    output_char = input_char;
+                    forward = true;
+
+                    if (interactive_mode)
                     {
-                        forward = false;
-                    }
-
-                    /* Handle commands */
-                    handle_command_sequence(input_char, previous_char, &output_char, &forward);
-
-                    /* Save previous key */
-                    previous_char = input_char;
-
-                    if (print_mode == HEX)
-                    {
-                        if (!is_valid_hex(input_char))
+                        /* Do not forward ctrl-t key */
+                        if (input_char == KEY_CTRL_T)
                         {
-                            warning_printf("Invalid hex character: '%d' (0x%02x)", input_char, input_char);
                             forward = false;
                         }
-                    }
-                }
 
-                if (forward)
-                {
-                    forward_to_tty(fd, output_char);
+                        /* Handle commands */
+                        handle_command_sequence(input_char, previous_char, &output_char, &forward);
+
+                        /* Save previous key */
+                        previous_char = input_char;
+
+                        if (print_mode == HEX)
+                        {
+                            if (!is_valid_hex(input_char))
+                            {
+                                warning_printf("Invalid hex character: '%d' (0x%02x)", input_char, input_char);
+                                forward = false;
+                            }
+                        }
+                    }
+
+                    if (forward)
+                    {
+                        forward_to_tty(fd, output_char);
+                    }
                 }
             }
             else
