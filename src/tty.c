@@ -693,6 +693,62 @@ void tty_restore(void)
     }
 }
 
+void forward_to_tty(int fd, char output_char)
+{
+    int status;
+
+    /* Map output character */
+    if ((output_char == 127) && (map_o_del_bs))
+    {
+        output_char = '\b';
+    }
+    if ((output_char == '\r') && (map_o_cr_nl))
+    {
+        output_char = '\n';
+    }
+
+    /* Map newline character */
+    if ((output_char == '\n' || output_char == '\r') && (map_o_nl_crnl))
+    {
+        const char *crlf = "\r\n";
+
+        optional_local_echo(crlf[0]);
+        optional_local_echo(crlf[1]);
+        status = write(fd, crlf, 2);
+        if (status < 0)
+        {
+            warning_printf("Could not write to tty device");
+        }
+
+        tx_total += 2;
+        delay(option.output_delay);
+    }
+    else
+    {
+        if (print_mode == HEX)
+        {
+            output_hex(output_char);
+        }
+        else
+        {
+            /* Send output to tty device */
+            optional_local_echo(output_char);
+            status = write(fd, &output_char, 1);
+            if (status < 0)
+            {
+                warning_printf("Could not write to tty device");
+            }
+            fsync(fd);
+
+            /* Update transmit statistics */
+            tx_total++;
+        }
+
+        /* Insert output delay */
+        delay(option.output_delay);
+    }
+}
+
 int tty_connect(void)
 {
     fd_set rdfs;           /* Read file descriptor set */
@@ -879,8 +935,6 @@ int tty_connect(void)
             }
             else if (FD_ISSET(STDIN_FILENO, &rdfs))
             {
-                forward = true;
-
                 /* Input from stdin ready */
                 status = read(STDIN_FILENO, &input_char, 1);
                 if (status <= 0)
@@ -890,6 +944,8 @@ int tty_connect(void)
                 }
 
                 /* Forward input to output */
+                output_char = input_char;
+                forward = true;
                 output_char = input_char;
 
                 if (interactive_mode)
@@ -905,73 +961,29 @@ int tty_connect(void)
 
                     /* Save previous key */
                     previous_char = input_char;
+
+                    if (print_mode == HEX)
+                    {
+                        if (!is_valid_hex(input_char))
+                        {
+                            warning_printf("Invalid hex character: '%d' (0x%02x)", input_char, input_char);
+                            forward = false;
+                        }
+                    }
                 }
 
-                if (print_mode == HEX)
+                if (forward)
                 {
-                    if (!is_valid_hex(input_char))
-                    {
-                        warning_printf("Invalid hex character: '%d' (0x%02x)", input_char, input_char);
-                        continue;
-                    }
+                    forward_to_tty(fd, output_char);
                 }
             }
             else
             {
                 forward = socket_handle_input(&rdfs, &output_char);
-            }
 
-            if (forward)
-            {
-                /* Map output character */
-                if ((output_char == 127) && (map_o_del_bs))
+                if (forward)
                 {
-                    output_char = '\b';
-                }
-                if ((output_char == '\r') && (map_o_cr_nl))
-                {
-                    output_char = '\n';
-                }
-
-                /* Map newline character */
-                if ((output_char == '\n' || output_char == '\r') && (map_o_nl_crnl))
-                {
-                    const char *crlf = "\r\n";
-
-                    optional_local_echo(crlf[0]);
-                    optional_local_echo(crlf[1]);
-                    status = write(fd, crlf, 2);
-                    if (status < 0)
-                    {
-                        warning_printf("Could not write to tty device");
-                    }
-
-                    tx_total += 2;
-                    delay(option.output_delay);
-                }
-                else
-                {
-                    if (print_mode == HEX)
-                    {
-                        output_hex(output_char);
-                    }
-                    else
-                    {
-                        /* Send output to tty device */
-                        optional_local_echo(output_char);
-                        status = write(fd, &output_char, 1);
-                        if (status < 0)
-                        {
-                            warning_printf("Could not write to tty device");
-                        }
-                        fsync(fd);
-
-                        /* Update transmit statistics */
-                        tx_total++;
-                    }
-
-                    /* Insert output delay */
-                    delay(option.output_delay);
+                    forward_to_tty(fd, output_char);
                 }
             }
         }
