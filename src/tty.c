@@ -78,6 +78,9 @@ static bool map_o_nl_crnl = false;
 static bool map_o_del_bs = false;
 static char hex_chars[2];
 static unsigned char hex_char_index = 0;
+static char tty_buffer[BUFSIZ*2];
+static size_t tty_count = 0;
+static char *tty_write_ptr = tty_buffer;
 
 static void optional_local_echo(char c)
 {
@@ -117,6 +120,51 @@ inline static unsigned char char_to_nibble(char c)
     }
 }
 
+void tty_flush(int fd)
+{
+    write(fd, tty_buffer, tty_count);
+
+    // Reset
+    tty_write_ptr = tty_buffer;
+    tty_count = 0;
+}
+
+ssize_t tty_write(int fd, const void *buffer, size_t count)
+{
+    ssize_t bytes_written = 0;
+
+    if (option.output_delay)
+    {
+        // Write byte by byte with output delay
+        for (size_t i=0; i<count; i++)
+        {
+            bytes_written = write(fd, buffer, 1);
+            if (bytes_written <= 0)
+            {
+                break;
+            }
+            delay(option.output_delay);
+        }
+        fsync(fd);
+    }
+    else
+    {
+        // Flush tty buffer if too full
+        if ((tty_count + count) > BUFSIZ)
+        {
+            tty_flush(fd);
+        }
+
+        // Copy bytes to tty buffer
+        memcpy(tty_write_ptr, buffer, count);
+        tty_write_ptr += count;
+        tty_count += count;
+        bytes_written = count;
+    }
+
+    return bytes_written;
+}
+
 static void output_hex(char c)
 {
     hex_chars[hex_char_index++] = c;
@@ -128,7 +176,7 @@ static void output_hex(char c)
 
         optional_local_echo(hex_value);
 
-        ssize_t status = write(fd, &hex_value, 1);
+        ssize_t status = tty_write(fd, &hex_value, 1);
         if (status < 0)
         {
             warning_printf("Could not write to tty device");
@@ -137,8 +185,6 @@ static void output_hex(char c)
         {
             tx_total++;
         }
-
-        fsync(fd);
     }
 }
 
@@ -714,14 +760,13 @@ void forward_to_tty(int fd, char output_char)
 
         optional_local_echo(crlf[0]);
         optional_local_echo(crlf[1]);
-        status = write(fd, crlf, 2);
+        status = tty_write(fd, crlf, 2);
         if (status < 0)
         {
             warning_printf("Could not write to tty device");
         }
 
         tx_total += 2;
-        delay(option.output_delay);
     }
     else
     {
@@ -733,19 +778,15 @@ void forward_to_tty(int fd, char output_char)
         {
             /* Send output to tty device */
             optional_local_echo(output_char);
-            status = write(fd, &output_char, 1);
+            status = tty_write(fd, &output_char, 1);
             if (status < 0)
             {
                 warning_printf("Could not write to tty device");
             }
-            fsync(fd);
 
             /* Update transmit statistics */
             tx_total++;
         }
-
-        /* Insert output delay */
-        delay(option.output_delay);
     }
 }
 
@@ -989,6 +1030,8 @@ int tty_connect(void)
                         forward_to_tty(fd, output_char);
                     }
                 }
+
+                tty_flush(fd);
             }
             else
             {
@@ -998,6 +1041,8 @@ int tty_connect(void)
                 {
                     forward_to_tty(fd, output_char);
                 }
+
+                tty_flush(fd);
             }
         }
         else if (status == -1)
