@@ -16,8 +16,8 @@ devices for basic I/O operations.
 
 ### 1.1 Motivation
 
-To make a simpler serial device tool for talking with TTY devices with less
-focus on classic terminal/modem features and more focus on the needs of
+To make a simpler serial device tool for talking with serial TTY devices with
+less focus on classic terminal/modem features and more focus on the needs of
 embedded developers and hackers.
 
 tio was originally created to replace
