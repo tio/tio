@@ -210,17 +210,17 @@ Bytes can be sent in this mode by typing the \fBtwo-character hexadecimal\fR rep
 .SH "CONFIGURATION"
 .PP
 .TP 16n
-Options can be set via a configuration file using the INI format. tio uses the configuration file first found in the following locations in the order listed: $XDG_CONFIG_HOME/tio/tiorc, $HOME/.config/tio/tiorc, $HOME/.tiorc
+Options can be set via configuration file using the INI format. tio uses the configuration file first found in the following locations in the order listed: $XDG_CONFIG_HOME/tio/tiorc, $HOME/.config/tio/tiorc, $HOME/.tiorc
 
 .TP
-Config sections (subconfigurations) can be used to group settings.
+Labels can be used to group settings into named sub-configurations which can be activated from the command-line when starting tio.
 
 .TP
 .TP
-tio will try to match the user input to a config section by name or by pattern to get the tty and other options.
+tio will try to match the user input to a sub-configuration by name or by pattern to get the tty and other options.
 
 .TP
-Options without any config section name sets the default options.
+Options without any label changes the default options.
 
 .TP
 The following configuration file options are available:
@@ -268,44 +268,66 @@ Set socket to redirect I/O to
 .SH "CONFIGURATION EXAMPLES"
 
 .TP
-A typical config section used as a short-hand would be defined as such:
+To change the default configuration simply set options like so:
+
+.RS
+.nf
+.eo
+# Defaults
+baudrate = 115200
+databits = 8
+parity = none
+stopbits = 1
+color = 10
+.ec
+.fi
+.RE
+
+.TP
+Named sub-configurations can be added via labels:
 
 .RS
 .nf
 .eo
 [ftdi]
-baudrate=115200
-tty=/dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
-color=11
+baudrate = 115200
+tty = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+color = 11
 .ec
 .fi
 .RE
 
 .TP
-With this config section defined in the configuration file the following commands would be equivalent:
+Activate the sub-configuration by name:
 
 $ tio ftdi
+
+.TP
+Which is equivalent to:
 
 $ tio -b 115200 -c 11 /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 
 .TP
-A config section can also be matched by its pattern which supports regular expressions:
+A sub-configuration can also be matched by its pattern which supports regular expressions:
 
 .RS
 .nf
 .eo
 [usb device]
-pattern=usb([0-9]*)
-baudrate=115200
-tty=/dev/ttyUSB%s
+pattern = usb([0-9]*)
+baudrate = 115200
+tty = /dev/ttyUSB%s
 .ec
 .fi
 .RE
 
 .TP
-Making the following commands equivalent:
+Activate the sub-configuration by pattern match:
 
 $ tio usb12
+
+.TP
+Which is equivalent to:
 
 $ tio -b 115200 /dev/ttyUSB12
 
