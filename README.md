@@ -38,6 +38,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Support for delayed output
  * Hexadecimal mode
  * Log to file
+ * Autogeneration of log filename
  * Configuration file support
  * Select subconfigurations by name or pattern
  * Redirect I/O to socket for scripting or TTY sharing
@@ -67,7 +68,7 @@ The command-line interface is straightforward as reflected in the output from
       -t, --timestamp                  Enable line timestamp
           --timestamp-format <format>  Set timestamp format (default: 24hour)
       -L, --list-devices               List available serial devices
-      -l, --log                        Enable logging to file
+      -l, --log                        Enable log to file
           --log-file <filename>        Set log filename
           --log-strip                  Strip control characters and escape sequences
       -m, --map <flags>                Map special characters

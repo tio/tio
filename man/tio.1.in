@@ -87,7 +87,7 @@ List available serial devices.
 .TP
 .BR \-l ", " \-\-log
 
-Enable logging to file. If no filename is provided the filename will be automatically generated.
+Enable log to file. If no filename is provided the filename will be automatically generated.
 
 .TP
 .BR "    \-\-log-file \fI<filename>
@@ -245,7 +245,7 @@ Set output delay
 .IP "\fBno-autoconnect"
 Disable automatic connect
 .IP "\fBlog"
-Enable logging to file
+Enable log to file
 .IP "\fBlog-file"
 Set log filename
 .IP "\fBlog-strip"
