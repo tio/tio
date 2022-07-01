@@ -88,7 +88,7 @@ void print_help(char *argv[])
     printf("  -m, --map <flags>                Map special characters\n");
     printf("  -c, --color 0..255|none|list     Colorize tio text (default: 15)\n");
     printf("  -S, --socket <socket>            Redirect I/O to socket\n");
-    printf("  -x, --hex-mode                   Enable hexadecimal mode\n");
+    printf("  -x, --hexadecimal                Enable hexadecimal mode\n");
     printf("  -v, --version                    Display version\n");
     printf("  -h, --help                       Display help\n");
     printf("\n");

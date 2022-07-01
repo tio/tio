@@ -171,7 +171,7 @@ static int data_handler(void *user, const char *section, const char *name,
                 option.local_echo = false;
             }
         }
-        else if (!strcmp(name, "hex-mode"))
+        else if (!strcmp(name, "hexadecimal"))
         {
             if (!strcmp(value, "enable"))
             {

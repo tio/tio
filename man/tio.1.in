@@ -124,7 +124,7 @@ If defining more than one flag, the flags must be comma separated.
 .RE
 
 .TP
-.BR \-x ", " \-\-hex\-mode
+.BR \-x ", " \-\-hexadecimal
 
 Enable hexadecimal mode.
 
@@ -260,7 +260,7 @@ Set timestamp format
 Map special characters on input or output
 .IP "\fBcolor"
 Colorize tio text using ANSI color code ranging from 0 to 255
-.IP "\fBhex-mode"
+.IP "\fBhexadecimal"
 Enable hexadecimal mode
 .IP "\fBsocket"
 Set socket to redirect I/O to

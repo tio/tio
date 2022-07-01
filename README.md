@@ -74,7 +74,7 @@ The command-line interface is straightforward as reflected in the output from
       -m, --map <flags>                Map special characters
       -c, --color 0..255|none|list     Colorize tio text (default: 15)
       -S, --socket <socket>            Redirect I/O to socket
-      -x, --hex                        Enable hexadecimal mode
+      -x, --hexadecimal                Enable hexadecimal mode
       -v, --version                    Display version
       -h, --help                       Display help
 
