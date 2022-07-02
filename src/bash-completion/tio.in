@@ -27,7 +27,7 @@ _tio()
           -L --list-devices \
           -c --color \
           -S --socket \
-          -x --hex-mode \
+          -x --hexadecimal \
           -v --version \
           -h --help"
 
@@ -102,7 +102,7 @@ _tio()
             COMPREPLY=( $(compgen -W "unix: inet: inet6:" -- ${cur}) )
             return 0
             ;;
-        -x | --hex-mode)
+        -x | --hexadecimal)
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;

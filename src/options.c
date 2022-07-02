@@ -199,7 +199,7 @@ void options_parse(int argc, char *argv[])
             {"socket",           required_argument, 0, 'S'                  },
             {"map",              required_argument, 0, 'm'                  },
             {"color",            required_argument, 0, 'c'                  },
-            {"hex-mode",         no_argument,       0, 'x'                  },
+            {"hexadecimal",      no_argument,       0, 'x'                  },
             {"version",          no_argument,       0, 'v'                  },
             {"help",             no_argument,       0, 'h'                  },
             {0,                  0,                 0,  0                   }
