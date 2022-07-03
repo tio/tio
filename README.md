@@ -40,7 +40,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Log to file
  * Autogeneration of log filename
  * Configuration file support
- * Select subconfigurations by name or pattern
+ * Select sub-configurations by name or pattern
  * Redirect I/O to socket for scripting or TTY sharing
  * Pipe input and/or output
  * Bash completion
@@ -54,7 +54,7 @@ when used in combination with [tmux](https://tmux.github.io).
 The command-line interface is straightforward as reflected in the output from
 'tio --help':
 ```
-    Usage: tio [<options>] <tty-device|config>
+    Usage: tio [<options>] <tty-device|sub-config>
 
     Options:
       -b, --baudrate <bps>             Baud rate (default: 115200)

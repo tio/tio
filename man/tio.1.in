@@ -207,10 +207,16 @@ In hexadecimal mode each incoming byte is printed out as a hexadecimal value.
 .TP
 Bytes can be sent in this mode by typing the \fBtwo-character hexadecimal\fR representation of the value, e.g.: to send \fI0xA\fR you must type \fI0a\fR or \fI0A\fR.
 
-.SH "CONFIGURATION"
+.SH "CONFIGURATION FILE"
 .PP
 .TP 16n
-Options can be set via configuration file using the INI format. tio uses the configuration file first found in the following locations in the order listed: $XDG_CONFIG_HOME/tio/tiorc, $HOME/.config/tio/tiorc, $HOME/.tiorc
+Options can be set via configuration file using the INI format. tio uses the configuration file first found in the following locations in the order listed:
+.PP
+.I $XDG_CONFIG_HOME/tio/tiorc
+.PP
+.I $HOME/.config/tio/tiorc
+.PP
+.I $HOME/.tiorc
 
 .TP
 Labels can be used to group settings into named sub-configurations which can be activated from the command-line when starting tio.
@@ -220,7 +226,7 @@ Labels can be used to group settings into named sub-configurations which can be 
 tio will try to match the user input to a sub-configuration by name or by pattern to get the tty and other options.
 
 .TP
-Options without any label changes the default options.
+Options without any label change the default options.
 
 .TP
 The following configuration file options are available:
@@ -265,7 +271,7 @@ Enable hexadecimal mode
 .IP "\fBsocket"
 Set socket to redirect I/O to
 
-.SH "CONFIGURATION EXAMPLES"
+.SH "CONFIGURATION FILE EXAMPLES"
 
 .TP
 To change the default configuration simply set options like so:
@@ -308,7 +314,7 @@ Which is equivalent to:
 $ tio -b 115200 -c 11 /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 
 .TP
-A sub-configuration can also be matched by its pattern which supports regular expressions:
+A sub-configuration can also be activated by its pattern which supports regular expressions:
 
 .RS
 .nf
