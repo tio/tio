@@ -20,10 +20,6 @@
  * 02110-1301, USA.
  */
 
-#include "socket.h"
-#include "options.h"
-#include "print.h"
-
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,6 +28,10 @@
 #include <sys/un.h>
 #include <netinet/in.h>
 #include <unistd.h>
+
+#include "socket.h"
+#include "options.h"
+#include "print.h"
 
 #define MAX_SOCKET_CLIENTS 16
 #define SOCKET_PORT_DEFAULT 3333
