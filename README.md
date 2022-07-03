@@ -56,6 +56,8 @@ The command-line interface is straightforward as reflected in the output from
 ```
     Usage: tio [<options>] <tty-device|sub-config>
 
+    Connect to tty-device or activate sub-configuration.
+
     Options:
       -b, --baudrate <bps>             Baud rate (default: 115200)
       -d, --databits 5|6|7|8           Data bits (default: 8)
