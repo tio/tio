@@ -80,7 +80,7 @@ The command-line interface is straightforward as reflected in the output from
       -v, --version                    Display version
       -h, --help                       Display help
 
-    Options may be set via configuration file.
+    Options and sub-configurations may be set via configuration file.
 
     In session, press ctrl-t q to quit.
 
