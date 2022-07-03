@@ -229,6 +229,9 @@ tio will try to match the user input to a sub-configuration by name or by patter
 Options without any label change the default options.
 
 .TP
+Any options set via command-line will override options set in the configuraqtion file.
+
+.TP
 The following configuration file options are available:
 
 .TP 20n
@@ -337,6 +340,11 @@ Which is equivalent to:
 
 $ tio -b 115200 /dev/ttyUSB12
 
+.TP
+It is also possible to combine use of sub-configuration and command-line options. For example:
+
+$ tio -l -t usb12
+
 .SH "EXAMPLES"
 .TP
 Typical use is without options. For example:
@@ -354,9 +362,36 @@ $ tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
 Using serial devices by ID ensures that tio automatically reconnects to the
 correct serial device if the device is disconnected and then reconnected.
 .TP
-To listen and redirect serial device I/O to network socket on port 4444 do:
+Redirect serial device I/O to Unix file socket. For example:
 
-$ tio -S inet:4444 /dev/ttyUSB0
+$ tio -S unix:/tmp/tmux-socket0 /dev/ttyUSB0
+
+.TP
+Then, to issue a command via the file socket simply do for example:
+
+$ echo "ls -lah" | nc -UN /tmp/tmux-socket0 > /dev/null
+
+.TP
+Or use the expect command to script an interaction:
+
+.RS
+.nf
+.eo
+#!/usr/bin/expect -f
+
+set timeout -1
+log_user 0
+
+spawn nc -UN /path/to/socket
+set uart $spawn_id
+
+send -i $uart "command1\n"
+expect -i $uart "prompt> "
+send -i $uart "command2\n"
+expect -i $uart "prompt> "
+.ec
+.fi
+.RE
 
 .SH "WEBSITE"
 .PP
