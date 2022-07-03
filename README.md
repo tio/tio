@@ -40,7 +40,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Log to file
  * Autogeneration of log filename
  * Configuration file support
- * Select sub-configurations by name or pattern
+ * Activate sub-configurations by name or pattern
  * Redirect I/O to socket for scripting or TTY sharing
  * Pipe input and/or output
  * Bash completion
