@@ -1,4 +1,34 @@
-=== tio v1.40 ===
+=== tio v1.41 ===
+
+
+
+Changes since tio v1.40:
+
+ * Rename --hex-mode to --hexadecimal
+
+ * Enable buffered writing
+
+   Read block of bytes from input and process same block for output.  This
+   will speed things up by reducing I/O overhead.
+
+ * Enable buffered reading
+
+   Read block of bytes from input and process byte by byte for output. This
+   will speed things up by reducing I/O overhead.
+
+ * Refactoring
+
+ * Cleanup stdout flushing
+
+   Flushing is not needed since we disabled buffering of stdout.
+
+ * Simplify stdout_configure() code
+
+ * Simplify stdin_configure() code
+
+ * Update man page
+
+ * Update README
 
 
 
