@@ -347,7 +347,7 @@ $ tio -l -t usb12
 
 .SH "EXAMPLES"
 .TP
-Typical use is without options. For example:
+Typical use is without options:
 
 $ tio /dev/ttyUSB0
 .TP
@@ -355,21 +355,21 @@ Which corresponds to the commonly used options:
 
 $ tio \-b 115200 \-d 8 \-f none \-s 1 \-p none /dev/ttyUSB0
 .TP
-It is recommended to connect serial tty devices by ID. For example:
+It is recommended to connect serial tty devices by ID:
 
 $ tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
 .PP
 Using serial devices by ID ensures that tio automatically reconnects to the
 correct serial device if the device is disconnected and then reconnected.
 .TP
-Redirect serial device I/O to Unix file socket. For example:
+Redirect serial device I/O to Unix file socket for scripting:
 
 $ tio -S unix:/tmp/tmux-socket0 /dev/ttyUSB0
 
 .TP
-Then, to issue a command via the file socket simply do for example:
+Then, to issue a command via the file socket simply do:
 
-$ echo "ls -lah" | nc -UN /tmp/tmux-socket0 > /dev/null
+$ echo "ls -la" | nc -UN /tmp/tmux-socket0 > /dev/null
 
 .TP
 Or use the expect command to script an interaction:
@@ -382,21 +382,32 @@ Or use the expect command to script an interaction:
 set timeout -1
 log_user 0
 
-spawn nc -UN /path/to/socket
+spawn nc -UN /tmp/tio-socket0
 set uart $spawn_id
 
-send -i $uart "command1\n"
+send -i $uart "date\n"
 expect -i $uart "prompt> "
-send -i $uart "command2\n"
+send -i $uart "ls -la\n"
 expect -i $uart "prompt> "
 .ec
 .fi
 .RE
 
 .TP
-It is also possible to pipe data or command to the serial device. For example:
+Redirect device I/O to network file socket for remote tty sharing:
 
-$ echo "ls -lah" | tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
+$ tio --socket inet:4444 /dev/ttyUSB0
+
+.TP
+
+Then, use netcat to connect to the shared tty session over network (assuming tio is hosted on IP 10.0.0.42):
+
+$ nc -N 10.0.0.42 4444
+
+.TP
+Pipe data from file to the serial device:
+
+$ cat data.bin | tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
 
 .SH "WEBSITE"
 .PP
