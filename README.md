@@ -167,8 +167,12 @@ $ tio usb12
 ## 4. Installation
 
 ### 4.1 Installation using package manager
+
 Packages for various GNU/Linux distributions are available. Please consult your
 package manager tool to find and install tio.
+
+If you would like to see tio included in your favorite distribution, please
+reach out to their package maintainers team.
 
 ### 4.2 Installation using snap
 
