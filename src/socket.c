@@ -28,6 +28,7 @@
 #include <sys/un.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "socket.h"
 #include "options.h"
