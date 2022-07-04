@@ -79,8 +79,8 @@ static bool map_o_del_bs = false;
 static char hex_chars[2];
 static unsigned char hex_char_index = 0;
 static char tty_buffer[BUFSIZ*2];
-static size_t tty_count = 0;
-static char *tty_write_ptr = tty_buffer;
+static size_t tty_buffer_count = 0;
+static char *tty_buffer_write_ptr = tty_buffer;
 
 static void optional_local_echo(char c)
 {
@@ -122,11 +122,24 @@ inline static unsigned char char_to_nibble(char c)
 
 void tty_flush(int fd)
 {
-    write(fd, tty_buffer, tty_count);
+    ssize_t count;
+
+    do
+    {
+        count = write(fd, tty_buffer, tty_buffer_count);
+        if (count < 0)
+        {
+            // Error
+            debug_printf("Write error while flushing tty buffer (%s)", strerror(errno));
+            break;
+        }
+        tty_buffer_count -= count;
+    }
+    while (tty_buffer_count > 0);
 
     // Reset
-    tty_write_ptr = tty_buffer;
-    tty_count = 0;
+    tty_buffer_write_ptr = tty_buffer;
+    tty_buffer_count = 0;
 }
 
 ssize_t tty_write(int fd, const void *buffer, size_t count)
@@ -138,27 +151,30 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
         // Write byte by byte with output delay
         for (size_t i=0; i<count; i++)
         {
-            bytes_written = write(fd, buffer, 1);
-            if (bytes_written <= 0)
+            ssize_t retval = write(fd, buffer, 1);
+            if (retval < 0)
             {
+                // Error
+                debug_printf("Write error (%s)", strerror(errno));
                 break;
             }
+            bytes_written += retval;
+            fsync(fd);
             delay(option.output_delay);
         }
-        fsync(fd);
     }
     else
     {
         // Flush tty buffer if too full
-        if ((tty_count + count) > BUFSIZ)
+        if ((tty_buffer_count + count) > BUFSIZ)
         {
             tty_flush(fd);
         }
 
-        // Copy bytes to tty buffer
-        memcpy(tty_write_ptr, buffer, count);
-        tty_write_ptr += count;
-        tty_count += count;
+        // Copy bytes to tty write buffer
+        memcpy(tty_buffer_write_ptr, buffer, count);
+        tty_buffer_write_ptr += count;
+        tty_buffer_count += count;
         bytes_written = count;
     }
 
