@@ -393,6 +393,11 @@ expect -i $uart "prompt> "
 .fi
 .RE
 
+.TP
+It is also possible to pipe data or command to the serial device. For example:
+
+$ echo "ls -lah" | tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
+
 .SH "WEBSITE"
 .PP
 Visit https://tio.github.io
