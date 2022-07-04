@@ -320,6 +320,11 @@ void config_file_parse(void)
     int ret;
 
     c = malloc(sizeof(struct config_t));
+    if (!c)
+    {
+        fprintf(stderr, "Error: Insufficient memory allocation");
+        exit(EXIT_FAILURE);
+    } 
     memset(c, 0, sizeof(struct config_t));
 
     // Find config file
