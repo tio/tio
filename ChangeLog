@@ -1,4 +1,18 @@
-=== tio v1.41 ===
+=== tio v1.42 ===
+
+
+
+Changes since tio v1.41:
+
+ * Update man page
+
+ZeroMemoryEx:
+
+ * Handle malloc failure
+
+Sylvain LAFRASSE:
+
+ * Add missing 'string.h' include.
 
 
 
