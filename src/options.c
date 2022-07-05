@@ -157,10 +157,6 @@ enum timestamp_t timestamp_option_parse(const char *arg)
         {
             return TIMESTAMP_ISO8601;
         }
-        else
-        {
-            warning_printf("Unknown timestamp type, falling back to '24hour' default format");
-        }
     }
 
     return timestamp;
