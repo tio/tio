@@ -55,7 +55,8 @@ char *current_time(void)
         case TIMESTAMP_NONE:
         case TIMESTAMP_24HOUR:
             // "hh:mm:ss.sss" (24 hour format)
-            tm = localtime(&tv_now.tv_sec);
+            tv = tv_now;
+            tm = localtime(&tv.tv_sec);
             len = strftime(time_string, sizeof(time_string), "%H:%M:%S", tm);
             break;
         case TIMESTAMP_24HOUR_START:
@@ -74,7 +75,8 @@ char *current_time(void)
             break;
         case TIMESTAMP_ISO8601:
             // "YYYY-MM-DDThh:mm:ss.sss" (ISO-8601)
-            tm = localtime(&tv_now.tv_sec);
+            tv = tv_now;
+            tm = localtime(&tv.tv_sec);
             len = strftime(time_string, sizeof(time_string), "%Y-%m-%dT%H:%M:%S", tm);
             break;
         default:
