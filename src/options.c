@@ -105,10 +105,6 @@ const char* timestamp_token(enum timestamp_t timestamp)
 {
     switch (timestamp)
     {
-        case TIMESTAMP_NONE:
-            return "none";
-            break;
-
         case TIMESTAMP_24HOUR:
             return "24hour";
             break;
@@ -137,11 +133,7 @@ enum timestamp_t timestamp_option_parse(const char *arg)
     
     if (arg != NULL)
     {
-        if (strcmp(arg, "none") == 0)
-        {
-            return TIMESTAMP_NONE;
-        }
-        else if (strcmp(arg, "24hour") == 0)
+        if (strcmp(arg, "24hour") == 0)
         {
             return TIMESTAMP_24HOUR;
         }
