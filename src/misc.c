@@ -53,7 +53,6 @@ char *current_time(void)
     switch (option.timestamp)
     {
         case TIMESTAMP_NONE:
-            return NULL;
         case TIMESTAMP_24HOUR:
             // "hh:mm:ss.sss" (24 hour format)
             tv = tv_now;
