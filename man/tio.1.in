@@ -72,6 +72,8 @@ Set timestamp format to any of the following timestamp formats:
 24-hour format ("hh:mm:ss.sss")
 .IP "\fB24hour-start"
 24-hour format relative to start time
+.IP "\fB24hour-delta"
+24-hour format relative to previous timestamp
 .IP "\fBiso8601"
 ISO8601 format ("YYYY-MM-DDThh:mm:ss.sss")
 .P
