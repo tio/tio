@@ -369,7 +369,7 @@ void options_parse(int argc, char *argv[])
 
     if (strlen(option.tty_device) == 0)
     {
-        printf("Error: Missing device or config name\n");
+        printf("Error: Missing tty device or sub-configuration name\n");
         exit(EXIT_FAILURE);
     }
 
