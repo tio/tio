@@ -68,6 +68,7 @@ Enable line timestamp.
 Set timestamp format to any of the following timestamp formats:
 .RS
 .TP 16n
+
 .IP "\fB24hour"
 24-hour format ("hh:mm:ss.sss")
 .IP "\fB24hour-start"
@@ -76,7 +77,7 @@ Set timestamp format to any of the following timestamp formats:
 24-hour format relative to previous timestamp
 .IP "\fBiso8601"
 ISO8601 format ("YYYY-MM-DDThh:mm:ss.sss")
-.P
+.PP
 Default format is
 .B 24hour
 .RE
