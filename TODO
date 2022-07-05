@@ -1,3 +1,4 @@
 
  * Improve error/warning messaging when parsing configuration file
 
+ * Refactor and consolidate arbitrary set speed function into one file for all platforms
