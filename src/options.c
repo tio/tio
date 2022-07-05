@@ -117,6 +117,10 @@ const char* timestamp_token(enum timestamp_t timestamp)
             return "24hour-start";
             break;
 
+        case TIMESTAMP_24HOUR_DELTA:
+            return "24hour-delta";
+            break;
+
         case TIMESTAMP_ISO8601:
             return "iso8601";
             break;
@@ -133,9 +137,21 @@ enum timestamp_t timestamp_option_parse(const char *arg)
     
     if (arg != NULL)
     {
-        if (strcmp(arg, "24hour-start") == 0)
+        if (strcmp(arg, "none") == 0)
+        {
+            return TIMESTAMP_NONE;
+        }
+        else if (strcmp(arg, "24hour") == 0)
+        {
+            return TIMESTAMP_24HOUR;
+        }
+        else if (strcmp(arg, "24hour-start") == 0)
         {
             return TIMESTAMP_24HOUR_START;
+        }
+        else if (strcmp(arg, "24hour-delta") == 0)
+        {
+            return TIMESTAMP_24HOUR_DELTA;
         }
         else if (strcmp(arg, "iso8601") == 0)
         {

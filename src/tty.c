@@ -355,6 +355,9 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                     case TIMESTAMP_24HOUR_START:
                         tio_printf("Switched to 24hour-start timestamp mode");
                         break;
+                    case TIMESTAMP_24HOUR_DELTA:
+                        tio_printf("Switched to 24hour-delta timestamp mode");
+                        break;
                     case TIMESTAMP_ISO8601:
                         tio_printf("Switched to iso8601 timestamp mode");
                         break;

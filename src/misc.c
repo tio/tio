@@ -35,17 +35,17 @@
 char *current_time(void)
 {
     static char time_string[TIME_STRING_SIZE_MAX];
-    static struct timeval tv_start;
+    static struct timeval tv, tv_now, tv_start, tv_previous;
     static bool first = true;
     struct tm *tm;
-    struct timeval tv;
     size_t len;
 
-    gettimeofday(&tv, NULL);
+    // Get current time value
+    gettimeofday(&tv_now, NULL);
 
     if (first)
     {
-        tv_start = tv;
+        tv_start = tv_now;
         first = false;
     }
 
@@ -55,19 +55,26 @@ char *current_time(void)
         case TIMESTAMP_NONE:
         case TIMESTAMP_24HOUR:
             // "hh:mm:ss.sss" (24 hour format)
-            tm = localtime(&tv.tv_sec);
+            tm = localtime(&tv_now.tv_sec);
             len = strftime(time_string, sizeof(time_string), "%H:%M:%S", tm);
             break;
         case TIMESTAMP_24HOUR_START:
             // "hh:mm:ss.sss" (24 hour format relative to start time)
-            timersub(&tv, &tv_start, &tv);
+            timersub(&tv_now, &tv_start, &tv);
+            tv.tv_sec -= 3600; // Why is this needed??
+            tm = localtime(&tv.tv_sec);
+            len = strftime(time_string, sizeof(time_string), "%H:%M:%S", tm);
+            break;
+        case TIMESTAMP_24HOUR_DELTA:
+            // "hh:mm:ss.sss" (24 hour format relative to previous time stamp)
+            timersub(&tv_now, &tv_previous, &tv);
             tv.tv_sec -= 3600; // Why is this needed??
             tm = localtime(&tv.tv_sec);
             len = strftime(time_string, sizeof(time_string), "%H:%M:%S", tm);
             break;
         case TIMESTAMP_ISO8601:
             // "YYYY-MM-DDThh:mm:ss.sss" (ISO-8601)
-            tm = localtime(&tv.tv_sec);
+            tm = localtime(&tv_now.tv_sec);
             len = strftime(time_string, sizeof(time_string), "%Y-%m-%dT%H:%M:%S", tm);
             break;
         default:
@@ -79,6 +86,9 @@ char *current_time(void)
     {
         len = snprintf(time_string + len, TIME_STRING_SIZE_MAX - len, ".%03ld", (long)tv.tv_usec / 1000);
     }
+
+    // Save previous time value for next run
+    tv_previous = tv_now;
 
     return (len < TIME_STRING_SIZE_MAX) ? time_string : NULL;
 }
