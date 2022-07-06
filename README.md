@@ -153,18 +153,18 @@ Example configuration file:
 
 ```
 # Defaults
-baudrate = 115200
+baudrate = 9600
 databits = 8
 parity = none
 stopbits = 1
 color = 10
 
-[ftdi]
+[rpi3]
 tty = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
-baudrate = 9600
+baudrate = 115200
 no-autoconnect = enable
 log = enable
-log-file = ftdi.log
+log-file = rpi3.log
 color = 12
 
 [usb devices]
@@ -175,7 +175,7 @@ color = 13
 
 To use a specific sub-configuration by name simply start tio like so:
 ```
-$ tio ftdi
+$ tio rpi3
 ```
 Or by pattern match:
 ```

@@ -286,7 +286,7 @@ To change the default configuration simply set options like so:
 .nf
 .eo
 # Defaults
-baudrate = 115200
+baudrate = 9600
 databits = 8
 parity = none
 stopbits = 1
@@ -301,9 +301,9 @@ Named sub-configurations can be added via labels:
 .RS
 .nf
 .eo
-[ftdi]
-baudrate = 115200
+[rpi3]
 tty = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+baudrate = 115200
 color = 11
 .ec
 .fi
@@ -312,7 +312,7 @@ color = 11
 .TP
 Activate the sub-configuration by name:
 
-$ tio ftdi
+$ tio rpi3
 
 .TP
 Which is equivalent to:
@@ -327,8 +327,8 @@ A sub-configuration can also be activated by its pattern which supports regular 
 .eo
 [usb device]
 pattern = usb([0-9]*)
-baudrate = 115200
 tty = /dev/ttyUSB%s
+baudrate = 115200
 .ec
 .fi
 .RE
