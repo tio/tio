@@ -146,7 +146,8 @@ following locations in the order listed:
  - $HOME/.tiorc
 
 The configuration file supports sub-configurations using named sections which can
-be activated via the command-line by name or pattern.
+be activated via the command-line by name or pattern. A sub-configuration
+specifies which tty to connect to and other options.
 
 Example configuration file:
 
