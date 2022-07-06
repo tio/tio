@@ -102,7 +102,7 @@ Typical use is without options:
 $ tio /dev/ttyUSB0
 ```
 
-Which corresponds to the commonly used options:
+Which corresponds to the commonly used default options:
 ```
 $ tio -b 115200 -d 8 -f none -s 1 -p none /dev/ttyUSB0
 ```
@@ -112,8 +112,7 @@ It is recommended to connect serial tty devices by ID:
 $ tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 ```
 Using serial devices by ID ensures that tio automatically reconnects to the
-correct serial device if the serial device is disconnected and then
-reconnected.
+correct serial device if it is disconnected and then reconnected.
 
 ### 3.2 Key commands
 
