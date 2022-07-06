@@ -101,7 +101,7 @@ void print_help(char *argv[])
     printf("See the man page for more details.\n");
 }
 
-const char* timestamp_state(enum timestamp_t timestamp)
+const char* timestamp_state_to_string(enum timestamp_t timestamp)
 {
     switch (timestamp)
     {
@@ -167,7 +167,7 @@ void options_print()
     tio_printf(" Stopbits: %d", option.stopbits);
     tio_printf(" Parity: %s", option.parity);
     tio_printf(" Local echo: %s", option.local_echo ? "enabled" : "disabled");
-    tio_printf(" Timestamp: %s", timestamp_state(option.timestamp));
+    tio_printf(" Timestamp: %s", timestamp_state_to_string(option.timestamp));
     tio_printf(" Output delay: %d", option.output_delay);
     tio_printf(" Auto connect: %s", option.no_autoconnect ? "disabled" : "enabled");
     if (option.map[0] != 0)
