@@ -70,7 +70,7 @@ void print_help(char *argv[])
 {
     printf("Usage: %s [<options>] <tty-device|sub-config>\n", argv[0]);
     printf("\n");
-    printf("Connect to tty-device directly or via sub-configuration.\n");
+    printf("Connect to tty device directly or via sub-configuration.\n");
     printf("\n");
     printf("Options:\n");
     printf("  -b, --baudrate <bps>             Baud rate (default: 115200)\n");
