@@ -256,6 +256,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" ctrl-t b   Send break");
                 tio_printf(" ctrl-t c   Show configuration");
                 tio_printf(" ctrl-t d   Toggle DTR line");
+                tio_printf(" ctrl-t D   Pulse DTR line");
                 tio_printf(" ctrl-t e   Toggle local echo mode");
                 tio_printf(" ctrl-t h   Toggle hexadecimal mode");
                 tio_printf(" ctrl-t l   Clear screen");
@@ -283,6 +284,12 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" RI : %s", (state & TIOCM_RI) ? "HIGH" : "LOW");
                 break;
             case KEY_D:
+                toggle_line("DTR", TIOCM_DTR);
+                break;
+
+            case KEY_SHIFT_D:
+                toggle_line("DTR", TIOCM_DTR);
+                delay(option.dtr_pulse_duration);
                 toggle_line("DTR", TIOCM_DTR);
                 break;
 

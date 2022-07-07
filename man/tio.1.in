@@ -41,6 +41,12 @@ Set parity (default: none).
 .BR \-o ", " "\-\-output\-delay " \fI<ms>
 
 Set output delay [ms] inserted between each sent character (default: 0).
+
+.TP
+.BR "    \-\-dtr\-pulse\-duration " \fI<ms>
+
+Set the duration [ms] of the DTR pulse (default: 100).
+
 .TP
 .BR \-n ", " \-\-no\-autoconnect
 
@@ -199,6 +205,8 @@ Send ctrl-t key code
 Show line states (DTR, RTS, CTS, DSR, DCD, RI)
 .IP "\fBctrl-t d"
 Toggle DTR
+.IP "\fBctrl-t D"
+Pulse DTR
 .IP "\fBctrl-t r"
 Toggle RTS
 .IP "\fBctrl-t v"
@@ -254,6 +262,8 @@ Set stop bits
 Set parity
 .IP "\fBoutput-delay"
 Set output delay
+.IP "\fBdtr-pulse-duration"
+Set DTR pulse duration
 .IP "\fBno-autoconnect"
 Disable automatic connect
 .IP "\fBlog"
@@ -291,6 +301,7 @@ databits = 8
 parity = none
 stopbits = 1
 color = 10
+dtr-pulse-duration = 50
 .ec
 .fi
 .RE
