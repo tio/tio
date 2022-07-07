@@ -41,7 +41,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Autogeneration of log filename
  * Configuration file support
  * Activate sub-configurations by name or pattern
- * Redirect I/O to socket for scripting or TTY sharing
+ * Redirect I/O to file or network socket for scripting or TTY sharing
  * Pipe input and/or output
  * Bash completion
  * Color support
@@ -75,7 +75,7 @@ The command-line interface is straightforward as reflected in the output from
           --log-strip                  Strip control characters and escape sequences
       -m, --map <flags>                Map special characters
       -c, --color 0..255|none|list     Colorize tio text (default: 15)
-      -S, --socket <socket>            Redirect I/O to socket
+      -S, --socket <socket>            Redirect I/O to file or network socket
       -x, --hexadecimal                Enable hexadecimal mode
       -v, --version                    Display version
       -h, --help                       Display help
