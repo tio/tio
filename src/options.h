@@ -48,6 +48,7 @@ struct option_t
     int stopbits;
     char *parity;
     int output_delay;
+    int dtr_pulse_duration;
     bool no_autoconnect;
     bool log;
     bool log_strip;

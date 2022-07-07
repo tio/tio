@@ -16,6 +16,7 @@ _tio()
           -s --stopbits \
           -p --parity \
           -o --output-delay \
+             --dtr-pulse-duration \
           -n --no-autoconnect \
           -e --local-echo \
           -l --log \
@@ -56,6 +57,10 @@ _tio()
             ;;
         -o | --output-delay)
             COMPREPLY=( $(compgen -W "0 1 10 100" -- ${cur}) )
+            return 0
+            ;;
+        --dtr-pulse-duration)
+            COMPREPLY=( $(compgen -W "10 50 100 500" -- ${cur}) )
             return 0
             ;;
         -n | --no-autoconnect)

@@ -32,6 +32,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * List available serial devices
  * Show RX/TX statistics
  * Toggle serial lines
+ * Pulse the DTR line
  * Local echo support
  * Remap special characters (nl, cr-nl, bs, etc.)
  * Line timestamps
@@ -65,6 +66,7 @@ The command-line interface is straightforward as reflected in the output from
       -s, --stopbits 1|2               Stop bits (default: 1)
       -p, --parity odd|even|none       Parity (default: none)
       -o, --output-delay <ms>          Character output delay (default: 0)
+          --dtr-pulse-duration <ms>    DTR pulse duration (default: 100)
       -n, --no-autoconnect             Disable automatic connect
       -e, --local-echo                 Enable local echo
       -t, --timestamp                  Enable line timestamp
@@ -125,6 +127,7 @@ ctrl-t ? to list the available key commands.
 [20:19:12.040]  ctrl-t b   Send break
 [20:19:12.040]  ctrl-t c   Show configuration
 [20:19:12.040]  ctrl-t d   Toggle DTR line
+[20:19:12.040]  ctrl-t D   Pulse DTR line
 [20:19:12.040]  ctrl-t e   Toggle local echo mode
 [20:19:12.040]  ctrl-t h   Toggle hexadecimal mode
 [20:19:12.040]  ctrl-t l   Clear screen
@@ -158,6 +161,7 @@ databits = 8
 parity = none
 stopbits = 1
 color = 10
+dtr-pulse-duration = 50
 
 [rpi3]
 tty = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0

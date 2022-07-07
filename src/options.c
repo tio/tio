@@ -42,6 +42,7 @@ enum opt_t
     OPT_TIMESTAMP_FORMAT,
     OPT_LOG_FILE,
     OPT_LOG_STRIP,
+    OPT_DTR_PULSE_DURATION,
 };
 
 /* Default options */
@@ -54,6 +55,7 @@ struct option_t option =
     .stopbits = 1,
     .parity = "none",
     .output_delay = 0,
+    .dtr_pulse_duration = 100,
     .no_autoconnect = false,
     .log = false,
     .log_filename = NULL,
@@ -79,6 +81,7 @@ void print_help(char *argv[])
     printf("  -s, --stopbits 1|2               Stop bits (default: 1)\n");
     printf("  -p, --parity odd|even|none       Parity (default: none)\n");
     printf("  -o, --output-delay <ms>          Output delay (default: 0)\n");
+    printf("      --dtr-pulse-duration <ms>    DTR pulse duration (default: 100)\n");
     printf("  -n, --no-autoconnect             Disable automatic connect\n");
     printf("  -e, --local-echo                 Enable local echo\n");
     printf("  -t, --timestamp                  Enable line timestamp\n");
@@ -169,6 +172,7 @@ void options_print()
     tio_printf(" Local echo: %s", option.local_echo ? "enabled" : "disabled");
     tio_printf(" Timestamp: %s", timestamp_state_to_string(option.timestamp));
     tio_printf(" Output delay: %d", option.output_delay);
+    tio_printf(" DTR pulse duration: %d", option.dtr_pulse_duration);
     tio_printf(" Auto connect: %s", option.no_autoconnect ? "disabled" : "enabled");
     if (option.map[0] != 0)
         tio_printf(" Map flags: %s", option.map);
@@ -198,6 +202,7 @@ void options_parse(int argc, char *argv[])
             {"stopbits",         required_argument, 0, 's'                  },
             {"parity",           required_argument, 0, 'p'                  },
             {"output-delay",     required_argument, 0, 'o'                  },
+            {"dtr-pulse-duration",   required_argument, 0, OPT_DTR_PULSE_DURATION   },
             {"no-autoconnect",   no_argument,       0, 'n'                  },
             {"local-echo",       no_argument,       0, 'e'                  },
             {"timestamp",        no_argument,       0, 't'                  },
@@ -259,6 +264,10 @@ void options_parse(int argc, char *argv[])
 
             case 'o':
                 option.output_delay = string_to_long(optarg);
+                break;
+
+            case OPT_DTR_PULSE_DURATION:
+                option.dtr_pulse_duration = string_to_long(optarg);
                 break;
 
             case 'n':
