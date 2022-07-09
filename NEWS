@@ -1,4 +1,41 @@
-=== tio v1.42 ===
+
+=== tio v1.43 ===
+
+
+
+Changes since tio v1.42:
+
+ * Add '24hour-delta' timestamp option
+
+   When enabled this option will timestamp new lines with the time elapsed
+   since the line before.
+
+   This is a very useful feature to identify which events takes the most
+   time.
+
+ * Improve description of socket option
+
+ * Rename ChangeLog to NEWS
+
+ * Update README
+
+ * Update man page
+
+George Joseph:
+
+ * Add Pulse DTR command
+
+   MCUs like the ESP32 can be reset if the serial port DTR line is
+   pulsed for a short time.  You could just type CTRL-t d CTRL-t d
+   but that's a little awkward since you have to lift your finger
+   off the CTRL key to type the Ds.  Now you can just type CTRL-T D.
+
+   * Added new command "D" to pulse the DTR line.  I.E.  Toggle its
+     state twice with a configurable duration between toggles.
+
+   * Added new config/command line option "--dtr-pulse-duration"
+     to set the duration between the DTR state toggles.  The default
+     is 100ms.
 
 
 
