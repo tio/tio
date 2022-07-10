@@ -97,7 +97,7 @@ void print_help(char *argv[])
     printf("  -c, --color 0..255|none|list     Colorize tio text (default: 15)\n");
     printf("  -S, --socket <socket>            Redirect I/O to file or network socket\n");
     printf("  -x, --hexadecimal                Enable hexadecimal mode\n");
-    printf("  -U, --upcase		       Translate lower case alpha to upper case\n");
+    printf("  -U, --upcase                     Translate lower case alpha to upper case\n");
     printf("  -v, --version                    Display version\n");
     printf("  -h, --help                       Display help\n");
     printf("\n");
@@ -208,8 +208,8 @@ void options_parse(int argc, char *argv[])
             {"stopbits",         required_argument, 0, 's'                  },
             {"parity",           required_argument, 0, 'p'                  },
             {"output-delay",     required_argument, 0, 'o'                  },
-	    {"eol-delay",        required_argument, 0, 'O'                  },
-	    {"upcase",           no_argument,       0, 'U'                  },
+            {"eol-delay",        required_argument, 0, 'O'                  },
+            {"upcase",           no_argument,       0, 'U'                  },
             {"dtr-pulse-duration",   required_argument, 0, OPT_DTR_PULSE_DURATION   },
             {"no-autoconnect",   no_argument,       0, 'n'                  },
             {"local-echo",       no_argument,       0, 'e'                  },
@@ -274,9 +274,9 @@ void options_parse(int argc, char *argv[])
                 option.output_delay = string_to_long(optarg);
                 break;
 
-	    case 'O':
-		option.eol_delay = string_to_long(optarg);
-		break;
+            case 'O':
+                option.eol_delay = string_to_long(optarg);
+                break;
 
             case OPT_DTR_PULSE_DURATION:
                 option.dtr_pulse_duration = string_to_long(optarg);
@@ -353,9 +353,9 @@ void options_parse(int argc, char *argv[])
                 option.hex_mode = true;
                 break;
 
-	    case 'U':
-		option.upcase = true;
-		break;
+            case 'U':
+                option.upcase = true;
+                break;
 
             case 'v':
                 printf("tio v%s\n", VERSION);
@@ -384,7 +384,7 @@ void options_parse(int argc, char *argv[])
 
     /* Assume first non-option is the tty device name */
     if (strcmp(option.tty_device, ""))
-	    optind++;
+            optind++;
     else if (optind < argc)
         option.tty_device = argv[optind++];
 

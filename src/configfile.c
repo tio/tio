@@ -131,7 +131,7 @@ static int data_handler(void *user, const char *section, const char *name,
         else if ( !strcmp(name, "upcase"))
         {
             option.upcase = true;
-	}
+        }
         else if (!strcmp(name, "dtr-pulse-duration"))
         {
             option.dtr_pulse_duration = atoi(value);

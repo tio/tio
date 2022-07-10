@@ -152,11 +152,11 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
         // Write byte by byte with output delay
         for (size_t i=0; i<count; i++)
         {
-	    // convert alpha to upper case
-	    if ( option.upcase )
-	    {
-		*(unsigned char*)buffer = toupper(*(unsigned char*)buffer);
-	    }
+            // convert alpha to upper case
+            if ( option.upcase )
+            {
+                *(unsigned char*)buffer = toupper(*(unsigned char*)buffer);
+            }
             ssize_t retval = write(fd, buffer, 1);
             if (retval < 0)
             {
@@ -165,15 +165,15 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
                 break;
             }
             bytes_written += retval;
-	    if ( option.eol_delay && *(unsigned char*)buffer == '\r' )
-	    {
-		delay( option.eol_delay );
-	    }
+            if ( option.eol_delay && *(unsigned char*)buffer == '\r' )
+            {
+                delay( option.eol_delay );
+            }
             fsync(fd);
-	    if ( option.output_delay )
-	    {
-		delay(option.output_delay);
-	    }
+            if ( option.output_delay )
+            {
+                delay(option.output_delay);
+            }
         }
     }
     else
@@ -184,14 +184,14 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
             tty_flush(fd);
         }
 
-	// convert lower case to upper case, in situ
-	if ( option.upcase )
-	{
-	    for ( size_t i = 0; i<count; i++ )
-	    {
-		*((unsigned char*)buffer+i) = toupper(*((unsigned char*)buffer+i));
-	    }
-	}
+        // convert lower case to upper case, in situ
+        if ( option.upcase )
+        {
+            for ( size_t i = 0; i<count; i++ )
+            {
+                *((unsigned char*)buffer+i) = toupper(*((unsigned char*)buffer+i));
+            }
+        }
         // Copy bytes to tty write buffer
         memcpy(tty_buffer_write_ptr, buffer, count);
         tty_buffer_write_ptr += count;
@@ -287,7 +287,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" ctrl-t s   Show statistics");
                 tio_printf(" ctrl-t t   Send ctrl-t key code");
                 tio_printf(" ctrl-t T   Toggle line timestamp mode");
-		tio_printf(" ctrl-t U   Toggle upcase");
+                tio_printf(" ctrl-t U   Toggle upcase");
                 tio_printf(" ctrl-t v   Show version");
                 break;
 
@@ -397,16 +397,16 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 }
                 break;
 
-	    case KEY_U:
-		if ( option.upcase == true )
-		{
-		    option.upcase = false;
-		}
-		else
-		{
-		    option.upcase = true;
-		}
-		break;
+            case KEY_U:
+                if ( option.upcase == true )
+                {
+                    option.upcase = false;
+                }
+                else
+                {
+                    option.upcase = true;
+                }
+                break;
 
             case KEY_V:
                 tio_printf("tio v%s", VERSION);
@@ -631,9 +631,9 @@ void tty_configure(void)
     }
     else if ( strcmp("mark", option.parity) == 0)
     {
-	tio.c_cflag &= ~PARENB;
-	tio.c_cflag |= PARODD;
-	tio.c_cflag |= CMSPAR;
+        tio.c_cflag &= ~PARENB;
+        tio.c_cflag |= PARODD;
+        tio.c_cflag |= CMSPAR;
     }
     else
     {
