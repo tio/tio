@@ -34,7 +34,7 @@ Set flow control (default: none).
 
 Set stop bits (default: 1).
 .TP
-.BR \-p ", " "\-\-parity odd" | even | none
+.BR \-p ", " "\-\-parity odd" | even | none | mark
 
 Set parity (default: none).
 .TP
@@ -42,6 +42,15 @@ Set parity (default: none).
 
 Set output delay [ms] inserted between each sent character (default: 0).
 
+.TP
+.BR \-O ", " "\-\-eol\-delay " \fI<ms>
+
+Set EOL delay [ms] inserted between each sent line (default: 0).
+
+.TP
+.BR \-U ", " \-\-upcase"
+
+Convert any entered lower case alpha to upper case (default: disabled)
 .TP
 .BR "    \-\-dtr\-pulse\-duration " \fI<ms>
 
@@ -209,6 +218,8 @@ Toggle DTR
 Pulse DTR
 .IP "\fBctrl-t r"
 Toggle RTS
+.IP "\fBctrl-t U"
+Toggle upcase
 .IP "\fBctrl-t v"
 Show version
 
@@ -262,6 +273,10 @@ Set stop bits
 Set parity
 .IP "\fBoutput-delay"
 Set output delay
+.IP "\fBeol-delay"
+Set EOL delay
+.IP "\fBupcase"
+Set translation of alpha from lower to upper case
 .IP "\fBdtr-pulse-duration"
 Set DTR pulse duration
 .IP "\fBno-autoconnect"
