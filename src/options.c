@@ -56,6 +56,8 @@ struct option_t option =
     .parity = "none",
     .output_delay = 0,
     .dtr_pulse_duration = 100,
+    .eol_delay = 0,
+    .upcase = false,
     .no_autoconnect = false,
     .log = false,
     .log_filename = NULL,
@@ -79,8 +81,9 @@ void print_help(char *argv[])
     printf("  -d, --databits 5|6|7|8           Data bits (default: 8)\n");
     printf("  -f, --flow hard|soft|none        Flow control (default: none)\n");
     printf("  -s, --stopbits 1|2               Stop bits (default: 1)\n");
-    printf("  -p, --parity odd|even|none       Parity (default: none)\n");
+    printf("  -p, --parity odd|even|none|mark  Parity (default: none)\n");
     printf("  -o, --output-delay <ms>          Output delay (default: 0)\n");
+    printf("  -O, --eol-delay <ms>             EOL output delay (default: 0)\n");
     printf("      --dtr-pulse-duration <ms>    DTR pulse duration (default: 100)\n");
     printf("  -n, --no-autoconnect             Disable automatic connect\n");
     printf("  -e, --local-echo                 Enable local echo\n");
@@ -94,6 +97,7 @@ void print_help(char *argv[])
     printf("  -c, --color 0..255|none|list     Colorize tio text (default: 15)\n");
     printf("  -S, --socket <socket>            Redirect I/O to file or network socket\n");
     printf("  -x, --hexadecimal                Enable hexadecimal mode\n");
+    printf("  -U, --upcase                     Translate lower case alpha to upper case\n");
     printf("  -v, --version                    Display version\n");
     printf("  -h, --help                       Display help\n");
     printf("\n");
@@ -172,6 +176,8 @@ void options_print()
     tio_printf(" Local echo: %s", option.local_echo ? "enabled" : "disabled");
     tio_printf(" Timestamp: %s", timestamp_state_to_string(option.timestamp));
     tio_printf(" Output delay: %d", option.output_delay);
+    tio_printf(" EOL delay: %d", option.eol_delay);
+    tio_printf(" Upcase: %s", option.upcase ? "enabled" : "disabled");
     tio_printf(" DTR pulse duration: %d", option.dtr_pulse_duration);
     tio_printf(" Auto connect: %s", option.no_autoconnect ? "disabled" : "enabled");
     if (option.map[0] != 0)
@@ -202,6 +208,8 @@ void options_parse(int argc, char *argv[])
             {"stopbits",         required_argument, 0, 's'                  },
             {"parity",           required_argument, 0, 'p'                  },
             {"output-delay",     required_argument, 0, 'o'                  },
+            {"eol-delay",        required_argument, 0, 'O'                  },
+            {"upcase",           no_argument,       0, 'U'                  },
             {"dtr-pulse-duration",   required_argument, 0, OPT_DTR_PULSE_DURATION   },
             {"no-autoconnect",   no_argument,       0, 'n'                  },
             {"local-echo",       no_argument,       0, 'e'                  },
@@ -224,7 +232,7 @@ void options_parse(int argc, char *argv[])
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:netLlS:m:c:xvh", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:O:UnetLlS:m:c:xvh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
@@ -264,6 +272,10 @@ void options_parse(int argc, char *argv[])
 
             case 'o':
                 option.output_delay = string_to_long(optarg);
+                break;
+
+            case 'O':
+                option.eol_delay = string_to_long(optarg);
                 break;
 
             case OPT_DTR_PULSE_DURATION:
@@ -341,6 +353,10 @@ void options_parse(int argc, char *argv[])
                 option.hex_mode = true;
                 break;
 
+            case 'U':
+                option.upcase = true;
+                break;
+
             case 'v':
                 printf("tio v%s\n", VERSION);
                 printf("Copyright (c) 2014-2022 Martin Lund\n");
@@ -368,7 +384,7 @@ void options_parse(int argc, char *argv[])
 
     /* Assume first non-option is the tty device name */
     if (strcmp(option.tty_device, ""))
-	    optind++;
+            optind++;
     else if (optind < argc)
         option.tty_device = argv[optind++];
 
