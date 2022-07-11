@@ -57,7 +57,6 @@ struct option_t option =
     .output_delay = 0,
     .dtr_pulse_duration = 100,
     .eol_delay = 0,
-    .upcase = false,
     .no_autoconnect = false,
     .log = false,
     .log_filename = NULL,
@@ -93,11 +92,10 @@ void print_help(char *argv[])
     printf("  -l, --log                        Enable log to file\n");
     printf("      --log-file <filename>        Set log filename\n");
     printf("      --log-strip                  Strip control characters and escape sequences\n");
-    printf("  -m, --map <flags>                Map special characters\n");
+    printf("  -m, --map <flags>                Map characters\n");
     printf("  -c, --color 0..255|none|list     Colorize tio text (default: 15)\n");
     printf("  -S, --socket <socket>            Redirect I/O to file or network socket\n");
     printf("  -x, --hexadecimal                Enable hexadecimal mode\n");
-    printf("  -U, --upcase                     Translate lower case alpha to upper case\n");
     printf("  -v, --version                    Display version\n");
     printf("  -h, --help                       Display help\n");
     printf("\n");
@@ -177,7 +175,6 @@ void options_print()
     tio_printf(" Timestamp: %s", timestamp_state_to_string(option.timestamp));
     tio_printf(" Output delay: %d", option.output_delay);
     tio_printf(" EOL delay: %d", option.eol_delay);
-    tio_printf(" Upcase: %s", option.upcase ? "enabled" : "disabled");
     tio_printf(" DTR pulse duration: %d", option.dtr_pulse_duration);
     tio_printf(" Auto connect: %s", option.no_autoconnect ? "disabled" : "enabled");
     if (option.map[0] != 0)
@@ -209,7 +206,6 @@ void options_parse(int argc, char *argv[])
             {"parity",           required_argument, 0, 'p'                  },
             {"output-delay",     required_argument, 0, 'o'                  },
             {"eol-delay",        required_argument, 0, 'O'                  },
-            {"upcase",           no_argument,       0, 'U'                  },
             {"dtr-pulse-duration",   required_argument, 0, OPT_DTR_PULSE_DURATION   },
             {"no-autoconnect",   no_argument,       0, 'n'                  },
             {"local-echo",       no_argument,       0, 'e'                  },
@@ -232,7 +228,7 @@ void options_parse(int argc, char *argv[])
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:O:UnetLlS:m:c:xvh", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:O:netLlS:m:c:xvh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
@@ -351,10 +347,6 @@ void options_parse(int argc, char *argv[])
 
             case 'x':
                 option.hex_mode = true;
-                break;
-
-            case 'U':
-                option.upcase = true;
                 break;
 
             case 'v':

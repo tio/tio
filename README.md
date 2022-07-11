@@ -36,9 +36,9 @@ when used in combination with [tmux](https://tmux.github.io).
  * Local echo support
  * Remap special characters (nl, cr-nl, bs, etc.)
  * Line timestamps
- * Support for delayed output per transmitted character
+ * Support for delayed output per character
  * Support for delayed output per line
- * Support for translation of lower case to upper case
+ * Support for translation of lowercase to uppercase
  * Hexadecimal mode
  * Log to file
  * Autogeneration of log filename
@@ -88,7 +88,6 @@ The command-line interface is straightforward as reflected in the output from
       -c, --color 0..255|none|list     Colorize tio text (default: 15)
       -S, --socket <socket>            Redirect I/O to file or network socket
       -x, --hexadecimal                Enable hexadecimal mode
-      -U, --upper                      Enable translation of lower case to upper
       -v, --version                    Display version
       -h, --help                       Display help
 
@@ -147,7 +146,7 @@ ctrl-t ? to list the available key commands.
 [20:19:12.041]  ctrl-t s   Show statistics
 [20:19:12.041]  ctrl-t t   Send ctrl-t key code
 [20:19:12.041]  ctrl-t T   Toggle line timestamp mode
-[20:19:12.041]  ctrl-t U   Toggle lower case alpha to upper case
+[20:19:12.041]  ctrl-t U   Toggle conversion to uppercase
 [20:19:12.041]  ctrl-t v   Show version
 ```
 

@@ -48,10 +48,6 @@ Set output delay [ms] inserted between each sent character (default: 0).
 Set EOL delay [ms] inserted between each sent line (default: 0).
 
 .TP
-.BR \-U ", " \-\-upcase"
-
-Convert any entered lower case alpha to upper case (default: disabled)
-.TP
 .BR "    \-\-dtr\-pulse\-duration " \fI<ms>
 
 Set the duration [ms] of the DTR pulse (default: 100).
@@ -120,7 +116,7 @@ Strip control characters and escape sequences from log.
 .TP
 .BR \-m ", " "\-\-map " \fI<flags>
 
-Map (replace, translate) special characters on input or output. The following mapping flags are supported:
+Map (replace, translate) characters on input or output. The following mapping flags are supported:
 .RS
 .TP 12n
 .IP "\fBICRNL"
@@ -137,6 +133,8 @@ Map CR to NL on output.
 Map DEL to BS on output.
 .IP "\fBONLCRNL"
 Map NL to CR-NL on output.
+.IP "\fBOLTU"
+Map lowercase characters to uppercase on output.
 .P
 If defining more than one flag, the flags must be comma separated.
 .RE
@@ -219,7 +217,7 @@ Pulse DTR
 .IP "\fBctrl-t r"
 Toggle RTS
 .IP "\fBctrl-t U"
-Toggle upcase
+Toggle conversion to uppercase
 .IP "\fBctrl-t v"
 Show version
 
@@ -275,8 +273,6 @@ Set parity
 Set output delay
 .IP "\fBeol-delay"
 Set EOL delay
-.IP "\fBupcase"
-Set translation of alpha from lower to upper case
 .IP "\fBdtr-pulse-duration"
 Set DTR pulse duration
 .IP "\fBno-autoconnect"

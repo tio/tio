@@ -50,7 +50,6 @@ struct option_t
     int output_delay;
     int dtr_pulse_duration;
     int eol_delay;
-    bool upcase;
     bool no_autoconnect;
     bool log;
     bool log_strip;

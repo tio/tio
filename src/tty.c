@@ -77,6 +77,7 @@ static bool map_i_nl_crnl = false;
 static bool map_o_cr_nl = false;
 static bool map_o_nl_crnl = false;
 static bool map_o_del_bs = false;
+static bool map_o_ltu = false;
 static char hex_chars[2];
 static unsigned char hex_char_index = 0;
 static char tty_buffer[BUFSIZ*2];
@@ -148,7 +149,7 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
     ssize_t retval = 0, bytes_written = 0;
     size_t i;
 
-    if (option.upcase)
+    if (map_o_ltu)
     {
         // Convert lower case to upper case
         for (i = 0; i<count; i++)
@@ -287,7 +288,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" ctrl-t s   Show statistics");
                 tio_printf(" ctrl-t t   Send ctrl-t key code");
                 tio_printf(" ctrl-t T   Toggle line timestamp mode");
-                tio_printf(" ctrl-t U   Toggle conversion to upper case");
+                tio_printf(" ctrl-t U   Toggle conversion to uppercase");
                 tio_printf(" ctrl-t v   Show version");
                 break;
 
@@ -398,7 +399,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 break;
 
             case KEY_U:
-                option.upcase = !option.upcase;
+                map_o_ltu = !map_o_ltu;
                 break;
 
             case KEY_V:
@@ -685,6 +686,10 @@ void tty_configure(void)
             else if (strcmp(token, "ONLCRNL") == 0)
             {
                 map_o_nl_crnl = true;
+            }
+            else if (strcmp(token, "OLTU") == 0)
+            {
+                map_o_ltu = true;
             }
             else
             {
