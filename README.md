@@ -56,45 +56,40 @@ when used in combination with [tmux](https://tmux.github.io).
 The command-line interface is straightforward as reflected in the output from
 'tio --help':
 ```
-    Usage: tio [<options>] <tty-device|sub-config>
+  Usage: tio [<options>] <tty-device|sub-config>
+  
+  Connect to tty device directly or via sub-configuration.
+  
+  Options:
+    -b, --baudrate <bps>                   Baud rate (default: 115200)
+    -d, --databits 5|6|7|8                 Data bits (default: 8)
+    -f, --flow hard|soft|none              Flow control (default: none)
+    -s, --stopbits 1|2                     Stop bits (default: 1)
+    -p, --parity odd|even|none|mark|space  Parity (default: none)
+    -o, --output-delay <ms>                Output character delay (default: 0)
+    -O, --output-line-delay <ms>           Output line delay (default: 0)
+        --dtr-pulse-duration <ms>          DTR pulse duration (default: 100)
+    -n, --no-autoconnect                   Disable automatic connect
+    -e, --local-echo                       Enable local echo
+    -t, --timestamp                        Enable line timestamp
+        --timestamp-format <format>        Set timestamp format (default: 24hour)
+    -L, --list-devices                     List available serial devices
+    -l, --log                              Enable log to file
+        --log-file <filename>              Set log filename
+        --log-strip                        Strip control characters and escape sequences
+    -m, --map <flags>                      Map characters
+    -c, --color 0..255|none|list           Colorize tio text (default: 15)
+    -S, --socket <socket>                  Redirect I/O to file or network socket
+    -x, --hexadecimal                      Enable hexadecimal mode
+    -v, --version                          Display version
+    -h, --help                             Display help
+  
+  Options and sub-configurations may be set via configuration file.
+  
+  In session, press ctrl-t q to quit.
+  
+  See the man page for more details.
 
-    Connect to tty device directly or via sub-configuration.
-
-    Options:
-      -b, --baudrate <bps>             Baud rate (default: 115200)
-      -d, --databits 5|6|7|8           Data bits (default: 8)
-      -f, --flow hard|soft|none        Flow control (default: none)
-      -s, --stopbits 1|2               Stop bits (default: 1)
-      -p, --parity odd|even|none       Parity (default: none)
-      -o, --output-delay <ms>          Output character delay (default: 0)
-      -O, --output-line-delay <ms>     Output line delay (default: 0)
-          --dtr-pulse-duration <ms>    DTR pulse duration (default: 100)
-      -n, --no-autoconnect             Disable automatic connect
-      -e, --local-echo                 Enable local echo
-      -t, --timestamp                  Enable line timestamp
-          --timestamp-format <format>  Set timestamp format (default: 24hour)
-      -L, --list-devices               List available serial devices
-          --dtr-pulse-duration <ms>    DTR pulse duration (default: 100)
-      -n, --no-autoconnect             Disable automatic connect
-      -e, --local-echo                 Enable local echo
-      -t, --timestamp                  Enable line timestamp
-          --timestamp-format <format>  Set timestamp format (default: 24hour)
-      -L, --list-devices               List available serial devices
-      -l, --log                        Enable log to file
-          --log-file <filename>        Set log filename
-          --log-strip                  Strip control characters and escape sequences
-      -m, --map <flags>                Map characters
-      -c, --color 0..255|none|list     Colorize tio text (default: 15)
-      -S, --socket <socket>            Redirect I/O to file or network socket
-      -x, --hexadecimal                Enable hexadecimal mode
-      -v, --version                    Display version
-      -h, --help                       Display help
-
-    Options and sub-configurations may be set via configuration file.
-
-    In session, press ctrl-t q to quit.
-
-    See the man page for more details.
 ```
 
 By default tio automatically connects to the provided TTY device if present.
