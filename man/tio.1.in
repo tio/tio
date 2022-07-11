@@ -34,9 +34,11 @@ Set flow control (default: none).
 
 Set stop bits (default: 1).
 .TP
-.BR \-p ", " "\-\-parity odd" | even | none | mark
+.BR \-p ", " "\-\-parity odd" | even | none | mark | space
 
 Set parity (default: none).
+
+Note: With mark parity the parity bit is always 0. With space parity the parity bit is always 1. Not all platforms support mark and space parity.
 .TP
 .BR \-o ", " "\-\-output\-delay " \fI<ms>
 

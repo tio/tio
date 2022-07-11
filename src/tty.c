@@ -625,8 +625,14 @@ void tty_configure(void)
     }
     else if ( strcmp("mark", option.parity) == 0)
     {
-        tio.c_cflag &= ~PARENB;
+        tio.c_cflag |= PARENB;
         tio.c_cflag |= PARODD;
+        tio.c_cflag |= CMSPAR;
+    }
+    else if ( strcmp("space", option.parity) == 0)
+    {
+        tio.c_cflag |= PARENB;
+        tio.c_cflag &= ~PARODD;
         tio.c_cflag |= CMSPAR;
     }
     else
