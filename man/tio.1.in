@@ -290,7 +290,7 @@ Enable line timestamp
 .IP "\fBtimestamp-format"
 Set timestamp format
 .IP "\fBmap"
-Map special characters on input or output
+Map characters on input or output
 .IP "\fBcolor"
 Colorize tio text using ANSI color code ranging from 0 to 255
 .IP "\fBhexadecimal"

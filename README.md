@@ -34,11 +34,10 @@ when used in combination with [tmux](https://tmux.github.io).
  * Toggle serial lines
  * Pulse the DTR line
  * Local echo support
- * Remap special characters (nl, cr-nl, bs, etc.)
+ * Map characters (nl, cr-nl, bs, lowercase to uppercase, etc.)
  * Line timestamps
  * Support for delayed output per character
  * Support for delayed output per line
- * Support for translation of lowercase to uppercase
  * Hexadecimal mode
  * Log to file
  * Autogeneration of log filename
@@ -84,7 +83,7 @@ The command-line interface is straightforward as reflected in the output from
       -l, --log                        Enable log to file
           --log-file <filename>        Set log filename
           --log-strip                  Strip control characters and escape sequences
-      -m, --map <flags>                Map special characters
+      -m, --map <flags>                Map characters
       -c, --color 0..255|none|list     Colorize tio text (default: 15)
       -S, --socket <socket>            Redirect I/O to file or network socket
       -x, --hexadecimal                Enable hexadecimal mode
