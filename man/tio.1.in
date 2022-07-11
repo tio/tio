@@ -10,10 +10,9 @@ tio \- a simple serial device I/O tool
 
 .SH "DESCRIPTION"
 .PP
-.B tio
-is a simple serial device tool which features a straightforward command-line
-and configuration file interface to easily connect to serial TTY devices for
-basic I/O operations.
+\fBtio\fR is a simple serial device tool which features a straightforward
+command-line and configuration file interface to easily connect to serial TTY
+devices for basic I/O operations.
 
 .SH "OPTIONS"
 
@@ -38,7 +37,10 @@ Set stop bits (default: 1).
 
 Set parity (default: none).
 
-Note: With mark parity the parity bit is always 0. With space parity the parity bit is always 1. Not all platforms support mark and space parity.
+Note: With \fBmark\fR parity the parity bit is always 0. With \fBspace\fR
+parity the parity bit is always 1. Not all platforms support \fBmark\fR and
+\fBspace\fR parity.
+
 .TP
 .BR \-o ", " "\-\-output\-delay " \fI<ms>
 
@@ -59,11 +61,13 @@ Set the duration [ms] of the DTR pulse (default: 100).
 
 Disable automatic connect.
 
-By default tio automatically connects to the provided device if present. If the device is not present, it will wait for it to appear and then connect. If the connection is lost (eg. device disconnects), it will wait for the device to reappear and then reconnect.
+By default tio automatically connects to the provided device if present. If the
+device is not present, it will wait for it to appear and then connect. If the
+connection is lost (eg. device disconnects), it will wait for the device to
+reappear and then reconnect.
 
-However, if the
-.B \-\-no\-autoconnect
-option is provided, tio will exit if the device is not present or an established connection is lost.
+However, if the \fB\-\-no\-autoconnect\fR option is provided, tio will exit if
+the device is not present or an established connection is lost.
 
 .TP
 .BR \-e ", " "\-\-local\-echo
@@ -91,8 +95,7 @@ Set timestamp format to any of the following timestamp formats:
 .IP "\fBiso8601"
 ISO8601 format ("YYYY-MM-DDThh:mm:ss.sss")
 .PP
-Default format is
-.B 24hour
+Default format is \fB24hour\fR
 .RE
 
 .TP
@@ -103,7 +106,10 @@ List available serial devices.
 .TP
 .BR \-l ", " \-\-log
 
-Enable log to file. If no filename is provided the filename will be automatically generated.
+Enable log to file.
+
+If no filename is provided the filename will be
+automatically generated.
 
 .TP
 .BR "    \-\-log-file \fI<filename>
@@ -118,7 +124,9 @@ Strip control characters and escape sequences from log.
 .TP
 .BR \-m ", " "\-\-map " \fI<flags>
 
-Map (replace, translate) characters on input or output. The following mapping flags are supported:
+Map (replace, translate) characters on input or output. The following mapping
+flags are supported:
+
 .RS
 .TP 12n
 .IP "\fBICRNL"
@@ -149,7 +157,8 @@ Enable hexadecimal mode.
 .TP
 .BR \-c ", " "\-\-color " \fI0..255|none|list
 
-Colorize tio text using ANSI color code value ranging from 0 to 255 or use "none" for no color.
+Colorize tio text using ANSI color code value ranging from 0 to 255 or use
+"none" for no color.
 
 Use "list" to print a list of available ANSI color codes.
 
@@ -158,9 +167,10 @@ Default value is 15.
 .TP
 .BR \-S ", " "\-\-socket \fI<socket>\fR\fB
 
-Redirect I/O to socket. Any input from clients connected to the socket is sent on the serial port as if entered at the terminal where tio is running (except that
-.B ctrl-t
-sequences are not recognized), and any input from the serial port is multiplexed to the terminal and all connected clients.
+Redirect I/O to socket. Any input from clients connected to the socket is sent
+on the serial port as if entered at the terminal where tio is running (except
+that \fBctrl-t\fR sequences are not recognized), and any input from the serial
+port is multiplexed to the terminal and all connected clients.
 
 Sockets remain open while the serial port is disconnected, and writes will block.
 
@@ -224,15 +234,20 @@ Toggle conversion to uppercase
 Show version
 
 .SH "HEXADECIMAL MODE"
-.TP
+.PP
 In hexadecimal mode each incoming byte is printed out as a hexadecimal value.
-.TP
-Bytes can be sent in this mode by typing the \fBtwo-character hexadecimal\fR representation of the value, e.g.: to send \fI0xA\fR you must type \fI0a\fR or \fI0A\fR.
+
+.PP
+Bytes can be sent in this mode by typing the \fBtwo-character hexadecimal\fR
+representation of the value, e.g.: to send \fI0xA\fR you must type \fI0a\fR or
+\fI0A\fR.
 
 .SH "CONFIGURATION FILE"
 .PP
-.TP 16n
-Options can be set via configuration file using the INI format. tio uses the configuration file first found in the following locations in the order listed:
+Options can be set via configuration file using the INI format. \fBtio\fR uses
+the configuration file first found in the following locations in the order
+listed:
+
 .PP
 .I $XDG_CONFIG_HOME/tio/tiorc
 .PP
@@ -240,20 +255,21 @@ Options can be set via configuration file using the INI format. tio uses the con
 .PP
 .I $HOME/.tiorc
 
-.TP
-Labels can be used to group settings into named sub-configurations which can be activated from the command-line when starting tio.
+.PP
+Labels can be used to group settings into named sub-configurations which can be
+activated from the command-line when starting tio.
 
-.TP
-.TP
-tio will try to match the user input to a sub-configuration by name or by pattern to get the tty and other options.
+.PP
+\fBtio\fR will try to match the user input to a sub-configuration by name or by
+pattern to get the tty and other options.
 
-.TP
+.PP
 Options without any label change the default options.
 
-.TP
+.PP
 Any options set via command-line will override options set in the configuration file.
 
-.TP
+.PP
 The following configuration file options are available:
 
 .TP 20n
@@ -272,7 +288,7 @@ Set stop bits
 .IP "\fBparity"
 Set parity
 .IP "\fBoutput-delay"
-Set output delay
+Set output character delay
 .IP "\fBoutput-line-delay"
 Set output line delay
 .IP "\fBdtr-pulse-duration"
