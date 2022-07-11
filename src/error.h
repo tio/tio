@@ -24,6 +24,7 @@
 #define TIO_SUCCESS 0
 #define TIO_ERROR   1
 
-extern char error[2][1000];
-
+void tio_error_printf(const char *format, ...);
+void tio_error_printf_silent(const char *format, ...);
 void error_exit(void);
+void error_enter_session_mode(void);

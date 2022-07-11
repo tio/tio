@@ -132,7 +132,7 @@ void tty_flush(int fd)
         if (count < 0)
         {
             // Error
-            debug_printf("Write error while flushing tty buffer (%s)", strerror(errno));
+            tio_debug_printf("Write error while flushing tty buffer (%s)", strerror(errno));
             break;
         }
         tty_buffer_count -= count;
@@ -167,7 +167,7 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
             if (retval < 0)
             {
                 // Error
-                debug_printf("Write error (%s)", strerror(errno));
+                tio_debug_printf("Write error (%s)", strerror(errno));
                 break;
             }
             bytes_written += retval;
@@ -217,7 +217,7 @@ static void output_hex(char c)
         ssize_t status = tty_write(fd, &hex_value, 1);
         if (status < 0)
         {
-            warning_printf("Could not write to tty device");
+            tio_warning_printf("Could not write to tty device");
         }
         else
         {
@@ -232,7 +232,7 @@ static void toggle_line(const char *line_name, int mask)
 
     if (ioctl(fd, TIOCMGET, &state) < 0)
     {
-        warning_printf("Could not get line state (%s)", strerror(errno));
+        tio_warning_printf("Could not get line state (%s)", strerror(errno));
     }
     else
     {
@@ -247,7 +247,7 @@ static void toggle_line(const char *line_name, int mask)
             tio_printf("set %s to HIGH", line_name);
         }
         if (ioctl(fd, TIOCMSET, &state) < 0)
-            warning_printf("Could not set line state (%s)", strerror(errno));
+            tio_warning_printf("Could not set line state (%s)", strerror(errno));
     }
 }
 
@@ -295,7 +295,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
             case KEY_SHIFT_L:
                 if (ioctl(fd, TIOCMGET, &state) < 0)
                 {
-                    warning_printf("Could not get line state (%s)", strerror(errno));
+                    tio_warning_printf("Could not get line state (%s)", strerror(errno));
                     break;
                 }
                 tio_printf("Line states:");
@@ -425,7 +425,7 @@ void stdin_configure(void)
     /* Save current stdin settings */
     if (tcgetattr(STDIN_FILENO, &stdin_old) < 0)
     {
-        error_printf("Saving current stdin settings failed");
+        tio_error_printf("Saving current stdin settings failed");
         exit(EXIT_FAILURE);
     }
 
@@ -443,7 +443,7 @@ void stdin_configure(void)
     status = tcsetattr(STDIN_FILENO, TCSANOW, &stdin_new);
     if (status == -1)
     {
-        error_printf("Could not apply new stdin settings (%s)", strerror(errno));
+        tio_error_printf("Could not apply new stdin settings (%s)", strerror(errno));
         exit(EXIT_FAILURE);
     }
 
@@ -467,7 +467,7 @@ void stdout_configure(void)
     /* Save current stdout settings */
     if (tcgetattr(STDOUT_FILENO, &stdout_old) < 0)
     {
-        error_printf("Saving current stdio settings failed");
+        tio_error_printf("Saving current stdio settings failed");
         exit(EXIT_FAILURE);
     }
 
@@ -485,7 +485,7 @@ void stdout_configure(void)
     status = tcsetattr(STDOUT_FILENO, TCSANOW, &stdout_new);
     if (status == -1)
     {
-        error_printf("Could not apply new stdout settings (%s)", strerror(errno));
+        tio_error_printf("Could not apply new stdout settings (%s)", strerror(errno));
         exit(EXIT_FAILURE);
     }
 
@@ -527,7 +527,7 @@ void tty_configure(void)
             standard_baudrate = false;
             break;
 #else
-            error_printf("Invalid baud rate");
+            tio_error_printf("Invalid baud rate");
             exit(EXIT_FAILURE);
 #endif
     }
@@ -538,7 +538,7 @@ void tty_configure(void)
         status = cfsetispeed(&tio, baudrate);
         if (status == -1)
         {
-            error_printf("Could not configure input speed (%s)", strerror(errno));
+            tio_error_printf("Could not configure input speed (%s)", strerror(errno));
             exit(EXIT_FAILURE);
         }
 
@@ -546,7 +546,7 @@ void tty_configure(void)
         status = cfsetospeed(&tio, baudrate);
         if (status == -1)
         {
-            error_printf("Could not configure output speed (%s)", strerror(errno));
+            tio_error_printf("Could not configure output speed (%s)", strerror(errno));
             exit(EXIT_FAILURE);
         }
     }
@@ -568,7 +568,7 @@ void tty_configure(void)
             tio.c_cflag |= CS8;
             break;
         default:
-            error_printf("Invalid data bits");
+            tio_error_printf("Invalid data bits");
             exit(EXIT_FAILURE);
     }
 
@@ -590,7 +590,7 @@ void tty_configure(void)
     }
     else
     {
-        error_printf("Invalid flow control");
+        tio_error_printf("Invalid flow control");
         exit(EXIT_FAILURE);
     }
 
@@ -604,7 +604,7 @@ void tty_configure(void)
             tio.c_cflag |= CSTOPB;
             break;
         default:
-            error_printf("Invalid stop bits");
+            tio_error_printf("Invalid stop bits");
             exit(EXIT_FAILURE);
     }
 
@@ -637,7 +637,7 @@ void tty_configure(void)
     }
     else
     {
-        error_printf("Invalid parity");
+        tio_error_printf("Invalid parity");
         exit(EXIT_FAILURE);
     }
 
@@ -754,7 +754,7 @@ void tty_wait_for_device(void)
                 status = read(STDIN_FILENO, &input_char, 1);
                 if (status <= 0)
                 {
-                    error_printf("Could not read from stdin");
+                    tio_error_printf("Could not read from stdin");
                     exit(EXIT_FAILURE);
                 }
 
@@ -767,7 +767,7 @@ void tty_wait_for_device(void)
         }
         else if (status == -1)
         {
-            error_printf("select() failed (%s)", strerror(errno));
+            tio_error_printf("select() failed (%s)", strerror(errno));
             exit(EXIT_FAILURE);
         }
 
@@ -780,7 +780,7 @@ void tty_wait_for_device(void)
         }
         else if (last_errno != errno)
         {
-            warning_printf("Could not open tty device (%s)", strerror(errno));
+            tio_warning_printf("Could not open tty device (%s)", strerror(errno));
             tio_printf("Waiting for tty device..");
             last_errno = errno;
         }
@@ -832,7 +832,7 @@ void forward_to_tty(int fd, char output_char)
         status = tty_write(fd, crlf, 2);
         if (status < 0)
         {
-            warning_printf("Could not write to tty device");
+            tio_warning_printf("Could not write to tty device");
         }
 
         tx_total += 2;
@@ -850,7 +850,7 @@ void forward_to_tty(int fd, char output_char)
             status = tty_write(fd, &output_char, 1);
             if (status < 0)
             {
-                warning_printf("Could not write to tty device");
+                tio_warning_printf("Could not write to tty device");
             }
 
             /* Update transmit statistics */
@@ -875,14 +875,14 @@ int tty_connect(void)
     fd = open(option.tty_device, O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (fd < 0)
     {
-        error_printf_silent("Could not open tty device (%s)", strerror(errno));
+        tio_error_printf_silent("Could not open tty device (%s)", strerror(errno));
         goto error_open;
     }
 
     /* Make sure device is of tty type */
     if (!isatty(fd))
     {
-        error_printf("Not a tty device");
+        tio_error_printf("Not a tty device");
         exit(EXIT_FAILURE);;
     }
 
@@ -890,7 +890,7 @@ int tty_connect(void)
     status = flock(fd, LOCK_EX | LOCK_NB);
     if ((status == -1) && (errno == EWOULDBLOCK))
     {
-        error_printf("Device file is locked by another process");
+        tio_error_printf("Device file is locked by another process");
         exit(EXIT_FAILURE);
     }
 
@@ -945,7 +945,7 @@ int tty_connect(void)
     status = tcsetattr(fd, TCSANOW, &tio);
     if (status == -1)
     {
-        error_printf_silent("Could not apply port settings (%s)", strerror(errno));
+        tio_error_printf_silent("Could not apply port settings (%s)", strerror(errno));
         goto error_tcsetattr;
     }
 
@@ -954,7 +954,7 @@ int tty_connect(void)
     {
         if (setspeed2(fd, option.baudrate) != 0)
         {
-            error_printf_silent("Could not set baudrate speed (%s)", strerror(errno));
+            tio_error_printf_silent("Could not set baudrate speed (%s)", strerror(errno));
             goto error_setspeed;
         }
     }
@@ -965,7 +965,7 @@ int tty_connect(void)
     {
         if (iossiospeed(fd, option.baudrate) != 0)
         {
-            error_printf_silent("Could not set baudrate speed (%s)", strerror(errno));
+            tio_error_printf_silent("Could not set baudrate speed (%s)", strerror(errno));
             goto error_setspeed;
         }
     }
@@ -992,7 +992,7 @@ int tty_connect(void)
                 if (bytes_read <= 0)
                 {
                     /* Error reading - device is likely unplugged */
-                    error_printf_silent("Could not read from tty device");
+                    tio_error_printf_silent("Could not read from tty device");
                     goto error_read;
                 }
 
@@ -1057,7 +1057,7 @@ int tty_connect(void)
                 ssize_t bytes_read = read(STDIN_FILENO, input_buffer, BUFSIZ);
                 if (bytes_read <= 0)
                 {
-                    error_printf_silent("Could not read from stdin");
+                    tio_error_printf_silent("Could not read from stdin");
                     goto error_read;
                 }
 
@@ -1088,7 +1088,7 @@ int tty_connect(void)
                         {
                             if (!is_valid_hex(input_char))
                             {
-                                warning_printf("Invalid hex character: '%d' (0x%02x)", input_char, input_char);
+                                tio_warning_printf("Invalid hex character: '%d' (0x%02x)", input_char, input_char);
                                 forward = false;
                             }
                         }
@@ -1116,7 +1116,7 @@ int tty_connect(void)
         }
         else if (status == -1)
         {
-            error_printf("Error: select() failed (%s)", strerror(errno));
+            tio_error_printf("select() failed (%s)", strerror(errno));
             exit(EXIT_FAILURE);
         }
     }

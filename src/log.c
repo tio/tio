@@ -188,7 +188,7 @@ void log_exit(void)
 
     if (log_error)
     {
-        error_printf("Could not open log file %s (%s)", option.log_filename, strerror(errno));
+        tio_error_printf("Could not open log file %s (%s)", option.log_filename, strerror(errno));
     }
     else if (option.log)
     {

@@ -94,13 +94,13 @@ void socket_configure(void)
 
         if (strlen(socket_filename()) == 0)
         {
-            error_printf("Missing socket filename");
+            tio_error_printf("Missing socket filename");
             exit(EXIT_FAILURE);
         }
 
         if (strlen(socket_filename()) > sizeof(sockaddr_unix.sun_path) - 1)
         {
-            error_printf("Socket file path %s too long", option.socket);
+            tio_error_printf("Socket file path %s too long", option.socket);
             exit(EXIT_FAILURE);
         }
     }
@@ -113,7 +113,7 @@ void socket_configure(void)
 
         if (port_number < 0)
         {
-            error_printf("Invalid port number: %d", port_number);
+            tio_error_printf("Invalid port number: %d", port_number);
             exit(EXIT_FAILURE);
         }
     }
@@ -126,14 +126,14 @@ void socket_configure(void)
 
         if (port_number < 0)
         {
-            error_printf("Invalid port number: %d", port_number);
+            tio_error_printf("Invalid port number: %d", port_number);
             exit(EXIT_FAILURE);
         }
     }
 
     if (socket_family == AF_UNSPEC)
     {
-        error_printf("%s: Invalid socket scheme, must be prefixed with 'unix:', 'inet:', or 'inet6:'", option.socket);
+        tio_error_printf("%s: Invalid socket scheme, must be prefixed with 'unix:', 'inet:', or 'inet6:'", option.socket);
         exit(EXIT_FAILURE);
     }
  
@@ -165,7 +165,7 @@ void socket_configure(void)
             break;
 
         default:
-            error_printf("Invalid socket family (%d)", socket_family);
+            tio_error_printf("Invalid socket family (%d)", socket_family);
             exit(EXIT_FAILURE);
             break;
     }
@@ -174,21 +174,21 @@ void socket_configure(void)
     sockfd = socket(socket_family, SOCK_STREAM, 0);
     if (sockfd < 0)
     {
-        error_printf("Failed to create socket (%s)", strerror(errno));
+        tio_error_printf("Failed to create socket (%s)", strerror(errno));
         exit(EXIT_FAILURE);
     }
 
     /* Bind */
     if (bind(sockfd, sockaddr_p, socklen) < 0)
     {
-        error_printf("Failed to bind to socket (%s)", strerror(errno));
+        tio_error_printf("Failed to bind to socket (%s)", strerror(errno));
         exit(EXIT_FAILURE);
     }
 
     /* Listen */
     if (listen(sockfd, MAX_SOCKET_CLIENTS) < 0)
     {
-        error_printf("Failed to listen on socket (%s)", strerror(errno));
+        tio_error_printf("Failed to listen on socket (%s)", strerror(errno));
         exit(EXIT_FAILURE);
     }
 
@@ -218,7 +218,7 @@ void socket_write(char input_char)
         {
             if (write(clientfds[i], &input_char, 1) <= 0)
             {
-                error_printf_silent("Failed to write to socket (%s)", strerror(errno));
+                tio_error_printf_silent("Failed to write to socket (%s)", strerror(errno));
                 close(clientfds[i]);
                 clientfds[i] = -1;
             }
@@ -289,7 +289,7 @@ bool socket_handle_input(fd_set *rdfs, char *output_char)
             }
             if (status < 0)
             {
-                error_printf_silent("Failed to read from socket (%s)", strerror(errno));
+                tio_error_printf_silent("Failed to read from socket (%s)", strerror(errno));
                 close(clientfds[i]);
                 clientfds[i] = -1;
                 continue;

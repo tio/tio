@@ -58,7 +58,7 @@ static int get_match(const char *input, const char *pattern, char **match)
     if (ret)
     {
         regerror(ret, &re, err, sizeof(err));
-        fprintf(stderr, "regex error: %s", err);
+        tio_error_printf("Regex failure: %s", err);
         return ret;
     }
 
@@ -330,7 +330,7 @@ void config_file_parse(void)
     c = malloc(sizeof(struct config_t));
     if (!c)
     {
-        fprintf(stderr, "Error: Insufficient memory allocation");
+        tio_error_printf("Insufficient memory allocation");
         exit(EXIT_FAILURE);
     } 
     memset(c, 0, sizeof(struct config_t));
@@ -355,7 +355,7 @@ void config_file_parse(void)
     ret = ini_parse(c->path, data_handler, NULL);
     if (ret < 0)
     {
-        fprintf(stderr, "Error: Unable to parse configuration file (%d)", ret);
+        tio_error_printf("Unable to parse configuration file (%d)", ret);
         exit(EXIT_FAILURE);
     }
     free(c->section_name);
@@ -368,7 +368,7 @@ void config_file_parse(void)
         ret = ini_parse(c->path, section_name_search_handler, NULL);
         if (!c->section_name)
         {
-            debug_printf("Unable to match user input to configuration section (%d)", ret);
+            tio_debug_printf("Unable to match user input to configuration section (%d)", ret);
             return;
         }
     }
@@ -377,7 +377,7 @@ void config_file_parse(void)
     ret = ini_parse(c->path, data_handler, NULL);
     if (ret < 0)
     {
-        fprintf(stderr, "Error: Unable to parse configuration file (%d)", ret);
+        tio_error_printf("Unable to parse configuration file (%d)", ret);
         exit(EXIT_FAILURE);
     }
 

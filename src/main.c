@@ -88,6 +88,9 @@ int main(int argc, char *argv[])
     /* Initialize ANSI text formatting (colors etc.) */
     print_init_ansi_formatting();
 
+    /* Change error printing mode */
+    error_enter_session_mode();
+
     /* Print launch hints */
     tio_printf("tio v%s", VERSION);
     if (interactive_mode)

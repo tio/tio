@@ -340,7 +340,7 @@ void options_parse(int argc, char *argv[])
                 option.color = string_to_long(optarg);
                 if ((option.color < 0) || (option.color > 255))
                 {
-                    printf("Error: Invalid color code\n");
+                    tio_error_printf("Invalid color code");
                     exit(EXIT_FAILURE);
                 }
                 break;
@@ -382,17 +382,17 @@ void options_parse(int argc, char *argv[])
 
     if (strlen(option.tty_device) == 0)
     {
-        printf("Error: Missing tty device or sub-configuration name\n");
+        tio_error_printf("Missing tty device or sub-configuration name");
         exit(EXIT_FAILURE);
     }
 
     /* Print any remaining command line arguments (unknown options) */
     if (optind < argc)
     {
-        printf("Error: Unknown argument ");
+        fprintf(stderr, "Error: Unknown argument ");
         while (optind < argc)
             printf("%s ", argv[optind++]);
-        printf("\n");
+        fprintf(stderr, "\n");
         exit(EXIT_FAILURE);
     }
 }

@@ -56,7 +56,7 @@ extern char ansi_format[];
     fprintf (stdout, "%s" format ANSI_RESET, ansi_format, ## args); \
 }
 
-#define warning_printf(format, args...) \
+#define tio_warning_printf(format, args...) \
 { \
   if (print_tainted) \
     putchar('\n'); \
@@ -74,28 +74,14 @@ extern char ansi_format[];
   print_tainted = false; \
 }
 
-#define tio_error_printf(format, args...) \
-{ \
-  if (print_tainted) \
-    putchar('\n'); \
-  ansi_error_printf("[%s] " format, current_time(), ## args); \
-  print_tainted = false; \
-}
-
-#define error_printf(format, args...) \
-  snprintf(error[0], 1000, format, ## args);
-
-#define error_printf_silent(format, args...) \
-  snprintf(error[1], 1000, format, ## args);
-
 #ifdef DEBUG
-#define debug_printf(format, args...) \
+#define tio_debug_printf(format, args...) \
   fprintf (stdout, "[debug] " format, ## args)
-#define debug_printf_raw(format, args...) \
+#define tio_debug_printf_raw(format, args...) \
   fprintf (stdout, "" format, ## args)
 #else
-#define debug_printf(format, args...)
-#define debug_printf_raw(format, args...)
+#define tio_debug_printf(format, args...)
+#define tio_debug_printf_raw(format, args...)
 #endif
 
 void print_hex(char c);
