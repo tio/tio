@@ -43,9 +43,9 @@ Set parity (default: none).
 Set output delay [ms] inserted between each sent character (default: 0).
 
 .TP
-.BR \-O ", " "\-\-eol\-delay " \fI<ms>
+.BR \-O ", " "\-\-output\-line\-delay " \fI<ms>
 
-Set EOL delay [ms] inserted between each sent line (default: 0).
+Set output delay [ms] inserted between each sent line (default: 0).
 
 .TP
 .BR "    \-\-dtr\-pulse\-duration " \fI<ms>
@@ -271,8 +271,8 @@ Set stop bits
 Set parity
 .IP "\fBoutput-delay"
 Set output delay
-.IP "\fBeol-delay"
-Set EOL delay
+.IP "\fBoutput-line-delay"
+Set output line delay
 .IP "\fBdtr-pulse-duration"
 Set DTR pulse duration
 .IP "\fBno-autoconnect"

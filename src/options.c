@@ -55,8 +55,8 @@ struct option_t option =
     .stopbits = 1,
     .parity = "none",
     .output_delay = 0,
+    .output_line_delay = 0,
     .dtr_pulse_duration = 100,
-    .eol_delay = 0,
     .no_autoconnect = false,
     .log = false,
     .log_filename = NULL,
@@ -76,28 +76,28 @@ void print_help(char *argv[])
     printf("Connect to tty device directly or via sub-configuration.\n");
     printf("\n");
     printf("Options:\n");
-    printf("  -b, --baudrate <bps>             Baud rate (default: 115200)\n");
-    printf("  -d, --databits 5|6|7|8           Data bits (default: 8)\n");
-    printf("  -f, --flow hard|soft|none        Flow control (default: none)\n");
-    printf("  -s, --stopbits 1|2               Stop bits (default: 1)\n");
-    printf("  -p, --parity odd|even|none|mark  Parity (default: none)\n");
-    printf("  -o, --output-delay <ms>          Output delay (default: 0)\n");
-    printf("  -O, --eol-delay <ms>             EOL output delay (default: 0)\n");
-    printf("      --dtr-pulse-duration <ms>    DTR pulse duration (default: 100)\n");
-    printf("  -n, --no-autoconnect             Disable automatic connect\n");
-    printf("  -e, --local-echo                 Enable local echo\n");
-    printf("  -t, --timestamp                  Enable line timestamp\n");
-    printf("      --timestamp-format <format>  Set timestamp format (default: 24hour)\n");
-    printf("  -L, --list-devices               List available serial devices\n");
-    printf("  -l, --log                        Enable log to file\n");
-    printf("      --log-file <filename>        Set log filename\n");
-    printf("      --log-strip                  Strip control characters and escape sequences\n");
-    printf("  -m, --map <flags>                Map characters\n");
-    printf("  -c, --color 0..255|none|list     Colorize tio text (default: 15)\n");
-    printf("  -S, --socket <socket>            Redirect I/O to file or network socket\n");
-    printf("  -x, --hexadecimal                Enable hexadecimal mode\n");
-    printf("  -v, --version                    Display version\n");
-    printf("  -h, --help                       Display help\n");
+    printf("  -b, --baudrate <bps>                   Baud rate (default: 115200)\n");
+    printf("  -d, --databits 5|6|7|8                 Data bits (default: 8)\n");
+    printf("  -f, --flow hard|soft|none              Flow control (default: none)\n");
+    printf("  -s, --stopbits 1|2                     Stop bits (default: 1)\n");
+    printf("  -p, --parity odd|even|none|mark|space  Parity (default: none)\n");
+    printf("  -o, --output-delay <ms>                Output character delay (default: 0)\n");
+    printf("  -O, --output-line-delay <ms>           Output line delay (default: 0)\n");
+    printf("      --dtr-pulse-duration <ms>          DTR pulse duration (default: 100)\n");
+    printf("  -n, --no-autoconnect                   Disable automatic connect\n");
+    printf("  -e, --local-echo                       Enable local echo\n");
+    printf("  -t, --timestamp                        Enable line timestamp\n");
+    printf("      --timestamp-format <format>        Set timestamp format (default: 24hour)\n");
+    printf("  -L, --list-devices                     List available serial devices\n");
+    printf("  -l, --log                              Enable log to file\n");
+    printf("      --log-file <filename>              Set log filename\n");
+    printf("      --log-strip                        Strip control characters and escape sequences\n");
+    printf("  -m, --map <flags>                      Map characters\n");
+    printf("  -c, --color 0..255|none|list           Colorize tio text (default: 15)\n");
+    printf("  -S, --socket <socket>                  Redirect I/O to file or network socket\n");
+    printf("  -x, --hexadecimal                      Enable hexadecimal mode\n");
+    printf("  -v, --version                          Display version\n");
+    printf("  -h, --help                             Display help\n");
     printf("\n");
     printf("Options and sub-configurations may be set via configuration file.\n");
     printf("\n");
@@ -174,7 +174,7 @@ void options_print()
     tio_printf(" Local echo: %s", option.local_echo ? "enabled" : "disabled");
     tio_printf(" Timestamp: %s", timestamp_state_to_string(option.timestamp));
     tio_printf(" Output delay: %d", option.output_delay);
-    tio_printf(" EOL delay: %d", option.eol_delay);
+    tio_printf(" Output line delay: %d", option.output_line_delay);
     tio_printf(" DTR pulse duration: %d", option.dtr_pulse_duration);
     tio_printf(" Auto connect: %s", option.no_autoconnect ? "disabled" : "enabled");
     if (option.map[0] != 0)
@@ -205,7 +205,7 @@ void options_parse(int argc, char *argv[])
             {"stopbits",           required_argument, 0, 's'                   },
             {"parity",             required_argument, 0, 'p'                   },
             {"output-delay",       required_argument, 0, 'o'                   },
-            {"eol-delay",          required_argument, 0, 'O'                   },
+            {"output-line-delay",  required_argument, 0, 'O'                   },
             {"dtr-pulse-duration", required_argument, 0, OPT_DTR_PULSE_DURATION},
             {"no-autoconnect",     no_argument,       0, 'n'                   },
             {"local-echo",         no_argument,       0, 'e'                   },
@@ -271,7 +271,7 @@ void options_parse(int argc, char *argv[])
                 break;
 
             case 'O':
-                option.eol_delay = string_to_long(optarg);
+                option.output_line_delay = string_to_long(optarg);
                 break;
 
             case OPT_DTR_PULSE_DURATION:

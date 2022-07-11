@@ -124,9 +124,9 @@ static int data_handler(void *user, const char *section, const char *name,
         {
             option.output_delay = atoi(value);
         }
-        else if (!strcmp(name, "eol-delay"))
+        else if (!strcmp(name, "output-line-delay"))
         {
-            option.eol_delay = atoi(value);
+            option.output_line_delay = atoi(value);
         }
         else if (!strcmp(name, "dtr-pulse-duration"))
         {

@@ -158,7 +158,7 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
         }
     }
 
-    if (option.output_delay || option.eol_delay)
+    if (option.output_delay || option.output_line_delay)
     {
         // Write byte by byte with output delay
         for (i=0; i<count; i++)
@@ -172,9 +172,9 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
             }
             bytes_written += retval;
 
-            if (option.eol_delay && *(unsigned char*)buffer == '\r')
+            if (option.output_line_delay && *(unsigned char*)buffer == '\r')
             {
-                delay(option.eol_delay);
+                delay(option.output_line_delay);
             }
 
             fsync(fd);

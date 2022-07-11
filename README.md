@@ -68,7 +68,7 @@ The command-line interface is straightforward as reflected in the output from
       -s, --stopbits 1|2               Stop bits (default: 1)
       -p, --parity odd|even|none       Parity (default: none)
       -o, --output-delay <ms>          Character output delay (default: 0)
-      -O, --eol-delay <ms>             EOL output delay (default: 0)
+      -O, --output-line-delay <ms>     Line output delay (default: 0)
           --dtr-pulse-duration <ms>    DTR pulse duration (default: 100)
       -n, --no-autoconnect             Disable automatic connect
       -e, --local-echo                 Enable local echo
