@@ -120,21 +120,21 @@ Map (replace, translate) characters on input or output. The following mapping fl
 .RS
 .TP 12n
 .IP "\fBICRNL"
-Map CR to NL on input (unless IGNCR is set).
+Map CR to NL on input (unless IGNCR is set)
 .IP "\fBIGNCR"
-Ignore CR on input.
+Ignore CR on input
 .IP "\fBINLCR"
-Map NL to CR on input.
+Map NL to CR on input
 .IP "\fBINLCRNL"
-Map NL to CR-NL on input.
+Map NL to CR-NL on input
 .IP "\fBOCRNL"
-Map CR to NL on output.
+Map CR to NL on output
 .IP "\fBODELBS"
-Map DEL to BS on output.
+Map DEL to BS on output
 .IP "\fBONLCRNL"
-Map NL to CR-NL on output.
+Map NL to CR-NL on output
 .IP "\fBOLTU"
-Map lowercase characters to uppercase on output.
+Map lowercase characters to uppercase on output
 .P
 If defining more than one flag, the flags must be comma separated.
 .RE
