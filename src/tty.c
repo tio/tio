@@ -287,7 +287,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" ctrl-t s   Show statistics");
                 tio_printf(" ctrl-t t   Send ctrl-t key code");
                 tio_printf(" ctrl-t T   Toggle line timestamp mode");
-                tio_printf(" ctrl-t U   Toggle upcase");
+                tio_printf(" ctrl-t U   Toggle conversion to upper case");
                 tio_printf(" ctrl-t v   Show version");
                 break;
 
@@ -398,14 +398,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 break;
 
             case KEY_U:
-                if ( option.upcase == true )
-                {
-                    option.upcase = false;
-                }
-                else
-                {
-                    option.upcase = true;
-                }
+                option.upcase = !option.upcase;
                 break;
 
             case KEY_V:
