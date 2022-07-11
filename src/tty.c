@@ -145,19 +145,24 @@ void tty_flush(int fd)
 
 ssize_t tty_write(int fd, const void *buffer, size_t count)
 {
-    ssize_t bytes_written = 0;
+    ssize_t retval = 0, bytes_written = 0;
+    size_t i;
 
-    if (option.output_delay || option.eol_delay )
+    if (option.upcase)
+    {
+        // Convert lower case to upper case
+        for (i = 0; i<count; i++)
+        {
+            *((unsigned char*)buffer+i) = toupper(*((unsigned char*)buffer+i));
+        }
+    }
+
+    if (option.output_delay || option.eol_delay)
     {
         // Write byte by byte with output delay
-        for (size_t i=0; i<count; i++)
+        for (i=0; i<count; i++)
         {
-            // convert alpha to upper case
-            if ( option.upcase )
-            {
-                *(unsigned char*)buffer = toupper(*(unsigned char*)buffer);
-            }
-            ssize_t retval = write(fd, buffer, 1);
+            retval = write(fd, buffer, 1);
             if (retval < 0)
             {
                 // Error
@@ -165,12 +170,15 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
                 break;
             }
             bytes_written += retval;
-            if ( option.eol_delay && *(unsigned char*)buffer == '\r' )
+
+            if (option.eol_delay && *(unsigned char*)buffer == '\r')
             {
-                delay( option.eol_delay );
+                delay(option.eol_delay);
             }
+
             fsync(fd);
-            if ( option.output_delay )
+
+            if (option.output_delay)
             {
                 delay(option.output_delay);
             }
@@ -184,14 +192,6 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
             tty_flush(fd);
         }
 
-        // convert lower case to upper case, in situ
-        if ( option.upcase )
-        {
-            for ( size_t i = 0; i<count; i++ )
-            {
-                *((unsigned char*)buffer+i) = toupper(*((unsigned char*)buffer+i));
-            }
-        }
         // Copy bytes to tty write buffer
         memcpy(tty_buffer_write_ptr, buffer, count);
         tty_buffer_write_ptr += count;
