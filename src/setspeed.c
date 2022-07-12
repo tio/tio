@@ -19,6 +19,8 @@
  * 02110-1301, USA.
  */
 
+#include <errno.h>
+
 #ifdef HAVE_TERMIOS2
 #define termios asmtermios
 #include <sys/ioctl.h>
