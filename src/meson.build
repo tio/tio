@@ -13,7 +13,8 @@ tio_sources = [
   'print.c',
   'configfile.c',
   'signals.c',
-  'socket.c'
+  'socket.c',
+  'setspeed.c'
 ]
 
 tio_dep = dependency('inih', required: true,
@@ -23,12 +24,10 @@ tio_dep = dependency('inih', required: true,
 tio_c_args = ['-Wno-unused-result']
 
 if enable_setspeed2
-  tio_sources += 'setspeed2.c'
   tio_c_args += '-DHAVE_TERMIOS2'
 endif
 
 if enable_iossiospeed
-  tio_sources += 'iossiospeed.c'
   tio_c_args += '-DHAVE_IOSSIOSPEED'
 endif
 

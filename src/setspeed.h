@@ -1,7 +1,7 @@
 /*
  * tio - a simple serial terminal I/O tool
  *
- * Copyright (c) 2017  Martin Lund
+ * Copyright (c) 2022  Martin Lund
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,10 +19,6 @@
  * 02110-1301, USA.
  */
 
-#include <sys/ioctl.h>
-#include <IOKit/serial/ioss.h>
+#pragma once
 
-int iossiospeed(int fd, int baudrate)
-{
-  return ioctl(fd, IOSSIOSPEED, (char *)&baudrate);
-}
+int setspeed(int fd, int baudrate);

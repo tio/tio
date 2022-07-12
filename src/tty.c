@@ -49,14 +49,7 @@
 #include "log.h"
 #include "error.h"
 #include "socket.h"
-
-#ifdef HAVE_TERMIOS2
-extern int setspeed2(int fd, int baudrate);
-#endif
-
-#ifdef HAVE_IOSSIOSPEED
-extern int iossiospeed(int fd, int baudrate);
-#endif
+#include "setspeed.h"
 
 #ifdef __APPLE__
 #define PATH_SERIAL_DEVICES "/dev/"
@@ -928,7 +921,7 @@ int tty_connect(void)
 #ifdef HAVE_IOSSIOSPEED
     if (!standard_baudrate)
     {
-        /* OS X wants these fields left alone. We'll set baudrate with iossiospeed below. */
+        /* OS X wants these fields left alone before setting arbitrary baud rate */
         tio.c_ispeed = tio_old.c_ispeed;
         tio.c_ospeed = tio_old.c_ospeed;
     }
@@ -949,27 +942,15 @@ int tty_connect(void)
         goto error_tcsetattr;
     }
 
-#ifdef HAVE_TERMIOS2
+    /* Set arbitrary baudrate (only works on supported platforms) */
     if (!standard_baudrate)
     {
-        if (setspeed2(fd, option.baudrate) != 0)
+        if (setspeed(fd, option.baudrate) != 0)
         {
             tio_error_printf_silent("Could not set baudrate speed (%s)", strerror(errno));
             goto error_setspeed;
         }
     }
-#endif
-
-#ifdef HAVE_IOSSIOSPEED
-    if (!standard_baudrate)
-    {
-        if (iossiospeed(fd, option.baudrate) != 0)
-        {
-            tio_error_printf_silent("Could not set baudrate speed (%s)", strerror(errno));
-            goto error_setspeed;
-        }
-    }
-#endif
 
     /* Input loop */
     while (true)
@@ -1123,9 +1104,7 @@ int tty_connect(void)
 
     return TIO_SUCCESS;
 
-#if defined (HAVE_TERMIOS2) || defined (HAVE_IOSSIOSPEED)
 error_setspeed:
-#endif
 error_tcsetattr:
 error_tcgetattr:
 error_read:

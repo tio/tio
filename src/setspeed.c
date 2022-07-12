@@ -19,13 +19,21 @@
  * 02110-1301, USA.
  */
 
+#ifdef HAVE_TERMIOS2
 #define termios asmtermios
 #include <sys/ioctl.h>
 #undef termios
 #include <asm-generic/ioctls.h>
 #include <asm-generic/termbits.h>
 
-int setspeed2(int fd, int baudrate)
+#elif HAVE_IOSSIOSPEED
+#include <sys/ioctl.h>
+#include <IOKit/serial/ioss.h>
+#endif
+
+
+#ifdef HAVE_TERMIOS2
+int setspeed(int fd, int baudrate)
 {
     struct termios2 tio;
     int status;
@@ -42,3 +50,17 @@ int setspeed2(int fd, int baudrate)
 
     return status;
 }
+
+#elif HAVE_IOSSIOSPEED
+int setspeed(int fd, int baudrate)
+{
+    return ioctl(fd, IOSSIOSPEED, (char *)&baudrate);
+}
+
+#else
+int setspeed(int fd, int baudrate)
+{
+    errno = EINVAL;
+    return -1;
+}
+#endif
