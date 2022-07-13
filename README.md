@@ -29,7 +29,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Easily connect to serial TTY devices
  * Automatic connect
  * Support for arbitrary baud rates
- * List available serial devices
+ * List available serial devices by ID
  * Show RX/TX statistics
  * Toggle serial lines
  * Pulse the DTR line
