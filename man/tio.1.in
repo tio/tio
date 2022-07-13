@@ -229,7 +229,7 @@ Pulse DTR
 .IP "\fBctrl-t r"
 Toggle RTS
 .IP "\fBctrl-t U"
-Toggle conversion to uppercase
+Toggle conversion to uppercase on output
 .IP "\fBctrl-t v"
 Show version
 
