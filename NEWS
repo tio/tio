@@ -1,5 +1,48 @@
 
-=== tio v1.43 ===
+=== tio v1.44 ===
+
+
+
+Changes since tio v1.43:
+
+ * Simplify arbitrary baudrate code
+
+ * Cleanup error printing routines
+
+   Clean up so that only the following error related printing functions are
+   used: tio_error_printf(), tio_error_printf_silent(),
+   tio_warning_printf().
+
+   A session mode switch is introduced for error printing so that it will
+   print error messages with better formatting depending on in or out of
+   session.
+
+ * Update README
+
+ * Clean up man page
+
+ * Add support for space parity
+
+ * Rename EOL delay to Output line delay
+
+ * Replace -U,--upcase with mapping flag OLTU
+
+ * Simplify tty_write()
+
+Robert Snell:
+
+ * Additional commands: EOL delay, lower to upper translation, added mark parity
+
+   Added command line options:
+   -O, --eol-delay to have a separate delay for end of line
+   -U, --upper to enable translation of lower case alpha to upper case
+
+   Added ability to set mark parity.
+   Added ctrl-t U key sequence to allow enable/disable lower case alpha to
+   upper case during a session.
+   Updated Man page with command line options, ctrl-t sequences and
+   configuration file options.
+   Updated README.md, with above information.
 
 
 
