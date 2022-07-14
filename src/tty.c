@@ -57,6 +57,10 @@
 #define PATH_SERIAL_DEVICES "/dev/serial/by-id/"
 #endif
 
+#ifndef CMSPAR
+#define CMSPAR   010000000000
+#endif
+
 bool interactive_mode = true;
 
 static struct termios tio, tio_old, stdout_new, stdout_old, stdin_new, stdin_old;
