@@ -204,26 +204,18 @@ package manager tool to find and install tio.
 If you would like to see tio included in your favorite distribution, please
 reach out to their package maintainers team.
 
-### 4.2 Installation using snap
+### 4.2 Installation using snap (Linux)
 
 Install latest stable version:
 ```
     $ snap install tio
 ```
-Install bleeding edge:
-```
-    $ snap install tio --edge
-```
 
-### 4.3 Installation use brew
+### 4.3 Installation using brew (MacOS, Linux)
 
-If you have [brew](http://brew.sh/) installed, you can also install the latest stable version as:
+If you have [brew](http://brew.sh) installed, you can install tio like so:
 ```
     $ brew install tio
-```
-or installing bleeding edge as:
-```
-    $ brew install tio --HEAD
 ```
 
 ### 4.4 Installation from source
@@ -239,8 +231,8 @@ Install steps:
 
 See meson\_options.txt for tio specific build options.
 
-Note: Please do no try to install from source if you are not familiar with
-how to build stuff using meson.
+Note: It is recommended to only try to install from source if you are familiar
+with how to build stuff using meson.
 
 
 ## 5. Contributing
