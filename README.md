@@ -57,9 +57,9 @@ The command-line interface is straightforward as reflected in the output from
 'tio --help':
 ```
   Usage: tio [<options>] <tty-device|sub-config>
-  
+
   Connect to tty device directly or via sub-configuration.
-  
+
   Options:
     -b, --baudrate <bps>                   Baud rate (default: 115200)
     -d, --databits 5|6|7|8                 Data bits (default: 8)
@@ -83,11 +83,11 @@ The command-line interface is straightforward as reflected in the output from
     -x, --hexadecimal                      Enable hexadecimal mode
     -v, --version                          Display version
     -h, --help                             Display help
-  
+
   Options and sub-configurations may be set via configuration file.
-  
+
   In session, press ctrl-t q to quit.
-  
+
   See the man page for more details.
 
 ```
@@ -212,7 +212,18 @@ Install bleeding edge:
     $ snap install tio --edge
 ```
 
-### 4.3 Installation from source
+### 4.3 Installation use brew
+
+If you have [brew](http://brew.sh/) installed, you can also install the latest stable version as:
+```
+    $ brew install tio
+```
+or installing bleeding edge as:
+```
+    $ brew install tio --HEAD
+```
+
+### 4.4 Installation from source
 
 The latest source releases can be found [here](https://github.com/tio/tio/releases).
 
