@@ -120,3 +120,13 @@ long string_to_long(char *string)
 
     return result;
 }
+
+int ctrl_key_code(unsigned char key)
+{
+    if ((key >= 'a') && (key <= 'z'))
+    {
+        return key & ~0x60;
+    }
+
+    return -1;
+}

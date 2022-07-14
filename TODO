@@ -1,8 +1,6 @@
 
  * Improve error/warning messaging when parsing configuration file
 
- * Refactor and consolidate arbitrary set speed function into one file for all platforms
-
  * Consider reworking line toggle and line pulse featueres in case requests are made to apply them to more lines:
 
      ctrl-t g Toggle serial line
