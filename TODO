@@ -20,3 +20,22 @@
      
      config file:
      line-pulse-duration="DTR=60,RTS=50,CTS=40,DSR=30,DCD=20,RI=10"
+
+ * Split I/O feature
+
+   Allow to split input and output so that it is possible to manage these independently.
+
+   The general idea is to redirect the output stream on the socket port number
+   specified but then redirect the input stream on the same port number + 1.
+
+   Example:
+
+   tio /dev/ttyUSB0 --socket inet:4444,split-io
+
+   Will result in output stream being hosted on port 4444 and input stream hosted on port 4445.
+
+   For file sockets something similar can be arranged:
+
+   tio /dev/ttyUSB0 --socket unix:/tmp/tio-socket-0,split-io
+
+   Will result in output stream being hosted via /tmp/tio-socket-0 and input stream hosted via /tmp/tio-socket-0_input
