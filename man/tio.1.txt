@@ -1,0 +1,365 @@
+tio(1)                                                        User Commands                                                        tio(1)
+
+NAME
+       tio - a simple serial device I/O tool
+
+SYNOPSIS
+       tio [<options>] <tty-device|sub-config>
+
+DESCRIPTION
+       tio  is  a simple serial device tool which features a straightforward command-line and configuration file interface to easily con‐
+       nect to serial TTY devices for basic I/O operations.
+
+OPTIONS
+       -b, --baudrate <bps>
+
+              Set baud rate [bps] (default: 115200).
+
+       -d, --databits 5|6|7|8
+
+              Set data bits (default: 8).
+
+       -f, --flow hard|soft|none
+
+              Set flow control (default: none).
+
+       -s, --stopbits 1|2
+
+              Set stop bits (default: 1).
+
+       -p, --parity odd|even|none|mark|space
+
+              Set parity (default: none).
+
+              Note: With mark parity the parity bit is always 0. With space parity the parity bit is always 1. Not all platforms  support
+              mark and space parity.
+
+       -o, --output-delay <ms>
+
+              Set output delay [ms] inserted between each sent character (default: 0).
+
+       -O, --output-line-delay <ms>
+
+              Set output delay [ms] inserted between each sent line (default: 0).
+
+           --dtr-pulse-duration <ms>
+
+              Set the duration [ms] of the DTR pulse (default: 100).
+
+       -n, --no-autoconnect
+
+              Disable automatic connect.
+
+              By  default tio automatically connects to the provided device if present. If the device is not present, it will wait for it
+              to appear and then connect. If the connection is lost (eg. device disconnects), it will wait for the device to reappear and
+              then reconnect.
+
+              However,  if  the --no-autoconnect option is provided, tio will exit if the device is not present or an established connec‐
+              tion is lost.
+
+       -e, --local-echo
+
+              Enable local echo.
+
+       -t, --timestamp
+
+              Enable line timestamp.
+
+           --timestamp-format <format>
+
+              Set timestamp format to any of the following timestamp formats:
+
+              24hour          24-hour format ("hh:mm:ss.sss")
+
+              24hour-start    24-hour format relative to start time
+
+              24hour-delta    24-hour format relative to previous timestamp
+
+              iso8601         ISO8601 format ("YYYY-MM-DDThh:mm:ss.sss")
+
+              Default format is 24hour
+
+       -L, --list-devices
+
+              List available serial devices.
+
+       -l, --log
+
+              Enable log to file.
+
+              If no filename is provided the filename will be automatically generated.
+
+           --log-file <filename>
+
+              Set log filename.
+
+           --log-strip
+
+              Strip control characters and escape sequences from log.
+
+       -m, --map <flags>
+
+              Map (replace, translate) characters on input or output. The following mapping flags are supported:
+
+              ICRNL       Map CR to NL on input (unless IGNCR is set)
+
+              IGNCR       Ignore CR on input
+
+              INLCR       Map NL to CR on input
+
+              INLCRNL     Map NL to CR-NL on input
+
+              OCRNL       Map CR to NL on output
+
+              ODELBS      Map DEL to BS on output
+
+              ONLCRNL     Map NL to CR-NL on output
+
+              OLTU        Map lowercase characters to uppercase on output
+
+              If defining more than one flag, the flags must be comma separated.
+
+       -x, --hexadecimal
+
+              Enable hexadecimal mode.
+
+       -c, --color 0..255|none|list
+
+              Colorize tio text using ANSI color code value ranging from 0 to 255 or use "none" for no color.
+
+              Use "list" to print a list of available ANSI color codes.
+
+              Default value is 15.
+
+       -S, --socket <socket>
+
+              Redirect I/O to socket. Any input from clients connected to the socket is sent on the serial port as if entered at the ter‐
+              minal  where tio is running (except that ctrl-t sequences are not recognized), and any input from the serial port is multi‐
+              plexed to the terminal and all connected clients.
+
+              Sockets remain open while the serial port is disconnected, and writes will block.
+
+              Various socket types are supported using the following prefixes in the socket field:
+
+              unix:<filename>     Unix Domain Socket (file)
+
+              inet:<port>         Internet Socket (network)
+
+              inet6:<port>        Internet IPv6 Socket (network)
+
+              If port is 0 or no port is provided default port 3333 is used.
+
+              At present there is a hardcoded limit of 16 clients connected at one time.
+
+       -v, --version
+
+              Display program version.
+
+       -h, --help
+
+              Display help.
+
+KEYS
+       In session, the following key sequences are intercepted as tio commands:
+
+       ctrl-t ?        List available key commands
+
+       ctrl-t b        Send serial break (triggers SysRq on Linux, etc.)
+
+       ctrl-t c        Show configuration (baudrate, databits, etc.)
+
+       ctrl-t e        Toggle local echo mode
+
+       ctrl-t h        Toggle hexadecimal mode
+
+       ctrl-t l        Clear screen
+
+       ctrl-t q        Quit
+
+       ctrl-t s        Show TX/RX statistics
+
+       ctrl-t t        Send ctrl-t key code
+
+       ctrl-t L        Show line states (DTR, RTS, CTS, DSR, DCD, RI)
+
+       ctrl-t d        Toggle DTR
+
+       ctrl-t D        Pulse DTR
+
+       ctrl-t r        Toggle RTS
+
+       ctrl-t U        Toggle conversion to uppercase on output
+
+       ctrl-t v        Show version
+
+HEXADECIMAL MODE
+       In hexadecimal mode each incoming byte is printed out as a hexadecimal value.
+
+       Bytes can be sent in this mode by typing the two-character hexadecimal representation of the value, e.g.: to  send  0xA  you  must
+       type 0a or 0A.
+
+CONFIGURATION FILE
+       Options can be set via configuration file using the INI format. tio uses the configuration file first found in the following loca‐
+       tions in the order listed:
+
+       $XDG_CONFIG_HOME/tio/tiorc
+
+       $HOME/.config/tio/tiorc
+
+       $HOME/.tiorc
+
+       Labels can be used to group settings into named sub-configurations which can be activated from the command-line when starting tio.
+
+       tio will try to match the user input to a sub-configuration by name or by pattern to get the tty and other options.
+
+       Options without any label change the default options.
+
+       Any options set via command-line will override options set in the configuration file.
+
+       The following configuration file options are available:
+
+       pattern             Pattern matching user input. This pattern can be an extended regular expression with a single group.
+
+       tty                 tty device to open. If it contains a "%s" it is substituted with the first group match.
+
+       baudrate            Set baud rate
+
+       databits            Set data bits
+
+       flow                Set flow control
+
+       stopbits            Set stop bits
+
+       parity              Set parity
+
+       output-delay        Set output character delay
+
+       output-line-delay   Set output line delay
+
+       dtr-pulse-duration  Set DTR pulse duration
+
+       no-autoconnect      Disable automatic connect
+
+       log                 Enable log to file
+
+       log-file            Set log filename
+
+       log-strip           Enable strip of control and escape sequences from log
+
+       local-echo          Enable local echo
+
+       timestamp           Enable line timestamp
+
+       timestamp-format    Set timestamp format
+
+       map                 Map characters on input or output
+
+       color               Colorize tio text using ANSI color code ranging from 0 to 255
+
+       hexadecimal         Enable hexadecimal mode
+
+       socket              Set socket to redirect I/O to
+
+CONFIGURATION FILE EXAMPLES
+       To change the default configuration simply set options like so:
+
+              # Defaults
+              baudrate = 9600
+              databits = 8
+              parity = none
+              stopbits = 1
+              color = 10
+              dtr-pulse-duration = 50
+
+       Named sub-configurations can be added via labels:
+
+              [rpi3]
+              tty = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+              baudrate = 115200
+              color = 11
+
+       Activate the sub-configuration by name:
+
+              $ tio rpi3
+
+       Which is equivalent to:
+
+              $ tio -b 115200 -c 11 /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+
+       A sub-configuration can also be activated by its pattern which supports regular expressions:
+
+              [usb device]
+              pattern = usb([0-9]*)
+              tty = /dev/ttyUSB%s
+              baudrate = 115200
+
+       Activate the sub-configuration by pattern match:
+
+              $ tio usb12
+
+       Which is equivalent to:
+
+              $ tio -b 115200 /dev/ttyUSB12
+
+       It is also possible to combine use of sub-configuration and command-line options. For example:
+
+              $ tio -l -t usb12
+
+EXAMPLES
+       Typical use is without options:
+
+              $ tio /dev/ttyUSB0
+
+       Which corresponds to the commonly used default options:
+
+              $ tio -b 115200 -d 8 -f none -s 1 -p none /dev/ttyUSB0
+
+       It is recommended to connect serial tty devices by ID:
+
+              $ tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+
+       Using serial devices by ID ensures that tio automatically reconnects to the correct serial device if it is disconnected  and  then
+       reconnected.
+
+       Redirect serial device I/O to Unix file socket for scripting:
+
+              $ tio -S unix:/tmp/tmux-socket0 /dev/ttyUSB0
+
+       Then, to issue a command via the file socket simply do:
+
+              $ echo "ls -la" | nc -UN /tmp/tmux-socket0 > /dev/null
+
+       Or use the expect command to script an interaction:
+
+              #!/usr/bin/expect -f
+
+              set timeout -1
+              log_user 0
+
+              spawn nc -UN /tmp/tio-socket0
+              set uart $spawn_id
+
+              send -i $uart "date\n"
+              expect -i $uart "prompt> "
+              send -i $uart "ls -la\n"
+              expect -i $uart "prompt> "
+
+       Redirect device I/O to network file socket for remote tty sharing:
+
+              $ tio --socket inet:4444 /dev/ttyUSB0
+
+       Then, use netcat to connect to the shared tty session over network (assuming tio is hosted on IP 10.0.0.42):
+
+              $ nc -N 10.0.0.42 4444
+
+       Pipe data from file to the serial device:
+
+              $ cat data.bin | tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+
+WEBSITE
+       Visit https://tio.github.io
+
+AUTHOR
+       Created by Martin Lund <martin.lund@keep-it-simple.com>.
+
+tio 1.45                                                        2022-07-13                                                         tio(1)

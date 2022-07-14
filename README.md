@@ -51,6 +51,9 @@ when used in combination with [tmux](https://tmux.github.io).
 
 ## 3. Usage
 
+For more usage details please see the man page documentation
+[here](man/tio.1.txt).
+
 ### 3.1 Command-line
 
 The command-line interface is straightforward as reflected in the output from
