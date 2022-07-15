@@ -1,5 +1,43 @@
 
-=== tio v1.44 ===
+=== tio v1.45 ===
+
+
+
+Changes since tio v1.44:
+
+ * Introduce bold color option
+
+   Introduce "bold" color option which only apply bold color formatting to
+   existing system color.
+
+   Also make "bold" the default color option.
+
+   Fixes all white issue with black on white tio text.
+
+ * Update README
+
+ * Change 'ctrl-t T' to 'ctrl-t t' for timestamp toggle
+
+ * Add support for remapping prefix key
+
+   Make it possible to remap the prefix key (default: ctrl-t) by setting
+   the prefix-ctrl-key variable in the configuration file.
+
+   Allowed values are in the range a..z.
+
+   Example, to set the prefix key to ctrl-a simply do:
+
+   prefix-ctrl-key = a
+
+ * Add plaintext man page
+
+Rui Chen:
+
+ * docs: add homebrew installation note
+
+ * fix macOS build
+
+ * fix compilation error
 
 
 
