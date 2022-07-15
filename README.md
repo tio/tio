@@ -145,6 +145,8 @@ ctrl-t ? to list the available key commands.
 [20:19:12.041]  ctrl-t v   Show version
 ```
 
+If needed, the prefix key (ctrl-t) can be remapped via configuration file.
+
 ### 3.3 Configuration file
 
 Options can be set via the configuration file first found in any of the
