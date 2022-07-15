@@ -47,6 +47,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Pipe input and/or output
  * Bash completion
  * Color support
+ * Remapping of prefix key
  * Man page documentation
 
 ## 3. Usage
