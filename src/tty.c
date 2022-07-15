@@ -61,6 +61,25 @@
 #define CMSPAR   010000000000
 #endif
 
+#define KEY_QUESTION 0x3f
+#define KEY_B 0x62
+#define KEY_C 0x63
+#define KEY_E 0x65
+#define KEY_H 0x68
+#define KEY_L 0x6C
+#define KEY_Q 0x71
+#define KEY_S 0x73
+#define KEY_T 0x74
+#define KEY_U 0x55
+#define KEY_V 0x76
+#define KEY_D 0x64
+#define KEY_SHIFT_D 0x44
+#define KEY_R 0x72
+#define KEY_SHIFT_L 0x4C
+
+#define NORMAL 0
+#define HEX 1
+
 bool interactive_mode = true;
 
 static struct termios tio, tio_old, stdout_new, stdout_old, stdin_new, stdin_old;
@@ -283,8 +302,8 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" ctrl-%c q   Quit", option.prefix_key);
                 tio_printf(" ctrl-%c r   Toggle RTS line", option.prefix_key);
                 tio_printf(" ctrl-%c s   Show statistics", option.prefix_key);
-                tio_printf(" ctrl-%c T   Toggle line timestamp mode", option.prefix_key);
-                tio_printf(" ctrl-%c U   Toggle conversion to uppercase", option.prefix_key);
+                tio_printf(" ctrl-%c t   Toggle line timestamp mode", option.prefix_key);
+                tio_printf(" ctrl-%c U   Toggle conversion to uppercase on output", option.prefix_key);
                 tio_printf(" ctrl-%c v   Show version", option.prefix_key);
                 break;
 
@@ -363,7 +382,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" Received %lu bytes", rx_total);
                 break;
 
-            case KEY_SHIFT_T:
+            case KEY_T:
                 option.timestamp += 1;
                 switch (option.timestamp)
                 {

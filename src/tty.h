@@ -23,26 +23,6 @@
 
 #include <stdbool.h>
 
-#define KEY_QUESTION 0x3f
-#define KEY_B 0x62
-#define KEY_C 0x63
-#define KEY_E 0x65
-#define KEY_H 0x68
-#define KEY_L 0x6C
-#define KEY_Q 0x71
-#define KEY_S 0x73
-#define KEY_T 0x74
-#define KEY_SHIFT_T 0x54
-#define KEY_U 0x55
-#define KEY_V 0x76
-#define KEY_D 0x64
-#define KEY_SHIFT_D 0x44
-#define KEY_R 0x72
-#define KEY_SHIFT_L 0x4C
-
-#define NORMAL 0
-#define HEX 1
-
 extern bool interactive_mode;
 
 void stdout_configure(void);

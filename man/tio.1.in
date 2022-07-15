@@ -226,6 +226,8 @@ Toggle DTR
 Pulse DTR
 .IP "\fBctrl-t r"
 Toggle RTS
+.IP "\fBctrl-t t"
+Toggle line timestamp mode
 .IP "\fBctrl-t U"
 Toggle conversion to uppercase on output
 .IP "\fBctrl-t v"
