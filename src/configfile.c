@@ -226,6 +226,12 @@ static int data_handler(void *user, const char *section, const char *name,
                 return 0;
             }
 
+            if (!strcmp(value, "bold"))
+            {
+                option.color = 256; // Bold
+                return 0;
+            }
+
             option.color = atoi(value);
             if ((option.color < 0) || (option.color > 255))
             {

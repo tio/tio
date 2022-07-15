@@ -65,7 +65,7 @@ struct option_t option =
     .timestamp = TIMESTAMP_NONE,
     .socket = NULL,
     .map = "",
-    .color = 15,
+    .color = 256, // Bold
     .hex_mode = false,
     .prefix_code = 20, // ctrl-t
     .prefix_key = 't',
@@ -95,7 +95,7 @@ void print_help(char *argv[])
     printf("      --log-file <filename>              Set log filename\n");
     printf("      --log-strip                        Strip control characters and escape sequences\n");
     printf("  -m, --map <flags>                      Map characters\n");
-    printf("  -c, --color 0..255|none|list           Colorize tio text (default: 15)\n");
+    printf("  -c, --color 0..255|bold|none|list      Colorize tio text (default: bold)\n");
     printf("  -S, --socket <socket>                  Redirect I/O to file or network socket\n");
     printf("  -x, --hexadecimal                      Enable hexadecimal mode\n");
     printf("  -v, --version                          Display version\n");
@@ -333,7 +333,13 @@ void options_parse(int argc, char *argv[])
 
                 if (!strcmp(optarg, "none"))
                 {
-                    option.color = -1;
+                    option.color = -1; // No color
+                    break;
+                }
+
+                if (!strcmp(optarg, "bold"))
+                {
+                    option.color = 256; // Bold
                     break;
                 }
 

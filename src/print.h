@@ -42,7 +42,7 @@ extern char ansi_format[];
 #define ansi_error_printf(format, args...) \
 { \
   if (option.color < 0) \
-    fprintf (stdout, "\r" format "\r\n", ## args); \
+    fprintf (stderr, "\r" format "\r\n", ## args); \
   else \
     fprintf (stderr, "\r%s" format ANSI_RESET "\r\n", ansi_format, ## args); \
   fflush(stderr); \

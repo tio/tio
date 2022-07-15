@@ -155,14 +155,15 @@ If defining more than one flag, the flags must be comma separated.
 Enable hexadecimal mode.
 
 .TP
-.BR \-c ", " "\-\-color " \fI0..255|none|list
+.BR \-c ", " "\-\-color " \fI0..255|bold|none|list
 
 Colorize tio text using ANSI color code value ranging from 0 to 255 or use
-"none" for no color.
+"none" for no color or use "bold" to apply bold formatting to existing system
+color.
 
 Use "list" to print a list of available ANSI color codes.
 
-Default value is 15.
+Default value is "bold".
 
 .TP
 .BR \-S ", " "\-\-socket \fI<socket>\fR\fB

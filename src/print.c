@@ -39,6 +39,14 @@ void print_normal(char c)
 
 void print_init_ansi_formatting()
 {
-  // Set bold text with user defined ANSI color
-  sprintf(ansi_format, "\e[1;38;5;%dm", option.color);
+  if (option.color == 256)
+  {
+    // Set bold text with no color changes
+    sprintf(ansi_format, "\e[1m");
+  }
+  else
+  {
+    // Set bold text with user defined ANSI color
+    sprintf(ansi_format, "\e[1;38;5;%dm", option.color);
+  }
 }
