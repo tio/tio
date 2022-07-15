@@ -160,7 +160,8 @@ OPTIONS
               Display help.
 
 KEYS
-       In session, the following key sequences are intercepted as tio commands:
+       In session, the following key sequences, a prefix key (default: ctrl-t) followed by a command key, are  intercepted  as  tio  com‐
+       mands:
 
        ctrl-t ?        List available key commands
 
@@ -178,8 +179,6 @@ KEYS
 
        ctrl-t s        Show TX/RX statistics
 
-       ctrl-t t        Send ctrl-t key code
-
        ctrl-t L        Show line states (DTR, RTS, CTS, DSR, DCD, RI)
 
        ctrl-t d        Toggle DTR
@@ -188,6 +187,8 @@ KEYS
 
        ctrl-t r        Toggle RTS
 
+       ctrl-t t        Toggle line timestamp mode
+
        ctrl-t U        Toggle conversion to uppercase on output
 
        ctrl-t v        Show version
@@ -195,7 +196,7 @@ KEYS
 HEXADECIMAL MODE
        In hexadecimal mode each incoming byte is printed out as a hexadecimal value.
 
-       Bytes can be sent in this mode by typing the two-character hexadecimal representation of the value, e.g.: to  send  0xA  you  must
+       Bytes  can  be  sent  in this mode by typing the two-character hexadecimal representation of the value, e.g.: to send 0xA you must
        type 0a or 0A.
 
 CONFIGURATION FILE
@@ -260,6 +261,8 @@ CONFIGURATION FILE
 
        socket              Set socket to redirect I/O to
 
+       prefix-ctrl-key     Set prefix ctrl key (a..z, default: t)
+
 CONFIGURATION FILE EXAMPLES
        To change the default configuration simply set options like so:
 
@@ -318,7 +321,7 @@ EXAMPLES
 
               $ tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 
-       Using serial devices by ID ensures that tio automatically reconnects to the correct serial device if it is disconnected  and  then
+       Using  serial  devices by ID ensures that tio automatically reconnects to the correct serial device if it is disconnected and then
        reconnected.
 
        Redirect serial device I/O to Unix file socket for scripting:
