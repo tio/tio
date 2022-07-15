@@ -262,7 +262,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
         forward = &unused_bool;
 
     /* Handle escape key commands */
-    if (previous_char == KEY_CTRL_T)
+    if (previous_char == option.prefix_code)
     {
         /* Do not forward input char to output by default */
         *forward = false;
@@ -271,22 +271,21 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
         {
             case KEY_QUESTION:
                 tio_printf("Key commands:");
-                tio_printf(" ctrl-t ?   List available key commands");
-                tio_printf(" ctrl-t b   Send break");
-                tio_printf(" ctrl-t c   Show configuration");
-                tio_printf(" ctrl-t d   Toggle DTR line");
-                tio_printf(" ctrl-t D   Pulse DTR line");
-                tio_printf(" ctrl-t e   Toggle local echo mode");
-                tio_printf(" ctrl-t h   Toggle hexadecimal mode");
-                tio_printf(" ctrl-t l   Clear screen");
-                tio_printf(" ctrl-t L   Show line states");
-                tio_printf(" ctrl-t q   Quit");
-                tio_printf(" ctrl-t r   Toggle RTS line");
-                tio_printf(" ctrl-t s   Show statistics");
-                tio_printf(" ctrl-t t   Send ctrl-t key code");
-                tio_printf(" ctrl-t T   Toggle line timestamp mode");
-                tio_printf(" ctrl-t U   Toggle conversion to uppercase");
-                tio_printf(" ctrl-t v   Show version");
+                tio_printf(" ctrl-%c ?   List available key commands", option.prefix_key);
+                tio_printf(" ctrl-%c b   Send break", option.prefix_key);
+                tio_printf(" ctrl-%c c   Show configuration", option.prefix_key);
+                tio_printf(" ctrl-%c d   Toggle DTR line", option.prefix_key);
+                tio_printf(" ctrl-%c D   Pulse DTR line", option.prefix_key);
+                tio_printf(" ctrl-%c e   Toggle local echo mode", option.prefix_key);
+                tio_printf(" ctrl-%c h   Toggle hexadecimal mode", option.prefix_key);
+                tio_printf(" ctrl-%c l   Clear screen", option.prefix_key);
+                tio_printf(" ctrl-%c L   Show line states", option.prefix_key);
+                tio_printf(" ctrl-%c q   Quit", option.prefix_key);
+                tio_printf(" ctrl-%c r   Toggle RTS line", option.prefix_key);
+                tio_printf(" ctrl-%c s   Show statistics", option.prefix_key);
+                tio_printf(" ctrl-%c T   Toggle line timestamp mode", option.prefix_key);
+                tio_printf(" ctrl-%c U   Toggle conversion to uppercase", option.prefix_key);
+                tio_printf(" ctrl-%c v   Show version", option.prefix_key);
                 break;
 
             case KEY_SHIFT_L:
@@ -362,12 +361,6 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf("Statistics:");
                 tio_printf(" Sent %lu bytes", tx_total);
                 tio_printf(" Received %lu bytes", rx_total);
-                break;
-
-            case KEY_T:
-                /* Send ctrl-t key code upon ctrl-t t sequence */
-                *output_char = KEY_CTRL_T;
-                *forward = true;
                 break;
 
             case KEY_SHIFT_T:
@@ -1057,8 +1050,8 @@ int tty_connect(void)
 
                     if (interactive_mode)
                     {
-                        /* Do not forward ctrl-t key */
-                        if (input_char == KEY_CTRL_T)
+                        /* Do not forward prefix key */
+                        if (input_char == option.prefix_code)
                         {
                             forward = false;
                         }

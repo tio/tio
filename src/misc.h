@@ -26,3 +26,4 @@
 char * current_time(void);
 void delay(long ms);
 long string_to_long(char *string);
+int ctrl_key_code(unsigned char key);

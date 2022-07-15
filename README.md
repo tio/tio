@@ -89,8 +89,6 @@ The command-line interface is straightforward as reflected in the output from
 
   Options and sub-configurations may be set via configuration file.
 
-  In session, press ctrl-t q to quit.
-
   See the man page for more details.
 
 ```

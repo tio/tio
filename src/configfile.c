@@ -237,6 +237,15 @@ static int data_handler(void *user, const char *section, const char *name,
             asprintf(&c->socket, "%s", value);
             option.socket = c->socket;
         }
+        else if (!strcmp(name, "prefix-ctrl-key"))
+        {
+            if (ctrl_key_code(value[0]) > 0)
+            {
+                option.prefix_code = ctrl_key_code(value[0]);
+                option.prefix_key = value[0];
+            }
+        }
+
     }
     return 0;
 }

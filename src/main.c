@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
     tio_printf("tio v%s", VERSION);
     if (interactive_mode)
     {
-        tio_printf("Press ctrl-t q to quit");
+        tio_printf("Press ctrl-%c q to quit", option.prefix_key);
     }
 
     /* Open socket */

@@ -201,7 +201,7 @@ Display help.
 .SH "KEYS"
 .PP
 .TP 16n
-In session, the following key sequences are intercepted as tio commands:
+In session, the following key sequences, a prefix key (default: ctrl-t) followed by a command key, are intercepted as tio commands:
 .IP "\fBctrl-t ?"
 List available key commands
 .IP "\fBctrl-t b"
@@ -218,8 +218,6 @@ Clear screen
 Quit
 .IP "\fBctrl-t s"
 Show TX/RX statistics
-.IP "\fBctrl-t t"
-Send ctrl-t key code
 .IP "\fBctrl-t L"
 Show line states (DTR, RTS, CTS, DSR, DCD, RI)
 .IP "\fBctrl-t d"
@@ -315,6 +313,8 @@ Colorize tio text using ANSI color code ranging from 0 to 255
 Enable hexadecimal mode
 .IP "\fBsocket"
 Set socket to redirect I/O to
+.IP "\fBprefix-ctrl-key"
+Set prefix ctrl key (a..z, default: t)
 
 .SH "CONFIGURATION FILE EXAMPLES"
 

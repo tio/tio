@@ -67,6 +67,8 @@ struct option_t option =
     .map = "",
     .color = 15,
     .hex_mode = false,
+    .prefix_code = 20, // ctrl-t
+    .prefix_key = 't',
 };
 
 void print_help(char *argv[])
@@ -100,8 +102,6 @@ void print_help(char *argv[])
     printf("  -h, --help                             Display help\n");
     printf("\n");
     printf("Options and sub-configurations may be set via configuration file.\n");
-    printf("\n");
-    printf("In session, press ctrl-t q to quit.\n");
     printf("\n");
     printf("See the man page for more details.\n");
 }

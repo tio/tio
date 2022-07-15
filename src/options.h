@@ -60,6 +60,8 @@ struct option_t
     const char *socket;
     int color;
     bool hex_mode;
+    unsigned char prefix_code;
+    unsigned char prefix_key;
 };
 
 extern struct option_t option;
