@@ -1,0 +1,46 @@
+###############################
+# tio - https://tio.github.io #
+###############################
+
+# Example configuration file
+
+# Defaults
+baudrate = 115200
+databits = 8
+flow = none
+stopbits = 1
+parity = none
+prefix-ctrl-key = t
+output-delay = 0
+output-line-delay = 0
+dtr-pulse-duration = 0
+no-autoconnect = disable
+hexadecimal = disable
+timestamp = disable
+color = bold
+
+# Sub-configuraions
+
+[rpi3]
+baudrate = 115200
+tty = /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A6009HU3-if00-port0
+socket = unix:/tmp/tio-socket-0
+color = 9
+
+[am64-evm]
+baudrate = 115200
+tty = /dev/serial/by-id/usb-Silicon_Labs_CP2105_Dual_USB_to_UART_Bridge_Controller_01093176-if01-port0
+color = 10
+
+[tincan]
+baudrate = 9600
+tty = /dev/serial/by-id/usb-TinCanTools_Flyswatter2_FS20000-if00-port0
+log = enable
+log-file = tincan.log
+log-strip = enable
+color = 11
+
+[usb devices]
+pattern = usb([0-9]*)
+tty = /dev/ttyUSB%s
+color = 12
