@@ -194,6 +194,7 @@ Or by pattern match:
 $ tio usb12
 ```
 
+Another configuration file example is available [here](example/tiorc).
 
 ## 4. Installation
 
