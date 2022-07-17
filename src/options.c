@@ -330,14 +330,12 @@ void options_parse(int argc, char *argv[])
                     }
                     exit(EXIT_SUCCESS);
                 }
-
-                if (!strcmp(optarg, "none"))
+                else if (!strcmp(optarg, "none"))
                 {
                     option.color = -1; // No color
                     break;
                 }
-
-                if (!strcmp(optarg, "bold"))
+                else if (!strcmp(optarg, "bold"))
                 {
                     option.color = 256; // Bold
                     break;

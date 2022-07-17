@@ -219,14 +219,12 @@ static int data_handler(void *user, const char *section, const char *name,
                 // Ignore
                 return 0;
             }
-
-            if (!strcmp(value, "none"))
+            else if (!strcmp(value, "none"))
             {
                 option.color = -1; // No color
                 return 0;
             }
-
-            if (!strcmp(value, "bold"))
+            else if (!strcmp(value, "bold"))
             {
                 option.color = 256; // Bold
                 return 0;
