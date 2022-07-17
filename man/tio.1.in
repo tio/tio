@@ -451,7 +451,12 @@ Then, use netcat to connect to the shared tty session over network (assuming tio
 $ nc -N 10.0.0.42 4444
 
 .TP
-Pipe data from file to the serial device:
+Pipe command to the serial device:
+
+$ echo "ls -la" | tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
+ 
+.TP
+Likewise, to pipe data from file to the serial device:
 
 $ cat data.bin | tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
 
