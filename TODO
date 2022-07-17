@@ -1,6 +1,4 @@
 
- * Improve error/warning messaging when parsing configuration file
-
  * Consider reworking line toggle and line pulse featueres in case requests are made to apply them to more lines:
 
      ctrl-t g Toggle serial line
