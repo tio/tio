@@ -1,4 +1,4 @@
-tio(1)                                                                                                                              User Commands                                                                                                                             tio(1)
+tio(1)                                                         User Commands                                                        tio(1)
 
 NAME
        tio - a simple serial device I/O tool
@@ -7,7 +7,8 @@ SYNOPSIS
        tio [<options>] <tty-device|sub-config>
 
 DESCRIPTION
-       tio is a simple serial device tool which features a straightforward command-line and configuration file interface to easily connect to serial TTY devices for basic I/O operations.
+       tio is a simple serial device tool which features a straightforward command-line and configuration file interface to easily connect
+       to serial TTY devices for basic I/O operations.
 
 OPTIONS
        -b, --baudrate <bps>
@@ -30,7 +31,8 @@ OPTIONS
 
               Set parity (default: none).
 
-              Note: With mark parity the parity bit is always 0. With space parity the parity bit is always 1. Not all platforms support mark and space parity.
+              Note: With mark parity the parity bit is always 0. With space parity the parity bit is always 1. Not all  platforms  support
+              mark and space parity.
 
        -o, --output-delay <ms>
 
@@ -48,9 +50,12 @@ OPTIONS
 
               Disable automatic connect.
 
-              By default tio automatically connects to the provided device if present. If the device is not present, it will wait for it to appear and then connect. If the connection is lost (eg. device disconnects), it will wait for the device to reappear and then reconnect.
+              By  default  tio automatically connects to the provided device if present. If the device is not present, it will wait for it
+              to appear and then connect. If the connection is lost (eg. device disconnects), it will wait for the device to reappear  and
+              then reconnect.
 
-              However, if the --no-autoconnect option is provided, tio will exit if the device is not present or an established connection is lost.
+              However, if the --no-autoconnect option is provided, tio will exit if the device is not present or an established connection
+              is lost.
 
        -e, --local-echo
 
@@ -120,7 +125,8 @@ OPTIONS
 
        -c, --color 0..255|bold|none|list
 
-              Colorize tio text using ANSI color code value ranging from 0 to 255 or use "none" for no color or use "bold" to apply bold formatting to existing system color.
+              Colorize tio text using ANSI color code value ranging from 0 to 255 or use "none" for no color or use "bold" to  apply  bold
+              formatting to existing system color.
 
               Use "list" to print a list of available ANSI color codes.
 
@@ -128,8 +134,9 @@ OPTIONS
 
        -S, --socket <socket>
 
-              Redirect  I/O to socket. Any input from clients connected to the socket is sent on the serial port as if entered at the terminal where tio is running (except that ctrl-t sequences are not recognized), and any input from the serial port is multiplexed to the ter‐
-              minal and all connected clients.
+              Redirect  I/O to socket. Any input from clients connected to the socket is sent on the serial port as if entered at the ter‐
+              minal where tio is running (except that ctrl-t sequences are not recognized), and any input from the serial port  is  multi‐
+              plexed to the terminal and all connected clients.
 
               Sockets remain open while the serial port is disconnected, and writes will block.
 
@@ -189,10 +196,12 @@ KEYS
 HEXADECIMAL MODE
        In hexadecimal mode each incoming byte is printed out as a hexadecimal value.
 
-       Bytes can be sent in this mode by typing the two-character hexadecimal representation of the value, e.g.: to send 0xA you must type 0a or 0A.
+       Bytes can be sent in this mode by typing the two-character hexadecimal representation of the value, e.g.: to send 0xA you must type
+       0a or 0A.
 
 CONFIGURATION FILE
-       Options can be set via configuration file using the INI format. tio uses the configuration file first found in the following locations in the order listed:
+       Options can be set via configuration file using the INI format. tio uses the configuration file first found in the following  loca‐
+       tions in the order listed:
 
        $XDG_CONFIG_HOME/tio/tiorc
 
@@ -312,7 +321,8 @@ EXAMPLES
 
               $ tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 
-       Using serial devices by ID ensures that tio automatically reconnects to the correct serial device if it is disconnected and then reconnected.
+       Using  serial  devices  by ID ensures that tio automatically reconnects to the correct serial device if it is disconnected and then
+       reconnected.
 
        Redirect serial device I/O to Unix file socket for scripting:
 
@@ -345,7 +355,11 @@ EXAMPLES
 
               $ nc -N 10.0.0.42 4444
 
-       Pipe data from file to the serial device:
+       Pipe command to the serial device:
+
+              $ echo "ls -la" | tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+
+       Likewise, to pipe data from file to the serial device:
 
               $ cat data.bin | tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 
@@ -355,4 +369,4 @@ WEBSITE
 AUTHOR
        Created by Martin Lund <martin.lund@keep-it-simple.com>.
 
-tio 1.45                                                                                                                             2022-07-15                                                                                                                               tio(1)
+tio 1.46                                                        2022-07-15                                                          tio(1)
