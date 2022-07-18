@@ -62,15 +62,13 @@ char *current_time(void)
         case TIMESTAMP_24HOUR_START:
             // "hh:mm:ss.sss" (24 hour format relative to start time)
             timersub(&tv_now, &tv_start, &tv);
-            tv.tv_sec -= 3600; // Why is this needed??
-            tm = localtime(&tv.tv_sec);
+            tm = gmtime(&tv.tv_sec);
             len = strftime(time_string, sizeof(time_string), "%H:%M:%S", tm);
             break;
         case TIMESTAMP_24HOUR_DELTA:
             // "hh:mm:ss.sss" (24 hour format relative to previous time stamp)
             timersub(&tv_now, &tv_previous, &tv);
-            tv.tv_sec -= 3600; // Why is this needed??
-            tm = localtime(&tv.tv_sec);
+            tm = gmtime(&tv.tv_sec);
             len = strftime(time_string, sizeof(time_string), "%H:%M:%S", tm);
             break;
         case TIMESTAMP_ISO8601:
