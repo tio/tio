@@ -1,4 +1,4 @@
-tio(1)                                                         User Commands                                                        tio(1)
+tio(1)                                                        User Commands                                                        tio(1)
 
 NAME
        tio - a simple serial device I/O tool
@@ -7,8 +7,8 @@ SYNOPSIS
        tio [<options>] <tty-device|sub-config>
 
 DESCRIPTION
-       tio is a simple serial device tool which features a straightforward command-line and configuration file interface to easily connect
-       to serial TTY devices for basic I/O operations.
+       tio  is  a simple serial device tool which features a straightforward command-line and configuration file interface to easily con‐
+       nect to serial TTY devices for basic I/O operations.
 
 OPTIONS
        -b, --baudrate <bps>
@@ -31,7 +31,7 @@ OPTIONS
 
               Set parity (default: none).
 
-              Note: With mark parity the parity bit is always 0. With space parity the parity bit is always 1. Not all  platforms  support
+              Note: With mark parity the parity bit is always 0. With space parity the parity bit is always 1. Not all platforms  support
               mark and space parity.
 
        -o, --output-delay <ms>
@@ -42,20 +42,39 @@ OPTIONS
 
               Set output delay [ms] inserted between each sent line (default: 0).
 
-           --dtr-pulse-duration <ms>
+           --line-pulse-duration <duration>
 
-              Set the duration [ms] of the DTR pulse (default: 100).
+              Set  the  pulse  duration  [ms]  of  each serial port line using the following key valur pair format in the duration field:
+              <key>=<value>
+
+              Each key represents a serial line. The following keys are available:
+
+              DTR - Data Terminal Ready
+
+              RTS - Request To Send
+
+              CTS - Clear To Send
+
+              DSR - Data Set Ready
+
+              DCD - Data Carrier Detect
+
+              RI  - Ring Indicator
+
+              If defining more than one key value pair, the pairs must be comma separated.
+
+              The default pulse duration for each line is 100 ms.
 
        -n, --no-autoconnect
 
               Disable automatic connect.
 
-              By  default  tio automatically connects to the provided device if present. If the device is not present, it will wait for it
-              to appear and then connect. If the connection is lost (eg. device disconnects), it will wait for the device to reappear  and
+              By default tio automatically connects to the provided device if present. If the device is not present, it will wait for  it
+              to appear and then connect. If the connection is lost (eg. device disconnects), it will wait for the device to reappear and
               then reconnect.
 
-              However, if the --no-autoconnect option is provided, tio will exit if the device is not present or an established connection
-              is lost.
+              However, if the --no-autoconnect option is provided, tio will exit if the device is not present or an  established  connec‐
+              tion is lost.
 
        -e, --local-echo
 
@@ -125,7 +144,7 @@ OPTIONS
 
        -c, --color 0..255|bold|none|list
 
-              Colorize tio text using ANSI color code value ranging from 0 to 255 or use "none" for no color or use "bold" to  apply  bold
+              Colorize  tio text using ANSI color code value ranging from 0 to 255 or use "none" for no color or use "bold" to apply bold
               formatting to existing system color.
 
               Use "list" to print a list of available ANSI color codes.
@@ -134,8 +153,8 @@ OPTIONS
 
        -S, --socket <socket>
 
-              Redirect  I/O to socket. Any input from clients connected to the socket is sent on the serial port as if entered at the ter‐
-              minal where tio is running (except that ctrl-t sequences are not recognized), and any input from the serial port  is  multi‐
+              Redirect I/O to socket. Any input from clients connected to the socket is sent on the serial port as if entered at the ter‐
+              minal  where tio is running (except that ctrl-t sequences are not recognized), and any input from the serial port is multi‐
               plexed to the terminal and all connected clients.
 
               Sockets remain open while the serial port is disconnected, and writes will block.
@@ -161,7 +180,8 @@ OPTIONS
               Display help.
 
 KEYS
-       In session, the following key sequences, a prefix key (default: ctrl-t) followed by a command key, are intercepted as tio commands:
+       In session, the following key sequences, a prefix key (default: ctrl-t) followed by a command key, are  intercepted  as  tio  com‐
+       mands:
 
        ctrl-t ?        List available key commands
 
@@ -171,21 +191,19 @@ KEYS
 
        ctrl-t e        Toggle local echo mode
 
+       ctrl-t g        Toggle serial port line
+
        ctrl-t h        Toggle hexadecimal mode
 
        ctrl-t l        Clear screen
 
+       ctrl-t L        Show line states (DTR, RTS, CTS, DSR, DCD, RI)
+
+       ctrl-t p        Pulse serial port line
+
        ctrl-t q        Quit
 
        ctrl-t s        Show TX/RX statistics
-
-       ctrl-t L        Show line states (DTR, RTS, CTS, DSR, DCD, RI)
-
-       ctrl-t d        Toggle DTR
-
-       ctrl-t D        Pulse DTR
-
-       ctrl-t r        Toggle RTS
 
        ctrl-t t        Toggle line timestamp mode
 
@@ -196,11 +214,11 @@ KEYS
 HEXADECIMAL MODE
        In hexadecimal mode each incoming byte is printed out as a hexadecimal value.
 
-       Bytes can be sent in this mode by typing the two-character hexadecimal representation of the value, e.g.: to send 0xA you must type
-       0a or 0A.
+       Bytes  can  be  sent  in this mode by typing the two-character hexadecimal representation of the value, e.g.: to send 0xA you must
+       type 0a or 0A.
 
 CONFIGURATION FILE
-       Options can be set via configuration file using the INI format. tio uses the configuration file first found in the following  loca‐
+       Options can be set via configuration file using the INI format. tio uses the configuration file first found in the following loca‐
        tions in the order listed:
 
        $XDG_CONFIG_HOME/tio/tiorc
@@ -219,49 +237,49 @@ CONFIGURATION FILE
 
        The following configuration file options are available:
 
-       pattern             Pattern matching user input. This pattern can be an extended regular expression with a single group.
+       pattern              Pattern matching user input. This pattern can be an extended regular expression with a single group.
 
-       tty                 tty device to open. If it contains a "%s" it is substituted with the first group match.
+       tty                  tty device to open. If it contains a "%s" it is substituted with the first group match.
 
-       baudrate            Set baud rate
+       baudrate             Set baud rate
 
-       databits            Set data bits
+       databits             Set data bits
 
-       flow                Set flow control
+       flow                 Set flow control
 
-       stopbits            Set stop bits
+       stopbits             Set stop bits
 
-       parity              Set parity
+       parity               Set parity
 
-       output-delay        Set output character delay
+       output-delay         Set output character delay
 
-       output-line-delay   Set output line delay
+       output-line-delay    Set output line delay
 
-       dtr-pulse-duration  Set DTR pulse duration
+       line-pulse-duration  Set line pulse duration
 
-       no-autoconnect      Disable automatic connect
+       no-autoconnect       Disable automatic connect
 
-       log                 Enable log to file
+       log                  Enable log to file
 
-       log-file            Set log filename
+       log-file             Set log filename
 
-       log-strip           Enable strip of control and escape sequences from log
+       log-strip            Enable strip of control and escape sequences from log
 
-       local-echo          Enable local echo
+       local-echo           Enable local echo
 
-       timestamp           Enable line timestamp
+       timestamp            Enable line timestamp
 
-       timestamp-format    Set timestamp format
+       timestamp-format     Set timestamp format
 
-       map                 Map characters on input or output
+       map                  Map characters on input or output
 
-       color               Colorize tio text using ANSI color code ranging from 0 to 255
+       color                Colorize tio text using ANSI color code ranging from 0 to 255
 
-       hexadecimal         Enable hexadecimal mode
+       hexadecimal          Enable hexadecimal mode
 
-       socket              Set socket to redirect I/O to
+       socket               Set socket to redirect I/O to
 
-       prefix-ctrl-key     Set prefix ctrl key (a..z, default: t)
+       prefix-ctrl-key      Set prefix ctrl key (a..z, default: t)
 
 CONFIGURATION FILE EXAMPLES
        To change the default configuration simply set options like so:
@@ -272,7 +290,7 @@ CONFIGURATION FILE EXAMPLES
               parity = none
               stopbits = 1
               color = 10
-              dtr-pulse-duration = 50
+              line-pulse-duration = DTR=200,RTS=400
 
        Named sub-configurations can be added via labels:
 
@@ -321,7 +339,7 @@ EXAMPLES
 
               $ tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 
-       Using  serial  devices  by ID ensures that tio automatically reconnects to the correct serial device if it is disconnected and then
+       Using  serial  devices by ID ensures that tio automatically reconnects to the correct serial device if it is disconnected and then
        reconnected.
 
        Redirect serial device I/O to Unix file socket for scripting:
@@ -369,4 +387,4 @@ WEBSITE
 AUTHOR
        Created by Martin Lund <martin.lund@keep-it-simple.com>.
 
-tio 1.46                                                        2022-07-15                                                          tio(1)
+tio 1.46                                                        2022-07-15                                                         tio(1)
