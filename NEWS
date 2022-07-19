@@ -1,5 +1,52 @@
 
-=== tio v1.45 ===
+=== tio v1.46 ===
+
+
+
+Changes since tio v1.45:
+
+ * Rework toggle and pulse feature to support all lines
+
+   Replace existing toggle and pulse key commands with the following
+   generalized key commands which allows to toggle or pulse all serial port
+   lines:
+
+    ctrl-t g   Toggle serial port line
+    ctrl-t p   Pulse serial port line
+
+   When used, user will be asked which serial line to toggle or pulse.
+
+   Also introduce --line-pulse-duration option for setting specific pulse
+   duration in milliseconds for each serial line using a key value pair
+   format. Each key represents a serial line. The following keys are
+   available: DTR, RTS, CTS, DSR, DCD, RI.
+
+   Example:
+
+    $ tio /dev/ttyUSB0 --line-pulse-duration DTR=200,RTS=300,RI=50
+    
+   Likewise, the pulse duration can also be set via configuration file
+   using the line-pulse-duration variable:
+    
+    line-pulse-duration = DTR=200,RTS=300,RI=50
+
+ * Upgrade inih wrap to r56
+
+ * Optimization
+
+ * Add example configuration file
+
+
+Ralph Siemsen:
+
+ * Fix relative timestamps
+
+   Fix the display of relative timestamps. The hack of subtracting 3600
+   only works if you happen to be in a time zone that is one hour away from
+   UTC. When subtracting two time values, the result is an absolute
+   quantity (interval). These should be displayed as-is; without local time
+   zone nor daylight saving correction. Hence gmtime() instead of
+   localtime().
 
 
 
