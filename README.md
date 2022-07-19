@@ -32,7 +32,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * List available serial devices by ID
  * Show RX/TX statistics
  * Toggle serial lines
- * Pulse serial lines with configurable duration
+ * Pulse serial lines with configurable pulse duration
  * Local echo support
  * Map characters (nl, cr-nl, bs, lowercase to uppercase, etc.)
  * Line timestamps
