@@ -42,7 +42,7 @@ enum opt_t
     OPT_TIMESTAMP_FORMAT,
     OPT_LOG_FILE,
     OPT_LOG_STRIP,
-    OPT_DTR_PULSE_DURATION,
+    OPT_LINE_PULSE_DURATION,
 };
 
 /* Default options */
@@ -57,6 +57,11 @@ struct option_t option =
     .output_delay = 0,
     .output_line_delay = 0,
     .dtr_pulse_duration = 100,
+    .rts_pulse_duration = 100,
+    .cts_pulse_duration = 100,
+    .dsr_pulse_duration = 100,
+    .dcd_pulse_duration = 100,
+    .ri_pulse_duration = 100,
     .no_autoconnect = false,
     .log = false,
     .log_filename = NULL,
@@ -85,7 +90,7 @@ void print_help(char *argv[])
     printf("  -p, --parity odd|even|none|mark|space  Parity (default: none)\n");
     printf("  -o, --output-delay <ms>                Output character delay (default: 0)\n");
     printf("  -O, --output-line-delay <ms>           Output line delay (default: 0)\n");
-    printf("      --dtr-pulse-duration <ms>          DTR pulse duration (default: 100)\n");
+    printf("      --line-pulse-duration <duration>   Line pulse duration\n");
     printf("  -n, --no-autoconnect                   Disable automatic connect\n");
     printf("  -e, --local-echo                       Enable local echo\n");
     printf("  -t, --timestamp                        Enable line timestamp\n");
@@ -163,6 +168,63 @@ enum timestamp_t timestamp_option_parse(const char *arg)
     return timestamp;
 }
 
+void line_pulse_duration_option_parse(const char *arg)
+{
+    bool token_found = true;
+    char *token = NULL;
+    char *buffer = strdup(arg);
+
+    while (token_found == true)
+    {
+        if (token == NULL)
+        {
+            token = strtok(buffer,",");
+        }
+        else
+        {
+            token = strtok(NULL, ",");
+        }
+
+        if (token != NULL)
+        {
+            char keyname[10];
+            unsigned int value;
+            sscanf(token, "%10[^=]=%d", keyname, &value);
+
+            if (!strcmp(keyname, "DTR"))
+            {
+                option.dtr_pulse_duration = value;
+            }
+            else if (!strcmp(keyname, "RTS"))
+            {
+                option.rts_pulse_duration = value;
+            }
+            else if (!strcmp(keyname, "CTS"))
+            {
+                option.cts_pulse_duration = value;
+            }
+            else if (!strcmp(keyname, "DSR"))
+            {
+                option.dsr_pulse_duration = value;
+            }
+            else if (!strcmp(keyname, "DCD"))
+            {
+                option.dcd_pulse_duration = value;
+            }
+            else if (!strcmp(keyname, "RI"))
+            {
+                option.ri_pulse_duration = value;
+            }
+        }
+        else
+        {
+            token_found = false;
+        }
+    }
+    free(buffer);
+
+}
+
 void options_print()
 {
     tio_printf(" TTY device: %s", option.tty_device);
@@ -177,6 +239,12 @@ void options_print()
     tio_printf(" Output line delay: %d", option.output_line_delay);
     tio_printf(" DTR pulse duration: %d", option.dtr_pulse_duration);
     tio_printf(" Auto connect: %s", option.no_autoconnect ? "disabled" : "enabled");
+    tio_printf(" Pulse duration: DTR=%d RTS=%d CTS=%d DSR=%d DCD=%d RI=%d", option.dtr_pulse_duration,
+                                                                            option.rts_pulse_duration,
+                                                                            option.cts_pulse_duration,
+                                                                            option.dsr_pulse_duration,
+                                                                            option.dcd_pulse_duration,
+                                                                            option.ri_pulse_duration);
     if (option.map[0] != 0)
         tio_printf(" Map flags: %s", option.map);
     if (option.log)
@@ -199,29 +267,29 @@ void options_parse(int argc, char *argv[])
     {
         static struct option long_options[] =
         {
-            {"baudrate",           required_argument, 0, 'b'                   },
-            {"databits",           required_argument, 0, 'd'                   },
-            {"flow",               required_argument, 0, 'f'                   },
-            {"stopbits",           required_argument, 0, 's'                   },
-            {"parity",             required_argument, 0, 'p'                   },
-            {"output-delay",       required_argument, 0, 'o'                   },
-            {"output-line-delay",  required_argument, 0, 'O'                   },
-            {"dtr-pulse-duration", required_argument, 0, OPT_DTR_PULSE_DURATION},
-            {"no-autoconnect",     no_argument,       0, 'n'                   },
-            {"local-echo",         no_argument,       0, 'e'                   },
-            {"timestamp",          no_argument,       0, 't'                   },
-            {"timestamp-format",   required_argument, 0, OPT_TIMESTAMP_FORMAT  },
-            {"list-devices",       no_argument,       0, 'L'                   },
-            {"log",                no_argument,       0, 'l'                   },
-            {"log-file",           required_argument, 0, OPT_LOG_FILE          },
-            {"log-strip",          no_argument,       0, OPT_LOG_STRIP         },
-            {"socket",             required_argument, 0, 'S'                   },
-            {"map",                required_argument, 0, 'm'                   },
-            {"color",              required_argument, 0, 'c'                   },
-            {"hexadecimal",        no_argument,       0, 'x'                   },
-            {"version",            no_argument,       0, 'v'                   },
-            {"help",               no_argument,       0, 'h'                   },
-            {0,                    0,                 0,  0                    }
+            {"baudrate",            required_argument, 0, 'b'                    },
+            {"databits",            required_argument, 0, 'd'                    },
+            {"flow",                required_argument, 0, 'f'                    },
+            {"stopbits",            required_argument, 0, 's'                    },
+            {"parity",              required_argument, 0, 'p'                    },
+            {"output-delay",        required_argument, 0, 'o'                    },
+            {"output-line-delay" ,  required_argument, 0, 'O'                    },
+            {"line-pulse-duration", required_argument, 0, OPT_LINE_PULSE_DURATION},
+            {"no-autoconnect",      no_argument,       0, 'n'                    },
+            {"local-echo",          no_argument,       0, 'e'                    },
+            {"timestamp",           no_argument,       0, 't'                    },
+            {"timestamp-format",    required_argument, 0, OPT_TIMESTAMP_FORMAT   },
+            {"list-devices",        no_argument,       0, 'L'                    },
+            {"log",                 no_argument,       0, 'l'                    },
+            {"log-file",            required_argument, 0, OPT_LOG_FILE           },
+            {"log-strip",           no_argument,       0, OPT_LOG_STRIP          },
+            {"socket",              required_argument, 0, 'S'                    },
+            {"map",                 required_argument, 0, 'm'                    },
+            {"color",               required_argument, 0, 'c'                    },
+            {"hexadecimal",         no_argument,       0, 'x'                    },
+            {"version",             no_argument,       0, 'v'                    },
+            {"help",                no_argument,       0, 'h'                    },
+            {0,                     0,                 0,  0                     }
         };
 
         /* getopt_long stores the option index here */
@@ -274,8 +342,8 @@ void options_parse(int argc, char *argv[])
                 option.output_line_delay = string_to_long(optarg);
                 break;
 
-            case OPT_DTR_PULSE_DURATION:
-                option.dtr_pulse_duration = string_to_long(optarg);
+            case OPT_LINE_PULSE_DURATION:
+                line_pulse_duration_option_parse(optarg);
                 break;
 
             case 'n':

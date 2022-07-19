@@ -49,7 +49,12 @@ struct option_t
     char *parity;
     int output_delay;
     int output_line_delay;
-    int dtr_pulse_duration;
+    unsigned int dtr_pulse_duration;
+    unsigned int rts_pulse_duration;
+    unsigned int cts_pulse_duration;
+    unsigned int dsr_pulse_duration;
+    unsigned int dcd_pulse_duration;
+    unsigned int ri_pulse_duration;
     bool no_autoconnect;
     bool log;
     bool log_strip;
@@ -69,3 +74,5 @@ extern struct option_t option;
 void options_print();
 void options_parse(int argc, char *argv[]);
 void options_parse_final(int argc, char *argv[]);
+
+void line_pulse_duration_option_parse(const char *arg);

@@ -61,24 +61,36 @@
 #define CMSPAR   010000000000
 #endif
 
+#define KEY_0 0x30
+#define KEY_1 0x31
+#define KEY_2 0x32
+#define KEY_3 0x33
+#define KEY_4 0x34
+#define KEY_5 0x35
 #define KEY_QUESTION 0x3f
 #define KEY_B 0x62
 #define KEY_C 0x63
 #define KEY_E 0x65
+#define KEY_G 0x67
 #define KEY_H 0x68
 #define KEY_L 0x6C
+#define KEY_P 0x70
 #define KEY_Q 0x71
 #define KEY_S 0x73
 #define KEY_T 0x74
 #define KEY_U 0x55
 #define KEY_V 0x76
-#define KEY_D 0x64
-#define KEY_SHIFT_D 0x44
-#define KEY_R 0x72
 #define KEY_SHIFT_L 0x4C
 
 #define NORMAL 0
 #define HEX 1
+
+enum line_mode_t
+{
+    LINE_OFF,
+    LINE_TOGGLE,
+    LINE_PULSE
+};
 
 bool interactive_mode = true;
 
@@ -242,28 +254,67 @@ static void output_hex(char c)
     }
 }
 
-static void toggle_line(const char *line_name, int mask)
+static void toggle_line(const char *line_name, int mask, enum line_mode_t line_mode)
 {
     int state;
 
-    if (ioctl(fd, TIOCMGET, &state) < 0)
+    if (line_mode == LINE_TOGGLE)
     {
-        tio_warning_printf("Could not get line state (%s)", strerror(errno));
-    }
-    else
-    {
-        if (state & mask)
+        // Toggle line
+        if (ioctl(fd, TIOCMGET, &state) < 0)
         {
-            state &= ~mask;
-            tio_printf("set %s to LOW", line_name);
+            tio_warning_printf("Could not get line state (%s)", strerror(errno));
         }
         else
         {
-            state |= mask;
-            tio_printf("set %s to HIGH", line_name);
+            if (state & mask)
+            {
+                state &= ~mask;
+                tio_printf("Setting %s to LOW", line_name);
+            }
+            else
+            {
+                state |= mask;
+                tio_printf("Setting %s to HIGH", line_name);
+            }
+            if (ioctl(fd, TIOCMSET, &state) < 0)
+                tio_warning_printf("Could not set line state (%s)", strerror(errno));
         }
-        if (ioctl(fd, TIOCMSET, &state) < 0)
-            tio_warning_printf("Could not set line state (%s)", strerror(errno));
+    } else if (line_mode == LINE_PULSE)
+    {
+        int duration = 0;
+        // Pulse line
+        toggle_line(line_name, mask, LINE_TOGGLE);
+        switch (mask)
+        {
+            case TIOCM_DTR:
+                duration = option.dtr_pulse_duration;
+                break;
+            case TIOCM_RTS:
+                duration = option.rts_pulse_duration;
+                break;
+            case TIOCM_CTS:
+                duration = option.cts_pulse_duration;
+                break;
+            case TIOCM_DSR:
+                duration = option.dsr_pulse_duration;
+                break;
+            case TIOCM_CD:
+                duration = option.dcd_pulse_duration;
+                break;
+            case TIOCM_RI:
+                duration = option.ri_pulse_duration;
+                break;
+            default:
+                duration = 0;
+                break;
+        }
+        if (duration > 0)
+        {
+            tio_printf("Waiting %d ms", duration);
+            delay(duration);
+        }
+        toggle_line(line_name, mask, LINE_TOGGLE);
     }
 }
 
@@ -272,13 +323,52 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
     char unused_char;
     bool unused_bool;
     int state;
+    static enum line_mode_t line_mode = LINE_OFF;
 
     /* Ignore unused arguments */
     if (output_char == NULL)
+    {
         output_char = &unused_char;
+    }
 
     if (forward == NULL)
+    {
         forward = &unused_bool;
+    }
+
+    if (line_mode)
+    {
+        // Handle line toggle number action
+        *forward = false;
+        switch (input_char)
+        {
+            case KEY_0:
+                toggle_line("DTR", TIOCM_DTR, line_mode);
+                break;
+            case KEY_1:
+                toggle_line("RTS", TIOCM_RTS, line_mode);
+                break;
+            case KEY_2:
+                toggle_line("CTS", TIOCM_CTS, line_mode);
+                break;
+            case KEY_3:
+                toggle_line("DSR", TIOCM_DSR, line_mode);
+                break;
+            case KEY_4:
+                toggle_line("DCD", TIOCM_CD, line_mode);
+                break;
+            case KEY_5:
+                toggle_line("RI", TIOCM_RI, line_mode);
+                break;
+            default:
+                tio_warning_printf("Invalid line number");
+                break;
+        }
+
+        line_mode = LINE_OFF;
+
+        return;
+    }
 
     /* Handle escape key commands */
     if (previous_char == option.prefix_code)
@@ -293,14 +383,13 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" ctrl-%c ?   List available key commands", option.prefix_key);
                 tio_printf(" ctrl-%c b   Send break", option.prefix_key);
                 tio_printf(" ctrl-%c c   Show configuration", option.prefix_key);
-                tio_printf(" ctrl-%c d   Toggle DTR line", option.prefix_key);
-                tio_printf(" ctrl-%c D   Pulse DTR line", option.prefix_key);
                 tio_printf(" ctrl-%c e   Toggle local echo mode", option.prefix_key);
+                tio_printf(" ctrl-%c g   Toggle serial port line", option.prefix_key);
                 tio_printf(" ctrl-%c h   Toggle hexadecimal mode", option.prefix_key);
                 tio_printf(" ctrl-%c l   Clear screen", option.prefix_key);
                 tio_printf(" ctrl-%c L   Show line states", option.prefix_key);
+                tio_printf(" ctrl-%c p   Pulse serial port line", option.prefix_key);
                 tio_printf(" ctrl-%c q   Quit", option.prefix_key);
-                tio_printf(" ctrl-%c r   Toggle RTS line", option.prefix_key);
                 tio_printf(" ctrl-%c s   Show statistics", option.prefix_key);
                 tio_printf(" ctrl-%c t   Toggle line timestamp mode", option.prefix_key);
                 tio_printf(" ctrl-%c U   Toggle conversion to uppercase on output", option.prefix_key);
@@ -321,18 +410,29 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" DCD: %s", (state & TIOCM_CD) ? "HIGH" : "LOW");
                 tio_printf(" RI : %s", (state & TIOCM_RI) ? "HIGH" : "LOW");
                 break;
-            case KEY_D:
-                toggle_line("DTR", TIOCM_DTR);
+
+            case KEY_G:
+                tio_printf("Please enter which serial line number to toggle:");
+                tio_printf(" DTR (0)");
+                tio_printf(" RTS (1)");
+                tio_printf(" CTS (2)");
+                tio_printf(" DSR (3)");
+                tio_printf(" DCD (4)");
+                tio_printf(" RI  (5)");
+                // Process next input character as part of the line toggle step
+                line_mode = LINE_TOGGLE;
                 break;
 
-            case KEY_SHIFT_D:
-                toggle_line("DTR", TIOCM_DTR);
-                delay(option.dtr_pulse_duration);
-                toggle_line("DTR", TIOCM_DTR);
-                break;
-
-            case KEY_R:
-                toggle_line("RTS", TIOCM_RTS);
+            case KEY_P:
+                tio_printf("Please enter which serial line number to pulse:");
+                tio_printf(" DTR (0)");
+                tio_printf(" RTS (1)");
+                tio_printf(" CTS (2)");
+                tio_printf(" DSR (3)");
+                tio_printf(" DCD (4)");
+                tio_printf(" RI  (5)");
+                // Process next input character as part of the line pulse step
+                line_mode = LINE_PULSE;
                 break;
 
             case KEY_B:

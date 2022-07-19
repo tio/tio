@@ -128,9 +128,9 @@ static int data_handler(void *user, const char *section, const char *name,
         {
             option.output_line_delay = atoi(value);
         }
-        else if (!strcmp(name, "dtr-pulse-duration"))
+        else if (!strcmp(name, "line-pulse-duration"))
         {
-            option.dtr_pulse_duration = atoi(value);
+            line_pulse_duration_option_parse(value);
         }
         else if (!strcmp(name, "no-autoconnect"))
         {

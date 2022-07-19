@@ -52,9 +52,26 @@ Set output delay [ms] inserted between each sent character (default: 0).
 Set output delay [ms] inserted between each sent line (default: 0).
 
 .TP
-.BR "    \-\-dtr\-pulse\-duration " \fI<ms>
+.BR "    \-\-line\-pulse\-duration " \fI<duration>
 
-Set the duration [ms] of the DTR pulse (default: 100).
+Set the pulse duration [ms] of each serial port line using the following key
+valur pair format in the duration field: <key>=<value>
+
+Each key represents a serial line. The following keys are available:
+
+.RS
+.TP 12n
+.IP "\fBDTR - Data Terminal Ready"
+.IP "\fBRTS - Request To Send"
+.IP "\fBCTS - Clear To Send"
+.IP "\fBDSR - Data Set Ready"
+.IP "\fBDCD - Data Carrier Detect"
+.IP "\fBRI  - Ring Indicator"
+.P
+If defining more than one key value pair, the pairs must be comma separated.
+
+The default pulse duration for each line is 100 ms.
+.RE
 
 .TP
 .BR \-n ", " \-\-no\-autoconnect
@@ -211,22 +228,20 @@ Send serial break (triggers SysRq on Linux, etc.)
 Show configuration (baudrate, databits, etc.)
 .IP "\fBctrl-t e"
 Toggle local echo mode
+.IP "\fBctrl-t g"
+Toggle serial port line
 .IP "\fBctrl-t h"
 Toggle hexadecimal mode
 .IP "\fBctrl-t l"
 Clear screen
+.IP "\fBctrl-t L"
+Show line states (DTR, RTS, CTS, DSR, DCD, RI)
+.IP "\fBctrl-t p"
+Pulse serial port line
 .IP "\fBctrl-t q"
 Quit
 .IP "\fBctrl-t s"
 Show TX/RX statistics
-.IP "\fBctrl-t L"
-Show line states (DTR, RTS, CTS, DSR, DCD, RI)
-.IP "\fBctrl-t d"
-Toggle DTR
-.IP "\fBctrl-t D"
-Pulse DTR
-.IP "\fBctrl-t r"
-Toggle RTS
 .IP "\fBctrl-t t"
 Toggle line timestamp mode
 .IP "\fBctrl-t U"
@@ -273,7 +288,7 @@ Any options set via command-line will override options set in the configuration 
 .PP
 The following configuration file options are available:
 
-.TP 20n
+.TP 21n
 .IP "\fBpattern"
 Pattern matching user input. This pattern can be an extended regular expression with a single group.
 .IP "\fBtty"
@@ -292,8 +307,8 @@ Set parity
 Set output character delay
 .IP "\fBoutput-line-delay"
 Set output line delay
-.IP "\fBdtr-pulse-duration"
-Set DTR pulse duration
+.IP "\fBline-pulse-duration"
+Set line pulse duration
 .IP "\fBno-autoconnect"
 Disable automatic connect
 .IP "\fBlog"
@@ -333,7 +348,7 @@ databits = 8
 parity = none
 stopbits = 1
 color = 10
-dtr-pulse-duration = 50
+line-pulse-duration = DTR=200,RTS=400
 .ec
 .fi
 .RE

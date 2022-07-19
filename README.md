@@ -32,7 +32,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * List available serial devices by ID
  * Show RX/TX statistics
  * Toggle serial lines
- * Pulse the DTR line
+ * Pulse serial lines with configurable duration
  * Local echo support
  * Map characters (nl, cr-nl, bs, lowercase to uppercase, etc.)
  * Line timestamps
@@ -72,7 +72,7 @@ The command-line interface is straightforward as reflected in the output from
     -p, --parity odd|even|none|mark|space  Parity (default: none)
     -o, --output-delay <ms>                Output character delay (default: 0)
     -O, --output-line-delay <ms>           Output line delay (default: 0)
-        --dtr-pulse-duration <ms>          DTR pulse duration (default: 100)
+        --line-pulse-duration <duration>   Set line pulse duration
     -n, --no-autoconnect                   Disable automatic connect
     -e, --local-echo                       Enable local echo
     -t, --timestamp                        Enable line timestamp
@@ -131,16 +131,14 @@ ctrl-t ? to list the available key commands.
 [20:19:12.040]  ctrl-t ?   List available key commands
 [20:19:12.040]  ctrl-t b   Send break
 [20:19:12.040]  ctrl-t c   Show configuration
-[20:19:12.040]  ctrl-t d   Toggle DTR line
-[20:19:12.040]  ctrl-t D   Pulse DTR line
 [20:19:12.040]  ctrl-t e   Toggle local echo mode
+[20:19:12.040]  ctrl-t g   Toggle serial port line
 [20:19:12.040]  ctrl-t h   Toggle hexadecimal mode
 [20:19:12.040]  ctrl-t l   Clear screen
 [20:19:12.040]  ctrl-t L   Show line states
+[20:19:12.040]  ctrl-t p   Pulse serial port line
 [20:19:12.040]  ctrl-t q   Quit
-[20:19:12.040]  ctrl-t r   Toggle RTS line
 [20:19:12.041]  ctrl-t s   Show statistics
-[20:19:12.041]  ctrl-t t   Send ctrl-t key code
 [20:19:12.041]  ctrl-t T   Toggle line timestamp mode
 [20:19:12.041]  ctrl-t U   Toggle conversion to uppercase
 [20:19:12.041]  ctrl-t v   Show version
@@ -169,7 +167,6 @@ databits = 8
 parity = none
 stopbits = 1
 color = 10
-dtr-pulse-duration = 50
 
 [rpi3]
 tty = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
@@ -177,6 +174,7 @@ baudrate = 115200
 no-autoconnect = enable
 log = enable
 log-file = rpi3.log
+line-pulse-duration = DTR=200,RTS=150
 color = 12
 
 [usb devices]
