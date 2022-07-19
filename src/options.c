@@ -90,7 +90,7 @@ void print_help(char *argv[])
     printf("  -p, --parity odd|even|none|mark|space  Parity (default: none)\n");
     printf("  -o, --output-delay <ms>                Output character delay (default: 0)\n");
     printf("  -O, --output-line-delay <ms>           Output line delay (default: 0)\n");
-    printf("      --line-pulse-duration <duration>   Line pulse duration\n");
+    printf("      --line-pulse-duration <duration>   Set line pulse duration\n");
     printf("  -n, --no-autoconnect                   Disable automatic connect\n");
     printf("  -e, --local-echo                       Enable local echo\n");
     printf("  -t, --timestamp                        Enable line timestamp\n");
