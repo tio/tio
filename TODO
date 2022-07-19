@@ -1,24 +1,4 @@
 
- * Consider reworking line toggle and line pulse featueres in case requests are made to apply them to more lines:
-
-     ctrl-t g Toggle serial line
-     
-     Which would then make tio ask which line to toggle:
-     
-     [20:50:11.691] Please enter which line number to toggle?
-     [20:50:11.691] DTR(0) RTS(1) CTS(2) DSR(3) DCD(4) RI(5)
-     
-     ctrl-t p Pulse serial line
-     
-     [20:50:11.691] Please enter which line number to pulse?
-     [20:50:11.691] DTR(0) RTS(1) CTS(2) DSR(3) DCD(4) RI(5)
-     
-     command-line:
-     --line-pulse-duration="DTR=60,RTS=50,CTS=40,DSR=30,DCD=20,RI=10"
-     
-     config file:
-     line-pulse-duration="DTR=60,RTS=50,CTS=40,DSR=30,DCD=20,RI=10"
-
  * Split I/O feature
 
    Allow to split input and output so that it is possible to manage these independently.
