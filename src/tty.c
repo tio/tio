@@ -1153,10 +1153,15 @@ int tty_connect(void)
             {
                 /* Input from stdin ready */
                 ssize_t bytes_read = read(STDIN_FILENO, input_buffer, BUFSIZ);
-                if (bytes_read <= 0)
+                if (bytes_read < 0)
                 {
-                    tio_error_printf_silent("Could not read from stdin");
+                    tio_error_printf_silent("Could not read from stdin (%s)", strerror(errno));
                     goto error_read;
+                }
+                else if (bytes_read == 0)
+                {
+                    // Reached EOF (when piping to stdin)
+                    exit(EXIT_SUCCESS);
                 }
 
                 /* Process input byte by byte */
