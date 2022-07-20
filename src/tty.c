@@ -154,7 +154,7 @@ void tty_flush(int fd)
 {
     ssize_t count;
 
-    do
+    while (tty_buffer_count > 0)
     {
         count = write(fd, tty_buffer, tty_buffer_count);
         if (count < 0)
@@ -165,11 +165,11 @@ void tty_flush(int fd)
         }
         tty_buffer_count -= count;
     }
-    while (tty_buffer_count > 0);
 
     // Reset
     tty_buffer_write_ptr = tty_buffer;
     tty_buffer_count = 0;
+    fsync(fd);
 }
 
 ssize_t tty_write(int fd, const void *buffer, size_t count)
