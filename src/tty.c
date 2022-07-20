@@ -1160,7 +1160,8 @@ int tty_connect(void)
                 }
                 else if (bytes_read == 0)
                 {
-                    // Reached EOF (when piping to stdin)
+                    /* Reached EOF (when piping to stdin) */
+                    tty_flush(fd);
                     exit(EXIT_SUCCESS);
                 }
 
