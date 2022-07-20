@@ -218,7 +218,14 @@ If you have [brew](http://brew.sh) installed, you can install tio like so:
     $ brew install tio
 ```
 
-### 4.4 Installation from source
+### 4.4 Installation using MacPorts (MacOS)
+
+If you have [MacPorts](https://www.macports.org) installed, you can install tio like so:
+```
+    $ sudo port install tio
+```
+
+### 4.5 Installation from source
 
 The latest source releases can be found [here](https://github.com/tio/tio/releases).
 
