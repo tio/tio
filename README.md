@@ -196,7 +196,7 @@ Another configuration file example is available [here](example/tiorc).
 
 ## 4. Installation
 
-### 4.1 Installation using package manager
+### 4.1 Installation using package manager (Linux)
 
 Packages for various GNU/Linux distributions are available. Please consult your
 package manager tool to find and install tio.
@@ -213,14 +213,14 @@ Install latest stable version:
 
 ### 4.3 Installation using brew (MacOS, Linux)
 
-If you have [brew](http://brew.sh) installed, you can install tio like so:
+If you have [brew](http://brew.sh) installed:
 ```
     $ brew install tio
 ```
 
 ### 4.4 Installation using MacPorts (MacOS)
 
-If you have [MacPorts](https://www.macports.org) installed, you can install tio like so:
+If you have [MacPorts](https://www.macports.org) installed:
 ```
     $ sudo port install tio
 ```
