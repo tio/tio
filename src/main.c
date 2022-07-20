@@ -96,6 +96,10 @@ int main(int argc, char *argv[])
     if (interactive_mode)
     {
         tio_printf("Press ctrl-%c q to quit", option.prefix_key);
+    } else
+    {
+        tio_printf("Non-interactive mode enabled");
+        tio_printf("Press ctrl-c to quit");
     }
 
     /* Open socket */
@@ -105,7 +109,7 @@ int main(int argc, char *argv[])
     }
 
     /* Connect to tty device */
-    if ((option.no_autoconnect) || (!interactive_mode))
+    if (option.no_autoconnect)
     {
         status = tty_connect();
     }

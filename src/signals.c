@@ -27,15 +27,24 @@
 #include "error.h"
 #include "print.h"
 #include "misc.h"
+#include "tty.h"
 
 static void signal_handler(int signum)
 {
-    UNUSED(signum);
-    tio_printf("Received hangup signal!");
+    switch (signum)
+    {
+        case SIGHUP:
+            tio_printf("Received SIGHUP signal!");
+            break;
+        case SIGINT:
+            tio_printf("Received SIGINT signal!");
+            break;
+    }
     exit(EXIT_FAILURE);
 }
 
 void signal_handlers_install(void)
 {
     signal(SIGHUP, signal_handler);
+    signal(SIGINT, signal_handler);
 }

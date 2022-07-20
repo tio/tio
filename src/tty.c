@@ -586,6 +586,12 @@ void stdout_configure(void)
     /* Reconfigure stdout (RAW configuration) */
     cfmakeraw(&stdout_new);
 
+    /* Allow ^C / SIGINT (to allow termination when piping to tio) */
+    if (!interactive_mode)
+    {
+        stdout_new.c_lflag |= ISIG;
+    }
+
     /* Control characters */
     stdout_new.c_cc[VTIME] = 0; /* Inter-character timer unused */
     stdout_new.c_cc[VMIN]  = 1; /* Blocking read until 1 character received */
@@ -833,51 +839,56 @@ void tty_wait_for_device(void)
     /* Loop until device pops up */
     while (true)
     {
-        if (first)
+        if (interactive_mode)
         {
-            /* Don't wait first time */
-            tv.tv_sec = 0;
-            tv.tv_usec = 1;
-            first = false;
-        }
-        else
-        {
-            /* Wait up to 1 second */
-            tv.tv_sec = 1;
-            tv.tv_usec = 0;
-        }
-
-        FD_ZERO(&rdfs);
-        FD_SET(STDIN_FILENO, &rdfs);
-        maxfd = MAX(STDIN_FILENO, socket_add_fds(&rdfs, false));
-
-        /* Block until input becomes available or timeout */
-        status = select(maxfd + 1, &rdfs, NULL, NULL, &tv);
-        if (status > 0)
-        {
-            if (FD_ISSET(STDIN_FILENO, &rdfs))
+            /* In interactive mode, while waiting for tty device, we need to
+             * read from stdin to react on input key commands. */
+            if (first)
             {
-                /* Input from stdin ready */
-
-                /* Read one character */
-                status = read(STDIN_FILENO, &input_char, 1);
-                if (status <= 0)
-                {
-                    tio_error_printf("Could not read from stdin");
-                    exit(EXIT_FAILURE);
-                }
-
-                /* Handle commands */
-                handle_command_sequence(input_char, previous_char, NULL, NULL);
-
-                previous_char = input_char;
+                /* Don't wait first time */
+                tv.tv_sec = 0;
+                tv.tv_usec = 1;
+                first = false;
             }
-            socket_handle_input(&rdfs, NULL);
-        }
-        else if (status == -1)
-        {
-            tio_error_printf("select() failed (%s)", strerror(errno));
-            exit(EXIT_FAILURE);
+            else
+            {
+                /* Wait up to 1 second for input */
+                tv.tv_sec = 1;
+                tv.tv_usec = 0;
+            }
+
+            FD_ZERO(&rdfs);
+            FD_SET(STDIN_FILENO, &rdfs);
+            maxfd = MAX(STDIN_FILENO, socket_add_fds(&rdfs, false));
+
+            /* Block until input becomes available or timeout */
+            status = select(maxfd + 1, &rdfs, NULL, NULL, &tv);
+            if (status > 0)
+            {
+                if (FD_ISSET(STDIN_FILENO, &rdfs))
+                {
+                    /* Input from stdin ready */
+
+                    /* Read one character */
+                    status = read(STDIN_FILENO, &input_char, 1);
+                    if (status <= 0)
+                    {
+                        tio_error_printf("Could not read from stdin");
+                        exit(EXIT_FAILURE);
+                    }
+
+                    /* Handle commands */
+                    handle_command_sequence(input_char, previous_char, NULL, NULL);
+
+                    previous_char = input_char;
+                }
+                socket_handle_input(&rdfs, NULL);
+            }
+            else if (status == -1)
+            {
+                tio_error_printf("select() failed (%s)", strerror(errno));
+                exit(EXIT_FAILURE);
+            }
         }
 
         /* Test for accessible device file */
@@ -892,6 +903,14 @@ void tty_wait_for_device(void)
             tio_warning_printf("Could not open tty device (%s)", strerror(errno));
             tio_printf("Waiting for tty device..");
             last_errno = errno;
+        }
+
+        if (!interactive_mode)
+        {
+            /* In non-interactive mode we do not need to handle input key
+             * commands so we simply sleep 1 second between checking for
+             * presence of tty device */
+            sleep(1);
         }
     }
 }
