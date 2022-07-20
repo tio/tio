@@ -1031,6 +1031,7 @@ int tty_connect(void)
     /* Save current port settings */
     if (tcgetattr(fd, &tio_old) < 0)
     {
+        tio_error_printf_silent("Could not get port settings (%s)", strerror(errno));
         goto error_tcgetattr;
     }
 
