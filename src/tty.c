@@ -164,6 +164,7 @@ void tty_flush(int fd)
             break;
         }
         tty_buffer_count -= count;
+        fsync(fd);
     }
 
     // Reset
