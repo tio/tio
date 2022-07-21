@@ -13,7 +13,6 @@ parity = none
 prefix-ctrl-key = t
 output-delay = 0
 output-line-delay = 0
-dtr-pulse-duration = 0
 no-autoconnect = disable
 hexadecimal = disable
 timestamp = disable
