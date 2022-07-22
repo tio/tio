@@ -165,6 +165,7 @@ void tty_flush(int fd)
         }
         tty_buffer_count -= count;
         fsync(fd);
+        tcdrain(fd);
     }
 
     // Reset
@@ -206,6 +207,7 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
             }
 
             fsync(fd);
+            tcdrain(fd);
 
             if (option.output_delay)
             {
