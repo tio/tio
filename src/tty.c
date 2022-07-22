@@ -217,7 +217,7 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
     }
     else
     {
-        // Flush tty buffer if too full
+        // Force write of tty buffer if too full
         if ((tty_buffer_count + count) > BUFSIZ)
         {
             tty_sync(fd);
