@@ -150,7 +150,7 @@ inline static unsigned char char_to_nibble(char c)
     }
 }
 
-void tty_flush(int fd)
+void tty_sync(int fd)
 {
     ssize_t count;
 
@@ -220,7 +220,7 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
         // Flush tty buffer if too full
         if ((tty_buffer_count + count) > BUFSIZ)
         {
-            tty_flush(fd);
+            tty_sync(fd);
         }
 
         // Copy bytes to tty write buffer
@@ -1182,7 +1182,7 @@ int tty_connect(void)
                 else if (bytes_read == 0)
                 {
                     /* Reached EOF (when piping to stdin) */
-                    tty_flush(fd);
+                    tty_sync(fd);
                     exit(EXIT_SUCCESS);
                 }
 
@@ -1225,7 +1225,7 @@ int tty_connect(void)
                     }
                 }
 
-                tty_flush(fd);
+                tty_sync(fd);
             }
             else
             {
@@ -1236,7 +1236,7 @@ int tty_connect(void)
                     forward_to_tty(fd, output_char);
                 }
 
-                tty_flush(fd);
+                tty_sync(fd);
             }
         }
         else if (status == -1)
