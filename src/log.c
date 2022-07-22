@@ -149,6 +149,7 @@ void log_printf(const char *format, ...)
     va_end(args);
 
     fwrite(line, strlen(line), 1, fp);
+    fflush(fp);
 
     free(line);
 }
@@ -169,6 +170,7 @@ void log_putc(char c)
             fputc(c, fp);
         }
     }
+    fflush(fp);
 }
 
 void log_close(void)
