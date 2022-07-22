@@ -1209,7 +1209,7 @@ int tty_connect(void)
                         /* Save previous key */
                         previous_char = input_char;
 
-                        if (print_mode == HEX)
+                        if ((print_mode == HEX) && (forward))
                         {
                             if (!is_valid_hex(input_char))
                             {
