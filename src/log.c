@@ -76,8 +76,8 @@ void log_open(const char *filename)
         exit(EXIT_FAILURE);
     }
 
-    // Enable full buffering
-    setvbuf(fp, file_buffer, _IOFBF, BUFSIZ);
+    // Enable line buffering
+    setvbuf(fp, file_buffer, _IOLBF, BUFSIZ);
 }
 
 bool log_strip(char c)
@@ -149,7 +149,6 @@ void log_printf(const char *format, ...)
     va_end(args);
 
     fwrite(line, strlen(line), 1, fp);
-    fflush(fp);
 
     free(line);
 }
@@ -170,7 +169,6 @@ void log_putc(char c)
             fputc(c, fp);
         }
     }
-    fflush(fp);
 }
 
 void log_close(void)
