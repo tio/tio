@@ -28,7 +28,7 @@ when used in combination with [tmux](https://tmux.github.io).
 
  * Easily connect to serial TTY devices
  * Automatic connect and reconnect
- * Support for arbitrary baud rates
+ * Support for non-standard baud rates
  * List available serial devices by ID
  * Show RX/TX statistics
  * Toggle serial lines
