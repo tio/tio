@@ -1,5 +1,67 @@
 
-=== tio v1.46 ===
+=== tio v1.47 ===
+
+
+
+Changes since tio v1.46:
+
+ * Enable log feature when using --log-filename
+
+   No reason to not assume that the user wants to enable log when the
+   --log-filename is used. This way uses can skip the use of --log to
+   enable log.
+
+ * Enable line buffering of log
+
+   Replace flushing/writing of log at every log write operation with line
+   buffering, meaning log will be written line by line to make it more I/O
+   friendly but still update frequently.
+
+ * Avoid invalid hex character messages when switching hex mode
+
+ * Force flushing of log writes
+
+ * Renamed tty_flush() to tty_sync()
+
+ * Fix sync output to serial port
+
+   Using fsync() on filedescriptors for serial ports can not be relied on.
+   Add use of tcdrain() to make sure data has been written by the serial
+   port before proceeding.
+
+   This fixes a problem with tio sometimes not writing piped input data to
+   the serial port before exiting which results in the pending writes being
+   cancelled / flushed.
+
+ * Clean up tty_flush()
+
+ * Force frequent sync on tty_flush()
+
+ * Update README
+
+ * Update example tiorc
+
+ * Quit from non-interactive mode using ctrl-c
+
+   When piping to tio it will automatically enter "non-interactive" mode
+   which means it will not react to any input key sequences but simple read
+   the input stream and write it to the tty device.
+
+   This also means that ctrl-t q can not be used to quit and so tio would
+   hang forever when used in non-interactive mode.
+
+   This change allows to send the standard termination signal by pressing
+   ctrl-c on tio in non-interactive mode to make it quit.
+
+ * Make sure we flush output buffer to tty when piping to tio
+
+ * Do not return false read error when piping to tio
+
+ * Show error message when reading port settings fail
+
+Victor Oliveira
+
+ * add macports install instructions
 
 
 
