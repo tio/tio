@@ -237,7 +237,6 @@ void options_print()
     tio_printf(" Timestamp: %s", timestamp_state_to_string(option.timestamp));
     tio_printf(" Output delay: %d", option.output_delay);
     tio_printf(" Output line delay: %d", option.output_line_delay);
-    tio_printf(" DTR pulse duration: %d", option.dtr_pulse_duration);
     tio_printf(" Auto connect: %s", option.no_autoconnect ? "disabled" : "enabled");
     tio_printf(" Pulse duration: DTR=%d RTS=%d CTS=%d DSR=%d DCD=%d RI=%d", option.dtr_pulse_duration,
                                                                             option.rts_pulse_duration,
