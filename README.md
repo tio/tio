@@ -26,7 +26,7 @@ when used in combination with [tmux](https://tmux.github.io).
 
 ## 2. Features
 
- * Easily connect to serial TTY devices
+ * Easily connect to serial TTY devices with sensible defaults
  * Automatic connect and reconnect
  * Support for non-standard baud rates
  * List available serial devices by ID
