@@ -49,7 +49,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Color support
  * Remapping of prefix key
  * Man page documentation
- * Plays nicely with tmux
+ * Plays nicely with [tmux](https://tmux.github.io)
 
 ## 3. Usage
 
