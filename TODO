@@ -1,26 +1,30 @@
 
  * Split I/O feature
 
-   Allow to split input and output so that it is possible to manage these independently.
+   Allow to split input and output so that it is possible to manage these
+   independently.
 
    The general idea is to redirect the output stream on the socket port number
    specified but then redirect the input stream on the same port number + 1.
 
    Example:
 
-   tio /dev/ttyUSB0 --socket inet:4444,split-io
+    $ tio /dev/ttyUSB0 --socket inet:4444,split-io
 
-   Will result in output stream being hosted on port 4444 and input stream hosted on port 4445.
+   Will result in output stream being hosted on port 4444 and input stream
+   hosted on port 4445.
 
    For file sockets something similar can be arranged:
 
    tio /dev/ttyUSB0 --socket unix:/tmp/tio-socket-0,split-io
 
-   Will result in output stream being hosted via /tmp/tio-socket-0 and input stream hosted via /tmp/tio-socket-0_input
+   Will result in output stream being hosted via /tmp/tio-socket-0 and input
+   stream hosted via /tmp/tio-socket-0_input
 
  * Websocket support
 
-   Extend the socket feature to redirect serial I/O to websocket or e.g. port 1234 like so
+   Extend the socket feature to redirect serial I/O to websocket on e.g. port
+   1234 like so:
 
     $ tio --socket ws:1234
 
@@ -30,7 +34,7 @@
 
    Many modern RS-485 devices such as the ones from FTDI already operate in
    RS-485 mode by default and will work with tio out of the box. However, there
-   are still some RS-232/485 devices which need to be switched from e.g. RS-232
-   to RS-485 mode to operate accordingly on the physical level.
+   are still some RS-232/485 devices which need to be switched from e.g. RS-232 to
+   RS-485 mode to operate accordingly on the physical level.
 
    To support RS-485 on such serial devices the idea is to add a --rs-485 option.
