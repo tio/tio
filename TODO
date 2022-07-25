@@ -16,7 +16,7 @@
 
    For file sockets something similar can be arranged:
 
-   tio /dev/ttyUSB0 --socket unix:/tmp/tio-socket-0,split-io
+    $ tio /dev/ttyUSB0 --socket unix:/tmp/tio-socket-0,split-io
 
    Will result in output stream being hosted via /tmp/tio-socket-0 and input
    stream hosted via /tmp/tio-socket-0_input
@@ -37,4 +37,5 @@
    are still some RS-232/485 devices which need to be switched from e.g. RS-232 to
    RS-485 mode to operate accordingly on the physical level.
 
-   To support RS-485 on such serial devices the idea is to add a --rs-485 option.
+   To enable RS-485 mode on such serial devices the idea is to add a --rs-485
+   option.
