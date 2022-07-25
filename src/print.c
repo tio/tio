@@ -20,7 +20,9 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include "options.h"
 #include "print.h"
 
@@ -49,4 +51,25 @@ void print_init_ansi_formatting()
     // Set bold text with user defined ANSI color
     sprintf(ansi_format, "\e[1;38;5;%dm", option.color);
   }
+}
+
+void tio_printf_array(const char *array)
+{
+  int i = 0, j = 0;
+
+  tio_printf("");
+
+  while (array[i])
+  {
+    if (array[i] == '\n')
+    {
+      const char *line = &array[j];
+      char *line_copy = strndup(line, i-j);
+      tio_printf_raw("%s\r", line_copy);
+      free(line_copy);
+      j = i;
+    }
+    i++;
+  }
+  tio_printf("");
 }

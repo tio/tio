@@ -74,6 +74,14 @@ extern char ansi_format[];
   print_tainted = false; \
 }
 
+#define tio_printf_raw(format, args...) \
+{ \
+  if (print_tainted) \
+    putchar('\n'); \
+  ansi_printf_raw("[%s] " format, current_time(), ## args); \
+  print_tainted = false; \
+}
+
 #ifdef DEBUG
 #define tio_debug_printf(format, args...) \
   fprintf (stdout, "[debug] " format, ## args)
@@ -87,3 +95,4 @@ extern char ansi_format[];
 void print_hex(char c);
 void print_normal(char c);
 void print_init_ansi_formatting(void);
+void tio_printf_array(const char *array);
