@@ -44,7 +44,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Autogeneration of log filename
  * Configuration file support
  * Activate sub-configurations by name or pattern
- * Redirect I/O to file or network socket for scripting or TTY sharing
+ * Redirect I/O to file or IPv4/v6 network socket for scripting or TTY sharing
  * Pipe input and/or output
  * Bash completion
  * Color support
