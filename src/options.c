@@ -371,7 +371,6 @@ void options_parse(int argc, char *argv[])
                 break;
 
             case OPT_LOG_FILE:
-                option.log = true;
                 option.log_filename = optarg;
                 break;
 
