@@ -187,7 +187,7 @@ void line_pulse_duration_option_parse(const char *arg)
 
         if (token != NULL)
         {
-            char keyname[10];
+            char keyname[11];
             unsigned int value;
             sscanf(token, "%10[^=]=%d", keyname, &value);
 
