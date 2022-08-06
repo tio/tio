@@ -244,6 +244,7 @@ void options_print()
                                                                             option.dsr_pulse_duration,
                                                                             option.dcd_pulse_duration,
                                                                             option.ri_pulse_duration);
+    tio_printf(" Hexadecimal mode: %s", option.hex_mode ? "enabled" : "disabled");
     if (option.map[0] != 0)
         tio_printf(" Map flags: %s", option.map);
     if (option.log)

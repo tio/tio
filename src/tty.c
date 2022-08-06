@@ -83,9 +83,6 @@
 #define KEY_V 0x76
 #define KEY_Z 0x7a
 
-#define NORMAL 0
-#define HEX 1
-
 enum line_mode_t
 {
     LINE_OFF,
@@ -112,7 +109,6 @@ bool interactive_mode = true;
 static struct termios tio, tio_old, stdout_new, stdout_old, stdin_new, stdin_old;
 static unsigned long rx_total = 0, tx_total = 0;
 static bool connected = false;
-static bool print_mode = NORMAL;
 static bool standard_baudrate = true;
 static void (*print)(char c);
 static int fd;
@@ -469,16 +465,16 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
 
             case KEY_H:
                 /* Toggle hexadecimal printing mode */
-                if (print_mode == NORMAL)
+                if (!option.hex_mode)
                 {
                     print = print_hex;
-                    print_mode = HEX;
+                    option.hex_mode = true;
                     tio_printf("Switched to hexadecimal mode");
                 }
                 else
                 {
                     print = print_normal;
-                    print_mode = NORMAL;
+                    option.hex_mode = false;
                     tio_printf("Switched to normal mode");
                 }
                 break;
@@ -988,7 +984,7 @@ void forward_to_tty(int fd, char output_char)
     }
     else
     {
-        if (print_mode == HEX)
+        if (option.hex_mode)
         {
             output_hex(output_char);
         }
@@ -1060,12 +1056,10 @@ int tty_connect(void)
     if (option.hex_mode)
     {
         print = print_hex;
-        print_mode = HEX;
     }
     else
     {
         print = print_normal;
-        print_mode = NORMAL;
     }
 
     /* Save current port settings */
@@ -1228,7 +1222,7 @@ int tty_connect(void)
                         /* Save previous key */
                         previous_char = input_char;
 
-                        if ((print_mode == HEX) && (forward))
+                        if ((option.hex_mode) && (forward))
                         {
                             if (!is_valid_hex(input_char))
                             {
