@@ -227,6 +227,13 @@ If you have [MacPorts](https://www.macports.org) installed:
     $ sudo port install tio
 ```
 
+### 4.4 Installation using MSYS2 (Windows)
+
+If you have [MSYS2](https://www.msys2.org) installed:
+```
+    $ pacman -S tio
+```
+
 ### 4.5 Installation from source
 
 The latest source releases can be found [here](https://github.com/tio/tio/releases).
