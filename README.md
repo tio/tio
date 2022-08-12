@@ -46,6 +46,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Activate sub-configurations by name or pattern
  * Redirect I/O to file or IPv4/v6 network socket for scripting or TTY sharing
  * Pipe input and/or output
+ * Support for simple line request/response handling
  * Bash completion
  * Color support
  * Remapping of prefix key
@@ -87,6 +88,8 @@ The command-line interface is straightforward as reflected in the output from
     -c, --color 0..255|bold|none|list      Colorize tio text (default: bold)
     -S, --socket <socket>                  Redirect I/O to file or network socket
     -x, --hexadecimal                      Enable hexadecimal mode
+    -r, --response-wait                    Wait for line response then quit
+        --response-timeout <ms>            Response timeout (default: 100)
     -v, --version                          Display version
     -h, --help                             Display help
 

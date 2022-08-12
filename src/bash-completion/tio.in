@@ -29,6 +29,8 @@ _tio()
           -L --list-devices \
           -c --color \
           -S --socket \
+          -r --response-wait \
+             --response-timeout \
           -x --hexadecimal \
           -v --version \
           -h --help"
@@ -110,6 +112,14 @@ _tio()
             ;;
         -S | --socket)
             COMPREPLY=( $(compgen -W "unix: inet: inet6:" -- ${cur}) )
+            return 0
+            ;;
+        -r | --response-wait)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        --response-timeout)
+            COMPREPLY=( $(compgen -W "1 10 100" -- ${cur}) )
             return 0
             ;;
         -x | --hexadecimal)

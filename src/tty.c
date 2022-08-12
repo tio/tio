@@ -1015,6 +1015,9 @@ int tty_connect(void)
     int    status;
     bool   next_timestamp = false;
     char*  now = NULL;
+    struct timeval tv;
+    struct timeval *tv_p = &tv;
+    bool ignore_stdin = false;
 
     /* Open tty device */
     fd = open(option.tty_device, O_RDWR | O_NOCTTY | O_NONBLOCK);
@@ -1108,12 +1111,28 @@ int tty_connect(void)
     {
         FD_ZERO(&rdfs);
         FD_SET(fd, &rdfs);
-        FD_SET(STDIN_FILENO, &rdfs);
+        if (!ignore_stdin)
+        {
+            FD_SET(STDIN_FILENO, &rdfs);
+        }
         maxfd = MAX(fd, STDIN_FILENO);
         maxfd = MAX(maxfd, socket_add_fds(&rdfs, true));
 
+        /* Manage timeout */
+        if ((option.response_wait) && (option.response_timeout != 0))
+        {
+            // Set response timeout
+            tv_p->tv_sec = 0;
+            tv_p->tv_usec = option.response_timeout * 1000;
+        }
+        else
+        {
+            // No timeout
+            tv_p = NULL;
+        }
+
         /* Block until input becomes available */
-        status = select(maxfd + 1, &rdfs, NULL, NULL, NULL);
+        status = select(maxfd + 1, &rdfs, NULL, NULL, tv_p);
         if (status > 0)
         {
             bool forward = false;
@@ -1181,6 +1200,15 @@ int tty_connect(void)
                     {
                         next_timestamp = true;
                     }
+
+                    if (option.response_wait)
+                    {
+                        if ((input_char == '\r') || (input_char == '\n'))
+                        {
+                             tty_sync(fd);
+                             exit(EXIT_SUCCESS);
+                        }
+                    }
                 }
             }
             else if (FD_ISSET(STDIN_FILENO, &rdfs))
@@ -1195,8 +1223,21 @@ int tty_connect(void)
                 else if (bytes_read == 0)
                 {
                     /* Reached EOF (when piping to stdin) */
-                    tty_sync(fd);
-                    exit(EXIT_SUCCESS);
+                    if (option.response_wait)
+                    {
+                        /* Stdin pipe closed but not blocking so stop listening
+                         * to stdin in response mode.
+                         *
+                         * Note: select() really indicates not if data is ready
+                         * but if file descriptor is non-blocking for I/O
+                         * operation. */
+                        ignore_stdin = true;
+                    }
+                    else
+                    {
+                        tty_sync(fd);
+                        exit(EXIT_SUCCESS);
+                    }
                 }
 
                 /* Process input byte by byte */
@@ -1255,6 +1296,11 @@ int tty_connect(void)
         else if (status == -1)
         {
             tio_error_printf("select() failed (%s)", strerror(errno));
+            exit(EXIT_FAILURE);
+        }
+        else
+        {
+            // Timeout (only happens in response wait mode)
             exit(EXIT_FAILURE);
         }
     }

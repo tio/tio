@@ -43,6 +43,7 @@ enum opt_t
     OPT_LOG_FILE,
     OPT_LOG_STRIP,
     OPT_LINE_PULSE_DURATION,
+    OPT_RESPONSE_TIMEOUT,
 };
 
 /* Default options */
@@ -74,6 +75,9 @@ struct option_t option =
     .hex_mode = false,
     .prefix_code = 20, // ctrl-t
     .prefix_key = 't',
+    .response_wait = false,
+    .response_timeout = 100,
+    .mute = false,
 };
 
 void print_help(char *argv[])
@@ -103,6 +107,8 @@ void print_help(char *argv[])
     printf("  -c, --color 0..255|bold|none|list      Colorize tio text (default: bold)\n");
     printf("  -S, --socket <socket>                  Redirect I/O to file or network socket\n");
     printf("  -x, --hexadecimal                      Enable hexadecimal mode\n");
+    printf("  -r, --response-wait                    Wait for line response then quit\n");
+    printf("      --response-timeout <ms>            Response timeout (default: 100)\n");
     printf("  -v, --version                          Display version\n");
     printf("  -h, --help                             Display help\n");
     printf("\n");
@@ -287,6 +293,8 @@ void options_parse(int argc, char *argv[])
             {"map",                 required_argument, 0, 'm'                    },
             {"color",               required_argument, 0, 'c'                    },
             {"hexadecimal",         no_argument,       0, 'x'                    },
+            {"response-wait",       no_argument,       0, 'r'                    },
+            {"response-timeout",    required_argument, 0, OPT_RESPONSE_TIMEOUT   },
             {"version",             no_argument,       0, 'v'                    },
             {"help",                no_argument,       0, 'h'                    },
             {0,                     0,                 0,  0                     }
@@ -296,7 +304,7 @@ void options_parse(int argc, char *argv[])
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:O:netLlS:m:c:xvh", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:O:netLlS:m:c:xrvh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
@@ -419,6 +427,14 @@ void options_parse(int argc, char *argv[])
 
             case 'x':
                 option.hex_mode = true;
+                break;
+
+            case 'r':
+                option.response_wait = true;
+                break;
+
+            case OPT_RESPONSE_TIMEOUT:
+                option.response_timeout = string_to_long(optarg);
                 break;
 
             case 'v':

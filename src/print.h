@@ -33,53 +33,65 @@ extern char ansi_format[];
 
 #define ansi_printf(format, args...) \
 { \
+  if (!option.mute) { \
   if (option.color < 0) \
     fprintf (stdout, "\r" format "\r\n", ## args); \
   else \
     fprintf (stdout, "\r%s" format ANSI_RESET "\r\n", ansi_format, ## args); \
+  } \
 }
 
 #define ansi_error_printf(format, args...) \
 { \
+  if (!option.mute) { \
   if (option.color < 0) \
     fprintf (stderr, "\r" format "\r\n", ## args); \
   else \
     fprintf (stderr, "\r%s" format ANSI_RESET "\r\n", ansi_format, ## args); \
   fflush(stderr); \
+  } \
 }
 
 #define ansi_printf_raw(format, args...) \
 { \
+  if (!option.mute) { \
   if (option.color < 0) \
     fprintf (stdout, format, ## args); \
   else \
     fprintf (stdout, "%s" format ANSI_RESET, ansi_format, ## args); \
+  } \
 }
 
 #define tio_warning_printf(format, args...) \
 { \
+  if (!option.mute) { \
   if (print_tainted) \
     putchar('\n'); \
   if (option.color < 0) \
     fprintf (stdout, "\r[%s] Warning: " format "\r\n", current_time(), ## args); \
   else \
     ansi_printf("[%s] Warning: " format, current_time(), ## args); \
+  } \
 }
 
 #define tio_printf(format, args...) \
 { \
+  if (!option.mute) { \
   if (print_tainted) \
     putchar('\n'); \
   ansi_printf("[%s] " format, current_time(), ## args); \
   print_tainted = false; \
+  } \
 }
 
 #define tio_printf_raw(format, args...) \
 { \
+  if (!option.mute) { \
   if (print_tainted) \
     putchar('\n'); \
   ansi_printf_raw("[%s] " format, current_time(), ## args); \
   print_tainted = false; \
+  } \
 }
 
 #ifdef DEBUG

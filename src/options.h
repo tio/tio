@@ -67,6 +67,9 @@ struct option_t
     bool hex_mode;
     unsigned char prefix_code;
     unsigned char prefix_key;
+    bool response_wait;
+    int response_timeout;
+    bool mute;
 };
 
 extern struct option_t option;

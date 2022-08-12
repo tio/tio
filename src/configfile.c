@@ -249,7 +249,21 @@ static int data_handler(void *user, const char *section, const char *name,
                 option.prefix_key = value[0];
             }
         }
-
+        else if (!strcmp(name, "response-wait"))
+        {
+            if (!strcmp(value, "enable"))
+            {
+                option.response_wait = true;
+            }
+            else if (!strcmp(value, "disable"))
+            {
+                option.response_wait = false;
+            }
+        }
+        else if (!strcmp(name, "response-timeout"))
+        {
+            option.response_timeout = atoi(value);
+        }
     }
     return 0;
 }
