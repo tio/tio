@@ -247,8 +247,7 @@ Install steps:
 
 See meson\_options.txt for tio specific build options.
 
-Note: It is recommended to only try to install from source if you are familiar
-with how to build stuff using meson.
+Note: The meson install steps may differ depending on your specific system.
 
 
 ## 5. Contributing
