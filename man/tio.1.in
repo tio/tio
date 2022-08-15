@@ -60,13 +60,19 @@ valur pair format in the duration field: <key>=<value>
 Each key represents a serial line. The following keys are available:
 
 .RS
-.TP 12n
-.IP "\fBDTR - Data Terminal Ready"
-.IP "\fBRTS - Request To Send"
-.IP "\fBCTS - Clear To Send"
-.IP "\fBDSR - Data Set Ready"
-.IP "\fBDCD - Data Carrier Detect"
-.IP "\fBRI  - Ring Indicator"
+.TP 8n
+.IP "\fBDTR
+Data Terminal Ready"
+.IP "\fBRTS
+Request To Send"
+.IP "\fBCTS
+Clear To Send"
+.IP "\fBDSR
+Data Set Ready"
+.IP "\fBDCD
+Data Carrier Detect"
+.IP "\fBRI
+Ring Indicator"
 .P
 If defining more than one key value pair, the pairs must be comma separated.
 
@@ -288,7 +294,7 @@ Any options set via command-line will override options set in the configuration 
 .PP
 The following configuration file options are available:
 
-.TP 21n
+.TP 25n
 .IP "\fBpattern"
 Pattern matching user input. This pattern can be an extended regular expression with a single group.
 .IP "\fBtty"
