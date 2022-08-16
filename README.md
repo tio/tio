@@ -126,6 +126,18 @@ $ tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 Using serial devices by ID ensures that tio automatically reconnects to the
 correct serial device if it is disconnected and then reconnected.
 
+
+Inject data to the serial device:
+```
+$ cat data.bin | tio /dev/ttyUSB0
+```
+
+Send command to serial device and wait for line response:
+```
+$ echo "*IDN?" | tio /dev/ttyACM0 --response-wait
+KORAD KD3305P V4.2 SN:32475045
+```
+
 ### 3.2 Key commands
 
 Various in session key commands are supported. When tio is started, press
@@ -207,7 +219,7 @@ Packages for various GNU/Linux distributions are available. Please consult your
 package manager tool to find and install tio.
 
 If you would like to see tio included in your favorite distribution, please
-reach out to their package maintainers team.
+reach out to its package maintainers team.
 
 ### 4.2 Installation using snap (Linux)
 
