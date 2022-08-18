@@ -47,4 +47,5 @@ void signal_handlers_install(void)
 {
     signal(SIGHUP, signal_handler);
     signal(SIGINT, signal_handler);
+    signal(SIGPIPE, SIG_IGN);
 }
