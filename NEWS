@@ -1,5 +1,66 @@
 
-=== tio v1.47 ===
+=== tio v2.0 ===
+
+
+
+Changes since tio v1.47:
+
+ * Add line response feature
+
+   Add a simple line response feature to make it possible to send e.g. a
+   command string to your serial device and easily receive and parse a line
+   response.
+   
+   This is a convenience feature for simple request/response interaction
+   based on lines. For more advanced interaction the socket feature should
+   be used instead.
+   
+   The line response feature is detailed via the following options:
+   
+    -r, --response-wait
+   
+   Wait for line response then quit. A line is considered any string ending
+   with either CR or NL character. If no line is received tio will quit
+   after response timeout.
+   
+   Any tio text is automatically muted when piping a string to tio while in
+   response mode to make it easy to parse the response.
+   
+    --response-timeout <ms>
+   
+   Set timeout [ms] of line response (default: 100).
+   
+   Example:
+   
+   Sending a string (SCPI command) to a test instrument (Korad PSU) and
+   print line response:
+   
+    $ echo "*IDN?" | tio /dev/ttyACM0 --response-wait
+    KORAD KD3305P V4.2 SN:32477045
+
+ * Fix potential sscanf() overflow
+
+ * Only print version on '--version'
+
+ * Remove duplicate show config entry of DTR pulse duration
+
+ * Remove MacPorts instructions
+
+   Remove instructions for MacPorts because the port has no maintainer and
+   the port build definition is broken (missing dependency on libinih etc.).
+
+   It is recommended to use brew instead.
+
+Peter Collingbourne:
+
+ * Ignore SIGPIPE signals
+
+   If the remote end of a socket is closed between when an input character
+   is received from the serial port and when it is written to the socket,
+   tio will receive a SIGPIPE signal when writing the character to the
+   socket, which will terminate the program. To prevent this, ignore the
+   signal, which will cause write(2) to return -EPIPE, causing tio to close
+   the socket.
 
 
 
