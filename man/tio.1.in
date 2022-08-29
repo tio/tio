@@ -55,24 +55,24 @@ Set output delay [ms] inserted between each sent line (default: 0).
 .BR "    \-\-line\-pulse\-duration " \fI<duration>
 
 Set the pulse duration [ms] of each serial port line using the following key
-valur pair format in the duration field: <key>=<value>
+value pair format in the duration field: <key>=<value>
 
 Each key represents a serial line. The following keys are available:
 
 .RS
 .TP 8n
-.IP "\fBDTR
-Data Terminal Ready"
-.IP "\fBRTS
-Request To Send"
-.IP "\fBCTS
-Clear To Send"
-.IP "\fBDSR
-Data Set Ready"
-.IP "\fBDCD
-Data Carrier Detect"
-.IP "\fBRI
-Ring Indicator"
+.IP \fBDTR
+Data Terminal Ready
+.IP \fBRTS
+Request To Send
+.IP \fBCTS
+Clear To Send
+.IP \fBDSR
+Data Set Ready
+.IP \fBDCD
+Data Carrier Detect
+.IP \fBRI
+Ring Indicator
 .P
 If defining more than one key value pair, the pairs must be comma separated.
 
