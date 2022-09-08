@@ -99,7 +99,7 @@ void print_help(char *argv[])
     printf("  -e, --local-echo                       Enable local echo\n");
     printf("  -t, --timestamp                        Enable line timestamp\n");
     printf("      --timestamp-format <format>        Set timestamp format (default: 24hour)\n");
-    printf("  -L, --list-devices                     List available serial devices\n");
+    printf("  -L, --list-devices                     List available serial devices by ID\n");
     printf("  -l, --log                              Enable log to file\n");
     printf("      --log-file <filename>              Set log filename\n");
     printf("      --log-strip                        Strip control characters and escape sequences\n");

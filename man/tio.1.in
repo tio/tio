@@ -124,7 +124,7 @@ Default format is \fB24hour\fR
 .TP
 .BR \-L ", " \-\-list\-devices
 
-List available serial devices.
+List available serial devices by ID.
 
 .TP
 .BR \-l ", " \-\-log
