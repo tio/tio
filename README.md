@@ -30,6 +30,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Automatic connect and reconnect
  * Sensible defaults
  * Support for non-standard baud rates
+ * Support for RS-485 mode
  * List available serial devices by ID
  * Show RX/TX statistics
  * Toggle serial lines
@@ -90,6 +91,8 @@ The command-line interface is straightforward as reflected in the output from
     -x, --hexadecimal                      Enable hexadecimal mode
     -r, --response-wait                    Wait for line response then quit
         --response-timeout <ms>            Response timeout (default: 100)
+        --rs-485                           Enable RS-485 mode
+        --rs-485-config <config>           Set RS-485 configuration
     -v, --version                          Display version
     -h, --help                             Display help
 
