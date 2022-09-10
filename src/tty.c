@@ -54,8 +54,13 @@
 
 #ifdef __APPLE__
 #define PATH_SERIAL_DEVICES "/dev/"
+#define PREFIX_TTY_DEVICES "tty."
+#elifdef __CYGWIN__
+#define PATH_SERIAL_DEVICES "/dev/serial/by-id/"
+#define PREFIX_TTY_DEVICES "ttyS"
 #else
 #define PATH_SERIAL_DEVICES "/dev/serial/by-id/"
+#define PREFIX_TTY_DEVICES ""
 #endif
 
 #ifndef CMSPAR
@@ -1343,11 +1348,10 @@ void list_serial_devices(void)
         {
             if ((strcmp(dir->d_name, ".")) && (strcmp(dir->d_name, "..")))
             {
-#ifdef __APPLE__
-#define TTY_DEVICES_PREFIX "tty."
-                if (!strncmp(dir->d_name, TTY_DEVICES_PREFIX, sizeof(TTY_DEVICES_PREFIX) - 1))
-#endif
-                printf("%s%s\n", PATH_SERIAL_DEVICES, dir->d_name);
+                if (!strncmp(dir->d_name, PREFIX_TTY_DEVICES, sizeof(PREFIX_TTY_DEVICES) - 1))
+                {
+                    printf("%s%s\n", PATH_SERIAL_DEVICES, dir->d_name);
+                }
             }
         }
         closedir(d);
