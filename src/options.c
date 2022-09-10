@@ -36,6 +36,7 @@
 #include "print.h"
 #include "tty.h"
 #include "rs485.h"
+#include "timestamp.h"
 #include "alert.h"
 
 enum opt_t
@@ -128,63 +129,6 @@ void print_help(char *argv[])
     printf("Options and sub-configurations may be set via configuration file.\n");
     printf("\n");
     printf("See the man page for more details.\n");
-}
-
-const char* timestamp_state_to_string(enum timestamp_t timestamp)
-{
-    switch (timestamp)
-    {
-        case TIMESTAMP_NONE:
-            return "disabled";
-            break;
-
-        case TIMESTAMP_24HOUR:
-            return "24hour";
-            break;
-
-        case TIMESTAMP_24HOUR_START:
-            return "24hour-start";
-            break;
-
-        case TIMESTAMP_24HOUR_DELTA:
-            return "24hour-delta";
-            break;
-
-        case TIMESTAMP_ISO8601:
-            return "iso8601";
-            break;
-
-        default:
-            return "unknown";
-            break;
-    }
-}
-
-enum timestamp_t timestamp_option_parse(const char *arg)
-{
-    enum timestamp_t timestamp = TIMESTAMP_24HOUR; // Default
-
-    if (arg != NULL)
-    {
-        if (strcmp(arg, "24hour") == 0)
-        {
-            return TIMESTAMP_24HOUR;
-        }
-        else if (strcmp(arg, "24hour-start") == 0)
-        {
-            return TIMESTAMP_24HOUR_START;
-        }
-        else if (strcmp(arg, "24hour-delta") == 0)
-        {
-            return TIMESTAMP_24HOUR_DELTA;
-        }
-        else if (strcmp(arg, "iso8601") == 0)
-        {
-            return TIMESTAMP_ISO8601;
-        }
-    }
-
-    return timestamp;
 }
 
 void line_pulse_duration_option_parse(const char *arg)

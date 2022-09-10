@@ -26,19 +26,8 @@
 #include <limits.h>
 #include <termios.h>
 #include <sys/param.h>
+#include "timestamp.h"
 #include "alert.h"
-
-enum timestamp_t
-{
-    TIMESTAMP_NONE,
-    TIMESTAMP_24HOUR,
-    TIMESTAMP_24HOUR_START,
-    TIMESTAMP_24HOUR_DELTA,
-    TIMESTAMP_ISO8601,
-    TIMESTAMP_END,
-};
-
-enum timestamp_t timestamp_option_parse(const char *arg);
 
 /* Options */
 struct option_t

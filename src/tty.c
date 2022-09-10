@@ -52,6 +52,7 @@
 #include "setspeed.h"
 #include "rs485.h"
 #include "alert.h"
+#include "timestamp.h"
 #include "misc.h"
 
 #ifdef __APPLE__
@@ -1188,7 +1189,7 @@ int tty_connect(void)
                     /* Print timestamp on new line if enabled */
                     if (next_timestamp && input_char != '\n' && input_char != '\r')
                     {
-                        now = current_time();
+                        now = timestamp_current_time();
                         if (now)
                         {
                             ansi_printf_raw("[%s] ", now);

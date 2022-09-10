@@ -43,6 +43,8 @@
 #include "error.h"
 #include "print.h"
 #include "rs485.h"
+#include "timestamp.h"
+#include "alert.h"
 
 static struct config_t *c;
 

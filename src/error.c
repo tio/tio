@@ -31,6 +31,7 @@
 #include "options.h"
 #include "print.h"
 #include "error.h"
+#include "timestamp.h"
 
 static char error[2][1000];
 static bool in_session = false;
@@ -54,7 +55,7 @@ void error_printf_(const char *format, ...)
     {
       putchar('\n');
     }
-    ansi_error_printf("[%s] %s", current_time(), line);
+    ansi_error_printf("[%s] %s", timestamp_current_time(), line);
   }
   else
   {

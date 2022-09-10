@@ -19,54 +19,18 @@
  * 02110-1301, USA.
  */
 
-#include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <time.h>
-#include <errno.h>
-#include "error.h"
-#include "print.h"
-#include "options.h"
+#pragma once
 
-void delay(long ms)
+enum timestamp_t
 {
-    struct timespec ts;
+    TIMESTAMP_NONE,
+    TIMESTAMP_24HOUR,
+    TIMESTAMP_24HOUR_START,
+    TIMESTAMP_24HOUR_DELTA,
+    TIMESTAMP_ISO8601,
+    TIMESTAMP_END,
+};
 
-    if (ms <= 0)
-    {
-        return;
-    }
-
-    ts.tv_sec = ms / 1000;
-    ts.tv_nsec = (ms % 1000) * 1000000;
-
-    nanosleep(&ts, NULL);
-}
-
-long string_to_long(char *string)
-{
-    long result;
-    char *end_token;
-
-    errno = 0;
-    result = strtol(string, &end_token, 10);
-    if ((errno != 0) || (*end_token != 0))
-    {
-        printf("Error: Invalid digit\n");
-        exit(EXIT_FAILURE);
-    }
-
-    return result;
-}
-
-int ctrl_key_code(unsigned char key)
-{
-    if ((key >= 'a') && (key <= 'z'))
-    {
-        return key & ~0x60;
-    }
-
-    return -1;
-}
+char *timestamp_current_time(void);
+const char* timestamp_state_to_string(enum timestamp_t timestamp);
+enum timestamp_t timestamp_option_parse(const char *arg);

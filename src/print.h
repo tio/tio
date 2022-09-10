@@ -26,6 +26,7 @@
 #include "misc.h"
 #include "error.h"
 #include "options.h"
+#include "timestamp.h"
 
 extern bool print_tainted;
 extern char ansi_format[];
@@ -69,9 +70,9 @@ extern char ansi_format[];
   if (print_tainted) \
     putchar('\n'); \
   if (option.color < 0) \
-    fprintf (stdout, "\r[%s] Warning: " format "\r\n", current_time(), ## args); \
+    fprintf (stdout, "\r[%s] Warning: " format "\r\n", timestamp_current_time(), ## args); \
   else \
-    ansi_printf("[%s] Warning: " format, current_time(), ## args); \
+    ansi_printf("[%s] Warning: " format, timestamp_current_time(), ## args); \
   } \
 }
 
@@ -80,7 +81,7 @@ extern char ansi_format[];
   if (!option.mute) { \
   if (print_tainted) \
     putchar('\n'); \
-  ansi_printf("[%s] " format, current_time(), ## args); \
+  ansi_printf("[%s] " format, timestamp_current_time(), ## args); \
   print_tainted = false; \
   } \
 }
@@ -90,7 +91,7 @@ extern char ansi_format[];
   if (!option.mute) { \
   if (print_tainted) \
     putchar('\n'); \
-  ansi_printf_raw("[%s] " format, current_time(), ## args); \
+  ansi_printf_raw("[%s] " format, timestamp_current_time(), ## args); \
   print_tainted = false; \
   } \
 }
