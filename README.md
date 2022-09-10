@@ -94,7 +94,7 @@ The command-line interface is straightforward as reflected in the output from
         --response-timeout <ms>            Response timeout (default: 100)
         --rs-485                           Enable RS-485 mode
         --rs-485-config <config>           Set RS-485 configuration
-        --alert none|bell|blink            Alert on connect/disconnect (default: none)
+        --alert bell|blink|none            Alert on connect/disconnect (default: none)
     -v, --version                          Display version
     -h, --help                             Display help
 

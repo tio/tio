@@ -122,7 +122,7 @@ void print_help(char *argv[])
     printf("      --response-timeout <ms>            Response timeout (default: 100)\n");
     printf("      --rs-485                           Enable RS-485 mode\n");
     printf("      --rs-485-config <config>           Set RS-485 configuration\n");
-    printf("      --alert none|bell|blink            Alert on connect/disconnect (default: none)\n");
+    printf("      --alert bell|blink|none            Alert on connect/disconnect (default: none)\n");
     printf("  -v, --version                          Display version\n");
     printf("  -h, --help                             Display help\n");
     printf("\n");
