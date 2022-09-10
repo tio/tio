@@ -29,13 +29,3 @@
     $ tio --socket ws:1234
 
    Use libwesockets to implement feature.
-
- * RS-485 support
-
-   Many modern RS-485 devices such as the ones from FTDI already operate in
-   RS-485 mode by default and will work with tio out of the box. However, there
-   are still some RS-232/485 devices which need to be switched from e.g. RS-232 to
-   RS-485 mode to operate accordingly on the physical level.
-
-   To enable RS-485 mode on such serial devices the idea is to add a --rs-485
-   option.

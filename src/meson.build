@@ -14,7 +14,8 @@ tio_sources = [
   'configfile.c',
   'signals.c',
   'socket.c',
-  'setspeed.c'
+  'setspeed.c',
+  'rs485.c'
 ]
 
 tio_dep = dependency('inih', required: true,
@@ -29,6 +30,10 @@ endif
 
 if enable_iossiospeed
   tio_c_args += '-DHAVE_IOSSIOSPEED'
+endif
+
+if enable_rs485
+  tio_c_args += '-DHAVE_RS485'
 endif
 
 executable('tio',

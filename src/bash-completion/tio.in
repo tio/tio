@@ -31,6 +31,8 @@ _tio()
           -S --socket \
           -r --response-wait \
              --response-timeout \
+             --rs-485 \
+             --rs-485-config \
           -x --hexadecimal \
           -v --version \
           -h --help"
@@ -120,6 +122,14 @@ _tio()
             ;;
         --response-timeout)
             COMPREPLY=( $(compgen -W "1 10 100" -- ${cur}) )
+            return 0
+            ;;
+        --rs-485)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        --rs-485-config)
+            COMPREPLY=( $(compgen -W "RTS_ON_SEND RTS_AFTER_SEND RTS_DELAY_BEFORE_SEND RTS_DELAY_AFTER_SEND RX_DURING_TX"  -- ${cur}) )
             return 0
             ;;
         -x | --hexadecimal)

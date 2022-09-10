@@ -230,6 +230,33 @@ response mode to make it easy to parse the response.
 Set timeout [ms] of line response (default: 100).
 
 .TP
+.BR "    \-\-rs\-485"
+
+Enable RS-485 mode.
+
+.TP
+.BR "    \-\-rs\-485\-config " \fI<config>
+
+Set the RS-485 configuration using the following key or key value pair format in
+the configuration field:
+
+.RS
+.TP 30n
+.IP \fBRTS_ON_SEND=value
+Set logical level (0 or 1) for RTS pin when sending
+.IP \fBRTS_AFTER_SEND=value
+Set logical level (0 or 1) for RTS pin after sending
+.IP \fBRTS_DELAY_BEFORE_SEND=value
+Set RTS delay (ms) before sending
+.IP \fBRTS_DELAY_AFTER_SEND=value
+Set RTS delay (ms) after sending
+.IP \fBRX_DURING_TX
+Receive data even while sending data
+.P
+If defining more than one key or key value pair, they must be comma separated.
+.RE
+
+.TP
 .BR \-v ", " \-\-version
 
 Display program version.
@@ -358,6 +385,10 @@ Set prefix ctrl key (a..z, default: t)
 Enable wait for line response
 .IP "\fBresponse-timeout"
 Set line response timeout
+.IP "\fBrs-485"
+Enable RS-485 mode
+.IP "\fBrs-485-config"
+Set RS-485 configuration
 
 .SH "CONFIGURATION FILE EXAMPLES"
 
@@ -506,6 +537,11 @@ In this mode, only the response will be printed.
 Likewise, to pipe data from file to the serial device:
 
 $ cat data.bin | tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
+
+.TP
+Enable RS-485 mode:
+
+$ tio --rs-485 --rs-485-config=RTS_ON_SEND=1,RX_DURING_TX /dev/ttyUSB0
 
 .SH "WEBSITE"
 .PP

@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <stdio.h>
 #include <stdbool.h>
 #include "misc.h"
 #include "error.h"

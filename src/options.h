@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <stdint.h>
 #include <stdbool.h>
 #include <limits.h>
 #include <termios.h>
@@ -70,6 +71,10 @@ struct option_t
     bool response_wait;
     int response_timeout;
     bool mute;
+    bool rs485;
+    uint32_t rs485_config_flags;
+    int32_t rs485_delay_rts_before_send;
+    int32_t rs485_delay_rts_after_send;
 };
 
 extern struct option_t option;

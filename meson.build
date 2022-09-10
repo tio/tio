@@ -71,5 +71,12 @@ foreach rate : test_baudrates
   endif
 endforeach
 
+# Test for RS-485 support on Linux
+if host_machine.system() == 'linux'
+  if compiler.check_header('linux/serial.h')
+    enable_rs485 = compiler.has_header_symbol('sys/ioctl.h', 'TIOCSRS485')
+  endif
+endif
+
 subdir('src')
 subdir('man')

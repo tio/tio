@@ -50,6 +50,7 @@
 #include "error.h"
 #include "socket.h"
 #include "setspeed.h"
+#include "rs485.h"
 
 #ifdef __APPLE__
 #define PATH_SERIAL_DEVICES "/dev/"
@@ -456,6 +457,10 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf("Configuration:");
                 config_file_print();
                 options_print();
+                if (option.rs485)
+                {
+                    rs485_print_config();
+                }
                 break;
 
             case KEY_E:
@@ -947,6 +952,12 @@ void tty_restore(void)
 {
     tcsetattr(fd, TCSANOW, &tio_old);
 
+    if (option.rs485)
+    {
+        /* Restore original RS-485 mode */
+        rs485_mode_restore(fd);
+    }
+
     if (connected)
     {
         tty_disconnect();
@@ -1080,6 +1091,12 @@ int tty_connect(void)
         tio.c_ospeed = tio_old.c_ospeed;
     }
 #endif
+
+    /* Manage RS-485 mode */
+    if (option.rs485)
+    {
+        rs485_mode_enable(fd);
+    }
 
     /* Make sure we restore tty settings on exit */
     if (first)

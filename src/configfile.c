@@ -42,6 +42,7 @@
 #include "options.h"
 #include "error.h"
 #include "print.h"
+#include "rs485.h"
 
 static struct config_t *c;
 
@@ -264,6 +265,22 @@ static int data_handler(void *user, const char *section, const char *name,
         {
             option.response_timeout = atoi(value);
         }
+        else if (!strcmp(name, "rs-485"))
+        {
+            if (!strcmp(value, "enable"))
+            {
+                option.rs485 = true;
+            }
+            else if (!strcmp(value, "disable"))
+            {
+                option.rs485 = false;
+            }
+        }
+        else if (!strcmp(name, "rs-485-config"))
+        {
+            rs485_parse_config(value);
+        }
+
     }
     return 0;
 }

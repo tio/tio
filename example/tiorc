@@ -44,3 +44,9 @@ color = 11
 pattern = usb([0-9]*)
 tty = /dev/ttyUSB%s
 color = 12
+
+[rs-485-device]
+tty = /dev/ttyUSB0
+rs-485 = enable
+rs-485-config = RTS_ON_SEND=1,RTS_AFTER_SEND=1,RTS_DELAY_BEFORE_SEND=60,RTS_DELAY_AFTER_SEND=80,RX_DURING_TX
+color = 13

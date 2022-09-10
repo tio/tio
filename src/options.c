@@ -35,6 +35,7 @@
 #include "misc.h"
 #include "print.h"
 #include "tty.h"
+#include "rs485.h"
 
 enum opt_t
 {
@@ -44,6 +45,8 @@ enum opt_t
     OPT_LOG_STRIP,
     OPT_LINE_PULSE_DURATION,
     OPT_RESPONSE_TIMEOUT,
+    OPT_RS485,
+    OPT_RS485_CONFIG,
 };
 
 /* Default options */
@@ -78,6 +81,10 @@ struct option_t option =
     .response_wait = false,
     .response_timeout = 100,
     .mute = false,
+    .rs485 = false,
+    .rs485_config_flags = 0,
+    .rs485_delay_rts_before_send = -1,
+    .rs485_delay_rts_after_send = -1,
 };
 
 void print_help(char *argv[])
@@ -109,6 +116,8 @@ void print_help(char *argv[])
     printf("  -x, --hexadecimal                      Enable hexadecimal mode\n");
     printf("  -r, --response-wait                    Wait for line response then quit\n");
     printf("      --response-timeout <ms>            Response timeout (default: 100)\n");
+    printf("      --rs-485                           Enable RS-485 mode\n");
+    printf("      --rs-485-config <config>           Set RS-485 configuration\n");
     printf("  -v, --version                          Display version\n");
     printf("  -h, --help                             Display help\n");
     printf("\n");
@@ -295,6 +304,8 @@ void options_parse(int argc, char *argv[])
             {"hexadecimal",         no_argument,       0, 'x'                    },
             {"response-wait",       no_argument,       0, 'r'                    },
             {"response-timeout",    required_argument, 0, OPT_RESPONSE_TIMEOUT   },
+            {"rs-485",              no_argument,       0, OPT_RS485              },
+            {"rs-485-config",       required_argument, 0, OPT_RS485_CONFIG       },
             {"version",             no_argument,       0, 'v'                    },
             {"help",                no_argument,       0, 'h'                    },
             {0,                     0,                 0,  0                     }
@@ -435,6 +446,14 @@ void options_parse(int argc, char *argv[])
 
             case OPT_RESPONSE_TIMEOUT:
                 option.response_timeout = string_to_long(optarg);
+                break;
+
+            case OPT_RS485:
+                option.rs485 = true;
+                break;
+
+            case OPT_RS485_CONFIG:
+                rs485_parse_config(optarg);
                 break;
 
             case 'v':
