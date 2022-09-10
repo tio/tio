@@ -5,36 +5,69 @@
 
 Changes since tio v1.47:
 
+ * Add experimental RS-485 support
+
+   Many modern RS-485 serial devices such as the ones from FTDI already
+   operate in RS-485 mode by default and will work with tio out of the box.
+   However, there are some RS-232/485 devices which need to be switched
+   from e.g. RS-232 to RS-485 mode to operate accordingly on the physical
+   level.
+
+   This commit implements the switching mechanism and interface required to
+   enable RS-485 mode. It only works on Linux and with serial devices which
+   use device drivers that support the Linux RS-485 control interface.
+
+   The RS-485 feature is detailed via the following options:
+
+    --rs-485                           Enable RS-485 mode
+    --rs-485-config <config>           Set RS-485 configuration
+
+   Set the RS-485 configuration using the following key or key value pair
+   format in the configuration field:
+
+    RTS_ON_SEND=value             Set logical level (0 or 1) for RTS pin when sending
+    RTS_AFTER_SEND=value          Set logical level (0 or 1) for RTS pin after sending
+    RTS_DELAY_BEFORE_SEND=value   Set RTS delay (ms) before sending
+    RTS_DELAY_AFTER_SEND=value    Set RTS delay (ms) after sending
+    RX_DURING_TX                  Receive data even while sending data
+
+   If defining more than one key or key value pair, they must be comma
+   separated.
+
+   Example use:
+
+     $ tio /dev/ttyUSB0 --rs-485 --rs-r485-config=RTS_DELAY_AFTER_SEND=50,RX_DURING_TX
+
  * Add line response feature
 
    Add a simple line response feature to make it possible to send e.g. a
    command string to your serial device and easily receive and parse a line
    response.
-   
+
    This is a convenience feature for simple request/response interaction
    based on lines. For more advanced interaction the socket feature should
    be used instead.
-   
+
    The line response feature is detailed via the following options:
-   
+
     -r, --response-wait
-   
+
    Wait for line response then quit. A line is considered any string ending
    with either CR or NL character. If no line is received tio will quit
    after response timeout.
-   
+
    Any tio text is automatically muted when piping a string to tio while in
    response mode to make it easy to parse the response.
-   
+
     --response-timeout <ms>
-   
+
    Set timeout [ms] of line response (default: 100).
-   
+
    Example:
-   
+
    Sending a string (SCPI command) to a test instrument (Korad PSU) and
    print line response:
-   
+
     $ echo "*IDN?" | tio /dev/ttyACM0 --response-wait
     KORAD KD3305P V4.2 SN:32477045
 
@@ -761,7 +794,7 @@ Changes since tio v1.32:
  * Rename option -i to -L
 
  * Shorten timestamp
- 
+
  * Shorten timestamp description
 
    We do not need the date part of the timestamp. It simply takes up too
