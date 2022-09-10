@@ -131,8 +131,7 @@ List available serial devices by ID.
 
 Enable log to file.
 
-If no filename is provided the filename will be
-automatically generated.
+If no filename is provided the filename will be automatically generated.
 
 .TP
 .BR "    \-\-log-file \fI<filename>
