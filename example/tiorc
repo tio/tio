@@ -16,7 +16,11 @@ output-line-delay = 0
 no-autoconnect = disable
 hexadecimal = disable
 timestamp = disable
+log = disable
+log-strip = disable
 color = bold
+rs-485 = disable
+alert = none
 
 # Sub-configuraions
 
