@@ -29,5 +29,6 @@ enum alert_t
     ALERT_END,
 };
 
+enum alert_t alert_option_parse(const char *arg);
 void alert_connect(void);
 void alert_disconnect(void);

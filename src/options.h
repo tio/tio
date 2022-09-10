@@ -75,4 +75,3 @@ void options_parse(int argc, char *argv[]);
 void options_parse_final(int argc, char *argv[]);
 
 void line_pulse_duration_option_parse(const char *arg);
-enum alert_t alert_option_parse(const char *arg);
