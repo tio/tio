@@ -50,6 +50,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Support for simple line request/response handling
  * Bash completion
  * Color support
+ * Visual or audible alert on connect/disconnect
  * Remapping of prefix key
  * Man page documentation
  * Plays nicely with [tmux](https://tmux.github.io)
@@ -93,6 +94,7 @@ The command-line interface is straightforward as reflected in the output from
         --response-timeout <ms>            Response timeout (default: 100)
         --rs-485                           Enable RS-485 mode
         --rs-485-config <config>           Set RS-485 configuration
+        --alert none|bell|blink            Alert on connect/disconnect (default: none)
     -v, --version                          Display version
     -h, --help                             Display help
 
