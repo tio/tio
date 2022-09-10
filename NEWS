@@ -5,6 +5,19 @@
 
 Changes since tio v1.47:
 
+ * Add visual or audible alert support on connect/disconnect
+
+   The feature is detailed via the following option:
+
+    --alert none|bell|blink
+
+      Set alert action on connect/disconnect.
+
+      It will sound the bell once or blink once on successful connect.
+      Likewise it will sound the bell twice or blink twice on disconnect.
+
+      Default value is "none" for no alert.
+
  * Add experimental RS-485 support
 
    Many modern RS-485 serial devices such as the ones from FTDI already
