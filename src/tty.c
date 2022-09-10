@@ -51,6 +51,8 @@
 #include "socket.h"
 #include "setspeed.h"
 #include "rs485.h"
+#include "alert.h"
+#include "misc.h"
 
 #ifdef __APPLE__
 #define PATH_SERIAL_DEVICES "/dev/"
@@ -950,6 +952,9 @@ void tty_disconnect(void)
         flock(fd, LOCK_UN);
         close(fd);
         connected = false;
+
+        /* Fire alert action */
+        alert_disconnect();
     }
 }
 
@@ -1065,6 +1070,9 @@ int tty_connect(void)
     tio_printf("Connected");
     connected = true;
     print_tainted = false;
+
+    /* Fire alert action */
+    alert_connect();
 
     if (option.timestamp)
     {

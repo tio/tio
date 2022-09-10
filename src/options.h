@@ -26,6 +26,7 @@
 #include <limits.h>
 #include <termios.h>
 #include <sys/param.h>
+#include "alert.h"
 
 enum timestamp_t
 {
@@ -75,6 +76,7 @@ struct option_t
     uint32_t rs485_config_flags;
     int32_t rs485_delay_rts_before_send;
     int32_t rs485_delay_rts_after_send;
+    enum alert_t alert;
 };
 
 extern struct option_t option;
@@ -84,3 +86,4 @@ void options_parse(int argc, char *argv[]);
 void options_parse_final(int argc, char *argv[]);
 
 void line_pulse_duration_option_parse(const char *arg);
+enum alert_t alert_option_parse(const char *arg);

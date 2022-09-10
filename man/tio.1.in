@@ -257,6 +257,16 @@ If defining more than one key or key value pair, they must be comma separated.
 .RE
 
 .TP
+.BR "\-\-alert none|bell|blink"
+
+Set alert action on connect/disconnect.
+
+It will sound the bell once or blink once on successful connect. Likewise it
+will sound the bell twice or blink twice on disconnect.
+
+Default value is "none".
+
+.TP
 .BR \-v ", " \-\-version
 
 Display program version.
@@ -389,6 +399,8 @@ Set line response timeout
 Enable RS-485 mode
 .IP "\fBrs-485-config"
 Set RS-485 configuration
+.IP "\fBalert"
+Set alert action on connect/disconnect
 
 .SH "CONFIGURATION FILE EXAMPLES"
 

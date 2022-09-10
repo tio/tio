@@ -15,7 +15,8 @@ tio_sources = [
   'signals.c',
   'socket.c',
   'setspeed.c',
-  'rs485.c'
+  'rs485.c',
+  'alert.c'
 ]
 
 tio_dep = dependency('inih', required: true,

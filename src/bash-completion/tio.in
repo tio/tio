@@ -29,11 +29,12 @@ _tio()
           -L --list-devices \
           -c --color \
           -S --socket \
+          -x --hexadecimal \
           -r --response-wait \
              --response-timeout \
              --rs-485 \
              --rs-485-config \
-          -x --hexadecimal \
+             --alert \
           -v --version \
           -h --help"
 
@@ -116,6 +117,10 @@ _tio()
             COMPREPLY=( $(compgen -W "unix: inet: inet6:" -- ${cur}) )
             return 0
             ;;
+        -x | --hexadecimal)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
         -r | --response-wait)
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
@@ -132,8 +137,8 @@ _tio()
             COMPREPLY=( $(compgen -W "RTS_ON_SEND RTS_AFTER_SEND RTS_DELAY_BEFORE_SEND RTS_DELAY_AFTER_SEND RX_DURING_TX"  -- ${cur}) )
             return 0
             ;;
-        -x | --hexadecimal)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        --alert)
+            COMPREPLY=( $(compgen -W "none bell blink"  -- ${cur}) )
             return 0
             ;;
         -v | --version)

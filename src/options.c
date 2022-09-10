@@ -36,6 +36,7 @@
 #include "print.h"
 #include "tty.h"
 #include "rs485.h"
+#include "alert.h"
 
 enum opt_t
 {
@@ -47,6 +48,7 @@ enum opt_t
     OPT_RESPONSE_TIMEOUT,
     OPT_RS485,
     OPT_RS485_CONFIG,
+    OPT_ALERT,
 };
 
 /* Default options */
@@ -85,6 +87,7 @@ struct option_t option =
     .rs485_config_flags = 0,
     .rs485_delay_rts_before_send = -1,
     .rs485_delay_rts_after_send = -1,
+    .alert = ALERT_NONE,
 };
 
 void print_help(char *argv[])
@@ -118,6 +121,7 @@ void print_help(char *argv[])
     printf("      --response-timeout <ms>            Response timeout (default: 100)\n");
     printf("      --rs-485                           Enable RS-485 mode\n");
     printf("      --rs-485-config <config>           Set RS-485 configuration\n");
+    printf("      --alert none|bell|blink            Alert on connect/disconnect (default: none)\n");
     printf("  -v, --version                          Display version\n");
     printf("  -h, --help                             Display help\n");
     printf("\n");
@@ -159,7 +163,7 @@ const char* timestamp_state_to_string(enum timestamp_t timestamp)
 enum timestamp_t timestamp_option_parse(const char *arg)
 {
     enum timestamp_t timestamp = TIMESTAMP_24HOUR; // Default
-    
+
     if (arg != NULL)
     {
         if (strcmp(arg, "24hour") == 0)
@@ -237,7 +241,6 @@ void line_pulse_duration_option_parse(const char *arg)
         }
     }
     free(buffer);
-
 }
 
 void options_print()
@@ -306,6 +309,7 @@ void options_parse(int argc, char *argv[])
             {"response-timeout",    required_argument, 0, OPT_RESPONSE_TIMEOUT   },
             {"rs-485",              no_argument,       0, OPT_RS485              },
             {"rs-485-config",       required_argument, 0, OPT_RS485_CONFIG       },
+            {"alert",               required_argument, 0, OPT_ALERT              },
             {"version",             no_argument,       0, 'v'                    },
             {"help",                no_argument,       0, 'h'                    },
             {0,                     0,                 0,  0                     }
@@ -454,6 +458,10 @@ void options_parse(int argc, char *argv[])
 
             case OPT_RS485_CONFIG:
                 rs485_parse_config(optarg);
+                break;
+
+            case OPT_ALERT:
+                option.alert = alert_option_parse(optarg);
                 break;
 
             case 'v':

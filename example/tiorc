@@ -30,6 +30,7 @@ color = 9
 baudrate = 115200
 tty = /dev/serial/by-id/usb-Silicon_Labs_CP2105_Dual_USB_to_UART_Bridge_Controller_01093176-if01-port0
 line-pulse-duration = DTR=200,RTS=300,RI=50
+alert = bell
 color = 10
 
 [tincan]

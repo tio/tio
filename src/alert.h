@@ -21,11 +21,13 @@
 
 #pragma once
 
-#define UNUSED(expr) do { (void)(expr); } while (0)
+enum alert_t
+{
+    ALERT_NONE,
+    ALERT_BELL,
+    ALERT_BLINK,
+    ALERT_END,
+};
 
-char * current_time(void);
-void delay(long ms);
-long string_to_long(char *string);
-int ctrl_key_code(unsigned char key);
 void alert_connect(void);
 void alert_disconnect(void);

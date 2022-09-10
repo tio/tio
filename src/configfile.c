@@ -280,8 +280,12 @@ static int data_handler(void *user, const char *section, const char *name,
         {
             rs485_parse_config(value);
         }
-
+        else if (!strcmp(name, "alert"))
+        {
+            option.alert = alert_option_parse(value);
+        }
     }
+
     return 0;
 }
 
