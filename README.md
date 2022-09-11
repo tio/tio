@@ -65,42 +65,42 @@ For more usage details please see the man page documentation
 The command-line interface is straightforward as reflected in the output from
 'tio --help':
 ```
-  Usage: tio [<options>] <tty-device|sub-config>
+ Usage: tio [<options>] <tty-device|sub-config>
 
-  Connect to tty device directly or via sub-configuration.
+ Connect to tty device directly or via sub-configuration.
 
-  Options:
-    -b, --baudrate <bps>                   Baud rate (default: 115200)
-    -d, --databits 5|6|7|8                 Data bits (default: 8)
-    -f, --flow hard|soft|none              Flow control (default: none)
-    -s, --stopbits 1|2                     Stop bits (default: 1)
-    -p, --parity odd|even|none|mark|space  Parity (default: none)
-    -o, --output-delay <ms>                Output character delay (default: 0)
-    -O, --output-line-delay <ms>           Output line delay (default: 0)
-        --line-pulse-duration <duration>   Set line pulse duration
-    -n, --no-autoconnect                   Disable automatic connect
-    -e, --local-echo                       Enable local echo
-    -t, --timestamp                        Enable line timestamp
-        --timestamp-format <format>        Set timestamp format (default: 24hour)
-    -L, --list-devices                     List available serial devices
-    -l, --log                              Enable log to file
-        --log-file <filename>              Set log filename
-        --log-strip                        Strip control characters and escape sequences
-    -m, --map <flags>                      Map characters
-    -c, --color 0..255|bold|none|list      Colorize tio text (default: bold)
-    -S, --socket <socket>                  Redirect I/O to socket
-    -x, --hexadecimal                      Enable hexadecimal mode
-    -r, --response-wait                    Wait for line response then quit
-        --response-timeout <ms>            Response timeout (default: 100)
-        --rs-485                           Enable RS-485 mode
-        --rs-485-config <config>           Set RS-485 configuration
-        --alert bell|blink|none            Alert on connect/disconnect (default: none)
-    -v, --version                          Display version
-    -h, --help                             Display help
+ Options:
+   -b, --baudrate <bps>                   Baud rate (default: 115200)
+   -d, --databits 5|6|7|8                 Data bits (default: 8)
+   -f, --flow hard|soft|none              Flow control (default: none)
+   -s, --stopbits 1|2                     Stop bits (default: 1)
+   -p, --parity odd|even|none|mark|space  Parity (default: none)
+   -o, --output-delay <ms>                Output character delay (default: 0)
+   -O, --output-line-delay <ms>           Output line delay (default: 0)
+       --line-pulse-duration <duration>   Set line pulse duration
+   -n, --no-autoconnect                   Disable automatic connect
+   -e, --local-echo                       Enable local echo
+   -t, --timestamp                        Enable line timestamp
+       --timestamp-format <format>        Set timestamp format (default: 24hour)
+   -L, --list-devices                     List available serial devices
+   -l, --log                              Enable log to file
+       --log-file <filename>              Set log filename
+       --log-strip                        Strip control characters and escape sequences
+   -m, --map <flags>                      Map characters
+   -c, --color 0..255|bold|none|list      Colorize tio text (default: bold)
+   -S, --socket <socket>                  Redirect I/O to socket
+   -x, --hexadecimal                      Enable hexadecimal mode
+   -r, --response-wait                    Wait for line response then quit
+       --response-timeout <ms>            Response timeout (default: 100)
+       --rs-485                           Enable RS-485 mode
+       --rs-485-config <config>           Set RS-485 configuration
+       --alert bell|blink|none            Alert on connect/disconnect (default: none)
+   -v, --version                          Display version
+   -h, --help                             Display help
 
-  Options and sub-configurations may be set via configuration file.
+ Options and sub-configurations may be set via configuration file.
 
-  See the man page for more details.
+ See the man page for more details.
 
 ```
 
@@ -230,21 +230,21 @@ reach out to its package maintainers team.
 
 Install latest stable version:
 ```
-    $ snap install tio
+$ snap install tio
 ```
 
 ### 4.3 Installation using brew (MacOS, Linux)
 
 If you have [brew](http://brew.sh) installed:
 ```
-    $ brew install tio
+$ brew install tio
 ```
 
 ### 4.4 Installation using MSYS2 (Windows)
 
 If you have [MSYS2](https://www.msys2.org) installed:
 ```
-    $ pacman -S tio
+$ pacman -S tio
 ```
 
 ### 4.5 Installation from source
@@ -253,9 +253,9 @@ The latest source releases can be found [here](https://github.com/tio/tio/releas
 
 Install steps:
 ```
-    $ meson build
-    $ meson compile -C build
-    $ meson install -C build
+$ meson build
+$ meson compile -C build
+$ meson install -C build
 ```
 
 See meson\_options.txt for tio specific build options.
