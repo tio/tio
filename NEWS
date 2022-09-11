@@ -5,6 +5,11 @@
 
 Changes since tio v1.47:
 
+ * Handle stale unix socket file
+
+   Delete existing unix socket file if it is tested to be stale, meaning no
+   one is listening on it.
+
  * Add visual or audible alert support on connect/disconnect
 
    The feature is detailed via the following option:
