@@ -58,7 +58,7 @@ when used in combination with [tmux](https://tmux.github.io).
 ## 3. Usage
 
 For more usage details please see the man page documentation
-[here](man/tio.1.txt).
+[here](https://raw.githubusercontent.com/tio/tio/master/man/tio.1.txt).
 
 ### 3.1 Command-line
 
