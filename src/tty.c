@@ -402,20 +402,21 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
         {
             case KEY_QUESTION:
                 tio_printf("Key commands:");
-                tio_printf(" ctrl-%c ?   List available key commands", option.prefix_key);
-                tio_printf(" ctrl-%c b   Send break", option.prefix_key);
-                tio_printf(" ctrl-%c c   Show configuration", option.prefix_key);
-                tio_printf(" ctrl-%c e   Toggle local echo mode", option.prefix_key);
-                tio_printf(" ctrl-%c g   Toggle serial port line", option.prefix_key);
-                tio_printf(" ctrl-%c h   Toggle hexadecimal mode", option.prefix_key);
-                tio_printf(" ctrl-%c l   Clear screen", option.prefix_key);
-                tio_printf(" ctrl-%c L   Show line states", option.prefix_key);
-                tio_printf(" ctrl-%c p   Pulse serial port line", option.prefix_key);
-                tio_printf(" ctrl-%c q   Quit", option.prefix_key);
-                tio_printf(" ctrl-%c s   Show statistics", option.prefix_key);
-                tio_printf(" ctrl-%c t   Toggle line timestamp mode", option.prefix_key);
-                tio_printf(" ctrl-%c U   Toggle conversion to uppercase on output", option.prefix_key);
-                tio_printf(" ctrl-%c v   Show version", option.prefix_key);
+                tio_printf(" ctrl-%c ?       List available key commands", option.prefix_key);
+                tio_printf(" ctrl-%c b       Send break", option.prefix_key);
+                tio_printf(" ctrl-%c c       Show configuration", option.prefix_key);
+                tio_printf(" ctrl-%c e       Toggle local echo mode", option.prefix_key);
+                tio_printf(" ctrl-%c g       Toggle serial port line", option.prefix_key);
+                tio_printf(" ctrl-%c h       Toggle hexadecimal mode", option.prefix_key);
+                tio_printf(" ctrl-%c l       Clear screen", option.prefix_key);
+                tio_printf(" ctrl-%c L       Show line states", option.prefix_key);
+                tio_printf(" ctrl-%c p       Pulse serial port line", option.prefix_key);
+                tio_printf(" ctrl-%c q       Quit", option.prefix_key);
+                tio_printf(" ctrl-%c s       Show statistics", option.prefix_key);
+                tio_printf(" ctrl-%c t       Toggle line timestamp mode", option.prefix_key);
+                tio_printf(" ctrl-%c U       Toggle conversion to uppercase on output", option.prefix_key);
+                tio_printf(" ctrl-%c v       Show version", option.prefix_key);
+                tio_printf(" ctrl-%c ctrl-%c  Send ctrl-%c character", option.prefix_key, option.prefix_key, option.prefix_key);
                 break;
 
             case KEY_SHIFT_L:
@@ -546,6 +547,23 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 break;
 
             default:
+                /* Handle double prefix key input case */
+                if (input_char == option.prefix_code)
+                {
+                    static int count = 0;
+                    if (count++ == 1)
+                    {
+                        // Do not forward prefix characters excessively
+                        count = 0;
+                        break;
+                    }
+
+                    /* Forward prefix character to tty */
+                    *output_char = option.prefix_code;
+                    *forward = true;
+                    break;
+                }
+
                 /* Ignore unknown ctrl-t escaped keys */
                 break;
         }
