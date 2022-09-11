@@ -150,20 +150,21 @@ ctrl-t ? to list the available key commands.
 
 ```
 [20:19:12.040] Key commands:
-[20:19:12.040]  ctrl-t ?   List available key commands
-[20:19:12.040]  ctrl-t b   Send break
-[20:19:12.040]  ctrl-t c   Show configuration
-[20:19:12.040]  ctrl-t e   Toggle local echo mode
-[20:19:12.040]  ctrl-t g   Toggle serial port line
-[20:19:12.040]  ctrl-t h   Toggle hexadecimal mode
-[20:19:12.040]  ctrl-t l   Clear screen
-[20:19:12.040]  ctrl-t L   Show line states
-[20:19:12.040]  ctrl-t p   Pulse serial port line
-[20:19:12.040]  ctrl-t q   Quit
-[20:19:12.041]  ctrl-t s   Show statistics
-[20:19:12.041]  ctrl-t T   Toggle line timestamp mode
-[20:19:12.041]  ctrl-t U   Toggle conversion to uppercase
-[20:19:12.041]  ctrl-t v   Show version
+[20:19:12.040]  ctrl-t ?       List available key commands
+[20:19:12.040]  ctrl-t b       Send break
+[20:19:12.040]  ctrl-t c       Show configuration
+[20:19:12.040]  ctrl-t e       Toggle local echo mode
+[20:19:12.040]  ctrl-t g       Toggle serial port line
+[20:19:12.040]  ctrl-t h       Toggle hexadecimal mode
+[20:19:12.040]  ctrl-t l       Clear screen
+[20:19:12.040]  ctrl-t L       Show line states
+[20:19:12.040]  ctrl-t p       Pulse serial port line
+[20:19:12.040]  ctrl-t q       Quit
+[20:19:12.041]  ctrl-t s       Show statistics
+[20:19:12.041]  ctrl-t t       Toggle line timestamp mode
+[20:19:12.041]  ctrl-t U       Toggle conversion to uppercase
+[20:19:12.041]  ctrl-t v       Show version
+[20:19:12.041]  ctrl-t ctrl-t  Send ctrl-t character
 ```
 
 If needed, the prefix key (ctrl-t) can be remapped via configuration file.
