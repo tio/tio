@@ -78,6 +78,44 @@ static void socket_exit(void)
     }
 }
 
+static bool socket_stale(const char *path)
+{
+    struct sockaddr_un addr;
+    bool stale = false;
+    int sockfd;
+
+    /* Test if socket file exists */
+    if (access(path, F_OK) == 0)
+    {
+        /* Create test socket  */
+        sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
+        if (sockfd < 0)
+        {
+            tio_warning_printf("Failure opening socket (%s)", strerror(errno));
+            return false;
+        }
+
+        /* Prepare address */
+        addr.sun_family = AF_UNIX;
+        strncpy(addr.sun_path, path, sizeof(addr.sun_path) - 1);
+
+        /* Perform connect to test if socket is active */
+        if (connect(sockfd, (struct sockaddr *) &addr, sizeof(struct sockaddr_un)) == -1)
+        {
+            if (errno == ECONNREFUSED)
+            {
+                // No one is listening on socket file
+                stale = true;
+            }
+        }
+
+        /* Cleanup */
+        close(sockfd);
+    }
+
+    return stale;
+}
+
 void socket_configure(void)
 {
     struct sockaddr_un sockaddr_unix = {};
@@ -136,7 +174,7 @@ void socket_configure(void)
         tio_error_printf("%s: Invalid socket scheme, must be prefixed with 'unix:', 'inet:', or 'inet6:'", option.socket);
         exit(EXIT_FAILURE);
     }
- 
+
     /* Configure socket */
 
     switch (socket_family)
@@ -146,6 +184,14 @@ void socket_configure(void)
             strncpy(sockaddr_unix.sun_path, socket_filename(), sizeof(sockaddr_unix.sun_path) - 1);
             sockaddr_p = (struct sockaddr *) &sockaddr_unix;
             socklen = sizeof(sockaddr_unix);
+
+            /* Test for stale unix socket file */
+            if (socket_stale(socket_filename()))
+            {
+                tio_printf("Cleaning up old socket file");
+                unlink(socket_filename());
+            }
+
             break;
 
         case AF_INET:
