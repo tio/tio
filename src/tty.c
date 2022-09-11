@@ -55,11 +55,11 @@
 #include "timestamp.h"
 #include "misc.h"
 
-#ifdef __APPLE__
+#if defined(__APPLE__)
 #define PATH_SERIAL_DEVICES "/dev/"
 #define PREFIX_TTY_DEVICES "tty."
-#elifdef __CYGWIN__
-#define PATH_SERIAL_DEVICES "/dev/serial/by-id/"
+#elif defined(__CYGWIN__)
+#define PATH_SERIAL_DEVICES "/dev/"
 #define PREFIX_TTY_DEVICES "ttyS"
 #else
 #define PATH_SERIAL_DEVICES "/dev/serial/by-id/"
