@@ -116,7 +116,7 @@ void print_help(char *argv[])
     printf("      --log-strip                        Strip control characters and escape sequences\n");
     printf("  -m, --map <flags>                      Map characters\n");
     printf("  -c, --color 0..255|bold|none|list      Colorize tio text (default: bold)\n");
-    printf("  -S, --socket <socket>                  Redirect I/O to file or network socket\n");
+    printf("  -S, --socket <socket>                  Redirect I/O to socket\n");
     printf("  -x, --hexadecimal                      Enable hexadecimal mode\n");
     printf("  -r, --response-wait                    Wait for line response then quit\n");
     printf("      --response-timeout <ms>            Response timeout (default: 100)\n");

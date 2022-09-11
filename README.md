@@ -88,7 +88,7 @@ The command-line interface is straightforward as reflected in the output from
         --log-strip                        Strip control characters and escape sequences
     -m, --map <flags>                      Map characters
     -c, --color 0..255|bold|none|list      Colorize tio text (default: bold)
-    -S, --socket <socket>                  Redirect I/O to file or network socket
+    -S, --socket <socket>                  Redirect I/O to socket
     -x, --hexadecimal                      Enable hexadecimal mode
     -r, --response-wait                    Wait for line response then quit
         --response-timeout <ms>            Response timeout (default: 100)

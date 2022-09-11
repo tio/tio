@@ -190,10 +190,12 @@ Default value is "bold".
 .TP
 .BR \-S ", " "\-\-socket \fI<socket>\fR\fB
 
-Redirect I/O to socket. Any input from clients connected to the socket is sent
-on the serial port as if entered at the terminal where tio is running (except
-that \fBctrl-t\fR sequences are not recognized), and any input from the serial
-port is multiplexed to the terminal and all connected clients.
+Redirect I/O to socket.
+
+Any input from clients connected to the socket is sent on the serial port as if
+entered at the terminal where tio is running (except that \fBctrl-t\fR sequences
+are not recognized), and any input from the serial port is multiplexed to the
+terminal and all connected clients.
 
 Sockets remain open while the serial port is disconnected, and writes will block.
 
