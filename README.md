@@ -1,6 +1,6 @@
 # tio - a simple serial device I/O tool
 
-[![CircleCI](https://img.shields.io/circleci/build/gh/tio/tio?token=da7e7fd0d0ee99b9f986f8877dcdbe28f73d9e06)]
+[![CircleCI](https://img.shields.io/circleci/build/gh/tio/tio?token=da7e7fd0d0ee99b9f986f8877dcdbe28f73d9e06)](https://circleci.com/gh/tio/tio/tree/master)
 
 [![CircleCI](https://circleci.com/gh/tio/tio/tree/master.svg?style=shield)](https://circleci.com/gh/tio/tio/tree/master)
 [![tio](https://snapcraft.io/tio/badge.svg)](https://snapcraft.io/tio)
