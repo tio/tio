@@ -3,6 +3,8 @@
 [![CircleCI](https://img.shields.io/circleci/build/gh/tio/tio?token=da7e7fd0d0ee99b9f986f8877dcdbe28f73d9e06)](https://circleci.com/gh/tio/tio/tree/master)
 [![Version](https://img.shields.io/github/v/release/tio/tio?label=version&sort=semver)](https://github.com/tio/tio/releases)
 [![Packaging status](https://img.shields.io/repology/repositories/tio)](https://repology.org/project/tio/versions)
+![Code Lines](https://img.shields.io/tokei/lines/github/tio/tio)
+![Contributors](https://img.shields.io/github/contributors/tio/tio)
 
 ## 1. Introduction
 
