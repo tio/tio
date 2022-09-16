@@ -307,6 +307,8 @@ Toggle line timestamp mode
 Toggle conversion to uppercase on output
 .IP "\fBctrl-t v"
 Show version
+.IP "\fBctrl-t ctrl-t"
+Send ctrl-t character
 
 .SH "HEXADECIMAL MODE"
 .PP
