@@ -132,6 +132,12 @@ $ tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 Using serial devices by ID ensures that tio automatically reconnects to the
 correct serial device if it is disconnected and then reconnected.
 
+List available serial devices by ID:
+```
+$ tio --list-devices
+```
+Note: One can also use tio shell completion on /dev which will automatically
+list all available serial tty devices.
 
 Inject data to the serial device:
 ```
