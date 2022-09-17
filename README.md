@@ -32,12 +32,13 @@ when used in combination with [tmux](https://tmux.github.io).
  * Sensible defaults
  * Support for non-standard baud rates
  * Support for RS-485 mode
+ * Support for mark and space parity
  * List available serial devices by ID
  * Show RX/TX statistics
  * Toggle serial lines
  * Pulse serial lines with configurable pulse duration
  * Local echo support
- * Map characters (nl, cr-nl, bs, lowercase to uppercase, etc.)
+ * Remapping of characters (nl, cr-nl, bs, lowercase to uppercase, etc.)
  * Line timestamps
  * Support for delayed output per character
  * Support for delayed output per line
@@ -50,7 +51,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Pipe input and/or output
  * Support for simple line request/response handling
  * Bash completion
- * Color support
+ * Configurable text color
  * Visual or audible alert on connect/disconnect
  * Remapping of prefix key
  * Man page documentation
