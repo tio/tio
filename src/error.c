@@ -38,64 +38,64 @@ static bool in_session = false;
 
 void error_enter_session_mode(void)
 {
-  in_session = true;
+    in_session = true;
 }
 
 void error_printf_(const char *format, ...)
 {
-  va_list args;
-  char *line;
+    va_list args;
+    char *line;
 
-  va_start(args, format);
-  vasprintf(&line, format, args);
+    va_start(args, format);
+    vasprintf(&line, format, args);
 
-  if (in_session)
-  {
-    if (print_tainted)
+    if (in_session)
     {
-      putchar('\n');
+        if (print_tainted)
+        {
+            putchar('\n');
+        }
+        ansi_error_printf("[%s] %s", timestamp_current_time(), line);
     }
-    ansi_error_printf("[%s] %s", timestamp_current_time(), line);
-  }
-  else
-  {
-    fprintf(stderr, "%s\n", line);
-  }
+    else
+    {
+        fprintf(stderr, "%s\n", line);
+    }
 
-  va_end(args);
+    va_end(args);
 
-  print_tainted = false;
-  free(line);
+    print_tainted = false;
+    free(line);
 }
 
 void tio_error_printf(const char *format, ...)
 {
-  va_list args;
+    va_list args;
 
-  va_start(args, format);
-  vsnprintf(error[0], 1000, format, args);
-  va_end(args);
+    va_start(args, format);
+    vsnprintf(error[0], 1000, format, args);
+    va_end(args);
 }
 
 void tio_error_printf_silent(const char *format, ...)
 {
-  va_list args;
+    va_list args;
 
-  va_start(args, format);
-  vsnprintf(error[1], 1000, format, args);
-  va_end(args);
+    va_start(args, format);
+    vsnprintf(error[1], 1000, format, args);
+    va_end(args);
 }
 
 void error_exit(void)
 {
-  if (error[0][0] != 0)
-  {
-    /* Print error */
-    error_printf_("Error: %s", error[0]);
-  }
-  else if ((error[1][0] != 0) && (option.no_autoconnect))
-  {
-    /* Print silent error */
-    error_printf_("Error: %s", error[1]);
-  }
+    if (error[0][0] != 0)
+    {
+        /* Print error */
+        error_printf_("Error: %s", error[0]);
+    }
+    else if ((error[1][0] != 0) && (option.no_autoconnect))
+    {
+        /* Print silent error */
+        error_printf_("Error: %s", error[1]);
+    }
 }

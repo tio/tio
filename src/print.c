@@ -31,45 +31,45 @@ char ansi_format[30];
 
 void print_hex(char c)
 {
-  printf("%02x ", (unsigned char) c);
+    printf("%02x ", (unsigned char) c);
 }
 
 void print_normal(char c)
 {
-  putchar(c);
+    putchar(c);
 }
 
 void print_init_ansi_formatting()
 {
-  if (option.color == 256)
-  {
-    // Set bold text with no color changes
-    sprintf(ansi_format, "\e[1m");
-  }
-  else
-  {
-    // Set bold text with user defined ANSI color
-    sprintf(ansi_format, "\e[1;38;5;%dm", option.color);
-  }
+    if (option.color == 256)
+    {
+        // Set bold text with no color changes
+        sprintf(ansi_format, "\e[1m");
+    }
+    else
+    {
+        // Set bold text with user defined ANSI color
+        sprintf(ansi_format, "\e[1;38;5;%dm", option.color);
+    }
 }
 
 void tio_printf_array(const char *array)
 {
-  int i = 0, j = 0;
+    int i = 0, j = 0;
 
-  tio_printf("");
+    tio_printf("");
 
-  while (array[i])
-  {
-    if (array[i] == '\n')
+    while (array[i])
     {
-      const char *line = &array[j];
-      char *line_copy = strndup(line, i-j);
-      tio_printf_raw("%s\r", line_copy);
-      free(line_copy);
-      j = i;
+        if (array[i] == '\n')
+        {
+            const char *line = &array[j];
+            char *line_copy = strndup(line, i-j);
+            tio_printf_raw("%s\r", line_copy);
+            free(line_copy);
+            j = i;
+        }
+        i++;
     }
-    i++;
-  }
-  tio_printf("");
+    tio_printf("");
 }
