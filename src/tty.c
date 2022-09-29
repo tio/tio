@@ -259,8 +259,14 @@ static void output_hex(char c)
 {
     hex_chars[hex_char_index++] = c;
 
+    printf("%c", c);
+
     if (hex_char_index == 2)
     {
+        usleep(100*1000);
+        printf("\b \b");
+        printf("\b \b");
+
         unsigned char hex_value = char_to_nibble(hex_chars[0]) << 4 | (char_to_nibble(hex_chars[1]) & 0x0F);
         hex_char_index = 0;
 
