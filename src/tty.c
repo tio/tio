@@ -84,6 +84,7 @@
 #define KEY_H 0x68
 #define KEY_L 0x6C
 #define KEY_SHIFT_L 0x4C
+#define KEY_M 0x6D
 #define KEY_P 0x70
 #define KEY_Q 0x71
 #define KEY_S 0x73
@@ -126,6 +127,7 @@ static bool map_o_cr_nl = false;
 static bool map_o_nl_crnl = false;
 static bool map_o_del_bs = false;
 static bool map_o_ltu = false;
+static bool map_o_msblsb = false;
 static char hex_chars[2];
 static unsigned char hex_char_index = 0;
 static char tty_buffer[BUFSIZ*2];
@@ -410,6 +412,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" ctrl-%c h       Toggle hexadecimal mode", option.prefix_key);
                 tio_printf(" ctrl-%c l       Clear screen", option.prefix_key);
                 tio_printf(" ctrl-%c L       Show line states", option.prefix_key);
+                tio_printf(" ctrl-%c m       Toggle MSB to LSB bit order", option.prefix_key);
                 tio_printf(" ctrl-%c p       Pulse serial port line", option.prefix_key);
                 tio_printf(" ctrl-%c q       Quit", option.prefix_key);
                 tio_printf(" ctrl-%c s       Show statistics", option.prefix_key);
@@ -496,6 +499,20 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
             case KEY_L:
                 /* Clear screen using ANSI/VT100 escape code */
                 printf("\033c");
+                break;
+
+            case KEY_M:
+                /* Toggle bit order */
+                if (!map_o_msblsb)
+                {
+                    map_o_msblsb = true;
+                    tio_printf("Switched to reverse bit order");
+                }
+                else
+                {
+                    map_o_msblsb = false;
+                    tio_printf("Switched to normal bit order");
+                }
                 break;
 
             case KEY_Q:
@@ -860,6 +877,10 @@ void tty_configure(void)
             {
                 map_o_ltu = true;
             }
+            else if (strcmp(token, "MSB2LSB") == 0)
+            {
+                map_o_msblsb = true;
+            }
             else
             {
                 printf("Error: Unknown mapping flag %s\n", token);
@@ -1219,8 +1240,19 @@ int tty_connect(void)
                         }
                     }
 
+                    /* Convert MSB to LSB bit order */
+                    if (map_o_msblsb)
+                    {
+                        char ch = input_char;
+                        input_char = 0;
+                        for (int j = 0; j < 8; ++j)
+                        {
+                            input_char |= ((1 << j) & ch) ? (1 << (7 - j)) : 0;
+                        }
+                    }
+
                     /* Map input character */
-                    if ((input_char == '\n') && (map_i_nl_crnl))
+                    if ((input_char == '\n') && (map_i_nl_crnl) && (!map_o_msblsb))
                     {
                         print('\r');
                         print('\n');

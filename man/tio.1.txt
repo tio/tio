@@ -131,6 +131,8 @@ OPTIONS
 
               OLTU        Map lowercase characters to uppercase on output
 
+              MSB2LSB     Map MSB bit order to LSB on output
+
               If defining more than one flag, the flags must be comma separated.
 
        -x, --hexadecimal
