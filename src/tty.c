@@ -1232,7 +1232,7 @@ int tty_connect(void)
                     input_char = input_buffer[i];
 
                     /* Print timestamp on new line if enabled */
-                    if (next_timestamp && input_char != '\n' && input_char != '\r')
+                    if ((next_timestamp && input_char != '\n' && input_char != '\r') && !option.hex_mode)
                     {
                         now = timestamp_current_time();
                         if (now)
