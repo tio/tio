@@ -167,6 +167,8 @@ Map DEL to BS on output
 Map NL to CR-NL on output
 .IP "\fBOLTU"
 Map lowercase characters to uppercase on output
+.IP "\fBMSB2LSB"
+Map MSB bit order to LSB on output
 .P
 If defining more than one flag, the flags must be comma separated.
 .RE
