@@ -223,7 +223,7 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
             }
             bytes_written += retval;
 
-            if (option.output_line_delay && *(unsigned char*)buffer == '\r')
+            if (option.output_line_delay && *(unsigned char*)buffer == '\n')
             {
                 delay(option.output_line_delay);
             }
