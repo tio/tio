@@ -1,5 +1,36 @@
 
-=== tio v2.0 ===
+=== tio v2.1 ===
+
+
+Changes since tio v2.0:
+
+ * Fix output line delay
+
+   Apply output line delay on lines ending with \n.
+
+   On most systems lines ends with \n or \r\n.
+
+ * Do not print timestamps in hex mode
+
+ * Improve input mechanism in hex mode
+
+   Print the 2 character hex code that you input in hex mode but then
+   delete it before sending. This way it is easier to keep track of what
+   you are inputting. It basically mimics the ctrl-shift-u input mechanism
+   that is used to input unicode.
+
+ * Add support for sending prefix character to serial device
+
+   Do so by inputting prefix key twice, e.g. input ctrl-t ctrl-t to send
+   ctrl-t character to serial device.
+
+ * Clean up indentation
+
+ * Update example tiorc
+
+Attila Veghelyi:
+
+ * Add bit reverse order feature
 
 
 
