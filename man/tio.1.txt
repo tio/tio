@@ -1,4 +1,4 @@
-tio(1)                                                                                    User Commands                                                                                   tio(1)
+tio(1)                                                                                    User Commands                                                                                    tio(1)
 
 NAME
        tio - a simple serial device I/O tool
@@ -66,7 +66,7 @@ OPTIONS
 
               Disable automatic connect.
 
-              By  default  tio automatically connects to the provided device if present. If the device is not present, it will wait for it to appear and then connect. If the connection is lost
+              By  default  tio  automatically connects to the provided device if present. If the device is not present, it will wait for it to appear and then connect. If the connection is lost
               (eg. device disconnects), it will wait for the device to reappear and then reconnect.
 
               However, if the --no-autoconnect option is provided, tio will exit if the device is not present or an established connection is lost.
@@ -151,8 +151,8 @@ OPTIONS
 
               Redirect I/O to socket.
 
-              Any input from clients connected to the socket is sent on the serial port as if entered at the terminal where tio is running (except that ctrl-t sequences  are  not  recognized),
-              and any input from the serial port is multiplexed to the terminal and all connected clients.
+              Any input from clients connected to the socket is sent on the serial port as if entered at the terminal where tio is running (except that ctrl-t sequences are not recognized), and
+              any input from the serial port is multiplexed to the terminal and all connected clients.
 
               Sockets remain open while the serial port is disconnected, and writes will block.
 
@@ -244,6 +244,8 @@ KEYS
        ctrl-t U        Toggle conversion to uppercase on output
 
        ctrl-t v        Show version
+
+       ctrl-t ctrl-t   Send ctrl-t character
 
 HEXADECIMAL MODE
        In hexadecimal mode each incoming byte is printed out as a hexadecimal value.
@@ -438,4 +440,4 @@ WEBSITE
 AUTHOR
        Created by Martin Lund <martin.lund@keep-it-simple.com>.
 
-tio 2.0                                                                                    2022-09-11                                                                                     tio(1)
+tio 2.1                                                                                     2022-10-15                                                                                     tio(1)
