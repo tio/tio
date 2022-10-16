@@ -46,7 +46,23 @@
 #include "timestamp.h"
 #include "alert.h"
 
-static struct config_t *c;
+struct config_t
+{
+    const char *user;
+
+    char *path;
+    char *section_name;
+    char *match;
+
+    char *tty;
+    char *flow;
+    char *parity;
+    char *log_filename;
+    char *socket;
+    char *map;
+};
+
+static struct config_t c;
 
 static int get_match(const char *input, const char *pattern, char **match)
 {
@@ -93,13 +109,13 @@ static int data_handler(void *user, const char *section, const char *name,
     UNUSED(user);
 
     // If section matches current section being parsed
-    if (!strcmp(section, c->section_name))
+    if (!strcmp(section, c.section_name))
     {
         // Set configuration parameter if found
         if (!strcmp(name, "tty"))
         {
-            asprintf(&c->tty, value, c->match);
-            option.tty_device = c->tty;
+            asprintf(&c.tty, value, c.match);
+            option.tty_device = c.tty;
         }
         else if (!strcmp(name, "baudrate"))
         {
@@ -111,8 +127,8 @@ static int data_handler(void *user, const char *section, const char *name,
         }
         else if (!strcmp(name, "flow"))
         {
-            asprintf(&c->flow, "%s", value);
-            option.flow = c->flow;
+            asprintf(&c.flow, "%s", value);
+            option.flow = c.flow;
         }
         else if (!strcmp(name, "stopbits"))
         {
@@ -120,8 +136,8 @@ static int data_handler(void *user, const char *section, const char *name,
         }
         else if (!strcmp(name, "parity"))
         {
-            asprintf(&c->parity, "%s", value);
-            option.parity = c->parity;
+            asprintf(&c.parity, "%s", value);
+            option.parity = c.parity;
         }
         else if (!strcmp(name, "output-delay"))
         {
@@ -159,8 +175,8 @@ static int data_handler(void *user, const char *section, const char *name,
         }
         else if (!strcmp(name, "log-file"))
         {
-            asprintf(&c->log_filename, "%s", value);
-            option.log_filename = c->log_filename;
+            asprintf(&c.log_filename, "%s", value);
+            option.log_filename = c.log_filename;
         }
         else if (!strcmp(name, "log-strip"))
         {
@@ -212,8 +228,8 @@ static int data_handler(void *user, const char *section, const char *name,
         }
         else if (!strcmp(name, "map"))
         {
-            asprintf(&c->map, "%s", value);
-            option.map = c->map;
+            asprintf(&c.map, "%s", value);
+            option.map = c.map;
         }
         else if (!strcmp(name, "color"))
         {
@@ -241,8 +257,8 @@ static int data_handler(void *user, const char *section, const char *name,
         }
         else if (!strcmp(name, "socket"))
         {
-            asprintf(&c->socket, "%s", value);
-            option.socket = c->socket;
+            asprintf(&c.socket, "%s", value);
+            option.socket = c.socket;
         }
         else if (!strcmp(name, "prefix-ctrl-key"))
         {
@@ -306,15 +322,15 @@ static int section_pattern_search_handler(void *user, const char *section, const
     if (strcmp(varname, "pattern"))
         return 0;
 
-    if (!strcmp(varval, c->user))
+    if (!strcmp(varval, c.user))
     {
         /* pattern matches as plain text */
-        asprintf(&c->section_name, "%s", section);
+        asprintf(&c.section_name, "%s", section);
     }
-    else if (get_match(c->user, varval, &c->match) > 0)
+    else if (get_match(c.user, varval, &c.match) > 0)
     {
         /* pattern matches as regex */
-        asprintf(&c->section_name, "%s", section);
+        asprintf(&c.section_name, "%s", section);
     }
 
     return 0;
@@ -333,10 +349,10 @@ static int section_name_search_handler(void *user, const char *section, const ch
     UNUSED(varname);
     UNUSED(varval);
 
-    if (!strcmp(section, c->user))
+    if (!strcmp(section, c.user))
     {
         /* section name matches as plain text */
-        asprintf(&c->section_name, "%s", section);
+        asprintf(&c.section_name, "%s", section);
     }
 
     return 0;
@@ -362,44 +378,38 @@ static int section_name_print_handler(void *user, const char *section, const cha
 
 static int resolve_config_file(void)
 {
-    asprintf(&c->path, "%s/tio/tiorc", getenv("XDG_CONFIG_HOME"));
-    if (!access(c->path, F_OK))
+    asprintf(&c.path, "%s/tio/tiorc", getenv("XDG_CONFIG_HOME"));
+    if (!access(c.path, F_OK))
     {
         return 0;
     }
 
-    free(c->path);
+    free(c.path);
 
-    asprintf(&c->path, "%s/.config/tio/tiorc", getenv("HOME"));
-    if (!access(c->path, F_OK))
+    asprintf(&c.path, "%s/.config/tio/tiorc", getenv("HOME"));
+    if (!access(c.path, F_OK))
     {
         return 0;
     }
 
-    free(c->path);
+    free(c.path);
 
-    asprintf(&c->path, "%s/.tiorc", getenv("HOME"));
-    if (!access(c->path, F_OK))
+    asprintf(&c.path, "%s/.tiorc", getenv("HOME"));
+    if (!access(c.path, F_OK))
     {
         return 0;
     }
 
-    free(c->path);
+    free(c.path);
 
-    c->path = NULL;
+    c.path = NULL;
 
     return -EINVAL;
 }
 
 void config_file_show_sub_configurations(void)
 {
-    c = malloc(sizeof(struct config_t));
-    if (!c)
-    {
-        tio_error_printf("Insufficient memory allocation");
-        exit(EXIT_FAILURE);
-    }
-    memset(c, 0, sizeof(struct config_t));
+    memset(&c, 0, sizeof(struct config_t));
 
     // Find config file
     if (resolve_config_file() != 0)
@@ -408,20 +418,14 @@ void config_file_show_sub_configurations(void)
         return;
     }
 
-    ini_parse(c->path, section_name_print_handler, NULL);
+    ini_parse(c.path, section_name_print_handler, NULL);
 }
 
 void config_file_parse(void)
 {
     int ret;
 
-    c = malloc(sizeof(struct config_t));
-    if (!c)
-    {
-        tio_error_printf("Insufficient memory allocation");
-        exit(EXIT_FAILURE);
-    }
-    memset(c, 0, sizeof(struct config_t));
+    memset(&c, 0, sizeof(struct config_t));
 
     // Find config file
     if (resolve_config_file() != 0)
@@ -431,30 +435,30 @@ void config_file_parse(void)
     }
 
     // Set user input which may be tty device or sub config
-    c->user = option.tty_device;
+    c.user = option.tty_device;
 
-    if (!c->user)
+    if (!c.user)
     {
         return;
     }
 
     // Parse default (unnamed) settings
-    asprintf(&c->section_name, "%s", "");
-    ret = ini_parse(c->path, data_handler, NULL);
+    asprintf(&c.section_name, "%s", "");
+    ret = ini_parse(c.path, data_handler, NULL);
     if (ret < 0)
     {
         tio_error_printf("Unable to parse configuration file (%d)", ret);
         exit(EXIT_FAILURE);
     }
-    free(c->section_name);
-    c->section_name = NULL;
+    free(c.section_name);
+    c.section_name = NULL;
 
     // Find matching section
-    ret = ini_parse(c->path, section_pattern_search_handler, NULL);
-    if (!c->section_name)
+    ret = ini_parse(c.path, section_pattern_search_handler, NULL);
+    if (!c.section_name)
     {
-        ret = ini_parse(c->path, section_name_search_handler, NULL);
-        if (!c->section_name)
+        ret = ini_parse(c.path, section_name_search_handler, NULL);
+        if (!c.section_name)
         {
             tio_debug_printf("Unable to match user input to configuration section (%d)", ret);
             return;
@@ -462,7 +466,7 @@ void config_file_parse(void)
     }
 
     // Parse settings of found section (sub config)
-    ret = ini_parse(c->path, data_handler, NULL);
+    ret = ini_parse(c.path, data_handler, NULL);
     if (ret < 0)
     {
         tio_error_printf("Unable to parse configuration file (%d)", ret);
@@ -474,27 +478,25 @@ void config_file_parse(void)
 
 void config_exit(void)
 {
-    free(c->tty);
-    free(c->flow);
-    free(c->parity);
-    free(c->log_filename);
-    free(c->map);
+    free(c.tty);
+    free(c.flow);
+    free(c.parity);
+    free(c.log_filename);
+    free(c.map);
 
-    free(c->match);
-    free(c->section_name);
-    free(c->path);
-
-    free(c);
+    free(c.match);
+    free(c.section_name);
+    free(c.path);
 }
 
 void config_file_print(void)
 {
-    if (c->path != NULL)
+    if (c.path != NULL)
     {
-        tio_printf(" Path: %s", c->path);
-        if (c->section_name != NULL)
+        tio_printf(" Path: %s", c.path);
+        if (c.section_name != NULL)
         {
-            tio_printf(" Active sub-configuration: %s", c->section_name);
+            tio_printf(" Active sub-configuration: %s", c.section_name);
         }
     }
 }
