@@ -457,7 +457,9 @@ void options_parse(int argc, char *argv[])
     {
         fprintf(stderr, "Error: Unknown argument ");
         while (optind < argc)
-            printf("%s ", argv[optind++]);
+        {
+            fprintf(stderr, "%s ", argv[optind++]);
+        }
         fprintf(stderr, "\n");
         exit(EXIT_FAILURE);
     }
