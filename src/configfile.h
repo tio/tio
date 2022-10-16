@@ -41,3 +41,4 @@ struct config_t
 void config_file_print(void);
 void config_file_parse(void);
 void config_exit(void);
+void config_file_show_sub_configurations(void);

@@ -50,6 +50,7 @@ enum opt_t
     OPT_RS485,
     OPT_RS485_CONFIG,
     OPT_ALERT,
+    OPT_COMPLETE_SUB_CONFIGS,
 };
 
 /* Default options */
@@ -89,6 +90,7 @@ struct option_t option =
     .rs485_delay_rts_before_send = -1,
     .rs485_delay_rts_after_send = -1,
     .alert = ALERT_NONE,
+    .complete_sub_configs = false,
 };
 
 void print_help(char *argv[])
@@ -229,34 +231,35 @@ void options_parse(int argc, char *argv[])
     {
         static struct option long_options[] =
         {
-            {"baudrate",            required_argument, 0, 'b'                    },
-            {"databits",            required_argument, 0, 'd'                    },
-            {"flow",                required_argument, 0, 'f'                    },
-            {"stopbits",            required_argument, 0, 's'                    },
-            {"parity",              required_argument, 0, 'p'                    },
-            {"output-delay",        required_argument, 0, 'o'                    },
-            {"output-line-delay" ,  required_argument, 0, 'O'                    },
-            {"line-pulse-duration", required_argument, 0, OPT_LINE_PULSE_DURATION},
-            {"no-autoconnect",      no_argument,       0, 'n'                    },
-            {"local-echo",          no_argument,       0, 'e'                    },
-            {"timestamp",           no_argument,       0, 't'                    },
-            {"timestamp-format",    required_argument, 0, OPT_TIMESTAMP_FORMAT   },
-            {"list-devices",        no_argument,       0, 'L'                    },
-            {"log",                 no_argument,       0, 'l'                    },
-            {"log-file",            required_argument, 0, OPT_LOG_FILE           },
-            {"log-strip",           no_argument,       0, OPT_LOG_STRIP          },
-            {"socket",              required_argument, 0, 'S'                    },
-            {"map",                 required_argument, 0, 'm'                    },
-            {"color",               required_argument, 0, 'c'                    },
-            {"hexadecimal",         no_argument,       0, 'x'                    },
-            {"response-wait",       no_argument,       0, 'r'                    },
-            {"response-timeout",    required_argument, 0, OPT_RESPONSE_TIMEOUT   },
-            {"rs-485",              no_argument,       0, OPT_RS485              },
-            {"rs-485-config",       required_argument, 0, OPT_RS485_CONFIG       },
-            {"alert",               required_argument, 0, OPT_ALERT              },
-            {"version",             no_argument,       0, 'v'                    },
-            {"help",                no_argument,       0, 'h'                    },
-            {0,                     0,                 0,  0                     }
+            {"baudrate",             required_argument, 0, 'b'                     },
+            {"databits",             required_argument, 0, 'd'                     },
+            {"flow",                 required_argument, 0, 'f'                     },
+            {"stopbits",             required_argument, 0, 's'                     },
+            {"parity",               required_argument, 0, 'p'                     },
+            {"output-delay",         required_argument, 0, 'o'                     },
+            {"output-line-delay" ,   required_argument, 0, 'O'                     },
+            {"line-pulse-duration",  required_argument, 0, OPT_LINE_PULSE_DURATION },
+            {"no-autoconnect",       no_argument,       0, 'n'                     },
+            {"local-echo",           no_argument,       0, 'e'                     },
+            {"timestamp",            no_argument,       0, 't'                     },
+            {"timestamp-format",     required_argument, 0, OPT_TIMESTAMP_FORMAT    },
+            {"list-devices",         no_argument,       0, 'L'                     },
+            {"log",                  no_argument,       0, 'l'                     },
+            {"log-file",             required_argument, 0, OPT_LOG_FILE            },
+            {"log-strip",            no_argument,       0, OPT_LOG_STRIP           },
+            {"socket",               required_argument, 0, 'S'                     },
+            {"map",                  required_argument, 0, 'm'                     },
+            {"color",                required_argument, 0, 'c'                     },
+            {"hexadecimal",          no_argument,       0, 'x'                     },
+            {"response-wait",        no_argument,       0, 'r'                     },
+            {"response-timeout",     required_argument, 0, OPT_RESPONSE_TIMEOUT    },
+            {"rs-485",               no_argument,       0, OPT_RS485               },
+            {"rs-485-config",        required_argument, 0, OPT_RS485_CONFIG        },
+            {"alert",                required_argument, 0, OPT_ALERT               },
+            {"version",              no_argument,       0, 'v'                     },
+            {"help",                 no_argument,       0, 'h'                     },
+            {"complete-sub-configs", no_argument,       0, OPT_COMPLETE_SUB_CONFIGS},
+            {0,                      0,                 0,  0                      }
         };
 
         /* getopt_long stores the option index here */
@@ -418,6 +421,10 @@ void options_parse(int argc, char *argv[])
                 exit(EXIT_SUCCESS);
                 break;
 
+            case OPT_COMPLETE_SUB_CONFIGS:
+                option.complete_sub_configs = true;
+                break;
+
             case '?':
                 /* getopt_long already printed an error message */
                 exit(EXIT_FAILURE);
@@ -433,6 +440,11 @@ void options_parse(int argc, char *argv[])
             optind++;
     else if (optind < argc)
         option.tty_device = argv[optind++];
+
+    if (option.complete_sub_configs)
+    {
+        return;
+    }
 
     if (strlen(option.tty_device) == 0)
     {

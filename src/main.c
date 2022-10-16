@@ -45,6 +45,12 @@ int main(int argc, char *argv[])
     /* Parse command-line options (1st pass) */
     options_parse(argc, argv);
 
+    if (option.complete_sub_configs)
+    {
+        config_file_show_sub_configurations();
+        return status;
+    }
+
     /* Parse configuration file */
     config_file_parse();
 

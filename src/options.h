@@ -66,6 +66,7 @@ struct option_t
     int32_t rs485_delay_rts_before_send;
     int32_t rs485_delay_rts_after_send;
     enum alert_t alert;
+    bool complete_sub_configs;
 };
 
 extern struct option_t option;

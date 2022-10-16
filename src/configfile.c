@@ -342,6 +342,24 @@ static int section_name_search_handler(void *user, const char *section, const ch
     return 0;
 }
 
+static int section_name_print_handler(void *user, const char *section, const char *varname,
+                                       const char *varval)
+{
+    UNUSED(user);
+    UNUSED(varname);
+    UNUSED(varval);
+
+    static char *section_previous = "";
+
+    if (strcmp(section, section_previous) != 0)
+    {
+        printf("%s ", section);
+        section_previous = strdup(section);
+    }
+
+    return 0;
+}
+
 static int resolve_config_file(void)
 {
     asprintf(&c->path, "%s/tio/tiorc", getenv("XDG_CONFIG_HOME"));
@@ -373,6 +391,26 @@ static int resolve_config_file(void)
     return -EINVAL;
 }
 
+void config_file_show_sub_configurations(void)
+{
+    c = malloc(sizeof(struct config_t));
+    if (!c)
+    {
+        tio_error_printf("Insufficient memory allocation");
+        exit(EXIT_FAILURE);
+    }
+    memset(c, 0, sizeof(struct config_t));
+
+    // Find config file
+    if (resolve_config_file() != 0)
+    {
+        // None found - stop parsing
+        return;
+    }
+
+    ini_parse(c->path, section_name_print_handler, NULL);
+}
+
 void config_file_parse(void)
 {
     int ret;
@@ -382,7 +420,7 @@ void config_file_parse(void)
     {
         tio_error_printf("Insufficient memory allocation");
         exit(EXIT_FAILURE);
-    } 
+    }
     memset(c, 0, sizeof(struct config_t));
 
     // Find config file
