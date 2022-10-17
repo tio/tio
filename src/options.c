@@ -95,7 +95,9 @@ struct option_t option =
 
 void print_help(char *argv[])
 {
-    printf("Usage: %s [<options>] <tty-device|sub-config>\n", argv[0]);
+    UNUSED(argv);
+
+    printf("Usage: tio [<options>] <tty-device|sub-config>\n");
     printf("\n");
     printf("Connect to tty device directly or via sub-configuration.\n");
     printf("\n");
