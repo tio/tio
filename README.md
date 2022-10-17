@@ -50,7 +50,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Redirect I/O to UNIX socket or IPv4/v6 network socket for scripting or TTY sharing
  * Pipe input and/or output
  * Support for simple line request/response handling
- * Bash completion
+ * Bash completion on options, serial device names, and sub-configuration names
  * Configurable text color
  * Visual or audible alert on connect/disconnect
  * Remapping of prefix key
