@@ -1,5 +1,21 @@
 
-=== tio v2.1 ===
+=== tio v2.2 ===
+
+
+
+Changes since tio v2.1:
+
+ * Add shell completion of sub-configuration names
+
+   Does not work with sub configuration names that contains one or more
+   white spaces.
+
+ * Beautify help
+
+ * Fix error message
+
+ * Simplify configfile implementation
+
 
 
 Changes since tio v2.0:
