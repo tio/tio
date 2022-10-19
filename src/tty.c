@@ -473,8 +473,8 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
 
             case KEY_C:
                 tio_printf("Configuration:");
-                config_file_print();
                 options_print();
+                config_file_print();
                 if (option.rs485)
                 {
                     rs485_print_config();

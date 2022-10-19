@@ -193,7 +193,7 @@ void line_pulse_duration_option_parse(const char *arg)
 
 void options_print()
 {
-    tio_printf(" TTY device: %s", option.tty_device);
+    tio_printf(" Device: %s", option.tty_device);
     tio_printf(" Baudrate: %u", option.baudrate);
     tio_printf(" Databits: %d", option.databits);
     tio_printf(" Flow: %s", option.flow);
