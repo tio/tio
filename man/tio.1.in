@@ -340,7 +340,7 @@ activated from the command-line when starting tio.
 
 .PP
 \fBtio\fR will try to match the user input to a sub-configuration by name or by
-pattern to get the tty and other options.
+pattern to get the TTY device and other options.
 
 .PP
 Options without any label change the default options.
@@ -354,8 +354,8 @@ The following configuration file options are available:
 .TP 25n
 .IP "\fBpattern"
 Pattern matching user input. This pattern can be an extended regular expression with a single group.
-.IP "\fBtty"
-tty device to open. If it contains a "%s" it is substituted with the first group match.
+.IP "\fBdevice"
+TTY device to open. If it contains a "%s" it is substituted with the first group match.
 .IP "\fBbaudrate"
 Set baud rate
 .IP "\fBdatabits"
@@ -433,7 +433,7 @@ Named sub-configurations can be added via labels:
 .nf
 .eo
 [rpi3]
-tty = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+device = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 baudrate = 115200
 color = 11
 .ec
@@ -458,7 +458,7 @@ A sub-configuration can also be activated by its pattern which supports regular 
 .eo
 [usb device]
 pattern = usb([0-9]*)
-tty = /dev/ttyUSB%s
+device = /dev/ttyUSB%s
 baudrate = 115200
 .ec
 .fi
@@ -489,7 +489,7 @@ Which corresponds to the commonly used default options:
 
 $ tio \-b 115200 \-d 8 \-f none \-s 1 \-p none /dev/ttyUSB0
 .TP
-It is recommended to connect serial tty devices by ID:
+It is recommended to connect serial TTY devices by ID:
 
 $ tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
 .PP
@@ -528,13 +528,13 @@ expect -i $uart "prompt> "
 .RE
 
 .TP
-Redirect device I/O to network file socket for remote tty sharing:
+Redirect device I/O to network file socket for remote TTY sharing:
 
 $ tio --socket inet:4444 /dev/ttyUSB0
 
 .TP
 
-Then, use netcat to connect to the shared tty session over network (assuming tio is hosted on IP 10.0.0.42):
+Then, use netcat to connect to the shared TTY session over network (assuming tio is hosted on IP 10.0.0.42):
 
 $ nc -N 10.0.0.42 4444
 
