@@ -493,7 +493,7 @@ void config_file_print(void)
 {
     if (c.path != NULL)
     {
-        tio_printf(" Path: %s", c.path);
+        tio_printf(" Active configuration file: %s", c.path);
         if (c.section_name != NULL)
         {
             tio_printf(" Active sub-configuration: %s", c.section_name);
