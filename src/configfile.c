@@ -112,7 +112,7 @@ static int data_handler(void *user, const char *section, const char *name,
     if (!strcmp(section, c.section_name))
     {
         // Set configuration parameter if found
-        if (!strcmp(name, "device"))
+        if (!strcmp(name, "device") || !strcmp(name, "tty"))
         {
             asprintf(&c.tty, value, c.match);
             option.tty_device = c.tty;
