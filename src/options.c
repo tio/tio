@@ -51,6 +51,7 @@ enum opt_t
     OPT_RS485_CONFIG,
     OPT_ALERT,
     OPT_COMPLETE_SUB_CONFIGS,
+    OPT_MUTE,
 };
 
 /* Default options */
@@ -127,6 +128,7 @@ void print_help(char *argv[])
     printf("      --rs-485                           Enable RS-485 mode\n");
     printf("      --rs-485-config <config>           Set RS-485 configuration\n");
     printf("      --alert bell|blink|none            Alert on connect/disconnect (default: none)\n");
+    printf("      --mute                             Mute tio\n");
     printf("  -v, --version                          Display version\n");
     printf("  -h, --help                             Display help\n");
     printf("\n");
@@ -258,6 +260,7 @@ void options_parse(int argc, char *argv[])
             {"rs-485",               no_argument,       0, OPT_RS485               },
             {"rs-485-config",        required_argument, 0, OPT_RS485_CONFIG        },
             {"alert",                required_argument, 0, OPT_ALERT               },
+            {"mute",                 no_argument,       0, OPT_MUTE                },
             {"version",              no_argument,       0, 'v'                     },
             {"help",                 no_argument,       0, 'h'                     },
             {"complete-sub-configs", no_argument,       0, OPT_COMPLETE_SUB_CONFIGS},
@@ -411,6 +414,10 @@ void options_parse(int argc, char *argv[])
 
             case OPT_ALERT:
                 option.alert = alert_option_parse(optarg);
+                break;
+
+            case OPT_MUTE:
+                option.mute = true;
                 break;
 
             case 'v':

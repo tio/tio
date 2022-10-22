@@ -302,6 +302,17 @@ static int data_handler(void *user, const char *section, const char *name,
         {
             option.alert = alert_option_parse(value);
         }
+        else if (!strcmp(name, "mute"))
+        {
+            if (!strcmp(value, "enable"))
+            {
+                option.mute = true;
+            }
+            else if (!strcmp(value, "disable"))
+            {
+                option.mute = false;
+            }
+        }
     }
 
     return 0;

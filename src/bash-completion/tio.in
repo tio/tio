@@ -35,6 +35,7 @@ _tio()
              --rs-485 \
              --rs-485-config \
              --alert \
+             --mute \
           -v --version \
           -h --help"
 
@@ -139,6 +140,10 @@ _tio()
             ;;
         --alert)
             COMPREPLY=( $(compgen -W "none bell blink"  -- ${cur}) )
+            return 0
+            ;;
+        --mute)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
         -v | --version)
