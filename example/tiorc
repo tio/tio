@@ -47,7 +47,7 @@ log-file = tincan.log
 log-strip = enable
 color = 11
 
-[usb devices]
+[usb]
 pattern = usb([0-9]*)
 tty = /dev/ttyUSB%s
 color = 12
