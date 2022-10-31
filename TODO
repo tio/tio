@@ -1,4 +1,33 @@
 
+ * Allow tio to connect to socket
+
+   After some more consideration I think it makes sense to support connecting to a
+   socket as that will make tio be able to both serve a serial port via a socket
+   and connect to it - it will be an end to end solution. In short we will be able
+   to do the following:
+
+   Host serial port on socket (existing feature):
+    $ tio --socket unix:/tmp/tio-socket-0 /dev/ttyUSB0
+
+   Connect to same socket (new feature):
+    $ tio unix:/tmp/tio-socket-0
+
+   Besides a bit of refactoring the following required changes spring to mind:
+
+    * Socket mode and type of socket should be activated via device name prefix. For example:
+      * UNIX socket: tio unix:<filename>
+      * TCPv4 socket: tio inet:<ip>:<port>
+      * TCPv6 socket: tio inet6:<ip>:<port>
+    * If no port number defined default to 3333
+    * Mapping flags INLCR, IGNCR, ICRNL needs implementation for socket mode
+    * Error messages should just say "device" instead of "tty device" etc.
+    * Remove other tty'isms (tty_write() should be device_write() etc.)
+    * In session key commands that do not work in socket mode should either not be listed or print an error messages if used.
+    * All non-tty features should continue work (auto-connect etc.)
+    * Shell completion script update
+    * Man page update
+
+
  * Split I/O feature
 
    Allow to split input and output so that it is possible to manage these
