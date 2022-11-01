@@ -216,7 +216,7 @@ stopbits = 1
 color = 10
 
 [rpi3]
-tty = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+device = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 baudrate = 115200
 no-autoconnect = enable
 log = enable
@@ -226,7 +226,7 @@ color = 12
 
 [usb devices]
 pattern = usb([0-9]*)
-tty = /dev/ttyUSB%s
+device = /dev/ttyUSB%s
 color = 13
 ```
 
