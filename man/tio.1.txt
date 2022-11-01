@@ -262,7 +262,7 @@ CONFIGURATION FILE
 
        Labels can be used to group settings into named sub-configurations which can be activated from the command-line when starting tio.
 
-       tio will try to match the user input to a sub-configuration by name or by pattern to get the tty and other options.
+       tio will try to match the user input to a sub-configuration by name or by pattern to get the TTY device and other options.
 
        Options without any label change the default options.
 
@@ -272,7 +272,7 @@ CONFIGURATION FILE
 
        pattern                  Pattern matching user input. This pattern can be an extended regular expression with a single group.
 
-       tty                      tty device to open. If it contains a "%s" it is substituted with the first group match.
+       device                   TTY device to open. If it contains a "%s" it is substituted with the first group match.
 
        baudrate                 Set baud rate
 
@@ -338,7 +338,7 @@ CONFIGURATION FILE EXAMPLES
        Named sub-configurations can be added via labels:
 
               [rpi3]
-              tty = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+              device = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
               baudrate = 115200
               color = 11
 
@@ -354,7 +354,7 @@ CONFIGURATION FILE EXAMPLES
 
               [usb device]
               pattern = usb([0-9]*)
-              tty = /dev/ttyUSB%s
+              device = /dev/ttyUSB%s
               baudrate = 115200
 
        Activate the sub-configuration by pattern match:
@@ -378,7 +378,7 @@ EXAMPLES
 
               $ tio -b 115200 -d 8 -f none -s 1 -p none /dev/ttyUSB0
 
-       It is recommended to connect serial tty devices by ID:
+       It is recommended to connect serial TTY devices by ID:
 
               $ tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 
@@ -407,11 +407,11 @@ EXAMPLES
               send -i $uart "ls -la\n"
               expect -i $uart "prompt> "
 
-       Redirect device I/O to network file socket for remote tty sharing:
+       Redirect device I/O to network file socket for remote TTY sharing:
 
               $ tio --socket inet:4444 /dev/ttyUSB0
 
-       Then, use netcat to connect to the shared tty session over network (assuming tio is hosted on IP 10.0.0.42):
+       Then, use netcat to connect to the shared TTY session over network (assuming tio is hosted on IP 10.0.0.42):
 
               $ nc -N 10.0.0.42 4444
 
@@ -439,4 +439,4 @@ WEBSITE
 AUTHOR
        Created by Martin Lund <martin.lund@keep-it-simple.com>.
 
-tio 2.2                                                                                                                              2022-10-18                                                                                                                               tio(1)
+tio 2.3                                                                                                                              2022-10-18                                                                                                                               tio(1)
