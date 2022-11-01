@@ -28,20 +28,20 @@ alert = none
 
 [rpi3]
 baudrate = 115200
-tty = /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A6009HU3-if00-port0
+device = /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A6009HU3-if00-port0
 socket = unix:/tmp/tio-socket-0
 color = 9
 
 [am64-evm]
 baudrate = 115200
-tty = /dev/serial/by-id/usb-Silicon_Labs_CP2105_Dual_USB_to_UART_Bridge_Controller_01093176-if01-port0
+device = /dev/serial/by-id/usb-Silicon_Labs_CP2105_Dual_USB_to_UART_Bridge_Controller_01093176-if01-port0
 line-pulse-duration = DTR=200,RTS=300,RI=50
 alert = bell
 color = 10
 
 [tincan]
 baudrate = 9600
-tty = /dev/serial/by-id/usb-TinCanTools_Flyswatter2_FS20000-if00-port0
+device = /dev/serial/by-id/usb-TinCanTools_Flyswatter2_FS20000-if00-port0
 log = enable
 log-file = tincan.log
 log-strip = enable
@@ -49,11 +49,11 @@ color = 11
 
 [usb]
 pattern = usb([0-9]*)
-tty = /dev/ttyUSB%s
+device = /dev/ttyUSB%s
 color = 12
 
 [rs-485-device]
-tty = /dev/ttyUSB0
+device = /dev/ttyUSB0
 rs-485 = enable
 rs-485-config = RTS_ON_SEND=1,RTS_AFTER_SEND=1,RTS_DELAY_BEFORE_SEND=60,RTS_DELAY_AFTER_SEND=80,RX_DURING_TX
 color = 13
