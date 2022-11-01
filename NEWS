@@ -1,5 +1,21 @@
 
-=== tio v2.2 ===
+=== tio v2.3 ===
+
+
+
+Changes since tio v2.2:
+
+ * Add mute feature
+
+   This will make tio go fully silent and not print anything.
+
+ * Rename config variable 'tty' to 'device'
+
+ * Deprecate tty config keyword but keep it around for now
+
+ * Update show config
+
+ * Update example tiorc
 
 
 
