@@ -1370,6 +1370,7 @@ int tty_connect(void)
             }
             else
             {
+                /* Input from socket ready */
                 forward = socket_handle_input(&rdfs, &output_char);
 
                 if (forward)
