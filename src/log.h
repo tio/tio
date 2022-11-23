@@ -21,8 +21,9 @@
 
 #pragma once
 
-void log_open(const char *filename);
+int log_open(const char *filename);
 void log_printf(const char *format, ...);
 void log_putc(char c);
 void log_close(void);
 void log_exit(void);
+const char * log_get_filename(void);

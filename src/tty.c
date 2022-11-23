@@ -80,6 +80,7 @@
 #define KEY_B 0x62
 #define KEY_C 0x63
 #define KEY_E 0x65
+#define KEY_F 0x66
 #define KEY_G 0x67
 #define KEY_H 0x68
 #define KEY_L 0x6C
@@ -414,6 +415,7 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" ctrl-%c b       Send break", option.prefix_key);
                 tio_printf(" ctrl-%c c       Show configuration", option.prefix_key);
                 tio_printf(" ctrl-%c e       Toggle local echo mode", option.prefix_key);
+                tio_printf(" ctrl-%c f       Toggle log to file", option.prefix_key);
                 tio_printf(" ctrl-%c g       Toggle serial port line", option.prefix_key);
                 tio_printf(" ctrl-%c h       Toggle hexadecimal mode", option.prefix_key);
                 tio_printf(" ctrl-%c l       Clear screen", option.prefix_key);
@@ -441,6 +443,22 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 tio_printf(" DSR: %s", (state & TIOCM_DSR) ? "HIGH" : "LOW");
                 tio_printf(" DCD: %s", (state & TIOCM_CD) ? "HIGH" : "LOW");
                 tio_printf(" RI : %s", (state & TIOCM_RI) ? "HIGH" : "LOW");
+                break;
+
+            case KEY_F:
+                if (option.log)
+                {
+                    log_close();
+                    option.log = false;
+                }
+                else
+                {
+                    if (log_open(option.log_filename) == 0)
+                    {
+                        option.log = true;
+                    }
+                }
+                tio_printf("Switched log to file %s", option.log ? "on" : "off");
                 break;
 
             case KEY_G:

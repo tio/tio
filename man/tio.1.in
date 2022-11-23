@@ -289,6 +289,8 @@ Send serial break (triggers SysRq on Linux, etc.)
 Show configuration (baudrate, databits, etc.)
 .IP "\fBctrl-t e"
 Toggle local echo mode
+.IP "\fBctrl-t f"
+Toggle log to file
 .IP "\fBctrl-t g"
 Toggle serial port line
 .IP "\fBctrl-t h"

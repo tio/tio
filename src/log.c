@@ -38,9 +38,9 @@
 #define IS_ESC_END_CHAR(c)              ((c >= 0x30) && (c <= 0x7E))
 #define IS_CTRL_CHAR(c)                 ((c >= 0x00) && (c <= 0x1F))
 
-static FILE *fp;
-static bool log_error = false;
+static FILE *fp = NULL;
 static char file_buffer[BUFSIZ];
+static const char *log_filename = NULL;
 
 static char *date_time(void)
 {
@@ -56,7 +56,7 @@ static char *date_time(void)
     return date_time_string;
 }
 
-void log_open(const char *filename)
+int log_open(const char *filename)
 {
     static char automatic_filename[400];
 
@@ -65,19 +65,22 @@ void log_open(const char *filename)
         // Generate filename if none provided ("tio_DEVICE_YYYY-MM-DDTHH:MM:SS.log")
         sprintf(automatic_filename, "tio_%s_%s.log", basename((char *)option.tty_device), date_time());
         filename = automatic_filename;
-        option.log_filename = automatic_filename;
     }
+
+    log_filename = filename;
 
     // Open log file in append write mode
     fp = fopen(filename, "a+");
     if (fp == NULL)
     {
-        log_error = true;
-        exit(EXIT_FAILURE);
+        tio_warning_printf("Could not open log file %s (%s)", filename, strerror(errno));
+        return -1;
     }
 
     // Enable line buffering
     setvbuf(fp, file_buffer, _IOLBF, BUFSIZ);
+
+    return 0;
 }
 
 bool log_strip(char c)
@@ -141,6 +144,11 @@ bool log_strip(char c)
 
 void log_printf(const char *format, ...)
 {
+    if (fp == NULL)
+    {
+        return;
+    }
+
     char *line;
 
     va_list(args);
@@ -155,19 +163,21 @@ void log_printf(const char *format, ...)
 
 void log_putc(char c)
 {
-    if (fp != NULL)
+    if (fp == NULL)
     {
-        if (option.log_strip)
-        {
-            if (!log_strip(c))
-            {
-                fputc(c, fp);
-            }
-        }
-        else
+        return;
+    }
+
+    if (option.log_strip)
+    {
+        if (!log_strip(c))
         {
             fputc(c, fp);
         }
+    }
+    else
+    {
+        fputc(c, fp);
     }
 }
 
@@ -176,6 +186,8 @@ void log_close(void)
     if (fp != NULL)
     {
         fclose(fp);
+        fp = NULL;
+        log_filename = NULL;
     }
 }
 
@@ -183,15 +195,12 @@ void log_exit(void)
 {
     if (option.log)
     {
+        tio_printf("Saved log to file %s", log_filename);
         log_close();
     }
+}
 
-    if (log_error)
-    {
-        tio_error_printf("Could not open log file %s (%s)", option.log_filename, strerror(errno));
-    }
-    else if (option.log)
-    {
-        tio_printf("Saved log to file %s", option.log_filename);
-    }
+const char *log_get_filename(void)
+{
+    return log_filename;
 }

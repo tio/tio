@@ -38,6 +38,7 @@
 #include "rs485.h"
 #include "timestamp.h"
 #include "alert.h"
+#include "log.h"
 
 enum opt_t
 {
@@ -216,7 +217,7 @@ void options_print()
     if (option.map[0] != 0)
         tio_printf(" Map flags: %s", option.map);
     if (option.log)
-        tio_printf(" Log file: %s", option.log_filename);
+        tio_printf(" Log file: %s", log_get_filename());
     if (option.socket)
         tio_printf(" Socket: %s", option.socket);
 }
