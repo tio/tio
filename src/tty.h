@@ -31,3 +31,5 @@ void tty_configure(void);
 int tty_connect(void);
 void tty_wait_for_device(void);
 void list_serial_devices(void);
+void tty_input_thread_create(void);
+void tty_input_thread_wait_ready(void);

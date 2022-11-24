@@ -40,6 +40,7 @@
 #include <errno.h>
 #include <time.h>
 #include <dirent.h>
+#include <pthread.h>
 #include "config.h"
 #include "configfile.h"
 #include "tty.h"
@@ -81,6 +82,7 @@
 #define KEY_C 0x63
 #define KEY_E 0x65
 #define KEY_F 0x66
+#define KEY_SHIFT_F 0x46
 #define KEY_G 0x67
 #define KEY_H 0x68
 #define KEY_L 0x6C
@@ -134,6 +136,9 @@ static unsigned char hex_char_index = 0;
 static char tty_buffer[BUFSIZ*2];
 static size_t tty_buffer_count = 0;
 static char *tty_buffer_write_ptr = tty_buffer;
+static pthread_t thread;
+static int pipefd[2];
+static pthread_mutex_t mutex_input_ready = PTHREAD_MUTEX_INITIALIZER;
 
 static void optional_local_echo(char c)
 {
@@ -254,6 +259,99 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
     }
 
     return bytes_written;
+}
+
+void *tty_stdin_input_thread(void *arg)
+{
+    UNUSED(arg);
+    char input_buffer[BUFSIZ];
+    ssize_t byte_count;
+    ssize_t bytes_written;
+
+    // Create FIFO pipe
+    if (pipe(pipefd) == -1)
+    {
+        tio_error_printf("Failed to create pipe");
+        exit(EXIT_FAILURE);
+    }
+
+    // Signal that input pipe is ready
+    pthread_mutex_unlock(&mutex_input_ready);
+
+    // Input loop for stdin
+    while (1)
+    {
+        /* Input from stdin ready */
+        byte_count = read(STDIN_FILENO, input_buffer, BUFSIZ);
+        if (byte_count < 0)
+        {
+            tio_warning_printf("Could not read from stdin (%s)", strerror(errno));
+        }
+        else if (byte_count == 0)
+        {
+            // Close write end to signal EOF in read end
+            close(pipefd[1]);
+            pthread_exit(0);
+        }
+
+        if (interactive_mode)
+        {
+            static char previous_char = 0;
+            char input_char;
+
+            // Process quit and flush key command
+            for (int i = 0; i<byte_count; i++)
+            {
+                input_char = input_buffer[i];
+
+                if (previous_char == option.prefix_code)
+                {
+                    switch (input_char)
+                    {
+                        case KEY_Q:
+                            exit(EXIT_FAILURE);
+                            break;
+                        case KEY_SHIFT_F:
+                            tio_printf("Flushed data I/O channels")
+                            tcflush(fd, TCIOFLUSH);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                previous_char = input_char;
+            }
+        }
+
+        // Write all bytes read to pipe
+        while (byte_count)
+        {
+            bytes_written = write(pipefd[1], input_buffer, byte_count);
+            if (bytes_written < 0)
+            {
+                tio_warning_printf("Could not write to pipe (%s)", strerror(errno));
+                break;
+            }
+            byte_count -= bytes_written;
+        }
+    }
+
+    pthread_exit(0);
+}
+
+void tty_input_thread_create(void)
+{
+    pthread_mutex_lock(&mutex_input_ready);
+
+    if (pthread_create(&thread, NULL, tty_stdin_input_thread, NULL) != 0) {
+        tio_error_printf("pthread_create() error");
+        exit(1);
+    }
+}
+
+void tty_input_thread_wait_ready(void)
+{
+    pthread_mutex_lock(&mutex_input_ready);
 }
 
 static void output_hex(char c)
@@ -470,6 +568,9 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                     }
                 }
                 tio_printf("Switched log to file %s", option.log ? "on" : "off");
+                break;
+
+            case KEY_SHIFT_F:
                 break;
 
             case KEY_G:
@@ -947,19 +1048,19 @@ void tty_wait_for_device(void)
             }
 
             FD_ZERO(&rdfs);
-            FD_SET(STDIN_FILENO, &rdfs);
-            maxfd = MAX(STDIN_FILENO, socket_add_fds(&rdfs, false));
+            FD_SET(pipefd[0], &rdfs);
+            maxfd = MAX(pipefd[0], socket_add_fds(&rdfs, false));
 
             /* Block until input becomes available or timeout */
             status = select(maxfd + 1, &rdfs, NULL, NULL, &tv);
             if (status > 0)
             {
-                if (FD_ISSET(STDIN_FILENO, &rdfs))
+                if (FD_ISSET(pipefd[0], &rdfs))
                 {
                     /* Input from stdin ready */
 
                     /* Read one character */
-                    status = read(STDIN_FILENO, &input_char, 1);
+                    status = read(pipefd[0], &input_char, 1);
                     if (status <= 0)
                     {
                         tio_error_printf("Could not read from stdin");
@@ -1200,9 +1301,9 @@ int tty_connect(void)
         FD_SET(fd, &rdfs);
         if (!ignore_stdin)
         {
-            FD_SET(STDIN_FILENO, &rdfs);
+            FD_SET(pipefd[0], &rdfs);
         }
-        maxfd = MAX(fd, STDIN_FILENO);
+        maxfd = MAX(fd, pipefd[0]);
         maxfd = MAX(maxfd, socket_add_fds(&rdfs, true));
 
         /* Manage timeout */
@@ -1309,10 +1410,10 @@ int tty_connect(void)
                     }
                 }
             }
-            else if (FD_ISSET(STDIN_FILENO, &rdfs))
+            else if (FD_ISSET(pipefd[0], &rdfs))
             {
                 /* Input from stdin ready */
-                ssize_t bytes_read = read(STDIN_FILENO, input_buffer, BUFSIZ);
+                ssize_t bytes_read = read(pipefd[0], input_buffer, BUFSIZ);
                 if (bytes_read < 0)
                 {
                     tio_error_printf_silent("Could not read from stdin (%s)", strerror(errno));

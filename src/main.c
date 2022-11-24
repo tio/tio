@@ -120,6 +120,12 @@ int main(int argc, char *argv[])
         socket_configure();
     }
 
+    /* Spawn input handling into separate thread */
+    tty_input_thread_create();
+
+    /* Wait for input to be ready */
+    tty_input_thread_wait_ready();
+
     /* Connect to tty device */
     if (option.no_autoconnect)
     {
