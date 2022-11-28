@@ -349,12 +349,13 @@ static void toggle_line(const char *line_name, int mask, enum line_mode_t line_m
     }
 }
 
-void handle_command_sequence(char input_char, char previous_char, char *output_char, bool *forward)
+void handle_command_sequence(char input_char, char *output_char, bool *forward)
 {
     char unused_char;
     bool unused_bool;
     int state;
     static enum line_mode_t line_mode = LINE_OFF;
+    static char previous_char = 0;
 
     /* Ignore unused arguments */
     if (output_char == NULL)
@@ -406,6 +407,16 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
     {
         /* Do not forward input char to output by default */
         *forward = false;
+
+        /* Handle special double prefix key input case */
+        if (input_char == option.prefix_code)
+        {
+            /* Forward prefix character to tty */
+            *output_char = option.prefix_code;
+            *forward = true;
+            previous_char = 0;
+            return;
+        }
 
         switch (input_char)
         {
@@ -588,27 +599,12 @@ void handle_command_sequence(char input_char, char previous_char, char *output_c
                 break;
 
             default:
-                /* Handle double prefix key input case */
-                if (input_char == option.prefix_code)
-                {
-                    static int count = 0;
-                    if (count++ == 1)
-                    {
-                        // Do not forward prefix characters excessively
-                        count = 0;
-                        break;
-                    }
-
-                    /* Forward prefix character to tty */
-                    *output_char = option.prefix_code;
-                    *forward = true;
-                    break;
-                }
-
                 /* Ignore unknown ctrl-t escaped keys */
                 break;
         }
     }
+
+    previous_char = input_char;
 }
 
 void stdin_restore(void)
@@ -925,7 +921,7 @@ void tty_wait_for_device(void)
     int    status;
     int    maxfd;
     struct timeval tv;
-    static char input_char, previous_char = 0;
+    static char input_char;
     static bool first = true;
     static int last_errno = 0;
 
@@ -971,9 +967,7 @@ void tty_wait_for_device(void)
                     }
 
                     /* Handle commands */
-                    handle_command_sequence(input_char, previous_char, NULL, NULL);
-
-                    previous_char = input_char;
+                    handle_command_sequence(input_char, NULL, NULL);
                 }
                 socket_handle_input(&rdfs, NULL);
             }
@@ -1095,7 +1089,6 @@ int tty_connect(void)
     int    maxfd;          /* Maximum file descriptor used */
     char   input_char, output_char;
     char   input_buffer[BUFSIZ];
-    static char previous_char = 0;
     static bool first = true;
     int    status;
     bool   next_timestamp = false;
@@ -1363,10 +1356,7 @@ int tty_connect(void)
                         }
 
                         /* Handle commands */
-                        handle_command_sequence(input_char, previous_char, &output_char, &forward);
-
-                        /* Save previous key */
-                        previous_char = input_char;
+                        handle_command_sequence(input_char, &output_char, &forward);
 
                         if ((option.hex_mode) && (forward))
                         {
