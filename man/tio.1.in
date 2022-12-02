@@ -292,7 +292,7 @@ Toggle local echo mode
 .IP "\fBctrl-t f"
 Toggle log to file
 .IP "\fBctrl-t F"
-Flush data I/O channels (discard data written but not transmitted and data received but not read)
+Flush data I/O buffers (discard data written but not transmitted and data received but not read)
 .IP "\fBctrl-t g"
 Toggle serial port line
 .IP "\fBctrl-t h"

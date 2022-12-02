@@ -525,6 +525,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 tio_printf(" ctrl-%c c       Show configuration", option.prefix_key);
                 tio_printf(" ctrl-%c e       Toggle local echo mode", option.prefix_key);
                 tio_printf(" ctrl-%c f       Toggle log to file", option.prefix_key);
+                tio_printf(" ctrl-%c F       Flush data I/O buffers", option.prefix_key);
                 tio_printf(" ctrl-%c g       Toggle serial port line", option.prefix_key);
                 tio_printf(" ctrl-%c h       Toggle hexadecimal mode", option.prefix_key);
                 tio_printf(" ctrl-%c l       Clear screen", option.prefix_key);
