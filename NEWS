@@ -1,5 +1,32 @@
 
-=== tio v2.3 ===
+=== tio v2.4 ===
+
+
+
+Changes since tio v2.3:
+
+ * Add threaded input handling
+
+   To make tio more responsive to quit and I/O flush key command when main I/O
+   thread is blocked on output.
+
+ * Fix so that is it possible to quit tio in tio etc.
+
+   Fix regression so that it is possible to send the prefix key code to the
+   remote tio session without local tio session reacting to same key code
+   (quitting etc.).
+
+ * Add key command to toggle log on/off
+
+    Add key command 'ctrl-t f' which will toggle log on/off.
+
+    If no log filename has been specified via the 'log-filename' option then
+    tio will automatically generate a new log filename every time the log
+    feature is toggled on. Meaning, when toggled multiple times, multiple
+    log files will be generated.
+
+    However, if a log filename has been specified, tio will only write and
+    append to that same file.
 
 
 
