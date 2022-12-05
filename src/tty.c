@@ -306,10 +306,16 @@ void *tty_stdin_input_thread(void *arg)
 
                 if (previous_char == option.prefix_code)
                 {
+                    if (input_char == option.prefix_code)
+                    {
+                        previous_char = 0;
+                        continue;
+                    }
+
                     switch (input_char)
                     {
                         case KEY_Q:
-                            exit(EXIT_FAILURE);
+                            exit(EXIT_SUCCESS);
                             break;
                         case KEY_SHIFT_F:
                             tio_printf("Flushed data I/O channels")
