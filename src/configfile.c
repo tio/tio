@@ -98,6 +98,40 @@ static int get_match(const char *input, const char *pattern, char **match)
     return len;
 }
 
+static bool read_boolean(const char *value, const char *name)
+{
+    const char *true_values[] = { "true", "enable", "on", "yes", "1", NULL };
+    const char *false_values[] = { "false", "disable", "off", "no", "0", NULL };
+
+    for (int i = 0; true_values[i] != NULL; i++)
+        if (strcmp(value, true_values[i]) == 0)
+            return true;
+
+    for (int i = 0; false_values[i] != NULL; i++)
+        if (strcmp(value, false_values[i]) == 0)
+            return false;
+
+    tio_error_printf("Invalid value '%s' for option '%s' in configuration file",
+            value, name);
+    exit(EXIT_FAILURE);
+}
+
+static long read_integer(const char *value, const char *name, long min_value, long max_value)
+{
+    errno = 0;
+    char *endptr;
+    long result = strtol(value, &endptr, 10);
+
+    if (errno || endptr == value || *endptr != '\0' || result < min_value || result > max_value)
+    {
+        tio_error_printf("Invalid value '%s' for option '%s' in configuration file",
+                value, name);
+        exit(EXIT_FAILURE);
+    }
+
+    return result;
+}
+
 /**
  * data_handler() - walk config file to load parameters matching user input
  *
@@ -119,11 +153,11 @@ static int data_handler(void *user, const char *section, const char *name,
         }
         else if (!strcmp(name, "baudrate"))
         {
-            option.baudrate = string_to_long((char *)value);
+            option.baudrate = read_integer(value, name, 0, LONG_MAX);
         }
         else if (!strcmp(name, "databits"))
         {
-            option.databits = atoi(value);
+            option.databits = read_integer(value, name, 5, 8);
         }
         else if (!strcmp(name, "flow"))
         {
@@ -132,7 +166,7 @@ static int data_handler(void *user, const char *section, const char *name,
         }
         else if (!strcmp(name, "stopbits"))
         {
-            option.stopbits = atoi(value);
+            option.stopbits = read_integer(value, name, 1, 2);
         }
         else if (!strcmp(name, "parity"))
         {
@@ -141,11 +175,11 @@ static int data_handler(void *user, const char *section, const char *name,
         }
         else if (!strcmp(name, "output-delay"))
         {
-            option.output_delay = atoi(value);
+            option.output_delay = read_integer(value, name, 0, LONG_MAX);
         }
         else if (!strcmp(name, "output-line-delay"))
         {
-            option.output_line_delay = atoi(value);
+            option.output_line_delay = read_integer(value, name, 0, LONG_MAX);
         }
         else if (!strcmp(name, "line-pulse-duration"))
         {
@@ -153,25 +187,11 @@ static int data_handler(void *user, const char *section, const char *name,
         }
         else if (!strcmp(name, "no-autoconnect"))
         {
-            if (!strcmp(value, "enable"))
-            {
-                option.no_autoconnect = true;
-            }
-            else if (!strcmp(value, "disable"))
-            {
-                option.no_autoconnect = false;
-            }
+            option.no_autoconnect = read_boolean(value, name);
         }
         else if (!strcmp(name, "log"))
         {
-            if (!strcmp(value, "enable"))
-            {
-                option.log = true;
-            }
-            else if (!strcmp(value, "disable"))
-            {
-                option.log = false;
-            }
+            option.log = read_boolean(value, name);
         }
         else if (!strcmp(name, "log-file"))
         {
@@ -180,47 +200,20 @@ static int data_handler(void *user, const char *section, const char *name,
         }
         else if (!strcmp(name, "log-strip"))
         {
-            if (!strcmp(value, "enable"))
-            {
-                option.log_strip = true;
-            }
-            else if (!strcmp(value, "disable"))
-            {
-                option.log_strip = false;
-            }
+            option.log_strip = read_boolean(value, name);
         }
         else if (!strcmp(name, "local-echo"))
         {
-            if (!strcmp(value, "enable"))
-            {
-                option.local_echo = true;
-            }
-            else if (!strcmp(value, "disable"))
-            {
-                option.local_echo = false;
-            }
+            option.local_echo = read_boolean(value, name);
         }
         else if (!strcmp(name, "hexadecimal"))
         {
-            if (!strcmp(value, "enable"))
-            {
-                option.hex_mode = true;
-            }
-            else if (!strcmp(value, "disable"))
-            {
-                option.hex_mode = false;
-            }
+            option.hex_mode = read_boolean(value, name);
         }
         else if (!strcmp(name, "timestamp"))
         {
-            if (!strcmp(value, "enable"))
-            {
-                option.timestamp = TIMESTAMP_24HOUR;
-            }
-            else if (!strcmp(value, "disable"))
-            {
-                option.timestamp = TIMESTAMP_NONE;
-            }
+            option.timestamp = read_boolean(value, name) ?
+                TIMESTAMP_24HOUR : TIMESTAMP_NONE;
         }
         else if (!strcmp(name, "timestamp-format"))
         {
@@ -270,29 +263,15 @@ static int data_handler(void *user, const char *section, const char *name,
         }
         else if (!strcmp(name, "response-wait"))
         {
-            if (!strcmp(value, "enable"))
-            {
-                option.response_wait = true;
-            }
-            else if (!strcmp(value, "disable"))
-            {
-                option.response_wait = false;
-            }
+            option.response_wait = read_boolean(value, name);
         }
         else if (!strcmp(name, "response-timeout"))
         {
-            option.response_timeout = atoi(value);
+            option.response_timeout = read_integer(value, name, 0, LONG_MAX);
         }
         else if (!strcmp(name, "rs-485"))
         {
-            if (!strcmp(value, "enable"))
-            {
-                option.rs485 = true;
-            }
-            else if (!strcmp(value, "disable"))
-            {
-                option.rs485 = false;
-            }
+            option.rs485 = read_boolean(value, name);
         }
         else if (!strcmp(name, "rs-485-config"))
         {
@@ -304,14 +283,11 @@ static int data_handler(void *user, const char *section, const char *name,
         }
         else if (!strcmp(name, "mute"))
         {
-            if (!strcmp(value, "enable"))
-            {
-                option.mute = true;
-            }
-            else if (!strcmp(value, "disable"))
-            {
-                option.mute = false;
-            }
+            option.mute = read_boolean(value, name);
+        }
+        else
+        {
+            tio_warning_printf("Unknown option '%s' in configuration file, ignored", name);
         }
     }
 
@@ -389,32 +365,29 @@ static int section_name_print_handler(void *user, const char *section, const cha
 
 static int resolve_config_file(void)
 {
-    asprintf(&c.path, "%s/tio/tiorc", getenv("XDG_CONFIG_HOME"));
-    if (!access(c.path, F_OK))
+    char *xdg = getenv("XDG_CONFIG_HOME");
+    if (xdg)
     {
-        return 0;
+        asprintf(&c.path, "%s/tio/config", xdg);
+        if (access(c.path, F_OK) == 0)
+        {
+            return 0;
+        }
+        free(c.path);
     }
 
-    free(c.path);
-
-    asprintf(&c.path, "%s/.config/tio/tiorc", getenv("HOME"));
-    if (!access(c.path, F_OK))
+    char *home = getenv("HOME");
+    if (home)
     {
-        return 0;
+        asprintf(&c.path, "%s/.config/tio/config", home);
+        if (access(c.path, F_OK) == 0)
+        {
+            return 0;
+        }
+        free(c.path);
     }
-
-    free(c.path);
-
-    asprintf(&c.path, "%s/.tiorc", getenv("HOME"));
-    if (!access(c.path, F_OK))
-    {
-        return 0;
-    }
-
-    free(c.path);
 
     c.path = NULL;
-
     return -EINVAL;
 }
 
