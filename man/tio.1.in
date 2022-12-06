@@ -332,11 +332,9 @@ the configuration file first found in the following locations in the order
 listed:
 
 .PP
-.I $XDG_CONFIG_HOME/tio/tiorc
+.I $XDG_CONFIG_HOME/tio/config
 .PP
-.I $HOME/.config/tio/tiorc
-.PP
-.I $HOME/.tiorc
+.I $HOME/.config/tio/config
 
 .PP
 Labels can be used to group settings into named sub-configurations which can be
