@@ -385,6 +385,13 @@ static int resolve_config_file(void)
             return 0;
         }
         free(c.path);
+
+        asprintf(&c.path, "%s/.tioconfig", home);
+        if (access(c.path, F_OK) == 0)
+        {
+            return 0;
+        }
+        free(c.path);
     }
 
     c.path = NULL;

@@ -335,6 +335,8 @@ listed:
 .I $XDG_CONFIG_HOME/tio/config
 .PP
 .I $HOME/.config/tio/config
+.PP
+.I $HOME/.tioconfig
 
 .PP
 Labels can be used to group settings into named sub-configurations which can be
