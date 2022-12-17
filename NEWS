@@ -1,5 +1,32 @@
 
-=== tio v2.4 ===
+=== tio v2.5 ===
+
+
+
+Changes since tio v2.4:
+
+ * Update configuration file documentation
+
+   Rename .tiorc to .tioconfig, tiorc to config, etc.
+
+ * Add support for $HOME/.tioconfig
+
+    Replaces what used to be $HOME/.tiorc
+
+ * Fix double prefix key regression
+
+Vyacheslav Patkov:
+
+ * Better error checking in config file, rename the file
+
+   Accept "true", "enable", "on", "yes", "1" as true values, their
+   counterparts as false ones. Check integer values for errors and range.
+   Warn about ignored (e.g. misspelled) options.
+
+   Check getenv() return value for NULL.
+
+   Rename "tiorc" to "config", as it's a static INI file, not an executable
+   "run commands".
 
 
 
