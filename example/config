@@ -2,7 +2,12 @@
 # tio - https://tio.github.io #
 ###############################
 
-# Example configuration file
+# Example tio configuration file
+#
+# Place file in any of the following locations:
+#  $XDG_CONFIG_HOME/tio/config
+#  $HOME/.config/tio/config
+#  $HOME/.tioconfig
 
 # Defaults
 baudrate = 115200
