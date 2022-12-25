@@ -1,4 +1,14 @@
 
+ * Support for running external command
+
+   Add key command e.g. 'ctrl-t r' which prompts user to run external command.
+   The command will be run in a process which stdin/stdout is redirected to the
+   serial port.
+
+   This is the first step towards maybe also adding automatic support for
+   x/y/zmodem data transfer protocols by calling external programs such as
+   rb/sb, rx/sx, rz/sz, etc.
+
  * Allow tio to connect to socket
 
    After some more consideration I think it makes sense to support connecting to a
