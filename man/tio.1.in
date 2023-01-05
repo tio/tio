@@ -502,12 +502,12 @@ correct serial device if it is disconnected and then reconnected.
 .TP
 Redirect serial device I/O to Unix file socket for scripting:
 
-$ tio -S unix:/tmp/tmux-socket0 /dev/ttyUSB0
+$ tio -S unix:/tmp/tio-socket0 /dev/ttyUSB0
 
 .TP
 Then, to issue a command via the file socket simply do:
 
-$ echo "ls -la" | nc -UN /tmp/tmux-socket0 > /dev/null
+$ echo "ls -la" | nc -UN /tmp/tio-socket0 > /dev/null
 
 .TP
 Or use the expect command to script an interaction:
