@@ -391,11 +391,11 @@ EXAMPLES
 
        Redirect serial device I/O to Unix file socket for scripting:
 
-              $ tio -S unix:/tmp/tmux-socket0 /dev/ttyUSB0
+              $ tio -S unix:/tmp/tio-socket0 /dev/ttyUSB0
 
        Then, to issue a command via the file socket simply do:
 
-              $ echo "ls -la" | nc -UN /tmp/tmux-socket0 > /dev/null
+              $ echo "ls -la" | nc -UN /tmp/tio-socket0 > /dev/null
 
        Or use the expect command to script an interaction:
 
@@ -444,4 +444,4 @@ WEBSITE
 AUTHOR
        Created by Martin Lund <martin.lund@keep-it-simple.com>.
 
-tio 2.5                                                                                                                2022-11-02                                                                                                                 tio(1)
+tio 2.6                                                                                                                2022-12-17                                                                                                                 tio(1)
