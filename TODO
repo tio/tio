@@ -1,3 +1,24 @@
+ * Support for interaction using simple autoresponse strings
+
+   Add support for simple autoresponse strings in the configuration file. For
+   example:
+
+   autoresponse = expect:'localhost login: ', send:'root\n',
+                  expect:'Password: ', send:'abcd1234\n'
+
+   When expect line is matched tio will respond by writing the send string.
+
+   When parsing the autoresponse variable make sure matching expect/send pairs
+   else provide warning.
+
+   Maybe support regex matching in expect string to make feature more powerful.
+
+   This is mostly a convenience feature. For more powerful scripted interaction
+   users can continue use the socket feature in combination with the expect tool
+   as described in the man page.
+
+   Maybe provide a mechanism to disable autoresponse feature. Maybe by defining
+   maximum match count and/or in session key command to toggle feature.
 
  * Support for running external command
 
