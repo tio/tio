@@ -29,7 +29,7 @@ when used in combination with [tmux](https://tmux.github.io).
 
  * Easily connect to serial TTY devices
  * Automatic connect and reconnect
- * Sensible defaults
+ * Sensible defaults (115200 8n1)
  * Support for non-standard baud rates
  * Support for RS-485 mode
  * Support for mark and space parity
