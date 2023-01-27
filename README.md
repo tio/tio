@@ -288,6 +288,15 @@ See meson\_options.txt for tio specific build options.
 
 Note: The meson install steps may differ depending on your specific system.
 
+### 4.6 Known issues
+
+Getting permission access errors trying to open your serial device?
+
+Add your user to the group which allows serial device access. For example, to add your user to the 'dialout' group do:
+```
+$ sudo usermod -a -G dialout <username>
+```
+
 
 ## 5. Contributing
 
