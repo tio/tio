@@ -256,8 +256,11 @@ reach out to its package maintainers team.
 
 Install latest stable version:
 ```
-$ snap install tio
+$ snap install tio --classic
 ```
+
+Note: Classic confinement is currently required due to limitations of the snapcraft framework.
+See [Issue #187](https://github.com/tio/tio/issues/187) for discussion.
 
 ### 4.3 Installation using brew (MacOS, Linux)
 
