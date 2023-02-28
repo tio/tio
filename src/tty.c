@@ -56,15 +56,23 @@
 #include "timestamp.h"
 #include "misc.h"
 
-#if defined(__APPLE__)
+/* tty device listing configuration */
+
+#if defined(__linux__)
+#define PATH_SERIAL_DEVICES "/dev/serial/by-id/"
+#define PREFIX_TTY_DEVICES ""
+#elif defined(__FreeBSD__)
+#define PATH_SERIAL_DEVICES "/dev/"
+#define PREFIX_TTY_DEVICES "cua"
+#elif defined(__APPLE__)
 #define PATH_SERIAL_DEVICES "/dev/"
 #define PREFIX_TTY_DEVICES "tty."
 #elif defined(__CYGWIN__)
 #define PATH_SERIAL_DEVICES "/dev/"
 #define PREFIX_TTY_DEVICES "ttyS"
 #else
-#define PATH_SERIAL_DEVICES "/dev/serial/by-id/"
-#define PREFIX_TTY_DEVICES ""
+#define PATH_SERIAL_DEVICES "/dev/"
+#define PREFIX_TTY_DEVICES "tty"
 #endif
 
 #ifndef CMSPAR
