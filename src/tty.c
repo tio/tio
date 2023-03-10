@@ -62,6 +62,9 @@
 #elif defined(__CYGWIN__)
 #define PATH_SERIAL_DEVICES "/dev/"
 #define PREFIX_TTY_DEVICES "ttyS"
+#elif defined(__HAIKU__)
+#define PATH_SERIAL_DEVICES "/dev/ports/"
+#define PREFIX_TTY_DEVICES ""
 #else
 #define PATH_SERIAL_DEVICES "/dev/serial/by-id/"
 #define PREFIX_TTY_DEVICES ""
