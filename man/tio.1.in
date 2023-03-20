@@ -1,0 +1,573 @@
+.TH "tio" "1" "@version_date@" "tio @version@" "User Commands"
+
+.SH "NAME"
+tio \- a simple serial device I/O tool
+
+.SH "SYNOPSIS"
+.PP
+.B tio
+.RI "[" <options> "] " "<tty-device|sub-config>"
+
+.SH "DESCRIPTION"
+.PP
+\fBtio\fR is a simple serial device tool which features a straightforward
+command-line and configuration file interface to easily connect to serial TTY
+devices for basic I/O operations.
+
+.SH "OPTIONS"
+
+.TP
+.BR \-b ", " "\-\-baudrate " \fI<bps>
+
+Set baud rate [bps] (default: 115200).
+.TP
+.BR \-d ", " "\-\-databits 5" | 6 | 7 | 8
+
+Set data bits (default: 8).
+.TP
+.BR \-f ", " "\-\-flow hard" | soft | none
+
+Set flow control (default: none).
+.TP
+.BR \-s ", " "\-\-stopbits 1" | 2
+
+Set stop bits (default: 1).
+.TP
+.BR \-p ", " "\-\-parity odd" | even | none | mark | space
+
+Set parity (default: none).
+
+Note: With \fBmark\fR parity the parity bit is always 0. With \fBspace\fR
+parity the parity bit is always 1. Not all platforms support \fBmark\fR and
+\fBspace\fR parity.
+
+.TP
+.BR \-o ", " "\-\-output\-delay " \fI<ms>
+
+Set output delay [ms] inserted between each sent character (default: 0).
+
+.TP
+.BR \-O ", " "\-\-output\-line\-delay " \fI<ms>
+
+Set output delay [ms] inserted between each sent line (default: 0).
+
+.TP
+.BR "    \-\-line\-pulse\-duration " \fI<duration>
+
+Set the pulse duration [ms] of each serial port line using the following key
+value pair format in the duration field: <key>=<value>
+
+Each key represents a serial line. The following keys are available:
+
+.RS
+.TP 8n
+.IP \fBDTR
+Data Terminal Ready
+.IP \fBRTS
+Request To Send
+.IP \fBCTS
+Clear To Send
+.IP \fBDSR
+Data Set Ready
+.IP \fBDCD
+Data Carrier Detect
+.IP \fBRI
+Ring Indicator
+.P
+If defining more than one key value pair, the pairs must be comma separated.
+
+The default pulse duration for each line is 100 ms.
+.RE
+
+.TP
+.BR \-n ", " \-\-no\-autoconnect
+
+Disable automatic connect.
+
+By default tio automatically connects to the provided device if present. If the
+device is not present, it will wait for it to appear and then connect. If the
+connection is lost (eg. device disconnects), it will wait for the device to
+reappear and then reconnect.
+
+However, if the \fB\-\-no\-autoconnect\fR option is provided, tio will exit if
+the device is not present or an established connection is lost.
+
+.TP
+.BR \-e ", " "\-\-local\-echo
+
+Enable local echo.
+
+.TP
+.BR \-t ", " \-\-timestamp
+
+Enable line timestamp.
+
+.TP
+.BR "    \-\-timestamp-format \fI<format>
+
+Set timestamp format to any of the following timestamp formats:
+.RS
+.TP 16n
+
+.IP "\fB24hour"
+24-hour format ("hh:mm:ss.sss")
+.IP "\fB24hour-start"
+24-hour format relative to start time
+.IP "\fB24hour-delta"
+24-hour format relative to previous timestamp
+.IP "\fBiso8601"
+ISO8601 format ("YYYY-MM-DDThh:mm:ss.sss")
+.PP
+Default format is \fB24hour\fR
+.RE
+
+.TP
+.BR \-L ", " \-\-list\-devices
+
+List available serial devices by ID.
+
+.TP
+.BR \-l ", " \-\-log
+
+Enable log to file.
+
+If no filename is provided the filename will be automatically generated.
+
+.TP
+.BR "    \-\-log-file \fI<filename>
+
+Set log filename.
+
+.TP
+.BR "    \-\-log-strip
+
+Strip control characters and escape sequences from log.
+
+.TP
+.BR \-m ", " "\-\-map " \fI<flags>
+
+Map (replace, translate) characters on input or output. The following mapping
+flags are supported:
+
+.RS
+.TP 12n
+.IP "\fBICRNL"
+Map CR to NL on input (unless IGNCR is set)
+.IP "\fBIGNCR"
+Ignore CR on input
+.IP "\fBINLCR"
+Map NL to CR on input
+.IP "\fBINLCRNL"
+Map NL to CR-NL on input
+.IP "\fBOCRNL"
+Map CR to NL on output
+.IP "\fBODELBS"
+Map DEL to BS on output
+.IP "\fBONLCRNL"
+Map NL to CR-NL on output
+.IP "\fBOLTU"
+Map lowercase characters to uppercase on output
+.IP "\fBMSB2LSB"
+Map MSB bit order to LSB on output
+.P
+If defining more than one flag, the flags must be comma separated.
+.RE
+
+.TP
+.BR \-x ", " \-\-hexadecimal
+
+Enable hexadecimal mode.
+
+.TP
+.BR \-c ", " "\-\-color " \fI0..255|bold|none|list
+
+Colorize tio text using ANSI color code value ranging from 0 to 255 or use
+"none" for no color or use "bold" to apply bold formatting to existing system
+color.
+
+Use "list" to print a list of available ANSI color codes.
+
+Default value is "bold".
+
+.TP
+.BR \-S ", " "\-\-socket \fI<socket>\fR\fB
+
+Redirect I/O to socket.
+
+Any input from clients connected to the socket is sent on the serial port as if
+entered at the terminal where tio is running (except that \fBctrl-t\fR sequences
+are not recognized), and any input from the serial port is multiplexed to the
+terminal and all connected clients.
+
+Sockets remain open while the serial port is disconnected, and writes will block.
+
+Various socket types are supported using the following prefixes in the socket field:
+
+.RS
+.TP 20n
+.IP "\fBunix:<filename>"
+Unix Domain Socket (file)
+.IP "\fBinet:<port>"
+Internet Socket (network)
+.IP "\fBinet6:<port>"
+Internet IPv6 Socket (network)
+.P
+If port is 0 or no port is provided default port 3333 is used.
+.P
+At present there is a hardcoded limit of 16 clients connected at one time.
+.RE
+
+.TP
+.BR \-r ", " \-\-response-wait
+
+Wait for line response then quit. A line is considered any string ending with
+either CR or NL character. If no line is received tio will quit after response
+timeout.
+
+Any tio text is automatically muted when piping a string to tio while in
+response mode to make it easy to parse the response.
+
+.TP
+.BR "    \-\-response\-timeout " \fI<ms>
+
+Set timeout [ms] of line response (default: 100).
+
+.TP
+.BR "    \-\-rs\-485"
+
+Enable RS-485 mode.
+
+.TP
+.BR "    \-\-rs\-485\-config " \fI<config>
+
+Set the RS-485 configuration using the following key or key value pair format in
+the configuration field:
+
+.RS
+.TP 30n
+.IP \fBRTS_ON_SEND=value
+Set logical level (0 or 1) for RTS pin when sending
+.IP \fBRTS_AFTER_SEND=value
+Set logical level (0 or 1) for RTS pin after sending
+.IP \fBRTS_DELAY_BEFORE_SEND=value
+Set RTS delay (ms) before sending
+.IP \fBRTS_DELAY_AFTER_SEND=value
+Set RTS delay (ms) after sending
+.IP \fBRX_DURING_TX
+Receive data even while sending data
+.P
+If defining more than one key or key value pair, they must be comma separated.
+.RE
+
+.TP
+.BR "\-\-alert none|bell|blink"
+
+Set alert action on connect/disconnect.
+
+It will sound the bell once or blink once on successful connect. Likewise it
+will sound the bell twice or blink twice on disconnect.
+
+Default value is "none".
+
+.TP
+.BR \-v ", " \-\-version
+
+Display program version.
+.TP
+.BR \-h ", " \-\-help
+
+Display help.
+.SH "KEYS"
+.PP
+.TP 16n
+In session, the following key sequences, a prefix key (default: ctrl-t) followed by a command key, are intercepted as tio commands:
+.IP "\fBctrl-t ?"
+List available key commands
+.IP "\fBctrl-t b"
+Send serial break (triggers SysRq on Linux, etc.)
+.IP "\fBctrl-t c"
+Show configuration (baudrate, databits, etc.)
+.IP "\fBctrl-t e"
+Toggle local echo mode
+.IP "\fBctrl-t f"
+Toggle log to file
+.IP "\fBctrl-t F"
+Flush data I/O buffers (discard data written but not transmitted and data received but not read)
+.IP "\fBctrl-t g"
+Toggle serial port line
+.IP "\fBctrl-t h"
+Toggle hexadecimal mode
+.IP "\fBctrl-t l"
+Clear screen
+.IP "\fBctrl-t L"
+Show line states (DTR, RTS, CTS, DSR, DCD, RI)
+.IP "\fBctrl-t p"
+Pulse serial port line
+.IP "\fBctrl-t q"
+Quit
+.IP "\fBctrl-t s"
+Show TX/RX statistics
+.IP "\fBctrl-t t"
+Toggle line timestamp mode
+.IP "\fBctrl-t U"
+Toggle conversion to uppercase on output
+.IP "\fBctrl-t v"
+Show version
+.IP "\fBctrl-t ctrl-t"
+Send ctrl-t character
+
+.SH "HEXADECIMAL MODE"
+.PP
+In hexadecimal mode each incoming byte is printed out as a hexadecimal value.
+
+.PP
+Bytes can be sent in this mode by typing the \fBtwo-character hexadecimal\fR
+representation of the value, e.g.: to send \fI0xA\fR you must type \fI0a\fR or
+\fI0A\fR.
+
+.SH "CONFIGURATION FILE"
+.PP
+Options can be set via configuration file using the INI format. \fBtio\fR uses
+the configuration file first found in the following locations in the order
+listed:
+
+.PP
+.I $XDG_CONFIG_HOME/tio/config
+.PP
+.I $HOME/.config/tio/config
+.PP
+.I $HOME/.tioconfig
+
+.PP
+Labels can be used to group settings into named sub-configurations which can be
+activated from the command-line when starting tio.
+
+.PP
+\fBtio\fR will try to match the user input to a sub-configuration by name or by
+pattern to get the TTY device and other options.
+
+.PP
+Options without any label change the default options.
+
+.PP
+Any options set via command-line will override options set in the configuration file.
+
+.PP
+The following configuration file options are available:
+
+.TP 25n
+.IP "\fBpattern"
+Pattern matching user input. This pattern can be an extended regular expression with a single group.
+.IP "\fBdevice"
+TTY device to open. If it contains a "%s" it is substituted with the first group match.
+.IP "\fBbaudrate"
+Set baud rate
+.IP "\fBdatabits"
+Set data bits
+.IP "\fBflow"
+Set flow control
+.IP "\fBstopbits"
+Set stop bits
+.IP "\fBparity"
+Set parity
+.IP "\fBoutput-delay"
+Set output character delay
+.IP "\fBoutput-line-delay"
+Set output line delay
+.IP "\fBline-pulse-duration"
+Set line pulse duration
+.IP "\fBno-autoconnect"
+Disable automatic connect
+.IP "\fBlog"
+Enable log to file
+.IP "\fBlog-file"
+Set log filename
+.IP "\fBlog-strip"
+Enable strip of control and escape sequences from log
+.IP "\fBlocal-echo"
+Enable local echo
+.IP "\fBtimestamp"
+Enable line timestamp
+.IP "\fBtimestamp-format"
+Set timestamp format
+.IP "\fBmap"
+Map characters on input or output
+.IP "\fBcolor"
+Colorize tio text using ANSI color code ranging from 0 to 255
+.IP "\fBhexadecimal"
+Enable hexadecimal mode
+.IP "\fBsocket"
+Set socket to redirect I/O to
+.IP "\fBprefix-ctrl-key"
+Set prefix ctrl key (a..z, default: t)
+.IP "\fBresponse-wait"
+Enable wait for line response
+.IP "\fBresponse-timeout"
+Set line response timeout
+.IP "\fBrs-485"
+Enable RS-485 mode
+.IP "\fBrs-485-config"
+Set RS-485 configuration
+.IP "\fBalert"
+Set alert action on connect/disconnect
+
+.SH "CONFIGURATION FILE EXAMPLES"
+
+.TP
+To change the default configuration simply set options like so:
+
+.RS
+.nf
+.eo
+# Defaults
+baudrate = 9600
+databits = 8
+parity = none
+stopbits = 1
+color = 10
+line-pulse-duration = DTR=200,RTS=400
+.ec
+.fi
+.RE
+
+.TP
+Named sub-configurations can be added via labels:
+
+.RS
+.nf
+.eo
+[rpi3]
+device = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+baudrate = 115200
+color = 11
+.ec
+.fi
+.RE
+
+.TP
+Activate the sub-configuration by name:
+
+$ tio rpi3
+
+.TP
+Which is equivalent to:
+
+$ tio -b 115200 -c 11 /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+
+.TP
+A sub-configuration can also be activated by its pattern which supports regular expressions:
+
+.RS
+.nf
+.eo
+[usb device]
+pattern = usb([0-9]*)
+device = /dev/ttyUSB%s
+baudrate = 115200
+.ec
+.fi
+.RE
+
+.TP
+Activate the sub-configuration by pattern match:
+
+$ tio usb12
+
+.TP
+Which is equivalent to:
+
+$ tio -b 115200 /dev/ttyUSB12
+
+.TP
+It is also possible to combine use of sub-configuration and command-line options. For example:
+
+$ tio -l -t usb12
+
+.SH "EXAMPLES"
+.TP
+Typical use is without options:
+
+$ tio /dev/ttyUSB0
+.TP
+Which corresponds to the commonly used default options:
+
+$ tio \-b 115200 \-d 8 \-f none \-s 1 \-p none /dev/ttyUSB0
+.TP
+It is recommended to connect serial TTY devices by ID:
+
+$ tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
+.PP
+Using serial devices by ID ensures that tio automatically reconnects to the
+correct serial device if it is disconnected and then reconnected.
+.TP
+Redirect serial device I/O to Unix file socket for scripting:
+
+$ tio -S unix:/tmp/tmux-socket0 /dev/ttyUSB0
+
+.TP
+Then, to issue a command via the file socket simply do:
+
+$ echo "ls -la" | nc -UN /tmp/tmux-socket0 > /dev/null
+
+.TP
+Or use the expect command to script an interaction:
+
+.RS
+.nf
+.eo
+#!/usr/bin/expect -f
+
+set timeout -1
+log_user 0
+
+spawn nc -UN /tmp/tio-socket0
+set uart $spawn_id
+
+send -i $uart "date\n"
+expect -i $uart "prompt> "
+send -i $uart "ls -la\n"
+expect -i $uart "prompt> "
+.ec
+.fi
+.RE
+
+.TP
+Redirect device I/O to network file socket for remote TTY sharing:
+
+$ tio --socket inet:4444 /dev/ttyUSB0
+
+.TP
+
+Then, use netcat to connect to the shared TTY session over network (assuming tio is hosted on IP 10.0.0.42):
+
+$ nc -N 10.0.0.42 4444
+
+.TP
+Pipe command to the serial device:
+
+$ echo "ls -la" | tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
+
+.TP
+Pipe command to the serial device and wait for line response (string ending with CR or NL):
+
+$ echo "*IDN?" | tio /dev/ttyACM0 --response-wait
+.TP
+In this mode, only the response will be printed.
+
+.TP
+Likewise, to pipe data from file to the serial device:
+
+$ cat data.bin | tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
+
+.TP
+Enable RS-485 mode:
+
+$ tio --rs-485 --rs-485-config=RTS_ON_SEND=1,RX_DURING_TX /dev/ttyUSB0
+
+.SH "WEBSITE"
+.PP
+Visit https://tio.github.io
+
+.SH "AUTHOR"
+.PP
+Created by Martin Lund <martin.lund@keep\-it\-simple.com>.

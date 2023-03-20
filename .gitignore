@@ -1,0 +1,4 @@
+/build
+/subprojects/libinih
+*.swp
+.cache
