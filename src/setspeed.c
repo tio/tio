@@ -33,6 +33,7 @@
 #include <IOKit/serial/ioss.h>
 #endif
 
+#include "misc.h"
 
 #ifdef HAVE_TERMIOS2
 int setspeed(int fd, int baudrate)
@@ -62,6 +63,9 @@ int setspeed(int fd, int baudrate)
 #else
 int setspeed(int fd, int baudrate)
 {
+    UNUSED(fd);
+    UNUSED(baudrate);
+
     errno = EINVAL;
     return -1;
 }
