@@ -1021,7 +1021,7 @@ Alban Bedel:
    is not in the search path. In tree builds are working because autoconf adds
    $(top_builddir)/src/include to the search path for the generated config.h.
    As $(top_builddir) and $(top_srcdir) are identical during in tree builds
-   the search path still end up beeing somehow correct.
+   the search path still end up being somehow correct.
 
    To fix this add -I$(srcdir)/include to the CPPFLAGS in Makefile.am.
 
