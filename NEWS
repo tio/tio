@@ -653,7 +653,7 @@ Changes since tio v1.38:
    inherently inconsistent with how you define required arguments.
 
    To avoid confusion we decide to avoid this inconsistency by replacing
-   optional options with additional options with required argmuments.
+   optional options with additional options with required arguments.
 
  * Replace '1' with 'enable' in config files
 
