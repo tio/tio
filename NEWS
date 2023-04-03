@@ -524,7 +524,7 @@ Changes since tio v1.39:
    pipe data to tio which then forwards the data to the connected serial
    device.
 
-   Non ineractive means that tio does not react to interactive key commands
+   Non interactive means that tio does not react to interactive key commands
    in the incoming stream. This allows users to pipe binary data directly
    to the connected serial device.
 
