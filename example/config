@@ -29,7 +29,7 @@ rs-485 = disable
 response-wait = disable
 alert = none
 
-# Sub-configuraions
+# Sub-configurations
 
 [rpi3]
 baudrate = 115200
