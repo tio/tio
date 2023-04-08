@@ -50,7 +50,7 @@ char *timestamp_current_time(void)
         first = false;
     }
 
-    // Add formatted timestap
+    // Add formatted timestamp
     switch (option.timestamp)
     {
         case TIMESTAMP_NONE:

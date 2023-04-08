@@ -524,7 +524,7 @@ Changes since tio v1.39:
    pipe data to tio which then forwards the data to the connected serial
    device.
 
-   Non ineractive means that tio does not react to interactive key commands
+   Non interactive means that tio does not react to interactive key commands
    in the incoming stream. This allows users to pipe binary data directly
    to the connected serial device.
 
@@ -653,7 +653,7 @@ Changes since tio v1.38:
    inherently inconsistent with how you define required arguments.
 
    To avoid confusion we decide to avoid this inconsistency by replacing
-   optional options with additional options with required argmuments.
+   optional options with additional options with required arguments.
 
  * Replace '1' with 'enable' in config files
 
@@ -1018,10 +1018,10 @@ Alban Bedel:
  * Fix out of tree builds
 
    Out of tree builds are currently broken because $(top_srcdir)src/include
-   is not in the search path. In tree builds are working because autconf add
+   is not in the search path. In tree builds are working because autoconf adds
    $(top_builddir)/src/include to the search path for the generated config.h.
    As $(top_builddir) and $(top_srcdir) are identical during in tree builds
-   the search path still end up beeing somehow correct.
+   the search path still end up being somehow correct.
 
    To fix this add -I$(srcdir)/include to the CPPFLAGS in Makefile.am.
 
