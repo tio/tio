@@ -41,6 +41,9 @@ static int sockfd;
 static int clientfds[MAX_SOCKET_CLIENTS];
 static int socket_family = AF_UNSPEC;
 static int port_number = SOCKET_PORT_DEFAULT;
+static bool map_i_nl_cr = false;
+static bool map_i_cr_nl = false;
+static bool map_ign_cr = false;
 
 static const char *socket_filename(void)
 {
@@ -123,6 +126,9 @@ void socket_configure(void)
     struct sockaddr_in6 sockaddr_inet6 = {};
     struct sockaddr *sockaddr_p;
     socklen_t socklen;
+    bool token_found = true;
+    char *token = NULL;
+    char *buffer;
 
     /* Parse socket string */
 
@@ -174,6 +180,41 @@ void socket_configure(void)
         tio_error_printf("%s: Invalid socket scheme, must be prefixed with 'unix:', 'inet:', or 'inet6:'", option.socket);
         exit(EXIT_FAILURE);
     }
+
+    /* Configure any specified input mappings */
+    buffer = strdup(option.map);
+    while (token_found == true)
+    {
+        if (token == NULL)
+        {
+            token = strtok(buffer,",");
+        }
+        else
+        {
+            token = strtok(NULL, ",");
+        }
+
+        if (token != NULL)
+        {
+            if (strcmp(token,"INLCR") == 0)
+            {
+                map_i_nl_cr = true;
+            }
+            else if (strcmp(token,"IGNCR") == 0)
+            {
+                map_ign_cr = true;
+            }
+            else if (strcmp(token,"ICRNL") == 0)
+            {
+                map_i_cr_nl = true;
+            }
+        }
+        else
+        {
+            token_found = false;
+        }
+    }
+    free(buffer);
 
     /* Configure socket */
 
@@ -340,10 +381,25 @@ bool socket_handle_input(fd_set *rdfs, char *output_char)
                 clientfds[i] = -1;
                 continue;
             }
-            /* match the behavior of a terminal in raw mode */
-            if (*output_char == '\n')
+
+            /* If INLCR is set, a received NL character shall be translated into a CR character */
+            if (*output_char == '\n' && map_i_nl_cr)
             {
                 *output_char = '\r';
+            }
+            else if (*output_char == '\r')
+            {
+                /* If IGNCR is set, a received CR character shall be ignored (not read). */
+                if (map_ign_cr)
+                {
+                    return false;
+                }
+
+                /* If IGNCR is not set and ICRNL is set, a received CR character shall be translated into an NL character. */
+                if (map_i_cr_nl)
+                {
+                    *output_char = '\n';
+                }
             }
             return true;
         }
