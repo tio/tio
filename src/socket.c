@@ -33,6 +33,7 @@
 #include "socket.h"
 #include "options.h"
 #include "print.h"
+#include "tty.h"
 
 #define MAX_SOCKET_CLIENTS 16
 #define SOCKET_PORT_DEFAULT 3333
@@ -340,10 +341,25 @@ bool socket_handle_input(fd_set *rdfs, char *output_char)
                 clientfds[i] = -1;
                 continue;
             }
-            /* match the behavior of a terminal in raw mode */
-            if (*output_char == '\n')
+
+            /* If INLCR is set, a received NL character shall be translated into a CR character */
+            if (*output_char == '\n' && map_i_nl_cr)
             {
                 *output_char = '\r';
+            }
+            else if (*output_char == '\r')
+            {
+                /* If IGNCR is set, a received CR character shall be ignored (not read). */
+                if (map_ign_cr)
+                {
+                    return false;
+                }
+
+                /* If IGNCR is not set and ICRNL is set, a received CR character shall be translated into an NL character. */
+                if (map_i_cr_nl)
+                {
+                    *output_char = '\n';
+                }
             }
             return true;
         }
