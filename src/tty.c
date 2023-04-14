@@ -987,14 +987,17 @@ void tty_configure(void)
             if (strcmp(token,"INLCR") == 0)
             {
                 tio.c_iflag |= INLCR;
+                map_i_nl_cr = true;
             }
             else if (strcmp(token,"IGNCR") == 0)
             {
                 tio.c_iflag |= IGNCR;
+                map_ign_cr = true;
             }
             else if (strcmp(token,"ICRNL") == 0)
             {
                 tio.c_iflag |= ICRNL;
+                map_i_cr_nl = true;
             }
             else if (strcmp(token,"OCRNL") == 0)
             {
