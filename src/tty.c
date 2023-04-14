@@ -129,6 +129,9 @@ const char random_array[] =
 };
 
 bool interactive_mode = true;
+bool map_i_nl_cr = false;
+bool map_i_cr_nl = false;
+bool map_ign_cr = false;
 
 static struct termios tio, tio_old, stdout_new, stdout_old, stdin_new, stdin_old;
 static unsigned long rx_total = 0, tx_total = 0;

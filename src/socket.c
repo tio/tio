@@ -33,6 +33,7 @@
 #include "socket.h"
 #include "options.h"
 #include "print.h"
+#include "tty.h"
 
 #define MAX_SOCKET_CLIENTS 16
 #define SOCKET_PORT_DEFAULT 3333
@@ -41,9 +42,6 @@ static int sockfd;
 static int clientfds[MAX_SOCKET_CLIENTS];
 static int socket_family = AF_UNSPEC;
 static int port_number = SOCKET_PORT_DEFAULT;
-bool map_i_nl_cr = false;
-bool map_i_cr_nl = false;
-bool map_ign_cr = false;
 
 static const char *socket_filename(void)
 {

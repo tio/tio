@@ -25,10 +25,6 @@
 #include <stdbool.h>
 #include <sys/select.h>
 
-extern bool map_i_nl_cr;
-extern bool map_i_cr_nl;
-extern bool map_ign_cr;
-
 void socket_configure(void);
 void socket_write(char input_char);
 int socket_add_fds(fd_set *fds, bool connected);
