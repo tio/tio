@@ -1426,7 +1426,7 @@ int tty_connect(void)
 
                     if (option.response_wait)
                     {
-                        if ((input_char == '\r') || (input_char == '\n'))
+                        if (input_char == '\n')
                         {
                              tty_sync(fd);
                              exit(EXIT_SUCCESS);

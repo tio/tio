@@ -220,8 +220,8 @@ At present there is a hardcoded limit of 16 clients connected at one time.
 .TP
 .BR \-r ", " \-\-response-wait
 
-Wait for line response then quit. A line is considered any string ending with
-either CR or NL character. If no line is received tio will quit after response
+Wait for line response then quit. A line is considered any string terminated
+with a NL character. If no line is received tio will quit after response
 timeout.
 
 Any tio text is automatically muted when piping a string to tio while in
