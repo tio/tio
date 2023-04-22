@@ -286,7 +286,7 @@ The latest source releases can be found [here](https://github.com/tio/tio/releas
 
 Install steps:
 ```
-$ meson build
+$ meson setup build
 $ meson compile -C build
 $ meson install -C build
 ```
