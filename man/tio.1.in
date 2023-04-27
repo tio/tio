@@ -131,7 +131,10 @@ List available serial devices by ID.
 
 Enable log to file.
 
-If no filename is provided the filename will be automatically generated.
+The filename will be automatically generated using the following format
+tio_DEVICE_YYYY-MM-DDTHH:MM:SS.log.
+
+The filename can be manually set using the \-\-log-file option.
 
 .TP
 .BR "    \-\-log-file \fI<filename>
