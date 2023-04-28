@@ -48,6 +48,7 @@ struct option_t
     unsigned int ri_pulse_duration;
     bool no_autoconnect;
     bool log;
+    bool log_append;
     bool log_strip;
     bool local_echo;
     enum timestamp_t timestamp;

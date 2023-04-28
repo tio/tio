@@ -74,6 +74,7 @@ struct option_t option =
     .ri_pulse_duration = 100,
     .no_autoconnect = false,
     .log = false,
+    .log_append = false,
     .log_filename = NULL,
     .log_strip = false,
     .local_echo = false,
@@ -119,6 +120,7 @@ void print_help(char *argv[])
     printf("  -L, --list-devices                     List available serial devices by ID\n");
     printf("  -l, --log                              Enable log to file\n");
     printf("      --log-file <filename>              Set log filename\n");
+    printf("      --log-append                       Append to log file\n");
     printf("      --log-strip                        Strip control characters and escape sequences\n");
     printf("  -m, --map <flags>                      Map characters\n");
     printf("  -c, --color 0..255|bold|none|list      Colorize tio text (default: bold)\n");

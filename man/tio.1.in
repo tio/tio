@@ -142,6 +142,11 @@ The filename can be manually set using the \-\-log-file option.
 Set log filename.
 
 .TP
+.BR "    \-\-log-append
+
+Append to log file.
+
+.TP
 .BR "    \-\-log-strip
 
 Strip control characters and escape sequences from log.

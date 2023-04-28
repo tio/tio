@@ -22,6 +22,7 @@ no-autoconnect = disable
 hexadecimal = disable
 timestamp = disable
 log = disable
+log-append = disable
 log-strip = disable
 local-echo = disable
 color = bold

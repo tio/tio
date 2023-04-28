@@ -108,6 +108,10 @@ OPTIONS
 
               Set log filename.
 
+           --log-append
+
+              Append to log file.
+
            --log-strip
 
               Strip control characters and escape sequences from log.

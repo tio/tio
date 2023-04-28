@@ -69,8 +69,17 @@ int log_open(const char *filename)
 
     log_filename = filename;
 
-    // Open log file in append write mode
-    fp = fopen(filename, "a+");
+    // Open log file
+    if (option.log_append)
+    {
+        // Appends to existing log file
+        fp = fopen(filename, "a+");
+    }
+    else
+    {
+        // Truncates existing log file
+        fp = fopen(filename, "w+");
+    }
     if (fp == NULL)
     {
         tio_warning_printf("Could not open log file %s (%s)", filename, strerror(errno));

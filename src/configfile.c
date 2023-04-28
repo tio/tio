@@ -198,6 +198,10 @@ static int data_handler(void *user, const char *section, const char *name,
             asprintf(&c.log_filename, "%s", value);
             option.log_filename = c.log_filename;
         }
+        else if (!strcmp(name, "log-append"))
+        {
+            option.log_append = read_boolean(value, name);
+        }
         else if (!strcmp(name, "log-strip"))
         {
             option.log_strip = read_boolean(value, name);
