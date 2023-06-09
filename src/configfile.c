@@ -289,6 +289,10 @@ static int data_handler(void *user, const char *section, const char *name,
         {
             option.mute = read_boolean(value, name);
         }
+        else if (!strcmp(name, "pattern"))
+        {
+            // Do nothing
+        }
         else
         {
             tio_warning_printf("Unknown option '%s' in configuration file, ignored", name);
