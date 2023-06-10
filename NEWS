@@ -1,5 +1,60 @@
 
-=== tio v2.5 ===
+=== tio v2.6 ===
+
+
+
+Changes since tio v2.5:
+
+ * Remove warning when using pattern option
+
+ * Add --log-append option
+
+   Add --log-append option which makes tio append to any existing log file.
+
+   This also changes the default behaviour of tio from appending to
+   overwriting any existing log file. Now you have to use this new option
+   to make tio append.
+
+ * Update man page
+
+ * Update README
+
+ * Fix line termination for response wait feature
+
+   The response wait feature waited for a line response, a string
+   terminated with either CR or NL. However, some devices may send a CR and
+   then their line content and then NL. This means tio will quit before
+   receiving and printing the line response. To solve this we simply ignore
+   the CR character and only consider lines terminated with a NL character.
+
+   This should work for all devices as lines are AFAIK always terminated
+   with either CRNL or a NL.
+
+ * Update tty device listing configuration
+
+   Cleanup and add FreeBSD tty device listing support.
+
+Braden Young:
+
+ * Move map variables to tty to keep them all in one spot
+
+ * Configure socket mapping flags from tty parsing logic. Remove duplicate parsing logic in socket
+
+ * Support input mapping modes for sockets
+
+Josh Soref:
+
+ * Various spelling fixes
+
+Peter van Dijk:
+
+ * avoid "warning: unused parameter" on setspeed stub
+
+ * use right /dev/ path on Haiku
+
+Bill Hass:
+
+ * Update README with details on snap confinement
 
 
 
