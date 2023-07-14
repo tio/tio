@@ -91,6 +91,7 @@ The command-line interface is straightforward as reflected in the output from
    -L, --list-devices                     List available serial devices
    -l, --log                              Enable log to file
        --log-file <filename>              Set log filename
+       --log-append                       Append to log file
        --log-strip                        Strip control characters and escape sequences
    -m, --map <flags>                      Map characters
    -c, --color 0..255|bold|none|list      Colorize tio text (default: bold)

@@ -305,6 +305,8 @@ CONFIGURATION FILE
 
        log-file                 Set log filename
 
+       log-append               Append to log file
+
        log-strip                Enable strip of control and escape sequences from log
 
        local-echo               Enable local echo
