@@ -46,6 +46,7 @@ enum opt_t
     OPT_TIMESTAMP_FORMAT,
     OPT_LOG_FILE,
     OPT_LOG_STRIP,
+    OPT_LOG_APPEND,
     OPT_LINE_PULSE_DURATION,
     OPT_RESPONSE_TIMEOUT,
     OPT_RS485,
@@ -254,6 +255,7 @@ void options_parse(int argc, char *argv[])
             {"log",                  no_argument,       0, 'l'                     },
             {"log-file",             required_argument, 0, OPT_LOG_FILE            },
             {"log-strip",            no_argument,       0, OPT_LOG_STRIP           },
+            {"log-append",           no_argument,       0, OPT_LOG_APPEND          },
             {"socket",               required_argument, 0, 'S'                     },
             {"map",                  required_argument, 0, 'm'                     },
             {"color",                required_argument, 0, 'c'                     },
@@ -355,6 +357,10 @@ void options_parse(int argc, char *argv[])
 
             case OPT_LOG_STRIP:
                 option.log_strip = true;
+                break;
+
+            case OPT_LOG_APPEND:
+                option.log_append = true;
                 break;
 
             case 'S':
