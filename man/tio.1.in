@@ -390,6 +390,8 @@ Disable automatic connect
 Enable log to file
 .IP "\fBlog-file"
 Set log filename
+.IP "\fBlog-append"
+Append to log file
 .IP "\fBlog-strip"
 Enable strip of control and escape sequences from log
 .IP "\fBlocal-echo"
