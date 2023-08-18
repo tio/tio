@@ -1,4 +1,9 @@
- * Support for interaction using simple autoresponse strings
+* Line mode feature
+
+  Only send line when pressing enter. Maybe even add readline support so one
+  can use all the readline editing feature before sending the line.
+
+* Support for interaction using simple autoresponse strings
 
    Add support for simple autoresponse strings in the configuration file. For
    example:
