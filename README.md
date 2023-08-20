@@ -6,7 +6,7 @@
 [![](https://img.shields.io/circleci/build/github/tio/tio)](https://circleci.com/github/tio/tio/tree/master)
 [![](https://img.shields.io/github/v/release/tio/tio?sort=semver)](https://github.com/tio/tio/releases)
 [![](https://img.shields.io/repology/repositories/tio)](https://repology.org/project/tio/versions)
-[![](https://img.shields.io/tokei/lines/github/tio/tio)](https://github.com/tio/tio)
+<!-- [![](https://img.shields.io/tokei/lines/github/tio/tio)](https://github.com/tio/tio) -->
 
 ## 1. Introduction
 
