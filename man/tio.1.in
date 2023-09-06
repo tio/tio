@@ -309,6 +309,8 @@ Toggle hexadecimal mode
 Clear screen
 .IP "\fBctrl-t L"
 Show line states (DTR, RTS, CTS, DSR, DCD, RI)
+.IP "\fBctrl-t m"
+Toggle MSB to LSB bit order
 .IP "\fBctrl-t p"
 Pulse serial port line
 .IP "\fBctrl-t q"
