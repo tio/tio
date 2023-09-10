@@ -492,6 +492,19 @@ void options_parse_final(int argc, char *argv[])
     optind = 1; // Reset option index to restart scanning of argv
     options_parse(argc, argv);
 
+#ifdef __CYGWIN__
+    unsigned char portnum;
+    char *tty_win;
+    if ( ((strncmp("COM", tty_device, 3) == 0)
+        || (strncmp("com", tty_device, 3) == 0) )
+        && (sscanf(tty_device + 3, "%hhu", &portnum) == 1)
+        && (portnum > 0) ) 
+    {
+        asprintf(&tty_win, "/dev/ttyS%hhu", portnum - 1);
+        tty_device = tty_win;
+    }
+#endif
+
     /* Restore tty device */
     option.tty_device = tty_device;
 }
