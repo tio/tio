@@ -299,6 +299,11 @@ void *tty_stdin_input_thread(void *arg)
         byte_count = read(STDIN_FILENO, input_buffer, BUFSIZ);
         if (byte_count < 0)
         {
+            /* No error actually occurred */
+            if (errno == EINTR)
+            {
+                continue;
+            }
             tio_warning_printf("Could not read from stdin (%s)", strerror(errno));
         }
         else if (byte_count == 0)
