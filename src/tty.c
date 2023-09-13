@@ -349,7 +349,7 @@ void *tty_stdin_input_thread(void *arg)
         }
 
         // Write all bytes read to pipe
-        while (byte_count)
+        while (byte_count > 0)
         {
             bytes_written = write(pipefd[1], input_buffer, byte_count);
             if (bytes_written < 0)
