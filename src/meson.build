@@ -18,6 +18,7 @@ tio_sources = [
   'rs485.c',
   'timestamp.c',
   'alert.c'
+  'xymodem.c'
 ]
 
 tio_dep = [
