@@ -303,6 +303,11 @@ void *tty_stdin_input_thread(void *arg)
         byte_count = read(STDIN_FILENO, input_buffer, BUFSIZ);
         if (byte_count < 0)
         {
+            /* No error actually occurred */
+            if (errno == EINTR)
+            {
+                continue;
+            }
             tio_warning_printf("Could not read from stdin (%s)", strerror(errno));
         }
         else if (byte_count == 0)
@@ -356,7 +361,7 @@ void *tty_stdin_input_thread(void *arg)
         }
 
         // Write all bytes read to pipe
-        while (byte_count)
+        while (byte_count > 0)
         {
             bytes_written = write(pipefd[1], input_buffer, byte_count);
             if (bytes_written < 0)
@@ -759,7 +764,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
             case KEY_X:
             case KEY_Y:
                 tio_printf("Send file with %cMODEM", toupper(input_char));
-                fprintf(stdout, "Enter file name: ");
+                tio_printf_raw("Enter file name: ");
                 if (tio_readln()) {
                     tio_printf("Sending file '%s'", line);
                     tio_printf("Press any key to abort transfer");

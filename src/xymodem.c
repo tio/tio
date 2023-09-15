@@ -2,6 +2,8 @@
  * Minimalistic implementation of the xmodem-1k and ymodem sender protocol.
  * https://en.wikipedia.org/wiki/XMODEM
  * https://en.wikipedia.org/wiki/YMODEM
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later OR MIT-0
  * 
  */
 
@@ -18,21 +20,24 @@
 #include <termios.h>
 #include "misc.h"
 
-#define X_STX 0x02
-#define X_ACK 0x06
-#define X_NAK 0x15
-#define X_CAN 0x18
-
+#define STX 0x02
+#define ACK 0x06
+#define NAK 0x15
+#define CAN 0x18
 #define EOT "\004"
+
+#define OK  0
+#define ERR (-1)
 
 #define min(a, b)       ((a) < (b) ? (a) : (b))
 
 struct xpacket {
-    uint8_t  start;
+    uint8_t  type;
     uint8_t  seq;
     uint8_t  nseq;
     uint8_t  data[1024];
-    uint16_t crc;
+    uint8_t  crc_hi;
+    uint8_t  crc_lo;
 } __attribute__((packed));
 
 /* See https://en.wikipedia.org/wiki/Computation_of_cyclic_redundancy_checks */
@@ -48,17 +53,12 @@ static uint16_t crc16(const uint8_t *data, uint16_t size)
     return crc;
 }
 
-static uint16_t swap16(uint16_t in)
-{
-    return (in >> 8) | ((in & 0xff) << 8);
-}
-
 static int xmodem(int sio, const void *data, size_t len, int seq)
 {
     struct xpacket  packet;
     const uint8_t  *buf = data;
     char            resp = 0;
-    int             rc;
+    int             rc, crc;
     
     /* Drain pending characters from serial line. Insist on the
      * last drained character being 'C'.
@@ -68,19 +68,19 @@ static int xmodem(int sio, const void *data, size_t len, int seq)
             return -1;
         if (read(sio, &resp, 1) < 0) {
             if (errno == EWOULDBLOCK) {
-                if (resp == 'C')   break;
-                if (resp == X_CAN) return -1;
+                if (resp == 'C') break;
+                if (resp == CAN) return ERR;
                 usleep(50000);
                 continue;
             }
             perror("Read sync from serial failed");
-            return -1;
+            return ERR;
         }
     }
 
     /* Always work with 1K packets */
-    packet.seq   = seq;
-    packet.start = X_STX; 
+    packet.seq  = seq;
+    packet.type = STX; 
 
     while (len) {
         size_t  sz, z = 0;
@@ -90,7 +90,9 @@ static int xmodem(int sio, const void *data, size_t len, int seq)
         z = min(len, sizeof(packet.data));
         memcpy(packet.data, buf, z);
         memset(packet.data + z, 0, sizeof(packet.data) - z);
-        packet.crc  = swap16(crc16(packet.data, sizeof(packet.data)));
+        crc = crc16(packet.data, sizeof(packet.data));
+        packet.crc_hi = crc >> 8;
+        packet.crc_lo = crc;
         packet.nseq = 0xff - packet.seq;
 
         /* Send packet */
@@ -98,47 +100,49 @@ static int xmodem(int sio, const void *data, size_t len, int seq)
         sz =  sizeof(packet);
         while (sz) {
             if (key_hit)
-                return -1;
+                return ERR;
             if ((rc = write(sio, from, sz)) < 0 ) {
                 if (errno ==  EWOULDBLOCK) {
                     usleep(1000);
                     continue;
                 }
                 perror("Write packet to serial failed");
-                return -1;
+                return ERR;
             }
             from += rc;
             sz   -= rc;
         }
         
+        /* 'lrzsz' does not ACK ymodem's fin packet */
+        if (seq == 0 && packet.data[0] == 0) resp = ACK;
+
         /* Read receiver response, timeout 1 s */
-        resp = X_ACK;
         for(int n=0; n < 20; n++) {
             if (key_hit)
-                return -1;
+                return ERR;
             if (read(sio, &resp, 1) < 0) {
                 if (errno ==  EWOULDBLOCK) {
                     usleep(50000);
                     continue;
                 }
                 perror("Read ack/nak from serial failed");
-                return -1;
+                return ERR;
             }
             break;
         }
         
         /* Update "progress bar" */
         switch (resp) {
-        case X_NAK: status = 'N'; break;
-        case X_ACK: status = '.'; break;
-        case 'C':   status = 'C'; break;
-        case X_CAN: status = '!'; return -1;
-        default:    status = '?';
+        case NAK: status = 'N'; break;
+        case ACK: status = '.'; break;
+        case 'C': status = 'C'; break;
+        case CAN: status = '!'; return ERR;
+        default:  status = '?';
         }
         write(STDOUT_FILENO, &status, 1);
 
         /* Move to next block after ACK */
-        if (resp == X_ACK) {
+        if (resp == ACK) {
             packet.seq++;
             len -= z;
             buf += z;
@@ -148,21 +152,21 @@ static int xmodem(int sio, const void *data, size_t len, int seq)
     /* Send EOT at 1 Hz until ACK or CAN received */
     while (seq) {
         if (key_hit)
-            return -1;
+            return ERR;
         if (write(sio, EOT, 1) < 0) {
             perror("Write EOT to serial failed");
-            return -1;
+            return ERR;
         }
         write(STDOUT_FILENO, "|", 1);
         usleep(1000000); /* 1 s timeout*/
         if (read(sio, &resp, 1) < 0) {
             if (errno == EWOULDBLOCK) continue;
             perror("Read from serial failed");
-            return -1;
+            return ERR;
         }
-        if (resp == X_ACK || resp == X_CAN) {
+        if (resp == ACK || resp == CAN) {
             write(STDOUT_FILENO, "\r\n", 2);
-            return (resp == X_ACK) ? 0 : -1;
+            return (resp == ACK) ? OK : ERR;
         }
     }
     return 0; /* not reached */
@@ -179,7 +183,7 @@ int xymodem_send(int sio, const char *filename, char mode)
     fd = open(filename, O_RDONLY);
     if (fd < 0) {
         perror("Could not open file");
-        return -1;
+        return ERR;
     }
     fstat(fd, &stat);
     len = stat.st_size;
@@ -187,7 +191,7 @@ int xymodem_send(int sio, const char *filename, char mode)
     if (!buf) {
         close(fd);
         perror("Could not mmap file");
-        return -1;
+        return ERR;
     }
 
     /* Do transfer */
