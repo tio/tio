@@ -82,6 +82,8 @@
 #define CMSPAR   010000000000
 #endif
 
+#define LINE_SIZE_MAX 1000
+
 #define KEY_0 0x30
 #define KEY_1 0x31
 #define KEY_2 0x32
@@ -157,7 +159,7 @@ static char *tty_buffer_write_ptr = tty_buffer;
 static pthread_t thread;
 static int pipefd[2];
 static pthread_mutex_t mutex_input_ready = PTHREAD_MUTEX_INITIALIZER;
-static char line[BUFSIZ];
+static char line[LINE_SIZE_MAX];
 
 static void optional_local_echo(char c)
 {
@@ -490,7 +492,7 @@ static int tio_readln(void)
     char *p = line;
 
     /* Read line, accept BS and DEL as rubout characters */
-    for (p = line ; p < &line[BUFSIZ-1]; )
+    for (p = line ; p < &line[LINE_SIZE_MAX-1]; )
     {
         if (read(pipefd[0], p, 1) > 0)
         {
