@@ -4,7 +4,7 @@
  * https://en.wikipedia.org/wiki/YMODEM
  *
  * SPDX-License-Identifier: GPL-2.0-or-later OR MIT-0
- * 
+ *
  */
 
 #include <stdio.h>
@@ -59,7 +59,7 @@ static int xmodem(int sio, const void *data, size_t len, int seq)
     const uint8_t  *buf = data;
     char            resp = 0;
     int             rc, crc;
-    
+
     /* Drain pending characters from serial line. Insist on the
      * last drained character being 'C'.
      */
@@ -112,7 +112,7 @@ static int xmodem(int sio, const void *data, size_t len, int seq)
             from += rc;
             sz   -= rc;
         }
-        
+
         /* 'lrzsz' does not ACK ymodem's fin packet */
         if (seq == 0 && packet.data[0] == 0) resp = ACK;
 
@@ -130,7 +130,7 @@ static int xmodem(int sio, const void *data, size_t len, int seq)
             }
             break;
         }
-        
+
         /* Update "progress bar" */
         switch (resp) {
         case NAK: status = 'N'; break;
@@ -178,7 +178,7 @@ int xymodem_send(int sio, const char *filename, char mode)
     int            rc, fd;
     struct stat    stat;
     const uint8_t *buf;
-    
+
     /* Open file, map into memory */
     fd = open(filename, O_RDONLY);
     if (fd < 0) {
@@ -214,7 +214,7 @@ int xymodem_send(int sio, const char *filename, char mode)
         }
     }
     key_hit = 0xff;
-    
+
     /* Flush serial and release resources */
     tcflush(sio, TCIOFLUSH);
     munmap((void *)buf, len);
