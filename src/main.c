@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
     tio_printf("tio v%s", VERSION);
     if (interactive_mode)
     {
-        tio_printf("Press ctrl-%c q to quit", option.prefix_key);
+        tio_printf("Press <ctrl-%c> then <q> to quit", option.prefix_key);
     } else
     {
         tio_printf("Non-interactive mode enabled");
