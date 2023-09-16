@@ -202,11 +202,13 @@ int xymodem_send(int sio, const char *filename, char mode)
     else {
         /* Ymodem: hdr + file + fin */
         while(1) {
-            char hdr[128], *p;
+            char hdr[1024], *p;
+
+            rc = -1;
+            if (strlen(filename) > 977) break; /* hdr block overrun */
             p  = stpcpy(hdr, filename) + 1;
             p += sprintf(p, "%ld %lo %o", len, stat.st_mtime, stat.st_mode);
 
-            rc = -1;
             if (xmodem(sio, hdr, p - hdr, 0) < 0) break; /* hdr with metadata */
             if (xmodem(sio, buf, len,     1) < 0) break; /* xmodem file */
             if (xmodem(sio, "",  1,       0) < 0) break; /* empty hdr = fin */
