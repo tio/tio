@@ -770,7 +770,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 tio_printf("Send file with %cMODEM", toupper(input_char));
                 tio_printf_raw("Enter file name: ");
                 if (tio_readln()) {
-                    tio_printf("Sending file '%s'", line);
+                    tio_printf("Sending file '%s'  ", line);
                     tio_printf("Press any key to abort transfer");
                     tio_printf("%s", xymodem_send(fd, line, input_char) < 0 ? "Aborted" : "Done");
                 }
