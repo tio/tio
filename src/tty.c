@@ -157,6 +157,7 @@ static char *tty_buffer_write_ptr = tty_buffer;
 static pthread_t thread;
 static int pipefd[2];
 static pthread_mutex_t mutex_input_ready = PTHREAD_MUTEX_INITIALIZER;
+static char line[BUFSIZ];
 
 static void optional_local_echo(char c)
 {
@@ -484,18 +485,19 @@ static void toggle_line(const char *line_name, int mask, enum line_mode_t line_m
     }
 }
 
-#define MAX_LINE 100
-static char line[MAX_LINE];
-
 static int tio_readln(void)
 {
     char *p = line;
-    
+
     /* Read line, accept BS and DEL as rubout characters */
-    for (p = line ; p < &line[MAX_LINE-1]; ) {
-        if (read(pipefd[0], p, 1) > 0) {
-            if (*p == 0x08 || *p == 0x7f) {
-                if (p > line ) {
+    for (p = line ; p < &line[BUFSIZ-1]; )
+    {
+        if (read(pipefd[0], p, 1) > 0)
+        {
+            if (*p == 0x08 || *p == 0x7f)
+            {
+                if (p > line )
+                {
                     write(STDOUT_FILENO, "\b \b", 3);
                     p--;
                 }
