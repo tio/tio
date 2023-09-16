@@ -105,6 +105,8 @@
 #define KEY_T 0x74
 #define KEY_U 0x55
 #define KEY_V 0x76
+#define KEY_X 0x78
+#define KEY_Y 0x79
 #define KEY_Z 0x7a
 
 enum line_mode_t
@@ -132,6 +134,8 @@ bool interactive_mode = true;
 bool map_i_nl_cr = false;
 bool map_i_cr_nl = false;
 bool map_ign_cr = false;
+
+char key_hit = 0xff;
 
 static struct termios tio, tio_old, stdout_new, stdout_old, stdin_new, stdin_old;
 static unsigned long rx_total = 0, tx_total = 0;
@@ -321,6 +325,14 @@ void *tty_stdin_input_thread(void *arg)
             // Process quit and flush key command
             for (int i = 0; i<byte_count; i++)
             {
+                // first do key hit check for xmodem abort
+                if (!key_hit) {
+                    key_hit = input_buffer[i];
+                    byte_count--;
+                    memcpy(input_buffer+i, input_buffer+i+1, byte_count-i);
+                    continue;
+                }
+
                 input_char = input_buffer[i];
 
                 if (previous_char == option.prefix_code)
@@ -472,6 +484,32 @@ static void toggle_line(const char *line_name, int mask, enum line_mode_t line_m
     }
 }
 
+#define MAX_LINE 100
+static char line[MAX_LINE];
+
+static int tio_readln(void)
+{
+    char *p = line;
+    
+    /* Read line, accept BS and DEL as rubout characters */
+    for (p = line ; p < &line[MAX_LINE-1]; ) {
+        if (read(pipefd[0], p, 1) > 0) {
+            if (*p == 0x08 || *p == 0x7f) {
+                if (p > line ) {
+                    write(STDOUT_FILENO, "\b \b", 3);
+                    p--;
+                }
+                continue;
+            }
+            write(STDOUT_FILENO, p, 1);
+            if (*p == '\r') break;
+            p++;
+        }
+    }
+    *p = 0;
+    return (p - line);
+}
+
 void handle_command_sequence(char input_char, char *output_char, bool *forward)
 {
     char unused_char;
@@ -562,7 +600,9 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 tio_printf(" ctrl-%c t       Toggle line timestamp mode", option.prefix_key);
                 tio_printf(" ctrl-%c U       Toggle conversion to uppercase on output", option.prefix_key);
                 tio_printf(" ctrl-%c v       Show version", option.prefix_key);
-                tio_printf(" ctrl-%c ctrl-%c  Send ctrl-%c character", option.prefix_key, option.prefix_key, option.prefix_key);
+                tio_printf(" ctrl-%c x       Send file via Xmodem-1K", option.prefix_key);
+                tio_printf(" ctrl-%c y       Send file via Ymodem", option.prefix_key);
+                tio_printf(" ctrl-%c ctrl-%c Send ctrl-%c character", option.prefix_key, option.prefix_key, option.prefix_key);
                 break;
 
             case KEY_SHIFT_L:
@@ -719,6 +759,17 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
 
             case KEY_V:
                 tio_printf("tio v%s", VERSION);
+                break;
+
+            case KEY_X:
+            case KEY_Y:
+                tio_printf("Send file with %cMODEM", toupper(input_char));
+                tio_printf_raw("Enter file name: ");
+                if (tio_readln()) {
+                    tio_printf("Sending file '%s'", line);
+                    tio_printf("Press any key to abort transfer");
+                    tio_printf("%s", xymodem_send(fd, line, input_char) < 0 ? "Aborted" : "Done");
+                }
                 break;
 
             case KEY_Z:

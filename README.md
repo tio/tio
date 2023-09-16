@@ -194,6 +194,8 @@ ctrl-t ? to list the available key commands.
 [20:19:12.041]  ctrl-t t       Toggle line timestamp mode
 [20:19:12.041]  ctrl-t U       Toggle conversion to uppercase
 [20:19:12.041]  ctrl-t v       Show version
+[20:19:12.041]  ctrl-t x       Send file using the XMODEM protocol
+[20:19:12.041]  ctrl-t y       Send file using the YMODEM protocol
 [20:19:12.041]  ctrl-t ctrl-t  Send ctrl-t character
 ```
 
