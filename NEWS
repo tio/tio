@@ -1,5 +1,31 @@
 
-=== tio v2.6 ===
+=== tio v2.7 ===
+
+
+
+Changes since tio v2.6:
+
+Paul Ruizendaal:
+
+ * Add xmodem and ymodem file send support
+
+HiFiPhile:
+
+ * tty_stdin_input_thread(): write to pipe only if byte_count > 0.
+
+ * Ignore EINTR error.
+
+ * CYGWIN: Add support for "COM*" naming.
+
+Wes Koerber:
+
+ * chore: reorder log-strip and log-append
+
+   reorder to maintain consistency with documentation
+
+ * chore: update readme, bash completion, man page
+
+ * fix: support --log-append in cli options
 
 
 
