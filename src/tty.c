@@ -1521,6 +1521,13 @@ int tty_connect(void)
         }
         else if (status == -1)
         {
+#if defined(__CYGWIN__)
+            // Happens when port unpluged
+            if (errno == EACCES)
+            {
+                goto error_read;
+            }
+#endif
             tio_error_printf("select() failed (%s)", strerror(errno));
             exit(EXIT_FAILURE);
         }
