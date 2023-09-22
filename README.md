@@ -35,6 +35,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Sensible defaults (115200 8n1)
  * Support for non-standard baud rates
  * Support for RS-485 mode
+ * X-modem (1K) and Y-modem file upload
  * Support for mark and space parity
  * List available serial devices by ID
  * Show RX/TX statistics
@@ -194,6 +195,8 @@ ctrl-t ? to list the available key commands.
 [20:19:12.041]  ctrl-t t       Toggle line timestamp mode
 [20:19:12.041]  ctrl-t U       Toggle conversion to uppercase
 [20:19:12.041]  ctrl-t v       Show version
+[20:19:12.041]  ctrl-t x       Send file using the XMODEM protocol
+[20:19:12.041]  ctrl-t y       Send file using the YMODEM protocol
 [20:19:12.041]  ctrl-t ctrl-t  Send ctrl-t character
 ```
 

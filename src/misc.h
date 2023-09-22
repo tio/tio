@@ -29,3 +29,6 @@ long string_to_long(char *string);
 int ctrl_key_code(unsigned char key);
 void alert_connect(void);
 void alert_disconnect(void);
+
+extern char key_hit;
+int xymodem_send(int sio, const char *filename, char mode);

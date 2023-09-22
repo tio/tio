@@ -323,6 +323,10 @@ Toggle line timestamp mode
 Toggle conversion to uppercase on output
 .IP "\fBctrl-t v"
 Show version
+.IP "\fBctrl-t x"
+Send a file using the XMODEM protocol (prompts for file name)
+.IP "\fBctrl-t y"
+Send a file using the YMODEM protocol (prompts for file name)
 .IP "\fBctrl-t ctrl-t"
 Send ctrl-t character
 

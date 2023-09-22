@@ -1,4 +1,4 @@
-tio(1)                                                                                                                                         User Commands                                                                                                                                         tio(1)
+tio(1)                                                                                                                                   User Commands                                                                                                                                   tio(1)
 
 NAME
        tio - a simple serial device I/O tool
@@ -241,6 +241,8 @@ KEYS
 
        ctrl-t L        Show line states (DTR, RTS, CTS, DSR, DCD, RI)
 
+       ctrl-t m        Toggle MSB to LSB bit order
+
        ctrl-t p        Pulse serial port line
 
        ctrl-t q        Quit
@@ -252,6 +254,10 @@ KEYS
        ctrl-t U        Toggle conversion to uppercase on output
 
        ctrl-t v        Show version
+
+       ctrl-t x        Send a file using the XMODEM protocol (prompts for file name)
+
+       ctrl-t y        Send a file using the YMODEM protocol (prompts for file name)
 
        ctrl-t ctrl-t   Send ctrl-t character
 
@@ -279,7 +285,8 @@ CONFIGURATION FILE
 
        The following configuration file options are available:
 
-       pattern                  Pattern matching user input. This pattern can be an extended regular expression with a single group.
+       pattern
+                                Pattern matching user input. This pattern can be an extended regular expression with a single group.
 
        device                   TTY device to open. If it contains a "%s" it is substituted with the first group match.
 
@@ -450,4 +457,4 @@ WEBSITE
 AUTHOR
        Created by Martin Lund <martin.lund@keep-it-simple.com>.
 
-tio 2.6                                                                                                                                          2022-12-17                                                                                                                                          tio(1)
+tio 2.7                                                                                                                                    2023-09-19                                                                                                                                    tio(1)
