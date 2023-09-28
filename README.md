@@ -34,9 +34,9 @@ when used in combination with [tmux](https://tmux.github.io).
  * Automatic connect and reconnect
  * Sensible defaults (115200 8n1)
  * Support for non-standard baud rates
- * Support for RS-485 mode
- * X-modem (1K) and Y-modem file upload
  * Support for mark and space parity
+ * X-modem (1K) and Y-modem file upload
+ * Support for RS-485 mode
  * List available serial devices by ID
  * Show RX/TX statistics
  * Toggle serial lines
