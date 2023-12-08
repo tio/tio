@@ -532,13 +532,13 @@ Or use the expect command to script an interaction:
 .nf
 .eo
 #!/usr/bin/expect -f
-
+.sp
 set timeout -1
 log_user 0
-
+.sp
 spawn nc -UN /tmp/tio-socket0
 set uart $spawn_id
-
+.sp
 send -i $uart "date\n"
 expect -i $uart "prompt> "
 send -i $uart "ls -la\n"
