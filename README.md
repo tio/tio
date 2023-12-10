@@ -59,7 +59,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Visual or audible alert on connect/disconnect
  * Remapping of prefix key
  * Man page documentation
- * Binary size less than 80kB
+ * Binary size less than 90kB
  * Plays nicely with [tmux](https://tmux.github.io)
 
 ## 3. Usage
