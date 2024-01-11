@@ -1582,9 +1582,15 @@ int tty_connect(void)
             {
                 goto error_read;
             }
-#endif
+#elif defined(__APPLE__)
+            if (errno == EBADF)
+            {
+                goto error_read;
+            }
+#else
             tio_error_printf("select() failed (%s)", strerror(errno));
             exit(EXIT_FAILURE);
+#endif
         }
         else
         {
