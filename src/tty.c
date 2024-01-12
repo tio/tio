@@ -1585,7 +1585,7 @@ int tty_connect(void)
 #elif defined(__APPLE__)
             if (errno == EBADF)
             {
-                goto error_read;
+                break; // tty_disconnect() will be naturally triggered by atexit()
             }
 #else
             tio_error_printf("select() failed (%s)", strerror(errno));
