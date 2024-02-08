@@ -100,7 +100,7 @@ _tio()
             return 0
             ;;
         -m | --map)
-            COMPREPLY=( $(compgen -W "ICRNL IGNCR INLCR INLCRNL OCRNL ODELBS ONLCRNL MSB2LSB" -- ${cur}) )
+            COMPREPLY=( $(compgen -W "ICRNL IGNCR INLCR IFFESCC INLCRNL OCRNL ODELBS ONLCRNL MSB2LSB" -- ${cur}) )
             return 0
             ;;
         -t | --timestamp)
