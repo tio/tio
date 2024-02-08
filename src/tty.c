@@ -145,6 +145,7 @@ static bool connected = false;
 static bool standard_baudrate = true;
 static void (*print)(char c);
 static int fd;
+static bool map_i_ff_escc = false;
 static bool map_i_nl_crnl = false;
 static bool map_o_cr_nl = false;
 static bool map_o_nl_crnl = false;
@@ -1070,6 +1071,10 @@ void tty_configure(void)
             {
                 map_o_del_bs = true;
             }
+            else if (strcmp(token,"IFFESCC") == 0)
+            {
+                map_i_ff_escc = true;
+            }
             else if (strcmp(token,"INLCRNL") == 0)
             {
                 map_i_nl_crnl = true;
@@ -1462,6 +1467,11 @@ int tty_connect(void)
                         {
                             next_timestamp = true;
                         }
+                    }
+                    else if ((input_char == '\f') && (map_i_ff_escc) && (!map_o_msblsb))
+                    {
+                        print('\e');
+                        print('c');
                     }
                     else
                     {

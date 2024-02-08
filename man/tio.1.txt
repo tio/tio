@@ -124,6 +124,8 @@ OPTIONS
 
               IGNCR       Ignore CR on input
 
+              IFFESCC     Map FF to ESC-c on input
+
               INLCR       Map NL to CR on input
 
               INLCRNL     Map NL to CR-NL on input

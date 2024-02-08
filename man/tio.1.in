@@ -163,6 +163,8 @@ flags are supported:
 Map CR to NL on input (unless IGNCR is set)
 .IP "\fBIGNCR"
 Ignore CR on input
+.IP "\fBIFFESCC"
+Map FF to ESC-c on input
 .IP "\fBINLCR"
 Map NL to CR on input
 .IP "\fBINLCRNL"
