@@ -80,4 +80,8 @@ if host_machine.system() == 'linux'
 endif
 
 subdir('src')
-subdir('man')
+
+install_man_pages = get_option('install_man_pages')
+if install_man_pages
+  subdir('man')
+endif

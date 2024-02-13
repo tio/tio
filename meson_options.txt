@@ -1,3 +1,6 @@
 option('bashcompletiondir',
        type : 'string',
        description : 'Directory for bash completion scripts ["no" disables]')
+option('install_man_pages',
+       type : 'boolean', value: true,
+       description : 'Install man pages')
