@@ -259,7 +259,11 @@ static int data_handler(void *user, const char *section, const char *name,
         }
         else if (!strcmp(name, "prefix-ctrl-key"))
         {
-            if (ctrl_key_code(value[0]) > 0)
+            if (!strcmp(value, "none"))
+            {
+                option.prefix_enabled = false;
+            }
+            else if (ctrl_key_code(value[0]) > 0)
             {
                 option.prefix_code = ctrl_key_code(value[0]);
                 option.prefix_key = value[0];

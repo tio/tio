@@ -86,6 +86,7 @@ struct option_t option =
     .hex_mode = false,
     .prefix_code = 20, // ctrl-t
     .prefix_key = 't',
+    .prefix_enabled = true,
     .response_wait = false,
     .response_timeout = 100,
     .mute = false,

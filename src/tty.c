@@ -339,7 +339,7 @@ void *tty_stdin_input_thread(void *arg)
 
                 input_char = input_buffer[i];
 
-                if (previous_char == option.prefix_code)
+                if (option.prefix_enabled && previous_char == option.prefix_code)
                 {
                     if (input_char == option.prefix_code)
                     {
@@ -569,7 +569,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
     }
 
     /* Handle escape key commands */
-    if (previous_char == option.prefix_code)
+    if (option.prefix_enabled && previous_char == option.prefix_code)
     {
         /* Do not forward input char to output by default */
         *forward = false;
@@ -1545,7 +1545,7 @@ int tty_connect(void)
                     if (interactive_mode)
                     {
                         /* Do not forward prefix key */
-                        if (input_char == option.prefix_code)
+                        if (option.prefix_enabled && input_char == option.prefix_code)
                         {
                             forward = false;
                         }

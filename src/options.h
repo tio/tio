@@ -59,6 +59,7 @@ struct option_t
     bool hex_mode;
     unsigned char prefix_code;
     unsigned char prefix_key;
+    bool prefix_enabled;
     bool response_wait;
     int response_timeout;
     bool mute;

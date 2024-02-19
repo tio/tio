@@ -417,7 +417,7 @@ Enable hexadecimal mode
 .IP "\fBsocket"
 Set socket to redirect I/O to
 .IP "\fBprefix-ctrl-key"
-Set prefix ctrl key (a..z, default: t)
+Set prefix ctrl key (a..z or 'none', default: t)
 .IP "\fBresponse-wait"
 Enable wait for line response
 .IP "\fBresponse-timeout"
