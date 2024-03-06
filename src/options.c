@@ -236,6 +236,11 @@ void options_parse(int argc, char *argv[])
         exit(EXIT_SUCCESS);
     }
 
+    // Support no-color.org informal spec
+    char *no_color = getenv("NO_COLOR");
+    if(no_color != NULL && no_color[0] != '\0')
+	    option.color = -1;
+
     while (1)
     {
         static struct option long_options[] =
