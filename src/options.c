@@ -163,7 +163,11 @@ void line_pulse_duration_option_parse(const char *arg)
         {
             char keyname[11];
             unsigned int value;
-            sscanf(token, "%10[^=]=%d", keyname, &value);
+
+            if (sscanf(token, "%10[^=]=%d", keyname, &value) != 2)
+            {
+                token_found = false;
+            }
 
             if (!strcmp(keyname, "DTR"))
             {
