@@ -57,7 +57,11 @@ void rs485_parse_config(const char *arg)
         {
             char keyname[31];
             unsigned int value;
-            sscanf(token, "%30[^=]=%d", keyname, &value);
+
+            if (sscanf(token, "%30[^=]=%d", keyname, &value) != 2)
+            {
+                token_found = false;
+            }
 
             if (!strcmp(keyname, "RTS_ON_SEND"))
             {
