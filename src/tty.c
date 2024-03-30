@@ -440,12 +440,12 @@ static void toggle_line(const char *line_name, int mask, enum line_mode_t line_m
             if (state & mask)
             {
                 state &= ~mask;
-                tio_printf("Setting %s to LOW", line_name);
+                tio_printf("Setting %s to HIGH", line_name);
             }
             else
             {
                 state |= mask;
-                tio_printf("Setting %s to HIGH", line_name);
+                tio_printf("Setting %s to LOW", line_name);
             }
             if (ioctl(fd, TIOCMSET, &state) < 0)
                 tio_warning_printf("Could not set line state (%s)", strerror(errno));
@@ -617,12 +617,12 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                     break;
                 }
                 tio_printf("Line states:");
-                tio_printf(" DTR: %s", (state & TIOCM_DTR) ? "HIGH" : "LOW");
-                tio_printf(" RTS: %s", (state & TIOCM_RTS) ? "HIGH" : "LOW");
-                tio_printf(" CTS: %s", (state & TIOCM_CTS) ? "HIGH" : "LOW");
-                tio_printf(" DSR: %s", (state & TIOCM_DSR) ? "HIGH" : "LOW");
-                tio_printf(" DCD: %s", (state & TIOCM_CD) ? "HIGH" : "LOW");
-                tio_printf(" RI : %s", (state & TIOCM_RI) ? "HIGH" : "LOW");
+                tio_printf(" DTR: %s", (state & TIOCM_DTR) ? "LOW" : "HIGH");
+                tio_printf(" RTS: %s", (state & TIOCM_RTS) ? "LOW" : "HIGH");
+                tio_printf(" CTS: %s", (state & TIOCM_CTS) ? "LOW" : "HIGH");
+                tio_printf(" DSR: %s", (state & TIOCM_DSR) ? "LOW" : "HIGH");
+                tio_printf(" DCD: %s", (state & TIOCM_CD) ? "LOW" : "HIGH");
+                tio_printf(" RI : %s", (state & TIOCM_RI) ? "LOW" : "HIGH");
                 break;
 
             case KEY_F:
