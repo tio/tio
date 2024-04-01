@@ -29,6 +29,7 @@ color = bold
 rs-485 = disable
 response-wait = disable
 alert = none
+script-run = always
 
 # Sub-configurations
 
@@ -63,3 +64,10 @@ device = /dev/ttyUSB0
 rs-485 = enable
 rs-485-config = RTS_ON_SEND=1,RTS_AFTER_SEND=1,RTS_DELAY_BEFORE_SEND=60,RTS_DELAY_AFTER_SEND=80,RX_DURING_TX
 color = 13
+
+[esp32]
+device = /dev/ttyUSB0
+color = 14
+script = high(DTR); low(RTS); msleep(100); low(DTR); high(RTS); msleep(100); low(RTS)
+script-run = always
+

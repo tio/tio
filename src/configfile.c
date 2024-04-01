@@ -60,6 +60,9 @@ struct config_t
     char *log_filename;
     char *socket;
     char *map;
+    char *script;
+    char *script_filename;
+    bool script_run;
 };
 
 static struct config_t c;
@@ -296,6 +299,20 @@ static int data_handler(void *user, const char *section, const char *name,
         else if (!strcmp(name, "pattern"))
         {
             // Do nothing
+        }
+        else if (!strcmp(name, "script"))
+        {
+            asprintf(&c.script, "%s", value);
+            option.script = c.script;
+        }
+        else if (!strcmp(name, "script-file"))
+        {
+            asprintf(&c.script_filename, "%s", value);
+            option.script_filename = c.script_filename;
+        }
+        else if (!strcmp(name, "script-run"))
+        {
+            option.script_run = script_run_option_parse(value);
         }
         else
         {

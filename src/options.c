@@ -39,6 +39,7 @@
 #include "timestamp.h"
 #include "alert.h"
 #include "log.h"
+#include "script.h"
 
 enum opt_t
 {
@@ -54,6 +55,9 @@ enum opt_t
     OPT_ALERT,
     OPT_COMPLETE_SUB_CONFIGS,
     OPT_MUTE,
+    OPT_SCRIPT,
+    OPT_SCRIPT_FILE,
+    OPT_SCRIPT_RUN,
 };
 
 /* Default options */
@@ -96,6 +100,9 @@ struct option_t option =
     .rs485_delay_rts_after_send = -1,
     .alert = ALERT_NONE,
     .complete_sub_configs = false,
+    .script = NULL,
+    .script_filename = NULL,
+    .script_run = SCRIPT_RUN_ALWAYS,
 };
 
 void print_help(char *argv[])
@@ -134,6 +141,9 @@ void print_help(char *argv[])
     printf("      --rs-485-config <config>           Set RS-485 configuration\n");
     printf("      --alert bell|blink|none            Alert on connect/disconnect (default: none)\n");
     printf("      --mute                             Mute tio\n");
+    printf("      --script <string>                  Run script from string\n");
+    printf("      --script-file <filename>           Run script from file\n");
+    printf("      --script-run once|always|never     Run script on connect (default: always)\n");
     printf("  -v, --version                          Display version\n");
     printf("  -h, --help                             Display help\n");
     printf("\n");
@@ -200,6 +210,27 @@ void line_pulse_duration_option_parse(const char *arg)
         }
     }
     free(buffer);
+}
+
+enum script_run_t script_run_option_parse(const char *arg)
+{
+    if (strcmp("once", arg) == 0)
+    {
+        return SCRIPT_RUN_ONCE;
+    }
+    else if (strcmp("always", arg) == 0)
+    {
+        return SCRIPT_RUN_ALWAYS;
+    }
+    else if (strcmp("never", arg) == 0)
+    {
+        return SCRIPT_RUN_NEVER;
+    }
+    else
+    {
+        tio_error_printf("Invalid script run option");
+        exit(EXIT_FAILURE);
+    }
 }
 
 void options_print()
@@ -276,6 +307,9 @@ void options_parse(int argc, char *argv[])
             {"rs-485-config",        required_argument, 0, OPT_RS485_CONFIG        },
             {"alert",                required_argument, 0, OPT_ALERT               },
             {"mute",                 no_argument,       0, OPT_MUTE                },
+            {"script",               required_argument, 0, OPT_SCRIPT              },
+            {"script-file",          required_argument, 0, OPT_SCRIPT_FILE         },
+            {"script-run",           required_argument, 0, OPT_SCRIPT_RUN          },
             {"version",              no_argument,       0, 'v'                     },
             {"help",                 no_argument,       0, 'h'                     },
             {"complete-sub-configs", no_argument,       0, OPT_COMPLETE_SUB_CONFIGS},
@@ -437,6 +471,18 @@ void options_parse(int argc, char *argv[])
 
             case OPT_MUTE:
                 option.mute = true;
+                break;
+
+            case OPT_SCRIPT:
+                option.script = optarg;
+                break;
+
+            case OPT_SCRIPT_FILE:
+                option.script_filename = optarg;
+                break;
+
+            case OPT_SCRIPT_RUN:
+                option.script_run = script_run_option_parse(optarg);
                 break;
 
             case 'v':

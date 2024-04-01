@@ -1,0 +1,7 @@
+high(DTR)
+low(RTS)
+msleep(100)
+low(DTR)
+high(RTS)
+msleep(100)
+low(RTS)

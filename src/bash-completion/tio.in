@@ -37,6 +37,9 @@ _tio()
              --rs-485-config \
              --alert \
              --mute \
+             --script \
+             --script-file \
+             --script-run \
           -v --version \
           -h --help"
 
@@ -149,6 +152,18 @@ _tio()
             ;;
         --mute)
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        --script)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        --script-file)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        --script-run)
+            COMPREPLY=( $(compgen -W "once always never"  -- ${cur}) )
             return 0
             ;;
         -v | --version)

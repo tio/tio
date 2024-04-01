@@ -103,7 +103,7 @@ Enable local echo.
 Enable line timestamp.
 
 .TP
-.BR "    \-\-timestamp-format \fI<format>
+.BR "    \-\-timestamp\-format \fI<format>
 
 Set timestamp format to any of the following timestamp formats:
 .RS
@@ -137,12 +137,12 @@ tio_DEVICE_YYYY-MM-DDTHH:MM:SS.log.
 The filename can be manually set using the \-\-log-file option.
 
 .TP
-.BR "    \-\-log-file \fI<filename>
+.BR "    \-\-log\-file \fI<filename>
 
 Set log filename.
 
 .TP
-.BR "    \-\-log-append
+.BR "    \-\-log\-append
 
 Append to log file.
 
@@ -228,7 +228,7 @@ At present there is a hardcoded limit of 16 clients connected at one time.
 .RE
 
 .TP
-.BR \-r ", " \-\-response-wait
+.BR \-r ", " \-\-response\-wait
 
 Wait for line response then quit. A line is considered any string terminated
 with a NL character. If no line is received tio will quit after response
@@ -280,6 +280,23 @@ will sound the bell twice or blink twice on disconnect.
 Default value is "none".
 
 .TP
+.BR "\-\-script \fI<string>
+
+Run script from string.
+
+.TP
+.BR "\-\-script\-file \fI<filename>
+
+Run script from file with filename.
+
+.TP
+.BR "\-\-script\-run once|always|never"
+
+Run script on connect once, always, or never.
+
+Default value is "always".
+
+.TP
 .BR \-v ", " \-\-version
 
 Display program version.
@@ -317,6 +334,8 @@ Toggle MSB to LSB bit order
 Pulse serial port line
 .IP "\fBctrl-t q"
 Quit
+.IP "\fBctrl-t r"
+Run script
 .IP "\fBctrl-t s"
 Show TX/RX statistics
 .IP "\fBctrl-t t"
@@ -340,6 +359,26 @@ In hexadecimal mode each incoming byte is printed out as a hexadecimal value.
 Bytes can be sent in this mode by typing the \fBtwo-character hexadecimal\fR
 representation of the value, e.g.: to send \fI0xA\fR you must type \fI0a\fR or
 \fI0A\fR.
+
+.SH "SCRIPT API"
+.PP
+Tio suppots Lua scripting for manipulating the tty device. In addition to the
+Lua API tio makes the following functions available:
+
+.TP 6n
+.IP "\fBhigh(line)"
+Set tty line high.
+.IP "\fBlow(line)"
+Set tty line low.
+.IP "\fBtoggle(line)"
+Toggle the tty line.
+.IP "\fBsleep(seconds)"
+Sleep for seconds.
+.IP "\fBmsleep(ms)"
+Sleep for miliseconds.
+
+.TP 0n
+Note: Line can be any of DTR, RTS, CTS, DSR, CD, RI
 
 .SH "CONFIGURATION FILE"
 .PP
@@ -428,6 +467,12 @@ Enable RS-485 mode
 Set RS-485 configuration
 .IP "\fBalert"
 Set alert action on connect/disconnect
+.IP "\fBscript"
+Run script from string
+.IP "\fBscript-file"
+Run script from file
+.IP "\fBscript-run"
+Run script on connect.
 
 .SH "CONFIGURATION FILE EXAMPLES"
 
@@ -581,6 +626,12 @@ $ cat data.bin | tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-po
 Enable RS-485 mode:
 
 $ tio --rs-485 --rs-485-config=RTS_ON_SEND=1,RX_DURING_TX /dev/ttyUSB0
+
+.TP
+Script manipulation of DTR and RTS lines upon first connect:
+
+$ tio --script "high(DTR); low(RTS); msleep(100); toggle(DTR)" --script-run once /dev/ttyUSB0
+
 
 .SH "WEBSITE"
 .PP

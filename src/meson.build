@@ -18,14 +18,27 @@ tio_sources = [
   'rs485.c',
   'timestamp.c',
   'alert.c',
-  'xymodem.c'
+  'xymodem.c',
+  'script.c'
 ]
+
+
+foreach name: ['lua-5.4', 'lua-5.3', 'lua-5.2', 'lua-5.1', 'lua']
+  lua_dep = dependency(name, version: '>=5.1', required: false)
+  if lua_dep.found()
+    break
+  endif
+endforeach
+if not lua_dep.found()
+  error('Lua could not be found!')
+endif
 
 tio_dep = [
   dependency('threads', required: true),
   dependency('inih', required: true,
                      fallback : ['libinih', 'inih_dep'],
-                     default_options: ['default_library=static', 'distro_install=false'])
+                     default_options: ['default_library=static', 'distro_install=false']),
+  lua_dep
 ]
 
 tio_c_args = ['-Wno-unused-result']
