@@ -17,6 +17,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
+#include <sys/poll.h>
 #include <termios.h>
 #include "misc.h"
 
@@ -63,6 +64,27 @@ static uint16_t crc16(const uint8_t *data, uint16_t size)
     return crc;
 }
 
+static int serial_poll(int sio, void *data, size_t len, int timeout)
+{
+    struct pollfd fds[1];
+    fds[0].fd = sio;
+    fds[0].events = POLLIN ;
+    int ret = 0;
+
+    /* Wait data available */
+    ret = poll(fds, 1, timeout);
+    if (ret < 0) {
+        return ret;
+    }
+    else if (ret > 0) {
+        if(fds[0].revents & POLLIN) {
+            return read(sio, data, len);
+        }
+    }
+    /* Timeout */
+    return ret;
+}
+
 static int xmodem_1k(int sio, const void *data, size_t len, int seq)
 {
     struct xpacket_1k  packet;
@@ -76,13 +98,13 @@ static int xmodem_1k(int sio, const void *data, size_t len, int seq)
     while(1) {
         if (key_hit)
             return -1;
-        if (read(sio, &resp, 1) < 0) {
-            if (errno == EWOULDBLOCK) {
-                if (resp == 'C') break;
-                if (resp == CAN) return ERR;
-                usleep(50000);
-                continue;
-            }
+        rc = serial_poll(sio, &resp, 1, 50);
+        if (rc == 0) {
+            if (resp == 'C') break;
+            if (resp == CAN) return ERR;
+            continue;
+        }
+        else if (rc < 0) {
             perror("Read sync from serial failed");
             return ERR;
         }
@@ -133,15 +155,13 @@ static int xmodem_1k(int sio, const void *data, size_t len, int seq)
         for(int n=0; n < 20; n++) {
             if (key_hit)
                 return ERR;
-            if (read(sio, &resp, 1) < 0) {
-                if (errno ==  EWOULDBLOCK) {
-                    usleep(50000);
-                    continue;
-                }
+            rc = serial_poll(sio, &resp, 1, 50);
+            if (rc < 0) {
                 perror("Read ack/nak from serial failed");
                 return ERR;
+            } else if(rc > 0) {
+                break;
             }
-            break;
         }
 
         /* Update "progress bar" */
@@ -171,11 +191,13 @@ static int xmodem_1k(int sio, const void *data, size_t len, int seq)
             return ERR;
         }
         write(STDOUT_FILENO, "|", 1);
-        usleep(1000000); /* 1 s timeout*/
-        if (read(sio, &resp, 1) < 0) {
-            if (errno == EWOULDBLOCK) continue;
+        /* 1s timeout */
+        rc = serial_poll(sio, &resp, 1, 1000);
+        if (rc < 0) {
             perror("Read from serial failed");
             return ERR;
+        } else if(rc == 0) {
+            continue;
         }
         if (resp == ACK || resp == CAN) {
             write(STDOUT_FILENO, "\r\n", 2);
@@ -198,13 +220,13 @@ static int xmodem(int sio, const void *data, size_t len)
     while(1) {
         if (key_hit)
             return -1;
-        if (read(sio, &resp, 1) < 0) {
-            if (errno == EWOULDBLOCK) {
-                if (resp == 'C') break;
-                if (resp == CAN) return ERR;
-                usleep(50000);
-                continue;
-            }
+        rc = serial_poll(sio, &resp, 1, 50);
+        if (rc == 0) {
+            if (resp == 'C') break;
+            if (resp == CAN) return ERR;
+            continue;
+        }
+        else if (rc < 0) {
             perror("Read sync from serial failed");
             return ERR;
         }
@@ -252,15 +274,13 @@ static int xmodem(int sio, const void *data, size_t len)
         for(int n=0; n < 20; n++) {
             if (key_hit)
                 return ERR;
-            if (read(sio, &resp, 1) < 0) {
-                if (errno ==  EWOULDBLOCK) {
-                    usleep(50000);
-                    continue;
-                }
+            rc = serial_poll(sio, &resp, 1, 50);
+            if (rc < 0) {
                 perror("Read ack/nak from serial failed");
                 return ERR;
+            } else if(rc > 0) {
+                break;
             }
-            break;
         }
 
         /* Update "progress bar" */
@@ -290,11 +310,13 @@ static int xmodem(int sio, const void *data, size_t len)
             return ERR;
         }
         write(STDOUT_FILENO, "|", 1);
-        usleep(1000000); /* 1 s timeout*/
-        if (read(sio, &resp, 1) < 0) {
-            if (errno == EWOULDBLOCK) continue;
+        /* 1s timeout */
+        rc = serial_poll(sio, &resp, 1, 1000);
+        if (rc < 0) {
             perror("Read from serial failed");
             return ERR;
+        } else if(rc == 0) {
+            continue;
         }
         if (resp == ACK || resp == CAN) {
             write(STDOUT_FILENO, "\r\n", 2);
