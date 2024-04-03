@@ -110,6 +110,7 @@
 #define KEY_U 0x55
 #define KEY_V 0x76
 #define KEY_X 0x78
+#define KEY_SHIFT_X 0x58
 #define KEY_Y 0x79
 #define KEY_Z 0x7a
 
@@ -629,6 +630,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 tio_printf(" ctrl-%c U       Toggle conversion to uppercase on output", option.prefix_key);
                 tio_printf(" ctrl-%c v       Show version", option.prefix_key);
                 tio_printf(" ctrl-%c x       Send file via Xmodem-1K", option.prefix_key);
+                tio_printf(" ctrl-%c X       Send file via Xmodem-CRC", option.prefix_key);
                 tio_printf(" ctrl-%c y       Send file via Ymodem", option.prefix_key);
                 tio_printf(" ctrl-%c ctrl-%c Send ctrl-%c character", option.prefix_key, option.prefix_key, option.prefix_key);
                 break;
@@ -796,7 +798,8 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
 
             case KEY_X:
             case KEY_Y:
-                tio_printf("Send file with %cMODEM", toupper(input_char));
+            case KEY_SHIFT_X:
+                tio_printf("Send file with %s", input_char == KEY_X ?  "XMODEM-1K" : (input_char == KEY_Y ? "YMODEM" : "XMODEM-CRC"));
                 tio_printf_raw("Enter file name: ");
                 if (tio_readln()) {
                     tio_printf("Sending file '%s'  ", line);
