@@ -33,6 +33,7 @@
 #include "options.h"
 #include "print.h"
 #include "error.h"
+#include "misc.h"
 
 #define IS_ESC_CSI_INTERMEDIATE_CHAR(c) ((c >= 0x20) && (c <= 0x3F))
 #define IS_ESC_END_CHAR(c)              ((c >= 0x30) && (c <= 0x7E))
@@ -58,13 +59,29 @@ static char *date_time(void)
 
 int log_open(const char *filename)
 {
-    static char automatic_filename[400];
+    char *automatic_filename;
+    char *dir_plus_automatic_filename;
 
     if (filename == NULL)
     {
         // Generate filename if none provided ("tio_DEVICE_YYYY-MM-DDTHH:MM:SS.log")
-        sprintf(automatic_filename, "tio_%s_%s.log", basename((char *)option.tty_device), date_time());
-        filename = automatic_filename;
+        asprintf(&automatic_filename, "tio_%s_%s.log", basename((char *)option.tty_device), date_time());
+
+        if (option.log_directory != NULL)
+        {
+            if (fs_dir_exists(option.log_directory) == false)
+            {
+                tio_error_printf("Log directory not found");
+                exit(EXIT_FAILURE);
+            }
+
+            asprintf(&dir_plus_automatic_filename, "%s/%s", option.log_directory, automatic_filename);
+            filename = dir_plus_automatic_filename;
+        }
+        else
+        {
+            filename = automatic_filename;
+        }
     }
 
     log_filename = filename;
@@ -72,12 +89,12 @@ int log_open(const char *filename)
     // Open log file
     if (option.log_append)
     {
-        // Appends to existing log file
+        // Append to existing log file
         fp = fopen(filename, "a+");
     }
     else
     {
-        // Truncates existing log file
+        // Truncate existing log file
         fp = fopen(filename, "w+");
     }
     if (fp == NULL)
@@ -202,7 +219,7 @@ void log_close(void)
 
 void log_exit(void)
 {
-    if (option.log)
+    if ((option.log) && (log_filename != NULL))
     {
         tio_printf("Saved log to file %s", log_filename);
         log_close();

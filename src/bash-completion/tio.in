@@ -22,6 +22,7 @@ _tio()
           -e --local-echo \
           -l --log \
              --log-file \
+             --log-directory \
              --log-append \
              --log-strip \
           -m --map \
@@ -91,6 +92,10 @@ _tio()
             return 0
             ;;
         --log-file)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        --log-directory)
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;

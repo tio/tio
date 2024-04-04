@@ -131,7 +131,7 @@ List available serial devices by ID.
 
 Enable log to file.
 
-The filename will be automatically generated using the following format
+The log file will be automatically named using the following format
 tio_DEVICE_YYYY-MM-DDTHH:MM:SS.log.
 
 The filename can be manually set using the \-\-log-file option.
@@ -140,6 +140,11 @@ The filename can be manually set using the \-\-log-file option.
 .BR "    \-\-log\-file \fI<filename>
 
 Set log filename.
+
+.TP
+.BR "    \-\-log\-directory \fI<path>
+
+Set log directory path in which to save automatically named log files.
 
 .TP
 .BR "    \-\-log\-append
@@ -437,6 +442,8 @@ Disable automatic connect
 Enable log to file
 .IP "\fBlog-file"
 Set log filename
+.IP "\fBlog-directory"
+Set log directory path in which to save automatically named log files.
 .IP "\fBlog-append"
 Append to log file
 .IP "\fBlog-strip"

@@ -46,6 +46,7 @@ enum opt_t
     OPT_NONE,
     OPT_TIMESTAMP_FORMAT,
     OPT_LOG_FILE,
+    OPT_LOG_DIRECTORY,
     OPT_LOG_STRIP,
     OPT_LOG_APPEND,
     OPT_LINE_PULSE_DURATION,
@@ -81,6 +82,7 @@ struct option_t option =
     .log = false,
     .log_append = false,
     .log_filename = NULL,
+    .log_directory = NULL,
     .log_strip = false,
     .local_echo = false,
     .timestamp = TIMESTAMP_NONE,
@@ -129,6 +131,7 @@ void print_help(char *argv[])
     printf("  -L, --list-devices                     List available serial devices by ID\n");
     printf("  -l, --log                              Enable log to file\n");
     printf("      --log-file <filename>              Set log filename\n");
+    printf("      --log-directory <path>             Set log directory path (for automatic named logs)\n");
     printf("      --log-append                       Append to log file\n");
     printf("      --log-strip                        Strip control characters and escape sequences\n");
     printf("  -m, --map <flags>                      Map characters\n");
@@ -295,6 +298,7 @@ void options_parse(int argc, char *argv[])
             {"list-devices",         no_argument,       0, 'L'                     },
             {"log",                  no_argument,       0, 'l'                     },
             {"log-file",             required_argument, 0, OPT_LOG_FILE            },
+            {"log-directory",        required_argument, 0, OPT_LOG_DIRECTORY       },
             {"log-append",           no_argument,       0, OPT_LOG_APPEND          },
             {"log-strip",            no_argument,       0, OPT_LOG_STRIP           },
             {"socket",               required_argument, 0, 'S'                     },
@@ -397,6 +401,10 @@ void options_parse(int argc, char *argv[])
 
             case OPT_LOG_FILE:
                 option.log_filename = optarg;
+                break;
+
+            case OPT_LOG_DIRECTORY:
+                option.log_directory = optarg;
                 break;
 
             case OPT_LOG_STRIP:

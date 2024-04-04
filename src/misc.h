@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <stdbool.h>
+
 #define UNUSED(expr) do { (void)(expr); } while (0)
 
 char * current_time(void);
@@ -29,6 +31,7 @@ long string_to_long(char *string);
 int ctrl_key_code(unsigned char key);
 void alert_connect(void);
 void alert_disconnect(void);
+bool fs_dir_exists(const char *path);
 
 extern char key_hit;
 int xymodem_send(int sio, const char *filename, char mode);

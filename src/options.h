@@ -54,6 +54,7 @@ struct option_t
     bool local_echo;
     enum timestamp_t timestamp;
     const char *log_filename;
+    const char *log_directory;
     const char *map;
     const char *socket;
     int color;
