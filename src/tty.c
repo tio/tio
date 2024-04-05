@@ -153,6 +153,7 @@ static bool map_o_cr_nl = false;
 static bool map_o_nl_crnl = false;
 static bool map_o_del_bs = false;
 static bool map_o_ltu = false;
+static bool map_o_nulbrk = false;
 static bool map_o_msblsb = false;
 static char hex_chars[2];
 static unsigned char hex_char_index = 0;
@@ -1115,6 +1116,10 @@ void tty_configure(void)
             {
                 map_o_ltu = true;
             }
+            else if (strcmp(token, "ONULBRK") == 0)
+            {
+                map_o_nulbrk = true;
+            }
             else if (strcmp(token, "MSB2LSB") == 0)
             {
                 map_o_msblsb = true;
@@ -1289,7 +1294,14 @@ void forward_to_tty(int fd, char output_char)
         {
             /* Send output to tty device */
             optional_local_echo(output_char);
-            status = tty_write(fd, &output_char, 1);
+            if ((output_char == 0) && (map_o_nulbrk))
+            {
+                status = tcsendbreak(fd, 0);
+            }
+            else
+            {
+                status = tty_write(fd, &output_char, 1);
+            }
             if (status < 0)
             {
                 tio_warning_printf("Could not write to tty device");

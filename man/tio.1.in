@@ -182,6 +182,8 @@ Map DEL to BS on output
 Map NL to CR-NL on output
 .IP "\fBOLTU"
 Map lowercase characters to uppercase on output
+.IP "\fBONULBRK"
+Map nul (zero) to send break signal on output
 .IP "\fBMSB2LSB"
 Map MSB bit order to LSB on output
 .P
