@@ -352,7 +352,9 @@ Toggle conversion to uppercase on output
 .IP "\fBctrl-t v"
 Show version
 .IP "\fBctrl-t x"
-Send a file using the XMODEM protocol (prompts for file name)
+Send a file using the XMODEM-1K protocol (prompts for file name)
+.IP "\fBctrl-t X"
+Send a file using the XMODEM-CRC protocol (prompts for file name)
 .IP "\fBctrl-t y"
 Send a file using the YMODEM protocol (prompts for file name)
 .IP "\fBctrl-t ctrl-t"
