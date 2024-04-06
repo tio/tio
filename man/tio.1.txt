@@ -257,7 +257,9 @@ KEYS
 
        ctrl-t v        Show version
 
-       ctrl-t x        Send a file using the XMODEM protocol (prompts for file name)
+       ctrl-t x        Send a file using the XMODEM-1K protocol (prompts for file name)
+
+       ctrl-t X        Send a file using the XMODEM-CRC protocol (prompts for file name)
 
        ctrl-t y        Send a file using the YMODEM protocol (prompts for file name)
 
