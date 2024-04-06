@@ -27,6 +27,7 @@
 #include <lauxlib.h>
 #include <lualib.h>
 #include <sys/ioctl.h>
+#include "misc.h"
 #include "print.h"
 #include "options.h"
 #include "tty.h"
@@ -67,60 +68,6 @@ static int msleep(lua_State *L)
     return 0;
 }
 
-static void script_line_set(int line, bool value)
-{
-    switch (line)
-    {
-        case TIOCM_DTR:
-            tty_line_set(serial_fd, "DTR", line, value);
-            break;
-        case TIOCM_RTS:
-            tty_line_set(serial_fd, "RTS", line, value);
-            break;
-        case TIOCM_CTS:
-            tty_line_set(serial_fd, "CTS", line, value);
-            break;
-        case TIOCM_DSR:
-            tty_line_set(serial_fd, "DSR", line, value);
-            break;
-        case TIOCM_CD:
-            tty_line_set(serial_fd, "CD", line, value);
-            break;
-        case TIOCM_RI:
-            tty_line_set(serial_fd, "RI", line, value);
-            break;
-        default:
-            break;
-    }
-}
-
-static void script_line_toggle(int line)
-{
-    switch (line)
-    {
-        case TIOCM_DTR:
-            tty_line_toggle(serial_fd, "DTR", line);
-            break;
-        case TIOCM_RTS:
-            tty_line_toggle(serial_fd, "RTS", line);
-            break;
-        case TIOCM_CTS:
-            tty_line_toggle(serial_fd, "CTS", line);
-            break;
-        case TIOCM_DSR:
-            tty_line_toggle(serial_fd, "DSR", line);
-            break;
-        case TIOCM_CD:
-            tty_line_toggle(serial_fd, "CD", line);
-            break;
-        case TIOCM_RI:
-            tty_line_toggle(serial_fd, "RI", line);
-            break;
-        default:
-            break;
-    }
-}
-
 // lua: high(line)
 static int high(lua_State *L)
 {
@@ -131,7 +78,7 @@ static int high(lua_State *L)
         return 0;
     }
 
-    script_line_set(line, LINE_HIGH);
+    tty_line_set(serial_fd, line, LINE_HIGH);
 
     return 0;
 }
@@ -146,7 +93,7 @@ static int low(lua_State *L)
         return 0;
     }
 
-    script_line_set(line, LINE_LOW);
+    tty_line_set(serial_fd, line, LINE_LOW);
 
     return 0;
 }
@@ -161,7 +108,47 @@ static int toggle(lua_State *L)
         return 0;
     }
 
-    script_line_toggle(line);
+    tty_line_toggle(serial_fd, line);
+
+    return 0;
+}
+
+// lua: config_high(line)
+static int config_high(lua_State *L)
+{
+    long line = lua_tointeger(L, 1);
+
+    if (line < 0)
+    {
+        return 0;
+    }
+
+    tty_line_config(line, true);
+
+    return 0;
+}
+
+// lua: config_low(line)
+static int config_low(lua_State *L)
+{
+    long line = lua_tointeger(L, 1);
+
+    if (line < 0)
+    {
+        return 0;
+    }
+
+    tty_line_config(line, false);
+
+    return 0;
+}
+
+// lua: config_apply(line)
+static int config_apply(lua_State *L)
+{
+    UNUSED(L);
+
+    tty_line_config_apply();
 
     return 0;
 }
@@ -186,6 +173,9 @@ static const struct luaL_Reg tio_lib[] =
     { "high", high},
     { "low", low},
     { "toggle", toggle},
+    { "config_high", config_high},
+    { "config_low", config_low},
+    { "config_apply", config_apply},
     {NULL, NULL}
 };
 

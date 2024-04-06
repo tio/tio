@@ -383,6 +383,14 @@ Toggle the tty line.
 Sleep for seconds.
 .IP "\fBmsleep(ms)"
 Sleep for miliseconds.
+.IP "\fBconfig_high(line)"
+Set tty line state configuration to high.
+.IP "\fBconfig_low(line)"
+Set tty line state configuration to low.
+.IP "\fBapply_config()"
+Apply tty line state configuration. Using the line state configuration API
+instead of high()/low() will help to make the lines physically switch as
+simultaneously as possible. This may solve timing issues on some platforms.
 
 .TP 0n
 Note: Line can be any of DTR, RTS, CTS, DSR, CD, RI

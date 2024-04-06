@@ -120,6 +120,13 @@ typedef enum
     LINE_PULSE
 } tty_line_mode_t;
 
+typedef struct
+{
+    int mask;
+    bool value;
+    bool reserved;
+} tty_line_config_t;
+
 const char random_array[] =
 {
 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x28, 0x20, 0x28, 0x0A, 0x20,
@@ -164,6 +171,7 @@ static pthread_t thread;
 static int pipefd[2];
 static pthread_mutex_t mutex_input_ready = PTHREAD_MUTEX_INITIALIZER;
 static char line[LINE_SIZE_MAX];
+static tty_line_config_t line_config[6] = { };
 
 static void optional_local_echo(char c)
 {
@@ -427,7 +435,89 @@ static void output_hex(char c)
     }
 }
 
-void tty_line_set(int fd, const char *name, int mask, bool value)
+static const char *tty_line_name(int mask)
+{
+    switch (mask)
+    {
+        case TIOCM_DTR:
+            return "DTR";
+        case TIOCM_RTS:
+            return "RTS";
+        case TIOCM_CTS:
+            return "CTS";
+        case TIOCM_DSR:
+            return "DSR";
+        case TIOCM_CD:
+            return "CD";
+        case TIOCM_RI:
+            return "RI";
+        default:
+            return NULL;
+    }
+}
+
+void tty_line_config(int mask, bool value)
+{
+    int i = 0;
+
+    for (i=0; i<6; i++)
+    {
+        if ((line_config[i].mask == mask) || (line_config[i].reserved == false))
+        {
+            line_config[i].mask = mask;
+            line_config[i].value = value;
+            line_config[i].reserved = true;
+            break;
+        }
+    }
+}
+
+void tty_line_config_apply(void)
+{
+    int i = 0;
+    static int state;
+
+    if (ioctl(fd, TIOCMGET, &state) < 0)
+    {
+        tio_warning_printf("Could not get line state (%s)", strerror(errno));
+        return;
+    }
+
+    for (i=0; i<6; i++)
+    {
+        if (line_config[i].reserved)
+        {
+            if (line_config[i].value)
+            {
+                // High
+                state &= ~line_config[i].mask;
+                tio_printf("Setting %s to HIGH", tty_line_name(line_config[i].mask));
+            }
+            else
+            {
+                // Low
+                state |= line_config[i].mask;
+                tio_printf("Setting %s to LOW", tty_line_name(line_config[i].mask));
+            }
+
+            line_config[i].reserved = true;
+        }
+    }
+
+    if (ioctl(fd, TIOCMSET, &state) < 0)
+    {
+        tio_warning_printf("Could not set line state configuration (%s)", strerror(errno));
+    }
+
+    // Reset configuration
+    for (i=0; i<6; i++)
+    {
+        line_config[i].reserved = false;
+        line_config[i].mask = -1;
+    }
+}
+
+void tty_line_set(int fd, int mask, bool value)
 {
     int state;
 
@@ -440,12 +530,12 @@ void tty_line_set(int fd, const char *name, int mask, bool value)
     if (value)
     {
         state &= ~mask;
-        tio_printf("Setting %s to HIGH", name);
+        tio_printf("Setting %s to HIGH", tty_line_name(mask));
     }
     else
     {
         state |= mask;
-        tio_printf("Setting %s to LOW", name);
+        tio_printf("Setting %s to LOW", tty_line_name(mask));
     }
 
     if (ioctl(fd, TIOCMSET, &state) < 0)
@@ -454,7 +544,7 @@ void tty_line_set(int fd, const char *name, int mask, bool value)
     }
 }
 
-void tty_line_toggle(int fd, const char *line_name, int mask)
+void tty_line_toggle(int fd, int mask)
 {
     int state;
 
@@ -467,12 +557,12 @@ void tty_line_toggle(int fd, const char *line_name, int mask)
     if (state & mask)
     {
         state &= ~mask;
-        tio_printf("Setting %s to HIGH", line_name);
+        tio_printf("Setting %s to HIGH", tty_line_name(mask));
     }
     else
     {
         state |= mask;
-        tio_printf("Setting %s to LOW", line_name);
+        tio_printf("Setting %s to LOW", tty_line_name(mask));
     }
 
     if (ioctl(fd, TIOCMSET, &state) < 0)
@@ -481,9 +571,9 @@ void tty_line_toggle(int fd, const char *line_name, int mask)
     }
 }
 
-static void tty_line_pulse(int fd, const char *line_name, int mask, unsigned int duration)
+static void tty_line_pulse(int fd, int mask, unsigned int duration)
 {
-    tty_line_toggle(fd, line_name, mask);
+    tty_line_toggle(fd, mask);
 
     if (duration > 0)
     {
@@ -491,19 +581,19 @@ static void tty_line_pulse(int fd, const char *line_name, int mask, unsigned int
         delay(duration);
     }
 
-    tty_line_toggle(fd, line_name, mask);
+    tty_line_toggle(fd, mask);
 }
 
-static void tty_line_poke(int fd, const char *name, int mask, tty_line_mode_t mode, unsigned int duration)
+static void tty_line_poke(int fd, int mask, tty_line_mode_t mode, unsigned int duration)
 {
     switch (mode)
     {
         case LINE_TOGGLE:
-            tty_line_toggle(fd, name, mask);
+            tty_line_toggle(fd, mask);
             break;
 
         case LINE_PULSE:
-            tty_line_pulse(fd, name, mask, duration);
+            tty_line_pulse(fd, mask, duration);
             break;
 
         case LINE_OFF:
@@ -564,22 +654,22 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
         switch (input_char)
         {
             case KEY_0:
-                tty_line_poke(fd, "DTR", TIOCM_DTR, line_mode, option.dtr_pulse_duration);
+                tty_line_poke(fd, TIOCM_DTR, line_mode, option.dtr_pulse_duration);
                 break;
             case KEY_1:
-                tty_line_poke(fd, "RTS", TIOCM_RTS, line_mode, option.rts_pulse_duration);
+                tty_line_poke(fd, TIOCM_RTS, line_mode, option.rts_pulse_duration);
                 break;
             case KEY_2:
-                tty_line_poke(fd, "CTS", TIOCM_CTS, line_mode, option.cts_pulse_duration);
+                tty_line_poke(fd, TIOCM_CTS, line_mode, option.cts_pulse_duration);
                 break;
             case KEY_3:
-                tty_line_poke(fd, "DSR", TIOCM_DSR, line_mode, option.dsr_pulse_duration);
+                tty_line_poke(fd, TIOCM_DSR, line_mode, option.dsr_pulse_duration);
                 break;
             case KEY_4:
-                tty_line_poke(fd, "DCD", TIOCM_CD, line_mode, option.dcd_pulse_duration);
+                tty_line_poke(fd, TIOCM_CD, line_mode, option.dcd_pulse_duration);
                 break;
             case KEY_5:
-                tty_line_poke(fd, "RI", TIOCM_RI, line_mode, option.ri_pulse_duration);
+                tty_line_poke(fd, TIOCM_RI, line_mode, option.ri_pulse_duration);
                 break;
             default:
                 tio_warning_printf("Invalid line number");
