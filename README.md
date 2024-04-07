@@ -58,8 +58,11 @@ when used in combination with [tmux](https://tmux.github.io).
  * Configurable text color
  * Visual or audible alert on connect/disconnect
  * Remapping of prefix key
+ * Support NO_COLOR env variable as per no-color.org
  * Man page documentation
- * Binary size less than 90kB
+ * Lua scripting support
+   * Manipulate port control lines at connect/reconnect (useful for microcontroller reset/boot etc.)
+   * Automate interaction with tty device (TBD)
  * Plays nicely with [tmux](https://tmux.github.io)
 
 ## 3. Usage
