@@ -19,7 +19,7 @@
 #include <sys/mman.h>
 #include <sys/poll.h>
 #include <termios.h>
-#include "misc.h"
+#include "xymodem.h"
 
 #define SOH 0x01
 #define STX 0x02
@@ -326,7 +326,7 @@ static int xmodem(int sio, const void *data, size_t len)
     return 0; /* not reached */
 }
 
-int xymodem_send(int sio, const char *filename, char mode)
+int xymodem_send(int sio, const char *filename, modem_mode_t mode)
 {
     size_t         len;
     int            rc, fd;
@@ -350,10 +350,10 @@ int xymodem_send(int sio, const char *filename, char mode)
 
     /* Do transfer */
     key_hit = 0;
-    if (mode == 'x') {
+    if (mode == XMODEM_1K) {
         rc = xmodem_1k(sio, buf, len, 1);
     }
-    else if (mode == 'X') {
+    else if (mode == XMODEM_CRC) {
         rc = xmodem(sio, buf, len);
     }
     else {

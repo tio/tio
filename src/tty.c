@@ -56,6 +56,7 @@
 #include "timestamp.h"
 #include "misc.h"
 #include "script.h"
+#include "xymodem.h"
 
 /* tty device listing configuration */
 
@@ -111,16 +112,22 @@
 #define KEY_U 0x55
 #define KEY_V 0x76
 #define KEY_X 0x78
-#define KEY_SHIFT_X 0x58
 #define KEY_Y 0x79
 #define KEY_Z 0x7a
 
 typedef enum
 {
-    LINE_OFF,
     LINE_TOGGLE,
     LINE_PULSE
 } tty_line_mode_t;
+
+typedef enum
+{
+    SUBCOMMAND_NONE,
+    SUBCOMMAND_LINE_TOGGLE,
+    SUBCOMMAND_LINE_PULSE,
+    SUBCOMMAND_XMODEM,
+} sub_command_t;
 
 typedef struct
 {
@@ -607,9 +614,6 @@ static void tty_line_poke(int fd, int mask, tty_line_mode_t mode, unsigned int d
         case LINE_PULSE:
             tty_line_pulse(fd, mask, duration);
             break;
-
-        case LINE_OFF:
-            break;
     }
 }
 
@@ -662,7 +666,8 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
     char unused_char;
     bool unused_bool;
     int state;
-    static tty_line_mode_t line_mode = LINE_OFF;
+    static tty_line_mode_t line_mode;
+    static sub_command_t sub_command = SUBCOMMAND_NONE;
     static char previous_char = 0;
 
     /* Ignore unused arguments */
@@ -676,37 +681,73 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
         forward = &unused_bool;
     }
 
-    // Handle tty line toggle and pulse action
-    if (line_mode)
+    // Handle sub commands
+    if (sub_command)
     {
         *forward = false;
-        switch (input_char)
+
+        switch (sub_command)
         {
-            case KEY_0:
-                tty_line_poke(fd, TIOCM_DTR, line_mode, option.dtr_pulse_duration);
+            case SUBCOMMAND_NONE:
                 break;
-            case KEY_1:
-                tty_line_poke(fd, TIOCM_RTS, line_mode, option.rts_pulse_duration);
+
+            case SUBCOMMAND_LINE_TOGGLE:
+            case SUBCOMMAND_LINE_PULSE:
+                switch (input_char)
+                {
+                    case KEY_0:
+                        tty_line_poke(fd, TIOCM_DTR, line_mode, option.dtr_pulse_duration);
+                        break;
+                    case KEY_1:
+                        tty_line_poke(fd, TIOCM_RTS, line_mode, option.rts_pulse_duration);
+                        break;
+                    case KEY_2:
+                        tty_line_poke(fd, TIOCM_CTS, line_mode, option.cts_pulse_duration);
+                        break;
+                    case KEY_3:
+                        tty_line_poke(fd, TIOCM_DSR, line_mode, option.dsr_pulse_duration);
+                        break;
+                    case KEY_4:
+                        tty_line_poke(fd, TIOCM_CD, line_mode, option.dcd_pulse_duration);
+                        break;
+                    case KEY_5:
+                        tty_line_poke(fd, TIOCM_RI, line_mode, option.ri_pulse_duration);
+                        break;
+                    default:
+                        tio_warning_printf("Invalid line number");
+                        break;
+                }
                 break;
-            case KEY_2:
-                tty_line_poke(fd, TIOCM_CTS, line_mode, option.cts_pulse_duration);
-                break;
-            case KEY_3:
-                tty_line_poke(fd, TIOCM_DSR, line_mode, option.dsr_pulse_duration);
-                break;
-            case KEY_4:
-                tty_line_poke(fd, TIOCM_CD, line_mode, option.dcd_pulse_duration);
-                break;
-            case KEY_5:
-                tty_line_poke(fd, TIOCM_RI, line_mode, option.ri_pulse_duration);
-                break;
-            default:
-                tio_warning_printf("Invalid line number");
+
+            case SUBCOMMAND_XMODEM:
+                switch (input_char)
+                {
+                    case KEY_0:
+                        tio_printf("Send file with XMODEM-1K");
+                        tio_printf_raw("Enter file name: ");
+                        if (tio_readln())
+                        {
+                            tio_printf("Sending file '%s'  ", line);
+                            tio_printf("Press any key to abort transfer");
+                            tio_printf("%s", xymodem_send(fd, line, XMODEM_CRC) < 0 ? "Aborted" : "Done");
+                        }
+                        break;
+
+                    case KEY_1:
+                        tio_printf("Send file with XMODEM-CRC");
+                        tio_printf_raw("Enter file name: ");
+                        if (tio_readln())
+                        {
+                            tio_printf("Sending file '%s'  ", line);
+                            tio_printf("Press any key to abort transfer");
+                            tio_printf("%s", xymodem_send(fd, line, XMODEM_CRC) < 0 ? "Aborted" : "Done");
+                        }
+                        break;
+                }
                 break;
         }
 
-        line_mode = LINE_OFF;
-
+        sub_command = SUBCOMMAND_NONE;
         return;
     }
 
@@ -726,6 +767,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
             return;
         }
 
+        // Handle commands
         switch (input_char)
         {
             case KEY_QUESTION:
@@ -749,8 +791,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 tio_printf(" ctrl-%c t       Toggle line timestamp mode", option.prefix_key);
                 tio_printf(" ctrl-%c U       Toggle conversion to uppercase on output", option.prefix_key);
                 tio_printf(" ctrl-%c v       Show version", option.prefix_key);
-                tio_printf(" ctrl-%c x       Send file via Xmodem-1K", option.prefix_key);
-                tio_printf(" ctrl-%c X       Send file via Xmodem-CRC", option.prefix_key);
+                tio_printf(" ctrl-%c x       Send file via Xmodem", option.prefix_key);
                 tio_printf(" ctrl-%c y       Send file via Ymodem", option.prefix_key);
                 tio_printf(" ctrl-%c ctrl-%c Send ctrl-%c character", option.prefix_key, option.prefix_key, option.prefix_key);
                 break;
@@ -791,26 +832,28 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
 
             case KEY_G:
                 tio_printf("Please enter which serial line number to toggle:");
-                tio_printf(" DTR (0)");
-                tio_printf(" RTS (1)");
-                tio_printf(" CTS (2)");
-                tio_printf(" DSR (3)");
-                tio_printf(" DCD (4)");
-                tio_printf(" RI  (5)");
-                // Process next input character as part of the line toggle step
+                tio_printf("(0) DTR");
+                tio_printf("(1) RTS");
+                tio_printf("(2) CTS");
+                tio_printf("(3) DSR");
+                tio_printf("(4) DCD");
+                tio_printf("(5) RI");
                 line_mode = LINE_TOGGLE;
+                // Process next input character as sub command
+                sub_command = SUBCOMMAND_LINE_TOGGLE;
                 break;
 
             case KEY_P:
                 tio_printf("Please enter which serial line number to pulse:");
-                tio_printf(" DTR (0)");
-                tio_printf(" RTS (1)");
-                tio_printf(" CTS (2)");
-                tio_printf(" DSR (3)");
-                tio_printf(" DCD (4)");
-                tio_printf(" RI  (5)");
-                // Process next input character as part of the line pulse step
+                tio_printf("(0) DTR");
+                tio_printf("(1) RTS");
+                tio_printf("(2) CTS");
+                tio_printf("(3) DSR");
+                tio_printf("(4) DCD");
+                tio_printf("(5) RI");
                 line_mode = LINE_PULSE;
+                // Process next input character as sub command
+                sub_command = SUBCOMMAND_LINE_PULSE;
                 break;
 
             case KEY_B:
@@ -940,14 +983,20 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 break;
 
             case KEY_X:
+                tio_printf("Please enter which X modem protocol to use:");
+                tio_printf(" (0) XMODEM-1K");
+                tio_printf(" (1) XMODEM-CRC");
+                // Process next input character as sub command
+                sub_command = SUBCOMMAND_XMODEM;
+                break;
+
             case KEY_Y:
-            case KEY_SHIFT_X:
-                tio_printf("Send file with %s", input_char == KEY_X ?  "XMODEM-1K" : (input_char == KEY_Y ? "YMODEM" : "XMODEM-CRC"));
+                tio_printf("Send file with YMODEM");
                 tio_printf_raw("Enter file name: ");
                 if (tio_readln()) {
                     tio_printf("Sending file '%s'  ", line);
                     tio_printf("Press any key to abort transfer");
-                    tio_printf("%s", xymodem_send(fd, line, input_char) < 0 ? "Aborted" : "Done");
+                    tio_printf("%s", xymodem_send(fd, line, YMODEM) < 0 ? "Aborted" : "Done");
                 }
                 break;
 
