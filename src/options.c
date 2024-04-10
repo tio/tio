@@ -59,6 +59,8 @@ enum opt_t
     OPT_SCRIPT,
     OPT_SCRIPT_FILE,
     OPT_SCRIPT_RUN,
+    OPT_INPUT_MODE,
+    OPT_OUTPUT_MODE,
 };
 
 /* Default options */
@@ -89,7 +91,8 @@ struct option_t option =
     .socket = NULL,
     .map = "",
     .color = 256, // Bold
-    .hex_mode = false,
+    .input_mode = INPUT_MODE_NORMAL,
+    .output_mode = OUTPUT_MODE_NORMAL,
     .prefix_code = 20, // ctrl-t
     .prefix_key = 't',
     .prefix_enabled = true,
@@ -137,7 +140,8 @@ void print_help(char *argv[])
     printf("  -m, --map <flags>                      Map characters\n");
     printf("  -c, --color 0..255|bold|none|list      Colorize tio text (default: bold)\n");
     printf("  -S, --socket <socket>                  Redirect I/O to socket\n");
-    printf("  -x, --hexadecimal                      Enable hexadecimal mode\n");
+    printf("      --input-mode normal|hex            Select input mode (default: normal)\n");
+    printf("      --output-mode normal|hex           Select output mode (default: normal)\n");
     printf("  -r, --response-wait                    Wait for line response then quit\n");
     printf("      --response-timeout <ms>            Response timeout (default: 100)\n");
     printf("      --rs-485                           Enable RS-485 mode\n");
@@ -215,6 +219,70 @@ void line_pulse_duration_option_parse(const char *arg)
     free(buffer);
 }
 
+input_mode_t input_mode_option_parse(const char *arg)
+{
+    if (strcmp("normal", arg) == 0)
+    {
+        return INPUT_MODE_NORMAL;
+    }
+    else if (strcmp("hex", arg) == 0)
+    {
+        return INPUT_MODE_HEX;
+    }
+    else
+    {
+        tio_error_printf("Invalid input mode option");
+        exit(EXIT_FAILURE);
+    }
+}
+
+output_mode_t output_mode_option_parse(const char *arg)
+{
+    if (strcmp("normal", arg) == 0)
+    {
+        return OUTPUT_MODE_NORMAL;
+    }
+    else if (strcmp("hex", arg) == 0)
+    {
+        return OUTPUT_MODE_HEX;
+    }
+    else
+    {
+        tio_error_printf("Invalid output mode option");
+        exit(EXIT_FAILURE);
+    }
+}
+
+const char *input_mode_by_string(input_mode_t mode)
+{
+    switch (mode)
+    {
+        case INPUT_MODE_NORMAL:
+            return "normal";
+        case INPUT_MODE_HEX:
+            return "hex";
+        case INPUT_MODE_END:
+            break;
+    }
+
+    return NULL;
+}
+
+const char *output_mode_by_string(output_mode_t mode)
+{
+    switch (mode)
+    {
+        case OUTPUT_MODE_NORMAL:
+            return "normal";
+        case OUTPUT_MODE_HEX:
+            return "hex";
+        case OUTPUT_MODE_END:
+            break;
+    }
+
+    return NULL;
+}
+
 enum script_run_t script_run_option_parse(const char *arg)
 {
     if (strcmp("once", arg) == 0)
@@ -255,7 +323,8 @@ void options_print()
                                                                             option.dsr_pulse_duration,
                                                                             option.dcd_pulse_duration,
                                                                             option.ri_pulse_duration);
-    tio_printf(" Hexadecimal mode: %s", option.hex_mode ? "enabled" : "disabled");
+    tio_printf(" Input mode: %s", input_mode_by_string(option.input_mode));
+    tio_printf(" Output mode: %s", output_mode_by_string(option.output_mode));
     if (option.map[0] != 0)
         tio_printf(" Map flags: %s", option.map);
     if (option.log)
@@ -304,7 +373,8 @@ void options_parse(int argc, char *argv[])
             {"socket",               required_argument, 0, 'S'                     },
             {"map",                  required_argument, 0, 'm'                     },
             {"color",                required_argument, 0, 'c'                     },
-            {"hexadecimal",          no_argument,       0, 'x'                     },
+            {"input-mode",           required_argument, 0, OPT_INPUT_MODE          },
+            {"output-mode",          required_argument, 0, OPT_OUTPUT_MODE         },
             {"response-wait",        no_argument,       0, 'r'                     },
             {"response-timeout",     required_argument, 0, OPT_RESPONSE_TIMEOUT    },
             {"rs-485",               no_argument,       0, OPT_RS485               },
@@ -453,8 +523,12 @@ void options_parse(int argc, char *argv[])
                 }
                 break;
 
-            case 'x':
-                option.hex_mode = true;
+            case OPT_INPUT_MODE:
+                option.input_mode = input_mode_option_parse(optarg);
+                break;
+
+            case OPT_OUTPUT_MODE:
+                option.output_mode = output_mode_option_parse(optarg);
                 break;
 
             case 'r':

@@ -98,10 +98,11 @@
 #define KEY_F 0x66
 #define KEY_SHIFT_F 0x46
 #define KEY_G 0x67
-#define KEY_H 0x68
+#define KEY_I 0x69
 #define KEY_L 0x6C
 #define KEY_SHIFT_L 0x4C
 #define KEY_M 0x6D
+#define KEY_O 0x6F
 #define KEY_P 0x70
 #define KEY_Q 0x71
 #define KEY_R 0x72
@@ -180,11 +181,15 @@ static void optional_local_echo(char c)
     {
         return;
     }
+
     print(c);
+
     if (option.log)
     {
         log_putc(c);
     }
+
+    print_tainted_set();
 }
 
 inline static bool is_valid_hex(char c)
@@ -407,22 +412,28 @@ void tty_input_thread_wait_ready(void)
     pthread_mutex_lock(&mutex_input_ready);
 }
 
-static void output_hex(char c)
+static void handle_hex_prompt(char c)
 {
     hex_chars[hex_char_index++] = c;
 
     printf("%c", c);
+    print_tainted_set();
 
     if (hex_char_index == 2)
     {
         usleep(100*1000);
-        printf("\b \b");
-        printf("\b \b");
+        if (option.local_echo == false)
+        {
+            printf("\b \b");
+            printf("\b \b");
+        }
+        else
+        {
+            printf(" ");
+        }
 
         unsigned char hex_value = char_to_nibble(hex_chars[0]) << 4 | (char_to_nibble(hex_chars[1]) & 0x0F);
         hex_char_index = 0;
-
-        optional_local_echo(hex_value);
 
         ssize_t status = tty_write(fd, &hex_value, 1);
         if (status < 0)
@@ -629,6 +640,23 @@ static int tio_readln(void)
     return (p - line);
 }
 
+void tty_output_mode_set(output_mode_t mode)
+{
+    switch (mode)
+    {
+        case OUTPUT_MODE_NORMAL:
+            print = print_normal;
+            break;
+
+        case OUTPUT_MODE_HEX:
+            print = print_hex;
+            break;
+
+        case OUTPUT_MODE_END:
+            break;
+    }
+}
+
 void handle_command_sequence(char input_char, char *output_char, bool *forward)
 {
     char unused_char;
@@ -709,10 +737,11 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 tio_printf(" ctrl-%c f       Toggle log to file", option.prefix_key);
                 tio_printf(" ctrl-%c F       Flush data I/O buffers", option.prefix_key);
                 tio_printf(" ctrl-%c g       Toggle serial port line", option.prefix_key);
-                tio_printf(" ctrl-%c h       Toggle hexadecimal mode", option.prefix_key);
+                tio_printf(" ctrl-%c i       Toggle input mode", option.prefix_key);
                 tio_printf(" ctrl-%c l       Clear screen", option.prefix_key);
                 tio_printf(" ctrl-%c L       Show line states", option.prefix_key);
                 tio_printf(" ctrl-%c m       Toggle MSB to LSB bit order", option.prefix_key);
+                tio_printf(" ctrl-%c o       Toggle output mode", option.prefix_key);
                 tio_printf(" ctrl-%c p       Pulse serial port line", option.prefix_key);
                 tio_printf(" ctrl-%c q       Quit", option.prefix_key);
                 tio_printf(" ctrl-%c r       Run script", option.prefix_key);
@@ -803,19 +832,42 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 tio_printf("Switched local echo %s", option.local_echo ? "on" : "off");
                 break;
 
-            case KEY_H:
-                /* Toggle hexadecimal printing mode */
-                if (!option.hex_mode)
+            case KEY_I:
+                option.input_mode += 1;
+                switch (option.input_mode)
                 {
-                    print = print_hex;
-                    option.hex_mode = true;
-                    tio_printf("Switched to hexadecimal mode");
+                    case INPUT_MODE_NORMAL:
+                        break;
+
+                    case INPUT_MODE_HEX:
+                        option.input_mode = INPUT_MODE_HEX;
+                        tio_printf("Switched to hex input mode");
+                        break;
+
+                    case INPUT_MODE_END:
+                        option.input_mode = INPUT_MODE_NORMAL;
+                        tio_printf("Switched to normal input mode");
+                        break;
                 }
-                else
+                break;
+
+            case KEY_O:
+                option.output_mode += 1;
+                switch (option.output_mode)
                 {
-                    print = print_normal;
-                    option.hex_mode = false;
-                    tio_printf("Switched to normal mode");
+                    case OUTPUT_MODE_NORMAL:
+                        break;
+
+                    case OUTPUT_MODE_HEX:
+                        tty_output_mode_set(OUTPUT_MODE_HEX);
+                        tio_printf("Switched to hex output mode");
+                        break;
+
+                    case OUTPUT_MODE_END:
+                        option.output_mode = OUTPUT_MODE_NORMAL;
+                        tty_output_mode_set(OUTPUT_MODE_NORMAL);
+                        tio_printf("Switched to normal output mode");
+                        break;
                 }
                 break;
 
@@ -1379,29 +1431,48 @@ void forward_to_tty(int fd, char output_char)
     }
     else
     {
-        if (option.hex_mode)
+        switch (option.output_mode)
         {
-            output_hex(output_char);
-        }
-        else
-        {
-            /* Send output to tty device */
-            optional_local_echo(output_char);
-            if ((output_char == 0) && (map_o_nulbrk))
-            {
-                status = tcsendbreak(fd, 0);
-            }
-            else
-            {
-                status = tty_write(fd, &output_char, 1);
-            }
-            if (status < 0)
-            {
-                tio_warning_printf("Could not write to tty device");
-            }
+            case OUTPUT_MODE_NORMAL:
+                if (option.input_mode == INPUT_MODE_HEX)
+                {
+                    handle_hex_prompt(output_char);
+                }
+                else
+                {
+                    /* Send output to tty device */
+                    optional_local_echo(output_char);
+                    if ((output_char == 0) && (map_o_nulbrk))
+                    {
+                        status = tcsendbreak(fd, 0);
+                    }
+                    else
+                    {
+                        status = tty_write(fd, &output_char, 1);
+                    }
+                    if (status < 0)
+                    {
+                        tio_warning_printf("Could not write to tty device");
+                    }
 
-            /* Update transmit statistics */
-            tx_total++;
+                    /* Update transmit statistics */
+                    tx_total++;
+                }
+                break;
+
+            case OUTPUT_MODE_HEX:
+                if (option.input_mode == INPUT_MODE_HEX)
+                {
+                    handle_hex_prompt(output_char);
+                }
+                else
+                {
+                    optional_local_echo(output_char);
+                }
+                break;
+
+            case OUTPUT_MODE_END:
+                break;
         }
     }
 }
@@ -1460,14 +1531,7 @@ int tty_connect(void)
     }
 
     /* Manage print output mode */
-    if (option.hex_mode)
-    {
-        print = print_hex;
-    }
-    else
-    {
-        print = print_normal;
-    }
+    tty_output_mode_set(option.output_mode);
 
     /* Save current port settings */
     if (tcgetattr(fd, &tio_old) < 0)
@@ -1577,7 +1641,7 @@ int tty_connect(void)
                     input_char = input_buffer[i];
 
                     /* Print timestamp on new line if enabled */
-                    if ((next_timestamp && input_char != '\n' && input_char != '\r') && !option.hex_mode)
+                    if ((next_timestamp && input_char != '\n' && input_char != '\r') && (option.output_mode == OUTPUT_MODE_NORMAL))
                     {
                         now = timestamp_current_time();
                         if (now)
@@ -1697,7 +1761,7 @@ int tty_connect(void)
                         /* Handle commands */
                         handle_command_sequence(input_char, &output_char, &forward);
 
-                        if ((option.hex_mode) && (forward))
+                        if ((option.input_mode == INPUT_MODE_HEX) && (forward))
                         {
                             if (!is_valid_hex(input_char))
                             {

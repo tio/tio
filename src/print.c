@@ -73,3 +73,8 @@ void tio_printf_array(const char *array)
     }
     tio_printf("");
 }
+
+void print_tainted_set()
+{
+    print_tainted = true;
+}

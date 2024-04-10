@@ -31,7 +31,8 @@ _tio()
           -L --list-devices \
           -c --color \
           -S --socket \
-          -x --hexadecimal \
+             --input-mode \
+             --output-mode \
           -r --response-wait \
              --response-timeout \
              --rs-485 \
@@ -131,8 +132,12 @@ _tio()
             COMPREPLY=( $(compgen -W "unix: inet: inet6:" -- ${cur}) )
             return 0
             ;;
-        -x | --hexadecimal)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        --input-mode)
+            COMPREPLY=( $(compgen -W "normal hex"  -- ${cur}) )
+            return 0
+            ;;
+        --output-mode)
+            COMPREPLY=( $(compgen -W "normal hex"  -- ${cur}) )
             return 0
             ;;
         -r | --response-wait)

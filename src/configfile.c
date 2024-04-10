@@ -213,9 +213,13 @@ static int data_handler(void *user, const char *section, const char *name,
         {
             option.local_echo = read_boolean(value, name);
         }
-        else if (!strcmp(name, "hexadecimal"))
+        else if (!strcmp(name, "input-mode"))
         {
-            option.hex_mode = read_boolean(value, name);
+            option.input_mode = input_mode_option_parse(value);
+        }
+        else if (!strcmp(name, "output-mode"))
+        {
+            option.output_mode = output_mode_option_parse(value);
         }
         else if (!strcmp(name, "timestamp"))
         {

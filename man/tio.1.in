@@ -191,9 +191,20 @@ If defining more than one flag, the flags must be comma separated.
 .RE
 
 .TP
-.BR \-x ", " \-\-hexadecimal
+.BR "    \-\-input\-mode " \fInormal|hex
 
-Enable hexadecimal mode.
+Set input mode. In hex input mode bytes can be sent by typing the
+\fBtwo-character hexadecimal\fR representation of the value, e.g.: to send
+\fI0xA\fR you must type \fI0a\fR or \fI0A\fR.
+
+Default value is "normal".
+
+.TP
+.BR "    \-\-output\-mode " \fInormal|hex
+
+Set output mode. In hex mode each incoming byte is printed out as a hex value.
+
+Default value is "normal".
 
 .TP
 .BR \-c ", " "\-\-color " \fI0..255|bold|none|list
@@ -329,14 +340,16 @@ Toggle log to file
 Flush data I/O buffers (discard data written but not transmitted and data received but not read)
 .IP "\fBctrl-t g"
 Toggle serial port line
-.IP "\fBctrl-t h"
-Toggle hexadecimal mode
+.IP "\fBctrl-t i"
+Toggle input mode
 .IP "\fBctrl-t l"
 Clear screen
 .IP "\fBctrl-t L"
 Show line states (DTR, RTS, CTS, DSR, DCD, RI)
 .IP "\fBctrl-t m"
 Toggle MSB to LSB bit order
+.IP "\fBctrl-t o"
+Toggle output mode
 .IP "\fBctrl-t p"
 Pulse serial port line
 .IP "\fBctrl-t q"
@@ -359,15 +372,6 @@ Send a file using the XMODEM-CRC protocol (prompts for file name)
 Send a file using the YMODEM protocol (prompts for file name)
 .IP "\fBctrl-t ctrl-t"
 Send ctrl-t character
-
-.SH "HEXADECIMAL MODE"
-.PP
-In hexadecimal mode each incoming byte is printed out as a hexadecimal value.
-
-.PP
-Bytes can be sent in this mode by typing the \fBtwo-character hexadecimal\fR
-representation of the value, e.g.: to send \fI0xA\fR you must type \fI0a\fR or
-\fI0A\fR.
 
 .SH "SCRIPT API"
 .PP
@@ -470,8 +474,10 @@ Set timestamp format
 Map characters on input or output
 .IP "\fBcolor"
 Colorize tio text using ANSI color code ranging from 0 to 255
-.IP "\fBhexadecimal"
-Enable hexadecimal mode
+.IP "\fBinput-mode"
+Set input mode.
+.IP "\fBoutput-mode"
+Set output mode.
 .IP "\fBsocket"
 Set socket to redirect I/O to
 .IP "\fBprefix-ctrl-key"

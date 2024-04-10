@@ -46,9 +46,8 @@ when used in combination with [tmux](https://tmux.github.io).
  * Line timestamps
  * Support for delayed output per character
  * Support for delayed output per line
- * Hexadecimal mode
- * Log to file
- * Autogeneration of log filename
+ * Switchable independent input and output mode (normal vs hex)
+ * Log to file with automatic or manual naming of log file
  * Configuration file support
  * Activate sub-configurations by name or pattern
  * Redirect I/O to UNIX socket or IPv4/v6 network socket for scripting or TTY sharing

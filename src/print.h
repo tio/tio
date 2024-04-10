@@ -116,3 +116,4 @@ void print_hex(char c);
 void print_normal(char c);
 void print_init_ansi_formatting(void);
 void tio_printf_array(const char *array);
+void print_tainted_set(void);
