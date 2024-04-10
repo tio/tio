@@ -80,6 +80,19 @@ extern char ansi_format[];
     } \
 }
 
+#define tio_error_print(format, args...) \
+{ \
+    if (!option.mute) \
+    { \
+        if (print_tainted) \
+        putchar('\n'); \
+        if (option.color < 0) \
+        fprintf (stdout, "\r[%s] Error: " format "\r\n", timestamp_current_time(), ## args); \
+        else \
+        ansi_printf("[%s] Error: " format, timestamp_current_time(), ## args); \
+    } \
+}
+
 #define tio_printf(format, args...) \
 { \
     if (!option.mute) \

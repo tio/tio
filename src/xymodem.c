@@ -20,6 +20,7 @@
 #include <sys/poll.h>
 #include <termios.h>
 #include "xymodem.h"
+#include "print.h"
 
 #define SOH 0x01
 #define STX 0x02
@@ -105,7 +106,7 @@ static int xmodem_1k(int sio, const void *data, size_t len, int seq)
             continue;
         }
         else if (rc < 0) {
-            perror("Read sync from serial failed");
+            tio_error_print("Read sync from serial failed");
             return ERR;
         }
     }
@@ -138,7 +139,7 @@ static int xmodem_1k(int sio, const void *data, size_t len, int seq)
                     usleep(1000);
                     continue;
                 }
-                perror("Write packet to serial failed");
+                tio_error_print("Write packet to serial failed");
                 return ERR;
             }
             from += rc;
@@ -157,7 +158,7 @@ static int xmodem_1k(int sio, const void *data, size_t len, int seq)
                 return ERR;
             rc = serial_poll(sio, &resp, 1, 50);
             if (rc < 0) {
-                perror("Read ack/nak from serial failed");
+                tio_error_print("Read ack/nak from serial failed");
                 return ERR;
             } else if(rc > 0) {
                 break;
@@ -187,14 +188,14 @@ static int xmodem_1k(int sio, const void *data, size_t len, int seq)
         if (key_hit)
             return ERR;
         if (write(sio, EOT, 1) < 0) {
-            perror("Write EOT to serial failed");
+            tio_error_print("Write EOT to serial failed");
             return ERR;
         }
         write(STDOUT_FILENO, "|", 1);
         /* 1s timeout */
         rc = serial_poll(sio, &resp, 1, 1000);
         if (rc < 0) {
-            perror("Read from serial failed");
+            tio_error_print("Read from serial failed");
             return ERR;
         } else if(rc == 0) {
             continue;
@@ -227,7 +228,7 @@ static int xmodem(int sio, const void *data, size_t len)
             continue;
         }
         else if (rc < 0) {
-            perror("Read sync from serial failed");
+            tio_error_print("Read sync from serial failed");
             return ERR;
         }
     }
@@ -260,7 +261,7 @@ static int xmodem(int sio, const void *data, size_t len)
                     usleep(1000);
                     continue;
                 }
-                perror("Write packet to serial failed");
+                tio_error_print("Write packet to serial failed");
                 return ERR;
             }
             from += rc;
@@ -276,7 +277,7 @@ static int xmodem(int sio, const void *data, size_t len)
                 return ERR;
             rc = serial_poll(sio, &resp, 1, 50);
             if (rc < 0) {
-                perror("Read ack/nak from serial failed");
+                tio_error_print("Read ack/nak from serial failed");
                 return ERR;
             } else if(rc > 0) {
                 break;
@@ -306,14 +307,14 @@ static int xmodem(int sio, const void *data, size_t len)
         if (key_hit)
             return ERR;
         if (write(sio, EOT, 1) < 0) {
-            perror("Write EOT to serial failed");
+            tio_error_print("Write EOT to serial failed");
             return ERR;
         }
         write(STDOUT_FILENO, "|", 1);
         /* 1s timeout */
         rc = serial_poll(sio, &resp, 1, 1000);
         if (rc < 0) {
-            perror("Read from serial failed");
+            tio_error_print("Read from serial failed");
             return ERR;
         } else if(rc == 0) {
             continue;
@@ -336,7 +337,7 @@ int xymodem_send(int sio, const char *filename, modem_mode_t mode)
     /* Open file, map into memory */
     fd = open(filename, O_RDONLY);
     if (fd < 0) {
-        perror("Could not open file");
+        tio_error_print("Could not open file");
         return ERR;
     }
     fstat(fd, &stat);
@@ -344,7 +345,7 @@ int xymodem_send(int sio, const char *filename, modem_mode_t mode)
     buf = mmap(NULL, len, PROT_READ, MAP_PRIVATE, fd, 0);
     if (!buf) {
         close(fd);
-        perror("Could not mmap file");
+        tio_error_print("Could not mmap file");
         return ERR;
     }
 
