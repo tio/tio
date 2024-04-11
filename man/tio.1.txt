@@ -100,13 +100,17 @@ OPTIONS
 
               Enable log to file.
 
-              The filename will be automatically generated using the following format tio_DEVICE_YYYY-MM-DDTHH:MM:SS.log.
+              The log file will be automatically named using the following format tio_DEVICE_YYYY-MM-DDTHH:MM:SS.log.
 
               The filename can be manually set using the --log-file option.
 
            --log-file <filename>
 
               Set log filename.
+
+           --log-directory <path>
+
+              Set log directory path in which to save automatically named log files.
 
            --log-append
 
@@ -138,13 +142,23 @@ OPTIONS
 
               OLTU        Map lowercase characters to uppercase on output
 
+              ONULBRK     Map nul (zero) to send break signal on output
+
               MSB2LSB     Map MSB bit order to LSB on output
 
               If defining more than one flag, the flags must be comma separated.
 
-       -x, --hexadecimal
+           --input-mode normal|hex
 
-              Enable hexadecimal mode.
+              Set input mode. In hex input mode bytes can be sent by typing the two-character hexadecimal representation of the 1 byte value, e.g.: to send 0xA you must type 0a or 0A.
+
+              Default value is "normal".
+
+           --output-mode normal|hex
+
+              Set output mode. In hex mode each incoming byte is printed out as a 1 byte hex value.
+
+              Default value is "normal".
 
        -c, --color 0..255|bold|none|list
 
@@ -212,6 +226,20 @@ OPTIONS
 
               Default value is "none".
 
+       --script <string>
+
+              Run script from string.
+
+       --script-file <filename>
+
+              Run script from file with filename.
+
+       --script-run once|always|never
+
+              Run script on connect once, always, or never.
+
+              Default value is "always".
+
        -v, --version
 
               Display program version.
@@ -237,7 +265,7 @@ KEYS
 
        ctrl-t g        Toggle serial port line
 
-       ctrl-t h        Toggle hexadecimal mode
+       ctrl-t i        Toggle input mode
 
        ctrl-t l        Clear screen
 
@@ -245,9 +273,13 @@ KEYS
 
        ctrl-t m        Toggle MSB to LSB bit order
 
+       ctrl-t o        Toggle output mode
+
        ctrl-t p        Pulse serial port line
 
        ctrl-t q        Quit
+
+       ctrl-t r        Run script
 
        ctrl-t s        Show TX/RX statistics
 
@@ -257,18 +289,50 @@ KEYS
 
        ctrl-t v        Show version
 
-       ctrl-t x        Send a file using the XMODEM-1K protocol (prompts for file name)
+       ctrl-t x        Send file using the XMODEM-1K or XMODEM-CRC protocol (prompts for file name and protocol)
 
-       ctrl-t X        Send a file using the XMODEM-CRC protocol (prompts for file name)
-
-       ctrl-t y        Send a file using the YMODEM protocol (prompts for file name)
+       ctrl-t y        Send file using the YMODEM protocol (prompts for file name)
 
        ctrl-t ctrl-t   Send ctrl-t character
 
-HEXADECIMAL MODE
-       In hexadecimal mode each incoming byte is printed out as a hexadecimal value.
+SCRIPT API
+       Tio suppots Lua scripting to easily automate interaction with the tty device.
 
-       Bytes can be sent in this mode by typing the two-character hexadecimal representation of the value, e.g.: to send 0xA you must type 0a or 0A.
+       This means that in addition to the Lua API tio makes the following functions available:
+
+       modem_send(file, protocol)
+             Send file using x/y-modem protocol.
+
+             Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
+
+       send(string)
+             Send string.
+
+       high(line)
+             Set tty line high.
+
+       low(line)
+             Set tty line low.
+
+       toggle(line)
+             Toggle the tty line.
+
+       sleep(seconds)
+             Sleep for seconds.
+
+       msleep(ms)
+             Sleep for miliseconds.
+
+       config_high(line)
+             Set tty line state configuration to high.
+
+       config_low(line)
+             Set tty line state configuration to low.
+
+       apply_config()
+             Apply tty line state configuration. Using the line state configuration API instead of high()/low() will help to make the lines physically switch as simultaneously as possible. This may solve timing issues on some platforms.
+
+       Note: Line can be any of DTR, RTS, CTS, DSR, CD, RI
 
 CONFIGURATION FILE
        Options can be set via configuration file using the INI format. tio uses the configuration file first found in the following locations in the order listed:
@@ -289,8 +353,7 @@ CONFIGURATION FILE
 
        The following configuration file options are available:
 
-       pattern
-                                Pattern matching user input. This pattern can be an extended regular expression with a single group.
+       pattern                  Pattern matching user input. This pattern can be an extended regular expression with a single group.
 
        device                   TTY device to open. If it contains a "%s" it is substituted with the first group match.
 
@@ -316,6 +379,8 @@ CONFIGURATION FILE
 
        log-file                 Set log filename
 
+       log-directory            Set log directory path in which to save automatically named log files.
+
        log-append               Append to log file
 
        log-strip                Enable strip of control and escape sequences from log
@@ -330,11 +395,13 @@ CONFIGURATION FILE
 
        color                    Colorize tio text using ANSI color code ranging from 0 to 255
 
-       hexadecimal              Enable hexadecimal mode
+       input-mode               Set input mode.
+
+       output-mode              Set output mode.
 
        socket                   Set socket to redirect I/O to
 
-       prefix-ctrl-key          Set prefix ctrl key (a..z, default: t)
+       prefix-ctrl-key          Set prefix ctrl key (a..z or 'none', default: t)
 
        response-wait            Enable wait for line response
 
@@ -345,6 +412,12 @@ CONFIGURATION FILE
        rs-485-config            Set RS-485 configuration
 
        alert                    Set alert action on connect/disconnect
+
+       script                   Run script from string
+
+       script-file              Run script from file
+
+       script-run               Run script on connect.
 
 CONFIGURATION FILE EXAMPLES
        To change the default configuration simply set options like so:
@@ -455,10 +528,14 @@ EXAMPLES
 
               $ tio --rs-485 --rs-485-config=RTS_ON_SEND=1,RX_DURING_TX /dev/ttyUSB0
 
+       Script manipulation of DTR and RTS lines upon first connect:
+
+              $ tio --script "high(DTR); low(RTS); msleep(100); toggle(DTR)" --script-run once /dev/ttyUSB0
+
 WEBSITE
        Visit https://tio.github.io
 
 AUTHOR
        Created by Martin Lund <martin.lund@keep-it-simple.com>.
 
-tio 2.7                                                                                                                                    2023-09-19                                                                                                                                    tio(1)
+tio 2.8                                                                                                                                    2023-09-19                                                                                                                                    tio(1)
