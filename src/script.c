@@ -19,6 +19,7 @@
  * 02110-1301, USA.
  */
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -186,6 +187,28 @@ static int modem_send(lua_State *L)
     return 0;
 }
 
+// lua: send(string)
+static int send(lua_State *L)
+{
+    const char *string = lua_tostring(L, 1);
+    int ret;
+
+    if (string == NULL)
+    {
+        return 0;
+    }
+
+    ret = write(serial_fd, string, strlen(string));
+    if (ret < 0)
+    {
+        tio_error_print("%s\n", strerror(errno));
+    }
+
+    lua_pushnumber(L, ret);
+
+    return 1;
+}
+
 static void script_buffer_run(lua_State *L, const char *script_buffer)
 {
     int error;
@@ -210,6 +233,7 @@ static const struct luaL_Reg tio_lib[] =
     { "config_low", config_low},
     { "config_apply", config_apply},
     { "modem_send", modem_send},
+    { "send", send},
     {NULL, NULL}
 };
 
