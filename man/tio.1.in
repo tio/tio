@@ -365,20 +365,26 @@ Toggle conversion to uppercase on output
 .IP "\fBctrl-t v"
 Show version
 .IP "\fBctrl-t x"
-Send a file using the XMODEM-1K protocol (prompts for file name)
-.IP "\fBctrl-t X"
-Send a file using the XMODEM-CRC protocol (prompts for file name)
+Send file using the XMODEM-1K or XMODEM-CRC protocol (prompts for file name and protocol)
 .IP "\fBctrl-t y"
-Send a file using the YMODEM protocol (prompts for file name)
+Send file using the YMODEM protocol (prompts for file name)
 .IP "\fBctrl-t ctrl-t"
 Send ctrl-t character
 
 .SH "SCRIPT API"
 .PP
-Tio suppots Lua scripting for manipulating the tty device. In addition to the
-Lua API tio makes the following functions available:
+Tio suppots Lua scripting to easily automate interaction with the tty device.
+
+This means that in addition to the Lua API tio makes the following functions
+available:
 
 .TP 6n
+
+.IP "\fBmodem_send(file, protocol)"
+Send file using x/y-modem protocol.
+
+Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
+
 .IP "\fBhigh(line)"
 Set tty line high.
 .IP "\fBlow(line)"

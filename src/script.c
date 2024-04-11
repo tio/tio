@@ -31,6 +31,7 @@
 #include "print.h"
 #include "options.h"
 #include "tty.h"
+#include "xymodem.h"
 
 static int serial_fd;
 
@@ -153,6 +154,38 @@ static int config_apply(lua_State *L)
     return 0;
 }
 
+// lua: modem_send(file, protocol)
+static int modem_send(lua_State *L)
+{
+    const char *file = lua_tostring(L, 1);
+    int protocol = lua_tointeger(L, 2);
+
+    if (file == NULL)
+    {
+        return 0;
+    }
+
+    switch (protocol)
+    {
+        case XMODEM_1K:
+            tio_printf("Sending file '%s' using XMODEM-1K", file);
+            tio_printf("%s", xymodem_send(serial_fd, file, XMODEM_1K) < 0 ? "Aborted" : "Done");
+            break;
+
+        case XMODEM_CRC:
+            tio_printf("Sending file '%s' using XMODEM-CRC", file);
+            tio_printf("%s", xymodem_send(serial_fd, file, XMODEM_CRC) < 0 ? "Aborted" : "Done");
+        break;
+
+        case YMODEM:
+            tio_printf("Sending file '%s' using YMODEM", file);
+            tio_printf("%s", xymodem_send(serial_fd, file, YMODEM) < 0 ? "Aborted" : "Done");
+        break;
+    }
+
+    return 0;
+}
+
 static void script_buffer_run(lua_State *L, const char *script_buffer)
 {
     int error;
@@ -176,6 +209,7 @@ static const struct luaL_Reg tio_lib[] =
     { "config_high", config_high},
     { "config_low", config_low},
     { "config_apply", config_apply},
+    { "modem_send", modem_send},
     {NULL, NULL}
 };
 
@@ -238,6 +272,9 @@ void script_set_globals(lua_State *L)
     script_set_global(L, "DSR", TIOCM_DSR);
     script_set_global(L, "CD", TIOCM_CD);
     script_set_global(L, "RI", TIOCM_RI);
+    script_set_global(L, "XMODEM_CRC", XMODEM_CRC);
+    script_set_global(L, "XMODEM_1K", XMODEM_1K);
+    script_set_global(L, "YMODEM", YMODEM);
 }
 
 void script_run(int fd)
