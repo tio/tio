@@ -59,9 +59,9 @@ when used in combination with [tmux](https://tmux.github.io).
  * Remapping of prefix key
  * Support NO_COLOR env variable as per no-color.org
  * Man page documentation
- * Lua scripting support for automating interaction with serial device
-   * Manipulate port control lines at connect/reconnect (useful for microcontroller reset/boot etc.)
+ * Lua scripting support for automating interaction with serial device at connect
    * Simple expect/send like functionality with support for regular expressions
+   * Manipulate port control lines (useful for microcontroller reset/boot etc.)
    * Send files via x/y-modem protocol
  * Plays nicely with [tmux](https://tmux.github.io)
 
@@ -209,12 +209,63 @@ ctrl-t ? to list the available key commands.
 [15:02:53.269]  ctrl-t v       Show version
 [15:02:53.269]  ctrl-t x       Send file via Xmodem
 [15:02:53.269]  ctrl-t y       Send file via Ymodem
-[15:02:53.269]  ctrl-t ctrl-t Send ctrl-t character
+[15:02:53.269]  ctrl-t ctrl-t  Send ctrl-t character
 ```
 
 If needed, the prefix key (ctrl-t) can be remapped via configuration file.
 
-### 3.3 Configuration file
+### 3.3 Lua script API
+
+Tio suppots Lua scripting to easily automate interaction with the tty device.
+
+In addition to the Lua API tio makes the following functions available:
+
+```
+  expect(string)
+        Expect string - waits for string to match before continueing.
+
+        Supports regular expressions. Special characters must be escaped with '\\'.
+
+  send(string)
+        Send string.
+
+  modem_send(file, protocol)
+        Send file using x/y-modem protocol.
+
+        Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
+
+  high(line)
+        Set tty line high.
+
+  low(line)
+        Set tty line low.
+
+  toggle(line)
+        Toggle the tty line.
+
+  sleep(seconds)
+        Sleep for seconds.
+
+  msleep(ms)
+        Sleep for miliseconds.
+
+  config_high(line)
+        Set tty line state configuration to high.
+
+  config_low(line)
+        Set tty line state configuration to low.
+
+  apply_config()
+        Apply tty line state configuration.
+
+        Using the line state configuration API instead of high()/low() will
+        help to make the lines physically switch as simultaneously as possible.
+        This may solve timing issues on some platforms.
+
+  Note: Line can be any of DTR, RTS, CTS, DSR, CD, RI
+```
+
+### 3.4 Configuration file
 
 Options can be set via the configuration file first found in any of the
 following locations in the order listed:
@@ -225,6 +276,8 @@ following locations in the order listed:
 The configuration file supports sub-configurations using named sections which can
 be activated via the command-line by name or pattern. A sub-configuration
 specifies which TTY device to connect to and other options.
+
+### 3.4.1 Examples
 
 Example configuration file:
 
@@ -245,10 +298,16 @@ log-file = rpi3.log
 line-pulse-duration = DTR=200,RTS=150
 color = 12
 
+[esp32]
+device = /dev/serial/by-id/usb-0403_6014-if00-port0
+script = high(DTR); low(RTS); msleep(100); low(DTR); high(RTS); msleep(100); low(RTS)
+script-run = always
+color = 13
+
 [usb devices]
 pattern = usb([0-9]*)
 device = /dev/ttyUSB%s
-color = 13
+color = 14
 ```
 
 To use a specific sub-configuration by name simply start tio like so:

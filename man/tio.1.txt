@@ -1,13 +1,13 @@
 tio(1)                                                                                                                                   User Commands                                                                                                                                   tio(1)
 
 NAME
-       tio - a simple serial device I/O tool
+       tio - a serial device I/O tool
 
 SYNOPSIS
        tio [<options>] <tty-device|sub-config>
 
 DESCRIPTION
-       tio is a simple serial device tool which features a straightforward command-line and configuration file interface to easily connect to serial TTY devices for basic I/O operations.
+       tio is a serial device tool which features a straightforward command-line and configuration file interface to easily connect to serial TTY devices for basic I/O operations.
 
 OPTIONS
        -b, --baudrate <bps>
@@ -298,15 +298,18 @@ KEYS
 SCRIPT API
        Tio suppots Lua scripting to easily automate interaction with the tty device.
 
-       This means that in addition to the Lua API tio makes the following functions available:
+       In addition to the Lua API tio makes the following functions available:
+
+       expect(string)
+             Expect string - waits for string to match before continueing. Supports regular expressions. Special characters must be escaped with '\\'.
+
+       send(string)
+             Send string.
 
        modem_send(file, protocol)
              Send file using x/y-modem protocol.
 
              Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
-
-       send(string)
-             Send string.
 
        high(line)
              Set tty line high.
@@ -528,9 +531,13 @@ EXAMPLES
 
               $ tio --rs-485 --rs-485-config=RTS_ON_SEND=1,RX_DURING_TX /dev/ttyUSB0
 
-       Script manipulation of DTR and RTS lines upon first connect:
+       Manipulate DTR and RTS lines upon first connect to reset connected microcontroller:
 
               $ tio --script "high(DTR); low(RTS); msleep(100); toggle(DTR)" --script-run once /dev/ttyUSB0
+
+       Automatically log in to connected OS:
+
+              $ tio --script "expect('password:'); send('my_password\n')" /dev/ttyUSB0
 
 WEBSITE
        Visit https://tio.github.io
