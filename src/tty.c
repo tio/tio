@@ -793,7 +793,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 tio_printf(" ctrl-%c v       Show version", option.prefix_key);
                 tio_printf(" ctrl-%c x       Send file via Xmodem", option.prefix_key);
                 tio_printf(" ctrl-%c y       Send file via Ymodem", option.prefix_key);
-                tio_printf(" ctrl-%c ctrl-%c Send ctrl-%c character", option.prefix_key, option.prefix_key, option.prefix_key);
+                tio_printf(" ctrl-%c ctrl-%c  Send ctrl-%c character", option.prefix_key, option.prefix_key, option.prefix_key);
                 break;
 
             case KEY_SHIFT_L:
