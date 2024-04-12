@@ -375,17 +375,18 @@ Send ctrl-t character
 .PP
 Tio suppots Lua scripting to easily automate interaction with the tty device.
 
-This means that in addition to the Lua API tio makes the following functions
-available:
+In addition to the Lua API tio makes the following functions available:
 
 .TP 6n
 
+.IP "\fBexpect(string)"
+Expect string - waits for string to match before continueing. Supports regular expressions. Special characters must be escaped with '\\\\'.
+.IP "\fBsend(string)"
+Send string.
 .IP "\fBmodem_send(file, protocol)"
 Send file using x/y-modem protocol.
 
 Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
-.IP "\fBsend(string)"
-Send string.
 .IP "\fBhigh(line)"
 Set tty line high.
 .IP "\fBlow(line)"
@@ -660,10 +661,14 @@ Enable RS-485 mode:
 $ tio --rs-485 --rs-485-config=RTS_ON_SEND=1,RX_DURING_TX /dev/ttyUSB0
 
 .TP
-Script manipulation of DTR and RTS lines upon first connect:
+Manipulate DTR and RTS lines upon first connect to reset connected microcontroller:
 
 $ tio --script "high(DTR); low(RTS); msleep(100); toggle(DTR)" --script-run once /dev/ttyUSB0
 
+.TP
+Automatically log in to connected OS:
+
+$ tio --script "expect('password:'); send('my_password\\n')" /dev/ttyUSB0
 
 .SH "WEBSITE"
 .PP

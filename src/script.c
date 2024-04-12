@@ -20,6 +20,7 @@
  */
 
 #include <errno.h>
+#include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -34,7 +35,11 @@
 #include "tty.h"
 #include "xymodem.h"
 
+#define MAX_BUFFER_SIZE 2000 // Maximum size of circular buffer
+
 static int serial_fd;
+static char circular_buffer[MAX_BUFFER_SIZE];
+static int buffer_size = 0;
 
 // lua: sleep(seconds)
 static int sleep_(lua_State *L)
@@ -209,6 +214,95 @@ static int send(lua_State *L)
     return 1;
 }
 
+// Function to add a character to the circular buffer
+void add_to_buffer(char c)
+{
+    if (buffer_size < MAX_BUFFER_SIZE)
+    {
+        circular_buffer[buffer_size++] = c;
+    }
+    else
+    {
+        // Shift the buffer to accommodate the new character
+        memmove(circular_buffer, circular_buffer + 1, MAX_BUFFER_SIZE - 1);
+        circular_buffer[MAX_BUFFER_SIZE - 1] = c;
+    }
+}
+
+// Function to match against the circular buffer using regex
+bool match_regex(regex_t *regex)
+{
+    char buffer[MAX_BUFFER_SIZE + 1]; // Temporary buffer for regex matching
+    memcpy(buffer, circular_buffer, buffer_size);
+    buffer[buffer_size] = '\0'; // Null-terminate the buffer
+
+    // Match against the regex
+    int ret = regexec(regex, buffer, 0, NULL, 0);
+    if (!ret)
+    {
+        // Match found
+        return true;
+    }
+    else if (ret == REG_NOMATCH)
+    {
+        // No match found, do nothing
+    }
+    else
+    {
+        // Error occurred during matching
+        tio_error_print("Regex match failed");
+    }
+
+    return false;
+}
+
+// lua: expect(string)
+static int expect(lua_State *L)
+{
+    const char *string = lua_tostring(L, 1);
+    regex_t regex;
+    int ret = 0;
+    char c;
+
+    if (string == NULL)
+    {
+        ret = -1;
+        goto error;
+    }
+
+    // Compile the regular expression
+    ret = regcomp(&regex, string, REG_EXTENDED);
+    if (ret)
+    {
+        tio_error_print("Could not compile regex");
+        ret = -1;
+        goto error;
+    }
+
+    // Main loop to read and match
+    while (true)
+    {
+        ssize_t bytes_read = read(serial_fd, &c, 1);
+        if (bytes_read > 0)
+        {
+            putchar(c);
+            add_to_buffer(c);
+            // Match against the entire buffer
+            if (match_regex(&regex))
+            {
+                break;
+            }
+        }
+    }
+
+    // Cleanup
+    regfree(&regex);
+
+error:
+    lua_pushnumber(L, ret);
+    return 1;
+}
+
 static void script_buffer_run(lua_State *L, const char *script_buffer)
 {
     int error;
@@ -217,7 +311,7 @@ static void script_buffer_run(lua_State *L, const char *script_buffer)
         lua_pcall(L, 0, 0, 0);
     if (error)
     {
-        tio_warning_printf("%s\n", lua_tostring(L, -1));
+        tio_warning_printf("lua: %s\n", lua_tostring(L, -1));
         lua_pop(L, 1);  /* pop error message from the stack */
     }
 }
@@ -234,6 +328,7 @@ static const struct luaL_Reg tio_lib[] =
     { "config_apply", config_apply},
     { "modem_send", modem_send},
     { "send", send},
+    { "expect", expect},
     {NULL, NULL}
 };
 
@@ -276,7 +371,7 @@ void script_file_run(lua_State *L, const char *filename)
 
     if (luaL_dofile(L, filename))
     {
-        tio_warning_printf("%s\n", lua_tostring(L, -1));
+        tio_warning_printf("lua: %s\n", lua_tostring(L, -1));
         lua_pop(L, 1);  /* pop error message from the stack */
         return;
     }

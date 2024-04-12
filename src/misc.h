@@ -32,3 +32,4 @@ int ctrl_key_code(unsigned char key);
 void alert_connect(void);
 void alert_disconnect(void);
 bool fs_dir_exists(const char *path);
+bool regex_match(const char *string, const char *pattern);

@@ -20,6 +20,7 @@
  */
 
 #include "config.h"
+#include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -85,5 +86,29 @@ bool fs_dir_exists(const char *path)
         return false;
     }
 
+    return true;
+}
+
+bool regex_match(const char *string, const char *pattern)
+{
+    regex_t regex;
+    int status;
+
+    if (regcomp(&regex, pattern, REG_EXTENDED | REG_NOSUB) != 0)
+    {
+        // No match
+        return false;
+    }
+
+    status = regexec(&regex, string, (size_t) 0, NULL, 0);
+    regfree(&regex);
+
+    if (status != 0)
+    {
+        // No match
+        return false;
+    }
+
+    // Match
     return true;
 }
