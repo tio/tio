@@ -1,7 +1,7 @@
 
 [![tio](images/tio-icon.png)]()
 
-# tio - a simple serial device I/O tool
+# tio - a serial device I/O tool
 
 [![](https://img.shields.io/circleci/build/github/tio/tio)](https://circleci.com/github/tio/tio/tree/master)
 [![](https://img.shields.io/github/v/release/tio/tio?sort=semver)](https://github.com/tio/tio/releases)
@@ -10,9 +10,9 @@
 
 ## 1. Introduction
 
-tio is a simple serial device tool which features a straightforward
-command-line and configuration file interface to easily connect to serial TTY
-devices for basic I/O operations.
+tio is a serial device tool which features a straightforward command-line and
+configuration file interface to easily connect to serial TTY devices for basic
+I/O operations.
 
 <p align="center">
 <img src="images/tio-demo.gif">
@@ -24,7 +24,7 @@ To make a simpler serial device tool for talking with serial TTY devices with
 less focus on classic terminal/modem features and more focus on the needs of
 embedded developers and hackers.
 
-tio was originally created as an alternative to 
+tio was originally created as an alternative to
 [screen](https://www.gnu.org/software/screen) for connecting to serial devices
 when used in combination with [tmux](https://tmux.github.io).
 

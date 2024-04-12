@@ -1,7 +1,7 @@
 .TH "tio" "1" "@version_date@" "tio @version@" "User Commands"
 
 .SH "NAME"
-tio \- a simple serial device I/O tool
+tio \- a serial device I/O tool
 
 .SH "SYNOPSIS"
 .PP
@@ -10,9 +10,9 @@ tio \- a simple serial device I/O tool
 
 .SH "DESCRIPTION"
 .PP
-\fBtio\fR is a simple serial device tool which features a straightforward
-command-line and configuration file interface to easily connect to serial TTY
-devices for basic I/O operations.
+\fBtio\fR is a serial device tool which features a straightforward command-line
+and configuration file interface to easily connect to serial TTY devices for
+basic I/O operations.
 
 .SH "OPTIONS"
 
