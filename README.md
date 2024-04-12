@@ -59,7 +59,8 @@ when used in combination with [tmux](https://tmux.github.io).
  * Remapping of prefix key
  * Support NO_COLOR env variable as per no-color.org
  * Man page documentation
- * Lua scripting support for automating interaction with serial device at connect
+ * Lua scripting support for automation
+   * Run script at connect once/always/never
    * Simple expect/send like functionality with support for regular expressions
    * Manipulate port control lines (useful for microcontroller reset/boot etc.)
    * Send files via x/y-modem protocol
