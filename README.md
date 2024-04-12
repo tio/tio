@@ -35,7 +35,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Sensible defaults (115200 8n1)
  * Support for non-standard baud rates
  * Support for mark and space parity
- * X-modem (1K) and Y-modem file upload
+ * X-modem (1K/CRC) and Y-modem file upload
  * Support for RS-485 mode
  * List available serial devices by ID
  * Show RX/TX statistics
@@ -59,9 +59,10 @@ when used in combination with [tmux](https://tmux.github.io).
  * Remapping of prefix key
  * Support NO_COLOR env variable as per no-color.org
  * Man page documentation
- * Lua scripting support
+ * Lua scripting support for automating interaction with serial device
    * Manipulate port control lines at connect/reconnect (useful for microcontroller reset/boot etc.)
-   * Automate interaction with tty device (TBD)
+   * Simple expect/send like functionality with support for regular expressions
+   * Send files via x/y-modem protocol
  * Plays nicely with [tmux](https://tmux.github.io)
 
 ## 3. Usage
