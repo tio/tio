@@ -60,7 +60,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Support NO_COLOR env variable as per no-color.org
  * Man page documentation
  * Lua scripting support for automation
-   * Run script at connect once/always/never
+   * Run script manually or automatically at connect once/always/never
    * Simple expect/send like functionality with support for regular expressions
    * Manipulate port control lines (useful for microcontroller reset/boot etc.)
    * Send files via x/y-modem protocol
@@ -302,7 +302,7 @@ color = 12
 [esp32]
 device = /dev/serial/by-id/usb-0403_6014-if00-port0
 script = high(DTR); low(RTS); msleep(100); low(DTR); high(RTS); msleep(100); low(RTS)
-script-run = always
+script-run = once
 color = 13
 
 [usb devices]
