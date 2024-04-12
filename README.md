@@ -207,8 +207,7 @@ ctrl-t ? to list the available key commands.
 [15:02:53.269]  ctrl-t t       Toggle line timestamp mode
 [15:02:53.269]  ctrl-t U       Toggle conversion to uppercase on output
 [15:02:53.269]  ctrl-t v       Show version
-[15:02:53.269]  ctrl-t x       Send file via Xmodem-1K
-[15:02:53.269]  ctrl-t X       Send file via Xmodem-CRC
+[15:02:53.269]  ctrl-t x       Send file via Xmodem
 [15:02:53.269]  ctrl-t y       Send file via Ymodem
 [15:02:53.269]  ctrl-t ctrl-t Send ctrl-t character
 ```
