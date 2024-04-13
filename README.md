@@ -237,6 +237,9 @@ In addition to the Lua API tio makes the following functions available:
 
         Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
 
+  exit(code)
+        Exit with code.
+
   high(line)
         Set tty line high.
 

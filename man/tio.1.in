@@ -389,6 +389,8 @@ Send string.
 Send file using x/y-modem protocol.
 
 Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
+.IP "\fBexit(code)"
+Exit with exit code.
 .IP "\fBhigh(line)"
 Set tty line high.
 .IP "\fBlow(line)"

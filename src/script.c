@@ -315,6 +315,16 @@ error:
     return 1;
 }
 
+// lua: exit(code)
+static int exit_(lua_State *L)
+{
+    long code = lua_tointeger(L, 1);
+
+    exit(code);
+
+    return 0;
+}
+
 static void script_buffer_run(lua_State *L, const char *script_buffer)
 {
     int error;
@@ -341,6 +351,7 @@ static const struct luaL_Reg tio_lib[] =
     { "modem_send", modem_send},
     { "send", send},
     { "expect", expect},
+    { "exit", exit_},
     {NULL, NULL}
 };
 
