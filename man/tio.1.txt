@@ -188,16 +188,6 @@ OPTIONS
 
               At present there is a hardcoded limit of 16 clients connected at one time.
 
-       -r, --response-wait
-
-              Wait for line response then quit. A line is considered any string terminated with a NL character. If no line is received tio will quit after response timeout.
-
-              Any tio text is automatically muted when piping a string to tio while in response mode to make it easy to parse the response.
-
-           --response-timeout <ms>
-
-              Set timeout [ms] of line response (default: 100).
-
            --rs-485
 
               Enable RS-485 mode.
@@ -300,8 +290,8 @@ SCRIPT API
 
        In addition to the Lua API tio makes the following functions available:
 
-       expect(string)
-             Expect string - waits for string to match before continueing. Supports regular expressions. Special characters must be escaped with '\\'.
+       expect(string, timeout)
+             Expect string - waits for string to match or timeout before continueing.  Supports regular expressions. Special characters must be escaped with '\\'.  Timeout is in milliseconds, defaults to 0 meaning it will wait forever.
 
        send(string)
              Send string.
@@ -310,6 +300,9 @@ SCRIPT API
              Send file using x/y-modem protocol.
 
              Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
+
+       exit(code)
+             Exit with exit code.
 
        high(line)
              Set tty line high.
@@ -405,10 +398,6 @@ CONFIGURATION FILE
        socket                   Set socket to redirect I/O to
 
        prefix-ctrl-key          Set prefix ctrl key (a..z or 'none', default: t)
-
-       response-wait            Enable wait for line response
-
-       response-timeout         Set line response timeout
 
        rs-485                   Enable RS-485 mode
 
@@ -517,11 +506,9 @@ EXAMPLES
 
               $ echo "ls -la" | tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 
-       Pipe command to the serial device and wait for line response (string ending with CR or NL):
+       Pipe command to serial device and wait for line response within 1 second:
 
-              $ echo "*IDN?" | tio /dev/ttyACM0 --response-wait
-
-       In this mode, only the response will be printed.
+              $ echo "*IDN?" | tio /dev/ttyACM0 --script "expect('\r\n', 1000)" --mute
 
        Likewise, to pipe data from file to the serial device:
 
