@@ -22,6 +22,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stdio.h>
 
 #define UNUSED(expr) do { (void)(expr); } while (0)
 
@@ -33,3 +34,4 @@ void alert_connect(void);
 void alert_disconnect(void);
 bool fs_dir_exists(const char *path);
 bool regex_match(const char *string, const char *pattern);
+int read_poll(int fd, void *data, size_t len, int timeout);

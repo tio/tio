@@ -222,10 +222,12 @@ Tio suppots Lua scripting to easily automate interaction with the tty device.
 In addition to the Lua API tio makes the following functions available:
 
 ```
-  expect(string)
-        Expect string - waits for string to match before continueing.
+  expect(string, timeout)
+        Expect string - waits for string to match or timeout before continueing.
 
         Supports regular expressions. Special characters must be escaped with '\\'.
+
+        Timeout is in milliseconds, defaults to 0 meaning it will wait forever.
 
   send(string)
         Send string.

@@ -28,6 +28,7 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <errno.h>
+#include <sys/poll.h>
 #include "error.h"
 #include "print.h"
 #include "options.h"
@@ -111,4 +112,32 @@ bool regex_match(const char *string, const char *pattern)
 
     // Match
     return true;
+}
+
+int read_poll(int fd, void *data, size_t len, int timeout)
+{
+    struct pollfd fds;
+    int ret = 0;
+
+    fds.events = POLLIN;
+    fds.fd = fd;
+
+    /* Wait data available */
+    ret = poll(&fds, 1, timeout);
+    if (ret < 0)
+    {
+        tio_error_print("%s", strerror(errno));
+        return ret;
+    }
+    else if (ret > 0)
+    {
+        if (fds.revents & POLLIN)
+        {
+            // Read ready data
+            return read(fd, data, len);
+        }
+    }
+
+    /* Timeout */
+    return ret;
 }

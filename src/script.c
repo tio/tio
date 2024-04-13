@@ -256,18 +256,25 @@ bool match_regex(regex_t *regex)
     return false;
 }
 
-// lua: expect(string)
+// lua: expect(string, timeout)
 static int expect(lua_State *L)
 {
     const char *string = lua_tostring(L, 1);
+    long timeout = lua_tointeger(L, 2);
     regex_t regex;
     int ret = 0;
     char c;
 
-    if (string == NULL)
+    if ((string == NULL) || (timeout < 0))
     {
         ret = -1;
         goto error;
+    }
+
+    if (timeout == 0)
+    {
+        // Let poll() wait forever
+        timeout = -1;
     }
 
     // Compile the regular expression
@@ -282,7 +289,7 @@ static int expect(lua_State *L)
     // Main loop to read and match
     while (true)
     {
-        ssize_t bytes_read = read(serial_fd, &c, 1);
+        ssize_t bytes_read = read_poll(serial_fd, &c, 1, timeout);
         if (bytes_read > 0)
         {
             putchar(c);
@@ -292,6 +299,11 @@ static int expect(lua_State *L)
             {
                 break;
             }
+        }
+        else
+        {
+            // Timeout or error
+            break;
         }
     }
 
