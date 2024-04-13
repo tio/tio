@@ -69,12 +69,6 @@ int main(int argc, char *argv[])
     {
         // Enter non interactive mode
         interactive_mode = false;
-
-        // Mute tio text in response mode
-        if (option.response_wait)
-        {
-            option.mute = true;
-        }
     }
 
     /* Configure output terminal */

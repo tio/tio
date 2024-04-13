@@ -246,21 +246,6 @@ At present there is a hardcoded limit of 16 clients connected at one time.
 .RE
 
 .TP
-.BR \-r ", " \-\-response\-wait
-
-Wait for line response then quit. A line is considered any string terminated
-with a NL character. If no line is received tio will quit after response
-timeout.
-
-Any tio text is automatically muted when piping a string to tio while in
-response mode to make it easy to parse the response.
-
-.TP
-.BR "    \-\-response\-timeout " \fI<ms>
-
-Set timeout [ms] of line response (default: 100).
-
-.TP
 .BR "    \-\-rs\-485"
 
 Enable RS-485 mode.
@@ -494,10 +479,6 @@ Set output mode.
 Set socket to redirect I/O to
 .IP "\fBprefix-ctrl-key"
 Set prefix ctrl key (a..z or 'none', default: t)
-.IP "\fBresponse-wait"
-Enable wait for line response
-.IP "\fBresponse-timeout"
-Set line response timeout
 .IP "\fBrs-485"
 Enable RS-485 mode
 .IP "\fBrs-485-config"
@@ -648,11 +629,10 @@ Pipe command to the serial device:
 $ echo "ls -la" | tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
 
 .TP
-Pipe command to the serial device and wait for line response (string ending with CR or NL):
+Pipe command to serial device and wait for line response within 1 second:
 
-$ echo "*IDN?" | tio /dev/ttyACM0 --response-wait
+$ echo "*IDN?" | tio /dev/ttyACM0 --script "expect('\\r\\n', 1000)" --mute
 .TP
-In this mode, only the response will be printed.
 
 .TP
 Likewise, to pipe data from file to the serial device:

@@ -27,7 +27,6 @@ log-strip = disable
 local-echo = disable
 color = bold
 rs-485 = disable
-response-wait = disable
 alert = none
 script-run = always
 

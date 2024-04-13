@@ -50,7 +50,6 @@ enum opt_t
     OPT_LOG_STRIP,
     OPT_LOG_APPEND,
     OPT_LINE_PULSE_DURATION,
-    OPT_RESPONSE_TIMEOUT,
     OPT_RS485,
     OPT_RS485_CONFIG,
     OPT_ALERT,
@@ -96,8 +95,6 @@ struct option_t option =
     .prefix_code = 20, // ctrl-t
     .prefix_key = 't',
     .prefix_enabled = true,
-    .response_wait = false,
-    .response_timeout = 100,
     .mute = false,
     .rs485 = false,
     .rs485_config_flags = 0,
@@ -142,8 +139,6 @@ void print_help(char *argv[])
     printf("  -m, --map <flags>                      Map characters\n");
     printf("  -c, --color 0..255|bold|none|list      Colorize tio text (default: bold)\n");
     printf("  -S, --socket <socket>                  Redirect I/O to socket\n");
-    printf("  -r, --response-wait                    Wait for line response then quit\n");
-    printf("      --response-timeout <ms>            Response timeout (default: 100)\n");
     printf("      --rs-485                           Enable RS-485 mode\n");
     printf("      --rs-485-config <config>           Set RS-485 configuration\n");
     printf("      --alert bell|blink|none            Alert on connect/disconnect (default: none)\n");
@@ -375,8 +370,6 @@ void options_parse(int argc, char *argv[])
             {"color",                required_argument, 0, 'c'                     },
             {"input-mode",           required_argument, 0, OPT_INPUT_MODE          },
             {"output-mode",          required_argument, 0, OPT_OUTPUT_MODE         },
-            {"response-wait",        no_argument,       0, 'r'                     },
-            {"response-timeout",     required_argument, 0, OPT_RESPONSE_TIMEOUT    },
             {"rs-485",               no_argument,       0, OPT_RS485               },
             {"rs-485-config",        required_argument, 0, OPT_RS485_CONFIG        },
             {"alert",                required_argument, 0, OPT_ALERT               },
@@ -529,14 +522,6 @@ void options_parse(int argc, char *argv[])
 
             case OPT_OUTPUT_MODE:
                 option.output_mode = output_mode_option_parse(optarg);
-                break;
-
-            case 'r':
-                option.response_wait = true;
-                break;
-
-            case OPT_RESPONSE_TIMEOUT:
-                option.response_timeout = string_to_long(optarg);
                 break;
 
             case OPT_RS485:

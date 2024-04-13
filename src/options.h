@@ -77,8 +77,6 @@ struct option_t
     unsigned char prefix_code;
     unsigned char prefix_key;
     bool prefix_enabled;
-    bool response_wait;
-    int response_timeout;
     bool mute;
     bool rs485;
     uint32_t rs485_config_flags;

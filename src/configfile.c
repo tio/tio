@@ -276,14 +276,6 @@ static int data_handler(void *user, const char *section, const char *name,
                 option.prefix_key = value[0];
             }
         }
-        else if (!strcmp(name, "response-wait"))
-        {
-            option.response_wait = read_boolean(value, name);
-        }
-        else if (!strcmp(name, "response-timeout"))
-        {
-            option.response_timeout = read_integer(value, name, 0, LONG_MAX);
-        }
         else if (!strcmp(name, "rs-485"))
         {
             option.rs485 = read_boolean(value, name);

@@ -52,7 +52,6 @@ when used in combination with [tmux](https://tmux.github.io).
  * Activate sub-configurations by name or pattern
  * Redirect I/O to UNIX socket or IPv4/v6 network socket for scripting or TTY sharing
  * Pipe input and/or output
- * Support for simple line request/response handling
  * Bash completion on options, serial device names, and sub-configuration names
  * Configurable text color
  * Visual or audible alert on connect/disconnect
@@ -104,8 +103,6 @@ Options:
   -m, --map <flags>                      Map characters
   -c, --color 0..255|bold|none|list      Colorize tio text (default: bold)
   -S, --socket <socket>                  Redirect I/O to socket
-  -r, --response-wait                    Wait for line response then quit
-      --response-timeout <ms>            Response timeout (default: 100)
       --rs-485                           Enable RS-485 mode
       --rs-485-config <config>           Set RS-485 configuration
       --alert bell|blink|none            Alert on connect/disconnect (default: none)
@@ -171,14 +168,14 @@ Redirect I/O to IPv4 network socket on port 4242:
 $ tio --socket inet:4242 /dev/ttyUSB0
 ```
 
-Inject data to the serial device:
+Pipe data to the serial device:
 ```
 $ cat data.bin | tio /dev/ttyUSB0
 ```
 
-Send command to serial device and wait for line response:
+Pipe command to serial device and wait for line response within 1 second:
 ```
-$ echo "*IDN?" | tio /dev/ttyACM0 --response-wait
+$ echo "*IDN?" | tio /dev/ttyACM0 --script "expect('\r\n', 1000)" --mute
 KORAD KD3305P V4.2 SN:32475045
 ```
 

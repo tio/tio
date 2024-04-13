@@ -1536,9 +1536,6 @@ int tty_connect(void)
     int    status;
     bool   next_timestamp = false;
     char*  now = NULL;
-    struct timeval tv;
-    struct timeval *tv_p = &tv;
-    bool ignore_stdin = false;
 
     /* Open tty device */
     fd = open(option.tty_device, O_RDWR | O_NOCTTY | O_NONBLOCK);
@@ -1629,6 +1626,35 @@ int tty_connect(void)
         }
     }
 
+    /* If stdin is a pipe forward all input to tty device */
+    if (interactive_mode == false)
+    {
+        while (true)
+        {
+            int ret = read(pipefd[0], &input_char, 1);
+            if (ret < 0)
+            {
+                tio_error_printf("Could not read from pipe (%s)", strerror(errno));
+                exit(EXIT_FAILURE);
+            }
+            else if (ret > 0)
+            {
+                // Forward to tty device
+                ret = write(fd, &input_char, 1);
+                if (ret < 0)
+                {
+                    tio_error_printf("Could not write to serial device (%s)", strerror(errno));
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else
+            {
+                // EOF - finished forwarding
+                break;
+            }
+        }
+    }
+
     /* Manage script activation */
     if (option.script_run != SCRIPT_RUN_NEVER)
     {
@@ -1640,33 +1666,24 @@ int tty_connect(void)
         }
     }
 
+    // Exit if piped input
+    if (interactive_mode == false)
+    {
+        exit(EXIT_SUCCESS);
+    }
+
     /* Input loop */
     while (true)
     {
         FD_ZERO(&rdfs);
         FD_SET(fd, &rdfs);
-        if (!ignore_stdin)
-        {
-            FD_SET(pipefd[0], &rdfs);
-        }
+        FD_SET(pipefd[0], &rdfs);
+
         maxfd = MAX(fd, pipefd[0]);
         maxfd = MAX(maxfd, socket_add_fds(&rdfs, true));
 
-        /* Manage timeout */
-        if ((option.response_wait) && (option.response_timeout != 0))
-        {
-            // Set response timeout
-            tv_p->tv_sec = 0;
-            tv_p->tv_usec = option.response_timeout * 1000;
-        }
-        else
-        {
-            // No timeout
-            tv_p = NULL;
-        }
-
         /* Block until input becomes available */
-        status = select(maxfd + 1, &rdfs, NULL, NULL, tv_p);
+        status = select(maxfd + 1, &rdfs, NULL, NULL, NULL);
         if (status > 0)
         {
             bool forward = false;
@@ -1750,15 +1767,6 @@ int tty_connect(void)
                     {
                         next_timestamp = true;
                     }
-
-                    if (option.response_wait)
-                    {
-                        if (input_char == '\n')
-                        {
-                             tty_sync(fd);
-                             exit(EXIT_SUCCESS);
-                        }
-                    }
                 }
             }
             else if (FD_ISSET(pipefd[0], &rdfs))
@@ -1772,22 +1780,9 @@ int tty_connect(void)
                 }
                 else if (bytes_read == 0)
                 {
-                    /* Reached EOF (when piping to stdin) */
-                    if (option.response_wait)
-                    {
-                        /* Stdin pipe closed but not blocking so stop listening
-                         * to stdin in response mode.
-                         *
-                         * Note: select() really indicates not if data is ready
-                         * but if file descriptor is non-blocking for I/O
-                         * operation. */
-                        ignore_stdin = true;
-                    }
-                    else
-                    {
-                        tty_sync(fd);
-                        exit(EXIT_SUCCESS);
-                    }
+                    /* Reached EOF (when piping to stdin, never reached) */
+                    tty_sync(fd);
+                    exit(EXIT_SUCCESS);
                 }
 
                 /* Process input byte by byte */
