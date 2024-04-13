@@ -136,7 +136,7 @@ $ tio /dev/ttyUSB0
 
 Which corresponds to the commonly used default options:
 ```
-$ tio -b 115200 -d 8 -f none -s 1 -p none /dev/ttyUSB0
+$ tio --baudrate 115200 --databits 8 --flow none --stopbits 1 --parity none /dev/ttyUSB0
 ```
 
 It is recommended to connect serial TTY devices by ID:
