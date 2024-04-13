@@ -250,7 +250,7 @@ In addition to the Lua API tio makes the following functions available:
         Sleep for seconds.
 
   msleep(ms)
-        Sleep for miliseconds.
+        Sleep for milliseconds.
 
   config_high(line)
         Set tty line state configuration to high.
@@ -299,6 +299,11 @@ no-autoconnect = enable
 log = enable
 log-file = rpi3.log
 line-pulse-duration = DTR=200,RTS=150
+color = 11
+
+[svf2]
+device = /dev/ttyUSB0
+script = expect("login: "); send("root\n"); expect("Password: "); send("root\n")
 color = 12
 
 [esp32]
