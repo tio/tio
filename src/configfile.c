@@ -393,30 +393,36 @@ static int resolve_config_file(void)
     char *xdg = getenv("XDG_CONFIG_HOME");
     if (xdg)
     {
-        asprintf(&c.path, "%s/tio/config", xdg);
-        if (access(c.path, F_OK) == 0)
+        if (asprintf(&c.path, "%s/tio/config", xdg) != -1)
         {
-            return 0;
+            if (access(c.path, F_OK) == 0)
+            {
+                return 0;
+            }
+            free(c.path);
         }
-        free(c.path);
     }
 
     char *home = getenv("HOME");
     if (home)
     {
-        asprintf(&c.path, "%s/.config/tio/config", home);
-        if (access(c.path, F_OK) == 0)
+        if (asprintf(&c.path, "%s/.config/tio/config", home) != -1)
         {
-            return 0;
+            if (access(c.path, F_OK) == 0)
+            {
+                return 0;
+            }
+            free(c.path);
         }
-        free(c.path);
 
-        asprintf(&c.path, "%s/.tioconfig", home);
-        if (access(c.path, F_OK) == 0)
+        if (asprintf(&c.path, "%s/.tioconfig", home) != -1)
         {
-            return 0;
+            if (access(c.path, F_OK) == 0)
+            {
+                return 0;
+            }
+            free(c.path);
         }
-        free(c.path);
     }
 
     c.path = NULL;
