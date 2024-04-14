@@ -390,10 +390,8 @@ $ sudo usermod -a -G dialout <username>
 
 ## 5. Contributing
 
-tio is open source. If you want to help out with the project please feel free
-to join in.
-
-All contributions (bug reports, code, doc, ideas, etc.) are welcome.
+This is an open source project - all contributions (bug reports, code, doc,
+ideas, etc.) are welcome.
 
 Please use the github issue tracker and pull request features.
 
@@ -420,6 +418,6 @@ tio is GPLv2+. See LICENSE file for more details.
 
 ## 9. Authors
 
-Created by Martin Lund \<martin.lund@keep-it-simple.com>
+Maintained by Martin Lund \<martin.lund@keep-it-simple.com>
 
 See the AUTHORS file for full list of contributors.
