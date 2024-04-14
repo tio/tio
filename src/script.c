@@ -37,7 +37,7 @@
 
 #define MAX_BUFFER_SIZE 2000 // Maximum size of circular buffer
 
-static int serial_fd;
+static int device_fd;
 static char circular_buffer[MAX_BUFFER_SIZE];
 static int buffer_size = 0;
 
@@ -85,7 +85,7 @@ static int high(lua_State *L)
         return 0;
     }
 
-    tty_line_set(serial_fd, line, LINE_HIGH);
+    tty_line_set(device_fd, line, LINE_HIGH);
 
     return 0;
 }
@@ -100,7 +100,7 @@ static int low(lua_State *L)
         return 0;
     }
 
-    tty_line_set(serial_fd, line, LINE_LOW);
+    tty_line_set(device_fd, line, LINE_LOW);
 
     return 0;
 }
@@ -115,7 +115,7 @@ static int toggle(lua_State *L)
         return 0;
     }
 
-    tty_line_toggle(serial_fd, line);
+    tty_line_toggle(device_fd, line);
 
     return 0;
 }
@@ -175,17 +175,17 @@ static int modem_send(lua_State *L)
     {
         case XMODEM_1K:
             tio_printf("Sending file '%s' using XMODEM-1K", file);
-            tio_printf("%s", xymodem_send(serial_fd, file, XMODEM_1K) < 0 ? "Aborted" : "Done");
+            tio_printf("%s", xymodem_send(device_fd, file, XMODEM_1K) < 0 ? "Aborted" : "Done");
             break;
 
         case XMODEM_CRC:
             tio_printf("Sending file '%s' using XMODEM-CRC", file);
-            tio_printf("%s", xymodem_send(serial_fd, file, XMODEM_CRC) < 0 ? "Aborted" : "Done");
+            tio_printf("%s", xymodem_send(device_fd, file, XMODEM_CRC) < 0 ? "Aborted" : "Done");
         break;
 
         case YMODEM:
             tio_printf("Sending file '%s' using YMODEM", file);
-            tio_printf("%s", xymodem_send(serial_fd, file, YMODEM) < 0 ? "Aborted" : "Done");
+            tio_printf("%s", xymodem_send(device_fd, file, YMODEM) < 0 ? "Aborted" : "Done");
         break;
     }
 
@@ -203,7 +203,7 @@ static int send(lua_State *L)
         return 0;
     }
 
-    ret = write(serial_fd, string, strlen(string));
+    ret = write(device_fd, string, strlen(string));
     if (ret < 0)
     {
         tio_error_print("%s\n", strerror(errno));
@@ -289,7 +289,7 @@ static int expect(lua_State *L)
     // Main loop to read and match
     while (true)
     {
-        ssize_t bytes_read = read_poll(serial_fd, &c, 1, timeout);
+        ssize_t bytes_read = read_poll(device_fd, &c, 1, timeout);
         if (bytes_read > 0)
         {
             putchar(c);
@@ -423,7 +423,7 @@ void script_run(int fd)
 {
     lua_State *L;
 
-    serial_fd = fd;
+    device_fd = fd;
 
     L = luaL_newstate();
     luaL_openlibs(L);
