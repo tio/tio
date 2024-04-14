@@ -176,34 +176,36 @@ void line_pulse_duration_option_parse(const char *arg)
             char keyname[11];
             unsigned int value;
 
-            if (sscanf(token, "%10[^=]=%d", keyname, &value) != 2)
+            if (sscanf(token, "%10[^=]=%d", keyname, &value) == 2)
+            {
+                if (!strcmp(keyname, "DTR"))
+                {
+                    option.dtr_pulse_duration = value;
+                }
+                else if (!strcmp(keyname, "RTS"))
+                {
+                    option.rts_pulse_duration = value;
+                }
+                else if (!strcmp(keyname, "CTS"))
+                {
+                    option.cts_pulse_duration = value;
+                }
+                else if (!strcmp(keyname, "DSR"))
+                {
+                    option.dsr_pulse_duration = value;
+                }
+                else if (!strcmp(keyname, "DCD"))
+                {
+                    option.dcd_pulse_duration = value;
+                }
+                else if (!strcmp(keyname, "RI"))
+                {
+                    option.ri_pulse_duration = value;
+                }
+            }
+            else
             {
                 token_found = false;
-            }
-
-            if (!strcmp(keyname, "DTR"))
-            {
-                option.dtr_pulse_duration = value;
-            }
-            else if (!strcmp(keyname, "RTS"))
-            {
-                option.rts_pulse_duration = value;
-            }
-            else if (!strcmp(keyname, "CTS"))
-            {
-                option.cts_pulse_duration = value;
-            }
-            else if (!strcmp(keyname, "DSR"))
-            {
-                option.dsr_pulse_duration = value;
-            }
-            else if (!strcmp(keyname, "DCD"))
-            {
-                option.dcd_pulse_duration = value;
-            }
-            else if (!strcmp(keyname, "RI"))
-            {
-                option.ri_pulse_duration = value;
             }
         }
         else
