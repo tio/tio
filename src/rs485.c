@@ -57,53 +57,60 @@ void rs485_parse_config(const char *arg)
         {
             char keyname[31];
             unsigned int value;
+            int match_count;
 
-            if (sscanf(token, "%30[^=]=%d", keyname, &value) != 2)
+            match_count = sscanf(token, "%30[^=]=%d", keyname, &value);
+
+            if (match_count == 2)
+            {
+                if (!strcmp(keyname, "RTS_ON_SEND"))
+                {
+                    if (value)
+                    {
+                        /* Set logical level for RTS pin equal to 1 when sending */
+                        option.rs485_config_flags |= SER_RS485_RTS_ON_SEND;
+                    }
+                    else
+                    {
+                        /* Set logical level for RTS pin equal to 0 when sending */
+                        option.rs485_config_flags &= ~(SER_RS485_RTS_ON_SEND);
+                    }
+                }
+                else if (!strcmp(keyname, "RTS_AFTER_SEND"))
+                {
+                    if (value)
+                    {
+                        /* Set logical level for RTS pin equal to 1 after sending */
+                        option.rs485_config_flags |= SER_RS485_RTS_AFTER_SEND;
+                    }
+                    else
+                    {
+                        /* Set logical level for RTS pin equal to 0 after sending */
+                        option.rs485_config_flags &= ~(SER_RS485_RTS_AFTER_SEND);
+                    }
+                }
+                else if (!strcmp(keyname, "RTS_DELAY_BEFORE_SEND"))
+                {
+                    /* Set RTS delay before send */
+                    option.rs485_delay_rts_before_send = value;
+                }
+                else if (!strcmp(keyname, "RTS_DELAY_AFTER_SEND"))
+                {
+                    /* Set RTS delay after send */
+                    option.rs485_delay_rts_after_send = value;
+                }
+            }
+            else if (match_count == 1)
+            {
+                if (!strcmp(keyname, "RX_DURING_TX"))
+                {
+                    /* Receive data even while sending data */
+                    option.rs485_config_flags |= SER_RS485_RX_DURING_TX;
+                }
+            }
+            else
             {
                 token_found = false;
-            }
-
-            if (!strcmp(keyname, "RTS_ON_SEND"))
-            {
-                if (value)
-                {
-
-                    /* Set logical level for RTS pin equal to 1 when sending */
-                    option.rs485_config_flags |= SER_RS485_RTS_ON_SEND;
-                }
-                else
-                {
-                    /* Set logical level for RTS pin equal to 0 when sending */
-                    option.rs485_config_flags &= ~(SER_RS485_RTS_ON_SEND);
-                }
-            }
-            else if (!strcmp(keyname, "RTS_AFTER_SEND"))
-            {
-                if (value)
-                {
-                    /* Set logical level for RTS pin equal to 1 after sending */
-                    option.rs485_config_flags |= SER_RS485_RTS_AFTER_SEND;
-                }
-                else
-                {
-                    /* Set logical level for RTS pin equal to 0 after sending */
-                    option.rs485_config_flags &= ~(SER_RS485_RTS_AFTER_SEND);
-                }
-            }
-            else if (!strcmp(keyname, "RTS_DELAY_BEFORE_SEND"))
-            {
-                /* Set RTS delay before send */
-                option.rs485_delay_rts_before_send = value;
-            }
-            else if (!strcmp(keyname, "RTS_DELAY_AFTER_SEND"))
-            {
-                /* Set RTS delay after send */
-                option.rs485_delay_rts_after_send = value;
-            }
-            else if (!strcmp(keyname, "RX_DURING_TX"))
-            {
-                /* Receive data even while sending data */
-                option.rs485_config_flags |= SER_RS485_RX_DURING_TX;
             }
         }
         else
