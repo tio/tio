@@ -19,6 +19,8 @@
  * 02110-1301, USA.
  */
 
+#pragma once
+
 typedef enum {
     XMODEM_1K,
     XMODEM_CRC,
