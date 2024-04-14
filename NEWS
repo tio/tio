@@ -1,5 +1,182 @@
 
-=== tio v2.7 ===
+=== tio v2.8 ===
+
+
+
+Changes since tio v2.7:
+
+ * Rework resolve_config_file()
+
+ * Rework line_pulse_duration_option_parse()
+
+   Introduce proper sscanf() checks.
+
+ * Rework rs485_parse_config()
+
+   Introduce proper sscanf() checks.
+
+ * Clean up file descriptor name shadowing
+
+ * Add missing header guard
+
+ * Upgrade inih subproject
+
+ * Remove options --response-wait, --response-timeout
+
+   Remove options and rework input handling so it is possible to do the
+   same thing but via script which is much more flexible.
+
+   These options were always a bit of a hardcoded solution. With the new
+   script expect feature we can wait for any type of response.
+
+   For example, pipe command to serial device and wait for line response within 1 second:
+
+   $ echo "*IDN?" | tio /dev/ttyACM0 --script "expect('\r\n', 1000)" --mute
+
+ * Add lua exit(code)
+
+ * Add timeout feature to expect()
+
+ * Add lua expect(string)
+
+   Add simple expect functionality.
+
+   The expect(string) function will wait for input from the tty device and
+   only return when there is a string match. Regular expressions are
+   supported.
+
+   Example:
+
+   script = expect('password:'); send('my_password\n')
+
+ * Add lua send(string)
+
+ * Add lua modem_send(file,protocol)
+
+ * Fix xymodem error print outs
+
+ * Rework x/y-modem transfer command
+
+   Remove ctrl-t X optin and instead introduce submenu to ctrl-t x option
+   for picking which xmodem protocol to use.
+
+ * Update README
+
+ * Cleanup options
+
+ * Add independent input and output mode
+
+   Replaces -x, --hexadecimal option with --intput-mode and --output-mode
+   so it is possible to select hex or normal mode for both input and output
+   independently.
+
+   To obtain same behaviour as -x, --hexadecimal use the following
+   configuration:
+
+   input-mode = hex
+   output-mode = hex
+
+ * Fix file descriptor handling on MacOS
+
+ * Add tty line configuration script API
+
+   On some platforms calling high()/low() to switch line states result in
+   costly system calls whick makes it impossible to swith two or more tty
+   lines simultaneously.
+
+   To help solve this timing issue we introduce a tty line state
+   configuration API which can be used instead of using
+   high()/low().
+
+   Using config_low(line) and config_high(line) one can set up a new line
+   state configuration for multiple lines and then use config_apply() to
+   finally apply the configuration. This will result in only one system
+   call to instruct the serial port drive to switch all the configured line
+   states which should help ensure that the lines are switched
+   simultaneously.
+
+   Example:
+
+   script = config_high(DTR); config_low(RTS); config_apply()
+
+ * Add ONULBRK mapping flag
+
+   Add ONULBRK mapping to map nul (zero) to send break signal on output.
+
+   This is useful if one needs to e.g. send the break signal to the tty
+   device when connected via socket.
+
+ * Add --log-directory option
+
+   For specifying directory path in which to save automatically named log
+   files.
+
+ * Add Lua scripting feature
+
+   Add support for running Lua scripts that can manipulate the tty control
+   lines. Script is activated automatically on connect or manually via in
+   session key command.
+
+   The Lua scripting feature opens up for many posibilities in the future
+   such as adding expect like functionality to easily and programatically
+   interact with the connected device.
+
+ * Invert line states to reflect true electrical level
+
+ * Add support for disabling prefix key handling
+
+   To disable prefix key input handing simply set prefix-ctrl-key to
+   'none'.
+
+   Based on original patch from Sebastian Krahmer.
+
+ * Add meson man pages install option
+
+   Defaults to installing man pages.
+
+HiFiPhile:
+
+ * Poll on serial port read instead of delay.
+
+ * Add Xmodem-CRC support.
+
+ * CYGWIN: Fix port auto connection.
+
+Mingjie Shen:
+
+ * Check return values of sscanf()
+
+   Failing to check that a call to 'sscanf' actually writes to an output
+   variable can lead to unexpected behavior at reading time.
+
+Jakob Haufe:
+
+ * Support NO_COLOR env variable as per no-color.org
+
+ * Fix troff warning
+
+   .eo/.ec sections seemingly need explicit empty lines using .sp
+
+   Otherwise, troff complains:
+
+   troff:<standard input>:535: warning: expected numeric expression, got '\'
+   troff:<standard input>:538: warning: expected numeric expression, got '\'
+   troff:<standard input>:541: warning: expected numeric expression, got '\'
+
+Fredrik Svedberg:
+
+ * Add map FF to ESC-c on input
+
+   Added map of form feed to ESC-c on input for terminals that
+   do not clear screen on ^L but do on ESC-c.
+
+Brian:
+
+ * Add CodeQL Workflow for Code Security Analysis
+
+Sylvain LAFRASSE:
+
+ * Fix double call of tty_disconnect() on macOS/Darwin.
 
 
 
