@@ -52,23 +52,23 @@ static const char *socket_filename(void)
 static int socket_inet_port(void)
 {
     /* skip 'inet:' */
-    int port_number = atoi(option.socket + 5);
-    if (port_number == 0)
+    int port = atoi(option.socket + 5);
+    if (port == 0)
     {
-        port_number = SOCKET_PORT_DEFAULT;
+        port = SOCKET_PORT_DEFAULT;
     }
-    return port_number;
+    return port;
 }
 
 static int socket_inet6_port(void)
 {
     /* skip 'inet6:' */
-    int port_number = atoi(option.socket + 6);
-    if (port_number == 0)
+    int port = atoi(option.socket + 6);
+    if (port == 0)
     {
-        port_number = SOCKET_PORT_DEFAULT;
+        port = SOCKET_PORT_DEFAULT;
     }
-    return port_number;
+    return port;
 }
 
 static void socket_exit(void)
@@ -83,14 +83,14 @@ static bool socket_stale(const char *path)
 {
     struct sockaddr_un addr;
     bool stale = false;
-    int sockfd;
+    int sfd;
 
     /* Test if socket file exists */
     if (access(path, F_OK) == 0)
     {
         /* Create test socket  */
-        sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
-        if (sockfd < 0)
+        sfd = socket(AF_UNIX, SOCK_STREAM, 0);
+        if (sfd < 0)
         {
             tio_warning_printf("Failure opening socket (%s)", strerror(errno));
             return false;
