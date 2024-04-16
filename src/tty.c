@@ -1895,13 +1895,14 @@ int tty_connect(void)
                                         default:
                                             if (line_index < BUFSIZ)
                                             {
+                                                optional_local_echo(input_char);
                                                 line_buffer[line_index++] = input_char;
                                             }
                                             else
                                             {
                                                 tio_error_print("Input exceeds maximum line length. Truncating.");
-                                                forward = false;
                                             }
+                                            forward = false;
                                     }
 
                                     // Save 2 latest stdin input characters
