@@ -34,6 +34,7 @@ typedef enum
 {
     INPUT_MODE_NORMAL,
     INPUT_MODE_HEX,
+    INPUT_MODE_LINE,
     INPUT_MODE_END,
 } input_mode_t;
 

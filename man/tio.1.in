@@ -191,11 +191,18 @@ If defining more than one flag, the flags must be comma separated.
 .RE
 
 .TP
-.BR "    \-\-input\-mode " normal|hex
+.BR "    \-\-input\-mode " normal|hex|line
 
-Set input mode. In hex input mode bytes can be sent by typing the
-\fBtwo-character hexadecimal\fR representation of the 1 byte value, e.g.: to
-send \fI0xA\fR you must type \fI0a\fR or \fI0A\fR.
+Set input mode.
+
+In normal mode input characters are sent immediately as they are typed.
+
+In hex input mode bytes can be sent by typing the \fBtwo-character
+hexadecimal\fR representation of the 1 byte value, e.g.: to send \fI0xA\fR you
+must type \fI0a\fR or \fI0A\fR.
+
+In line input mode input characters are sent when you press enter. The only
+editing feature supported in this mode is backspace.
 
 Default value is "normal".
 

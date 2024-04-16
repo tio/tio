@@ -31,11 +31,13 @@ char ansi_format[30];
 
 void print_hex(char c)
 {
+    print_tainted = true;
     printf("%02x ", (unsigned char) c);
 }
 
 void print_normal(char c)
 {
+    print_tainted = true;
     putchar(c);
 }
 

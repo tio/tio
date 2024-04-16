@@ -131,7 +131,7 @@ _tio()
             return 0
             ;;
         --input-mode)
-            COMPREPLY=( $(compgen -W "normal hex"  -- ${cur}) )
+            COMPREPLY=( $(compgen -W "normal hex line"  -- ${cur}) )
             return 0
             ;;
         --output-mode)

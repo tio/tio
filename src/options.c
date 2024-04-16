@@ -126,7 +126,7 @@ void print_help(char *argv[])
     printf("      --line-pulse-duration <duration>   Set line pulse duration\n");
     printf("  -n, --no-autoconnect                   Disable automatic connect\n");
     printf("  -e, --local-echo                       Enable local echo\n");
-    printf("      --input-mode normal|hex            Select input mode (default: normal)\n");
+    printf("      --input-mode normal|hex|line       Select input mode (default: normal)\n");
     printf("      --output-mode normal|hex           Select output mode (default: normal)\n");
     printf("  -t, --timestamp                        Enable line timestamp\n");
     printf("      --timestamp-format <format>        Set timestamp format (default: 24hour)\n");
@@ -226,6 +226,10 @@ input_mode_t input_mode_option_parse(const char *arg)
     {
         return INPUT_MODE_HEX;
     }
+    else if (strcmp("line", arg) == 0)
+    {
+        return INPUT_MODE_LINE;
+    }
     else
     {
         tio_error_printf("Invalid input mode option");
@@ -258,6 +262,8 @@ const char *input_mode_by_string(input_mode_t mode)
             return "normal";
         case INPUT_MODE_HEX:
             return "hex";
+        case INPUT_MODE_LINE:
+            return "line";
         case INPUT_MODE_END:
             break;
     }

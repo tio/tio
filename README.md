@@ -90,7 +90,7 @@ Options:
       --line-pulse-duration <duration>   Set line pulse duration
   -n, --no-autoconnect                   Disable automatic connect
   -e, --local-echo                       Enable local echo
-      --input-mode normal|hex            Select input mode (default: normal)
+      --input-mode normal|hex|line       Select input mode (default: normal)
       --output-mode normal|hex           Select output mode (default: normal)
   -t, --timestamp                        Enable line timestamp
       --timestamp-format <format>        Set timestamp format (default: 24hour)

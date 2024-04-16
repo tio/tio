@@ -195,8 +195,6 @@ static void optional_local_echo(char c)
     {
         log_putc(c);
     }
-
-    print_tainted_set();
 }
 
 inline static bool is_valid_hex(char c)
@@ -887,6 +885,11 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                         tio_printf("Switched to hex input mode");
                         break;
 
+                    case INPUT_MODE_LINE:
+                        option.input_mode = INPUT_MODE_LINE;
+                        tio_printf("Switched to line input mode");
+                        break;
+
                     case INPUT_MODE_END:
                         option.input_mode = INPUT_MODE_NORMAL;
                         tio_printf("Switched to normal input mode");
@@ -1531,11 +1534,14 @@ int tty_connect(void)
     fd_set rdfs;           /* Read file descriptor set */
     int    maxfd;          /* Maximum file descriptor used */
     char   input_char, output_char;
-    char   input_buffer[BUFSIZ];
+    char   input_buffer[BUFSIZ] = {};
+    char   line_buffer[BUFSIZ] = {};
     static bool first = true;
     int    status;
     bool   next_timestamp = false;
     char*  now = NULL;
+    unsigned int line_index = 0;
+    static char previous_char[2] = {};
 
     /* Open tty device */
     device_fd = open(option.tty_device, O_RDWR | O_NOCTTY | O_NONBLOCK);
@@ -1805,12 +1811,107 @@ int tty_connect(void)
                         /* Handle commands */
                         handle_command_sequence(input_char, &output_char, &forward);
 
-                        if ((option.input_mode == INPUT_MODE_HEX) && (forward))
+                        if (forward)
                         {
-                            if (!is_valid_hex(input_char))
+                            switch (option.input_mode)
                             {
-                                tio_warning_printf("Invalid hex character: '%d' (0x%02x)", input_char, input_char);
-                                forward = false;
+                                case INPUT_MODE_HEX:
+                                    if (!is_valid_hex(input_char))
+                                    {
+                                        tio_warning_printf("Invalid hex character: '%d' (0x%02x)", input_char, input_char);
+                                        forward = false;
+                                    }
+                                    break;
+
+                                case INPUT_MODE_LINE:
+                                    switch (input_char)
+                                    {
+                                        case 27: // Escape
+                                            forward = false;
+                                            break;
+
+                                        case '[':
+                                            if (previous_char[0] == 27)
+                                            {
+                                                forward = false;
+                                            }
+                                            break;
+
+                                        case 'A':
+                                        case 'B':
+                                        case 'C':
+                                        case 'D':
+                                            if ((previous_char[1] == 27) && (previous_char[0] == '['))
+                                            {
+                                                // Handle arrow keys
+                                                switch (input_char)
+                                                {
+                                                    case 'A': // Up arrow
+                                                        // Ignore
+                                                        break;
+                                                    case 'B': // Down arrow
+                                                        // Ignore
+                                                        break;
+                                                    case 'C': // Right arrow
+                                                        // Ignore
+                                                        break;
+                                                    case 'D': // Left arrow
+                                                        // Ignore
+                                                        break;
+                                                }
+                                                forward = false;
+                                            }
+                                            break;
+
+                                        case '\b':
+                                        case 127: // Backspace
+                                            if (line_index)
+                                            {
+                                                if ((option.output_mode == OUTPUT_MODE_HEX) && (option.local_echo))
+                                                {
+                                                    printf("\b\b\b   \b\b\b"); // Destructive backspace
+                                                }
+                                                else
+                                                {
+                                                    printf("\b \b"); // Destructive backspace
+                                                }
+                                                line_index--;
+                                            }
+                                            forward = false;
+                                            break;
+
+                                        case 13: // Carriage return
+                                            // Write buffered line to tty device
+                                            tty_write(device_fd, line_buffer, line_index);
+                                            tty_write(device_fd, "\r", 1);
+                                            optional_local_echo('\r');
+                                            tty_sync(device_fd);
+                                            putchar('\r');
+                                            putchar('\n');
+                                            line_index = 0;
+                                            forward = false;
+                                            break;
+
+                                        default:
+                                            if (line_index < BUFSIZ)
+                                            {
+                                                line_buffer[line_index++] = input_char;
+                                            }
+                                            else
+                                            {
+                                                tio_error_print("Input exceeds maximum line length. Truncating.");
+                                                forward = false;
+                                            }
+                                    }
+
+                                    // Save 2 latest stdin input characters
+                                    previous_char[1] = previous_char[0];
+                                    previous_char[0] = input_char;
+
+                                    break;
+
+                                default:
+                                    break;
                             }
                         }
                     }

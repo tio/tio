@@ -26,10 +26,11 @@
 
    Time is in ms.
 
-* Line mode feature
+* Advanced line mode
 
-  Only send line when pressing enter. Maybe even add readline support so one
-  can use all the readline editing feature before sending the line.
+  Current line mode only support backspace editing. Would be nice with arrow
+  key navigation left/right and insert/overwrite support. Also history browsing
+  pressing up/down.
 
 * Support for interaction using simple autoresponse strings
 
