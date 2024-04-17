@@ -327,7 +327,7 @@ Or by pattern match:
 $ tio usb12
 ```
 
-Another more elaborate configuration file example is available [here](example/config).
+Another more elaborate configuration file example is available [here](examples/config/config).
 
 ## 4. Installation
 
