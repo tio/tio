@@ -265,6 +265,9 @@ static int expect(lua_State *L)
     int ret = 0;
     char c;
 
+    // Resets buffer to ignore previous `expect` calls
+    buffer_size = 0;
+
     if ((string == NULL) || (timeout < 0))
     {
         ret = -1;
