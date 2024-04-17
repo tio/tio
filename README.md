@@ -265,6 +265,9 @@ In addition to the Lua API tio makes the following functions available:
         help to make the lines physically switch as simultaneously as possible.
         This may solve timing issues on some platforms.
 
+  reset_buffer()
+        Flush the internal ring buffer.
+
   Note: Line can be any of DTR, RTS, CTS, DSR, CD, RI
 ```
 
