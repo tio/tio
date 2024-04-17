@@ -256,14 +256,6 @@ bool match_regex(regex_t *regex)
     return false;
 }
 
-// lua: reset_buffer()
-static int reset_buffer(lua_State *L)
-{
-    (void)L;
-    buffer_size = 0;
-    return 1;
-}
-
 // lua: expect(string, timeout)
 static int expect(lua_State *L)
 {
@@ -360,7 +352,6 @@ static const struct luaL_Reg tio_lib[] =
     { "modem_send", modem_send},
     { "send", send},
     { "expect", expect},
-    { "reset_buffer", reset_buffer},
     { "exit", exit_},
     {NULL, NULL}
 };
