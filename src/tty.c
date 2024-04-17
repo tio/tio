@@ -1867,35 +1867,40 @@ int tty_connect(void)
                                         case 127: // Backspace
                                             if (line_index)
                                             {
-                                                if ((option.output_mode == OUTPUT_MODE_HEX) && (option.local_echo))
-                                                {
-                                                    printf("\b\b\b   \b\b\b"); // Destructive backspace
-                                                }
-                                                else
-                                                {
-                                                    printf("\b \b"); // Destructive backspace
-                                                }
+                                                printf("\b \b"); // Destructive backspace
                                                 line_index--;
                                             }
                                             forward = false;
                                             break;
 
-                                        case 13: // Carriage return
+                                        case '\r': // Carriage return
+                                            if (option.local_echo == false)
+                                            {
+                                                // Delete line
+                                                int i = line_index;
+                                                while (i--)
+                                                {
+                                                    printf("\b \b"); // Destructive backspace
+                                                }
+                                            }
+                                            else
+                                            {
+                                                // Preserve line, go to next line
+                                                putchar('\r');
+                                                putchar('\n');
+                                            }
+
                                             // Write buffered line to tty device
                                             tty_write(device_fd, line_buffer, line_index);
-                                            tty_write(device_fd, "\r", 1);
-                                            optional_local_echo('\r');
                                             tty_sync(device_fd);
-                                            putchar('\r');
-                                            putchar('\n');
                                             line_index = 0;
-                                            forward = false;
                                             break;
 
                                         default:
                                             if (line_index < BUFSIZ)
                                             {
-                                                optional_local_echo(input_char);
+                                                putchar(input_char);
+                                                print_tainted_set();
                                                 line_buffer[line_index++] = input_char;
                                             }
                                             else
@@ -1908,7 +1913,6 @@ int tty_connect(void)
                                     // Save 2 latest stdin input characters
                                     previous_char[1] = previous_char[0];
                                     previous_char[0] = input_char;
-
                                     break;
 
                                 default:
