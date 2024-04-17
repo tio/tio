@@ -39,6 +39,7 @@
 
 static int device_fd;
 static char circular_buffer[MAX_BUFFER_SIZE];
+static char match_string[MAX_BUFFER_SIZE];
 static int buffer_size = 0;
 
 // lua: sleep(seconds)
@@ -233,14 +234,22 @@ void add_to_buffer(char c)
 bool match_regex(regex_t *regex)
 {
     char buffer[MAX_BUFFER_SIZE + 1]; // Temporary buffer for regex matching
+    const char *s = circular_buffer;
+    regmatch_t pmatch[1];
+    regoff_t len;
+
     memcpy(buffer, circular_buffer, buffer_size);
     buffer[buffer_size] = '\0'; // Null-terminate the buffer
 
     // Match against the regex
-    int ret = regexec(regex, buffer, 0, NULL, 0);
+    int ret = regexec(regex, buffer, 1, pmatch, 0);
     if (!ret)
     {
         // Match found
+        len = pmatch[0].rm_eo - pmatch[0].rm_so;
+        memcpy(match_string, s + pmatch[0].rm_so, len);
+        match_string[len] = '\0';
+
         return true;
     }
     else if (ret == REG_NOMATCH)
@@ -267,6 +276,7 @@ static int expect(lua_State *L)
 
     // Resets buffer to ignore previous `expect` calls
     buffer_size = 0;
+    match_string[0] = '\0';
 
     if ((string == NULL) || (timeout < 0))
     {
@@ -316,7 +326,8 @@ static int expect(lua_State *L)
 
 error:
     lua_pushnumber(L, ret);
-    return 1;
+    lua_pushstring(L, match_string);
+    return 2;
 }
 
 // lua: exit(code)

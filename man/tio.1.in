@@ -375,6 +375,11 @@ In addition to the Lua API tio makes the following functions available:
 Expect string - waits for string to match or timeout before continueing.
 Supports regular expressions. Special characters must be escaped with '\\\\'.
 Timeout is in milliseconds, defaults to 0 meaning it will wait forever.
+
+Returns 1 on successful match, 0 on timeout, or -1 on invalid regular expression.
+
+On successful match it also returns the match string as second return value.
+
 .IP "\fBsend(string)"
 Send string.
 .IP "\fBmodem_send(file, protocol)"
