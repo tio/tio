@@ -297,6 +297,7 @@ static int expect(lua_State *L)
             // Match against the entire buffer
             if (match_regex(&regex))
             {
+                ret = 1;
                 break;
             }
         }
