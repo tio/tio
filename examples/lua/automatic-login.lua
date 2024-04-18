@@ -1,28 +1,30 @@
 local logins = {
-    {
-        serialnumber = "foo",
+    ["foo"] = {
         username = "foouser",
         password = "foopass",
     },
-    {
-        serialnumber = "bar",
+    ["bar"] = {
         username = "baruser",
         password = "barpass",
     },
-    {
-        serialnumber = "baz",
+    ["baz"] = {
         username = "bazuser",
         password = "bazpass",
     },
 }
 
-for _, login in ipairs(logins) do
-    send("\n")
-    local found = expect(login.serialnumber .. ".*login:", 10)
-    if (1 == found) then
+send("\n")
+local found, match_str = expect("\\w+- login:", 10)
+if (1 == found) then
+    local model = string.match(match_str, "^%w+")
+    local login = logins[model]
+    if (nil ~= login) then
         send(login.username .. "\n")
         expect("Password:")
         send(login.password .. "\n")
-        break
+    else
+        print("\r\nDon't know login info for " .. model .. "\r\n")
     end
+else
+    print("\r\nDidn't find a login prompt\r\n")
 end
