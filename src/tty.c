@@ -1519,7 +1519,10 @@ void forward_to_tty(int fd, char output_char)
                 }
                 else
                 {
-                    optional_local_echo(output_char);
+                    if (option.input_mode == INPUT_MODE_NORMAL)
+                    {
+                        optional_local_echo(output_char);
+                    }
                 }
                 break;
 
