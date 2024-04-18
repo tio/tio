@@ -1695,7 +1695,10 @@ int tty_connect(void)
             bool forward = false;
             if (FD_ISSET(device_fd, &rdfs))
             {
+                /*******************************/
                 /* Input from tty device ready */
+                /*******************************/
+
                 ssize_t bytes_read = read(device_fd, input_buffer, BUFSIZ);
                 if (bytes_read <= 0)
                 {
@@ -1777,7 +1780,10 @@ int tty_connect(void)
             }
             else if (FD_ISSET(pipefd[0], &rdfs))
             {
+                /**************************/
                 /* Input from stdin ready */
+                /**************************/
+
                 ssize_t bytes_read = read(pipefd[0], input_buffer, BUFSIZ);
                 if (bytes_read < 0)
                 {
@@ -1931,7 +1937,10 @@ int tty_connect(void)
             }
             else
             {
+                /***************************/
                 /* Input from socket ready */
+                /***************************/
+
                 forward = socket_handle_input(&rdfs, &output_char);
 
                 if (forward)
