@@ -45,6 +45,7 @@ enum opt_t
 {
     OPT_NONE,
     OPT_TIMESTAMP_FORMAT,
+    OPT_TIMESTAMP_TIMEOUT,
     OPT_LOG_FILE,
     OPT_LOG_DIRECTORY,
     OPT_LOG_STRIP,
@@ -105,6 +106,7 @@ struct option_t option =
     .script = NULL,
     .script_filename = NULL,
     .script_run = SCRIPT_RUN_ALWAYS,
+    .timestamp_timeout = 200,
 };
 
 void print_help(char *argv[])
@@ -130,6 +132,7 @@ void print_help(char *argv[])
     printf("      --output-mode normal|hex           Select output mode (default: normal)\n");
     printf("  -t, --timestamp                        Enable line timestamp\n");
     printf("      --timestamp-format <format>        Set timestamp format (default: 24hour)\n");
+    printf("      --timestamp-timeout <ms>           Set timestamp timeout (default: 200)\n");
     printf("  -L, --list-devices                     List available serial devices by ID\n");
     printf("  -l, --log                              Enable log to file\n");
     printf("      --log-file <filename>              Set log filename\n");
@@ -367,6 +370,7 @@ void options_parse(int argc, char *argv[])
             {"local-echo",           no_argument,       0, 'e'                     },
             {"timestamp",            no_argument,       0, 't'                     },
             {"timestamp-format",     required_argument, 0, OPT_TIMESTAMP_FORMAT    },
+            {"timestamp-timeout",    required_argument, 0, OPT_TIMESTAMP_TIMEOUT   },
             {"list-devices",         no_argument,       0, 'L'                     },
             {"log",                  no_argument,       0, 'l'                     },
             {"log-file",             required_argument, 0, OPT_LOG_FILE            },
@@ -459,6 +463,10 @@ void options_parse(int argc, char *argv[])
 
             case OPT_TIMESTAMP_FORMAT:
                 option.timestamp = timestamp_option_parse(optarg);
+                break;
+
+            case OPT_TIMESTAMP_TIMEOUT:
+                option.timestamp_timeout = string_to_long(optarg);
                 break;
 
             case 'L':

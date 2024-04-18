@@ -17,20 +17,15 @@
 
   With and without timestamp support for each broken up line.
 
- * Add support for activity based time stamping in both normal and hex-mode.
+ * Add support for activity based time stamping in normal output mode
 
-   Will print a new timestamp if there is no input activity within the time
-   defined in the configuration file, e.g.:
+   Already supported in hex output mode.
 
-    timestamp-timeout = 200
+ * Advanced line mode
 
-   Time is in ms.
-
-* Advanced line mode
-
-  Current line mode only support backspace editing. Would be nice with arrow
-  key navigation left/right and insert/overwrite support. Also history browsing
-  pressing up/down.
+   Current line mode only support backspace editing. Would be nice with arrow
+   key navigation left/right and insert/overwrite support. Also history browsing
+   pressing up/down.
 
  * Support for running external command
 

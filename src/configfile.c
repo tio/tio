@@ -230,6 +230,10 @@ static int data_handler(void *user, const char *section, const char *name,
         {
             option.timestamp = timestamp_option_parse(value);
         }
+        else if (!strcmp(name, "timestamp-timeout"))
+        {
+            option.timestamp_timeout = read_integer(value, name, 0, LONG_MAX);
+        }
         else if (!strcmp(name, "map"))
         {
             asprintf(&c.map, "%s", value);

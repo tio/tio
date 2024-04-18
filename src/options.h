@@ -88,6 +88,7 @@ struct option_t
     const char *script;
     const char *script_filename;
     enum script_run_t script_run;
+    unsigned int timestamp_timeout;
 };
 
 extern struct option_t option;

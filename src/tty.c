@@ -22,6 +22,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
@@ -972,7 +973,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                         break;
                     case TIMESTAMP_END:
                         option.timestamp = TIMESTAMP_NONE;
-                        tio_printf("Switched timestamp mode to off");
+                        tio_printf("Switched timestamp mode off");
                         break;
                 }
                 break;
@@ -1545,6 +1546,7 @@ int tty_connect(void)
     char*  now = NULL;
     unsigned int line_index = 0;
     static char previous_char[2] = {};
+    struct timeval tval_before = {}, tval_now, tval_result;
 
     /* Open tty device */
     device_fd = open(option.tty_device, O_RDWR | O_NOCTTY | O_NONBLOCK);
@@ -1713,23 +1715,50 @@ int tty_connect(void)
                 /* Update receive statistics */
                 rx_total += bytes_read;
 
+                // Manage timeout based timestamping in hex mode
+                if (option.output_mode == OUTPUT_MODE_HEX)
+                {
+                    if (option.timestamp != TIMESTAMP_NONE)
+                    {
+                        gettimeofday(&tval_now, NULL);
+                        timersub(&tval_now, &tval_before, &tval_result);
+                        if ((tval_result.tv_sec * 1000 + tval_result.tv_usec / 1000) > option.timestamp_timeout)
+                        {
+                            now = timestamp_current_time();
+                            if (now)
+                            {
+                                ansi_printf_raw("\r\n[%s] ", now);
+                                if (option.log)
+                                {
+                                    log_printf("\r\n[%s] ", now);
+                                }
+                                next_timestamp = false;
+                            }
+                        }
+                        tval_before = tval_now;
+                    }
+                }
+
                 /* Process input byte by byte */
                 for (int i=0; i<bytes_read; i++)
                 {
                     input_char = input_buffer[i];
 
                     /* Print timestamp on new line if enabled */
-                    if ((next_timestamp && input_char != '\n' && input_char != '\r') && (option.output_mode == OUTPUT_MODE_NORMAL))
+                    if (option.output_mode == OUTPUT_MODE_NORMAL)
                     {
-                        now = timestamp_current_time();
-                        if (now)
+                        if ((next_timestamp && input_char != '\n' && input_char != '\r'))
                         {
-                            ansi_printf_raw("[%s] ", now);
-                            if (option.log)
+                            now = timestamp_current_time();
+                            if (now)
                             {
-                                log_printf("[%s] ", now);
+                                ansi_printf_raw("[%s] ", now);
+                                if (option.log)
+                                {
+                                    log_printf("[%s] ", now);
+                                }
+                                next_timestamp = false;
                             }
-                            next_timestamp = false;
                         }
                     }
 

@@ -28,6 +28,7 @@ _tio()
           -m --map \
           -t --timestamp \
              --timestamp-format \
+             --timestamp-timeout \
           -L --list-devices \
           -c --color \
           -S --socket \
@@ -116,6 +117,10 @@ _tio()
             ;;
         --timestamp-format)
             COMPREPLY=( $(compgen -W "24hour 24hour-start 24hour-delta iso8601" -- ${cur}) )
+            return 0
+            ;;
+        --timestamp-timeout)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
         -L | --list-devices)

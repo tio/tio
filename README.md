@@ -43,7 +43,8 @@ when used in combination with [tmux](https://tmux.github.io).
  * Pulse serial lines with configurable pulse duration
  * Local echo support
  * Remapping of characters (nl, cr-nl, bs, lowercase to uppercase, etc.)
- * Line timestamps
+ * Per line timestamps in normal output mode
+ * Timeout based timestamps in hex output mode
  * Support for delayed output per character
  * Support for delayed output per line
  * Switchable independent input and output mode (normal vs hex)
@@ -94,6 +95,7 @@ Options:
       --output-mode normal|hex           Select output mode (default: normal)
   -t, --timestamp                        Enable line timestamp
       --timestamp-format <format>        Set timestamp format (default: 24hour)
+      --timestamp-timeout <ms>           Set timestamp timeout (default: 200)
   -L, --list-devices                     List available serial devices by ID
   -l, --log                              Enable log to file
       --log-file <filename>              Set log filename

@@ -122,6 +122,16 @@ Default format is \fB24hour\fR
 .RE
 
 .TP
+.BR "    \-\-timestamp\-timeout \fI<ms>
+
+Set timestamp timeout value in milliseconds.
+
+This value only takes effect in hex output mode where timestamps are only
+printed after elapsed timeout time of no output activity from tty device.
+
+Default value is 200.
+
+.TP
 .BR \-L ", " \-\-list\-devices
 
 List available serial devices by ID.
@@ -479,6 +489,8 @@ Enable local echo
 Enable line timestamp
 .IP "\fBtimestamp-format"
 Set timestamp format
+.IP "\fBtimestamp-timeout"
+Set timestamp timeout
 .IP "\fBmap"
 Map characters on input or output
 .IP "\fBcolor"
