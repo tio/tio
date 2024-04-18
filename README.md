@@ -43,11 +43,13 @@ when used in combination with [tmux](https://tmux.github.io).
  * Pulse serial lines with configurable pulse duration
  * Local echo support
  * Remapping of characters (nl, cr-nl, bs, lowercase to uppercase, etc.)
- * Per line timestamps in normal output mode
- * Timeout based timestamps in hex output mode
- * Support for delayed output per character
- * Support for delayed output per line
  * Switchable independent input and output mode (normal vs hex)
+ * Timestamp support
+   * Per line in normal output mode
+   * Output timeout timestamps in hex output mode
+ * Support for delayed output
+   * Per character
+   * Per line
  * Log to file with automatic or manual naming of log file
  * Configuration file support
  * Activate sub-configurations by name or pattern
@@ -58,12 +60,12 @@ when used in combination with [tmux](https://tmux.github.io).
  * Visual or audible alert on connect/disconnect
  * Remapping of prefix key
  * Support NO_COLOR env variable as per no-color.org
- * Man page documentation
  * Lua scripting support for automation
    * Run script manually or automatically at connect once/always/never
    * Simple expect/send like functionality with support for regular expressions
    * Manipulate port control lines (useful for microcontroller reset/boot etc.)
    * Send files via x/y-modem protocol
+ * Man page documentation
  * Plays nicely with [tmux](https://tmux.github.io)
 
 ## 3. Usage
