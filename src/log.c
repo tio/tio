@@ -194,16 +194,23 @@ void log_putc(char c)
         return;
     }
 
-    if (option.log_strip)
+    if (option.output_mode == OUTPUT_MODE_HEX)
     {
-        if (!log_strip(c))
-        {
-            fputc(c, fp);
-        }
+        fprintf(fp, "%02x ", (unsigned char) c);
     }
     else
     {
-        fputc(c, fp);
+        if (option.log_strip)
+        {
+            if (log_strip(c) == false)
+            {
+                fputc(c, fp);
+            }
+        }
+        else
+        {
+            fputc(c, fp);
+        }
     }
 }
 
