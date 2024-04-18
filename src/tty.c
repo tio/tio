@@ -882,17 +882,17 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
 
                     case INPUT_MODE_HEX:
                         option.input_mode = INPUT_MODE_HEX;
-                        tio_printf("Switched to hex input mode");
+                        tio_printf("Switched input mode to hex");
                         break;
 
                     case INPUT_MODE_LINE:
                         option.input_mode = INPUT_MODE_LINE;
-                        tio_printf("Switched to line input mode");
+                        tio_printf("Switched input mode to line");
                         break;
 
                     case INPUT_MODE_END:
                         option.input_mode = INPUT_MODE_NORMAL;
-                        tio_printf("Switched to normal input mode");
+                        tio_printf("Switched input mode to normal");
                         break;
                 }
                 break;
@@ -906,13 +906,13 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
 
                     case OUTPUT_MODE_HEX:
                         tty_output_mode_set(OUTPUT_MODE_HEX);
-                        tio_printf("Switched to hex output mode");
+                        tio_printf("Switched output mode to hex");
                         break;
 
                     case OUTPUT_MODE_END:
                         option.output_mode = OUTPUT_MODE_NORMAL;
                         tty_output_mode_set(OUTPUT_MODE_NORMAL);
-                        tio_printf("Switched to normal output mode");
+                        tio_printf("Switched output mode to normal");
                         break;
                 }
                 break;
@@ -959,20 +959,20 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                     case TIMESTAMP_NONE:
                         break;
                     case TIMESTAMP_24HOUR:
-                        tio_printf("Switched to 24hour timestamp mode");
+                        tio_printf("Switched timestamp mode to 24hour");
                         break;
                     case TIMESTAMP_24HOUR_START:
-                        tio_printf("Switched to 24hour-start timestamp mode");
+                        tio_printf("Switched timestamp mode to 24hour-start");
                         break;
                     case TIMESTAMP_24HOUR_DELTA:
-                        tio_printf("Switched to 24hour-delta timestamp mode");
+                        tio_printf("Switched timestamp mode to 24hour-delta");
                         break;
                     case TIMESTAMP_ISO8601:
-                        tio_printf("Switched to iso8601 timestamp mode");
+                        tio_printf("Switched timestamp mode to iso8601");
                         break;
                     case TIMESTAMP_END:
                         option.timestamp = TIMESTAMP_NONE;
-                        tio_printf("Switched timestamp off");
+                        tio_printf("Switched timestamp mode to off");
                         break;
                 }
                 break;
