@@ -266,6 +266,59 @@ static bool match_regex(regex_t *regex)
     return false;
 }
 
+// lua: ret,string = read_string(size, timeout)
+static int read_string(lua_State *L)
+{
+    int size = lua_tointeger(L, 1);
+    int timeout = lua_tointeger(L, 2);
+    int ret = 0;
+
+    char *buffer = malloc(size);
+    if (buffer == NULL)
+    {
+        ret = -3; // Read buffer allocation failed
+        goto error;
+    }
+
+    if (timeout == 0)
+    {
+        timeout = -1; // Wait forever
+    }
+
+    ssize_t bytes_read = read_poll(device_fd, buffer, size, timeout);
+    if (bytes_read < 0)
+    {
+        ret = -1; // Read error
+        goto error;
+    }
+    else if (bytes_read == 0)
+    {
+        ret = -2; // Timeout
+        goto error;
+    }
+
+    for (ssize_t i=0; i<bytes_read; i++)
+    {
+        putchar(buffer[i]);
+
+        if (option.log)
+        {
+            log_putc(buffer[i]);
+        }
+    }
+
+    ret = bytes_read;
+
+error:
+    lua_pushnumber(L, ret);
+    if (buffer != NULL)
+    {
+        lua_pushstring(L, buffer);
+        free(buffer);
+    }
+    return 2;
+}
+
 // lua: expect(string, timeout)
 static int expect(lua_State *L)
 {
@@ -372,6 +425,7 @@ static const struct luaL_Reg tio_lib[] =
     { "config_apply", config_apply},
     { "modem_send", modem_send},
     { "send", send},
+    { "read", read_string},
     { "expect", expect},
     { "exit", exit_},
     {NULL, NULL}
