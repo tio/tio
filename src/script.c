@@ -215,8 +215,8 @@ static int send(lua_State *L)
     return 1;
 }
 
-// Function to add a character to the circular buffer
-void add_to_buffer(char c)
+// Function to add a character to the circular expect buffer
+static void expect_buffer_add(char c)
 {
     if (buffer_size < MAX_BUFFER_SIZE)
     {
@@ -230,8 +230,8 @@ void add_to_buffer(char c)
     }
 }
 
-// Function to match against the circular buffer using regex
-bool match_regex(regex_t *regex)
+// Function to match against the circular expect buffer using regex
+static bool match_regex(regex_t *regex)
 {
     char buffer[MAX_BUFFER_SIZE + 1]; // Temporary buffer for regex matching
     const char *s = circular_buffer;
@@ -306,7 +306,7 @@ static int expect(lua_State *L)
         if (bytes_read > 0)
         {
             putchar(c);
-            add_to_buffer(c);
+            expect_buffer_add(c);
             // Match against the entire buffer
             if (match_regex(&regex))
             {
