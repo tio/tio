@@ -300,6 +300,11 @@ will sound the bell twice or blink twice on disconnect.
 Default value is "none".
 
 .TP
+.BR "\-\-mute"
+
+Mute tio messages.
+
+.TP
 .BR "\-\-script \fI<string>
 
 Run script from string.
@@ -509,6 +514,8 @@ Enable RS-485 mode
 Set RS-485 configuration
 .IP "\fBalert"
 Set alert action on connect/disconnect
+.IP "\fBmute"
+Mute tio messages
 .IP "\fBscript"
 Run script from string
 .IP "\fBscript-file"
