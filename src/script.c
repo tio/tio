@@ -34,6 +34,7 @@
 #include "options.h"
 #include "tty.h"
 #include "xymodem.h"
+#include "log.h"
 
 #define MAX_BUFFER_SIZE 2000 // Maximum size of circular buffer
 
@@ -307,6 +308,12 @@ static int expect(lua_State *L)
         {
             putchar(c);
             expect_buffer_add(c);
+
+            if (option.log)
+            {
+                log_putc(c);
+            }
+
             // Match against the entire buffer
             if (match_regex(&regex))
             {
