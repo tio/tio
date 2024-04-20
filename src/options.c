@@ -289,7 +289,7 @@ const char *output_mode_by_string(output_mode_t mode)
     return NULL;
 }
 
-enum script_run_t script_run_option_parse(const char *arg)
+script_run_t script_run_option_parse(const char *arg)
 {
     if (strcmp("once", arg) == 0)
     {
@@ -320,6 +320,7 @@ void options_print()
     tio_printf(" Parity: %s", option.parity);
     tio_printf(" Local echo: %s", option.local_echo ? "enabled" : "disabled");
     tio_printf(" Timestamp: %s", timestamp_state_to_string(option.timestamp));
+    tio_printf(" Timestamp timeout: %u", option.timestamp_timeout);
     tio_printf(" Output delay: %d", option.output_delay);
     tio_printf(" Output line delay: %d", option.output_line_delay);
     tio_printf(" Auto connect: %s", option.no_autoconnect ? "disabled" : "enabled");
@@ -331,12 +332,30 @@ void options_print()
                                                                             option.ri_pulse_duration);
     tio_printf(" Input mode: %s", input_mode_by_string(option.input_mode));
     tio_printf(" Output mode: %s", output_mode_by_string(option.output_mode));
+    tio_printf(" Alert: %s", alert_state_to_string(option.alert));
     if (option.map[0] != 0)
+    {
         tio_printf(" Map flags: %s", option.map);
+    }
     if (option.log)
+    {
         tio_printf(" Log file: %s", log_get_filename());
+        if (option.log_directory != NULL)
+        {
+            tio_printf(" Log file directory: %s", option.log_directory);
+        }
+        tio_printf(" Log append: %s", option.log_append ? "enabled" : "disabled");
+        tio_printf(" Log strip: %s", option.log_strip ? "enabled" : "disabled");
+    }
     if (option.socket)
+    {
         tio_printf(" Socket: %s", option.socket);
+    }
+    if (option.script_filename != NULL)
+    {
+        tio_printf(" Script file: %s", option.script_filename);
+        tio_printf(" Script run: %s", script_run_state_to_string(option.script_run));
+    }
 }
 
 void options_parse(int argc, char *argv[])

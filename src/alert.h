@@ -21,14 +21,15 @@
 
 #pragma once
 
-enum alert_t
+typedef enum
 {
     ALERT_NONE,
     ALERT_BELL,
     ALERT_BLINK,
     ALERT_END,
-};
+} alert_t;
 
-enum alert_t alert_option_parse(const char *arg);
+alert_t alert_option_parse(const char *arg);
 void alert_connect(void);
 void alert_disconnect(void);
+const char *alert_state_to_string(alert_t state);

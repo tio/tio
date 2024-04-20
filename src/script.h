@@ -21,12 +21,13 @@
 
 #pragma once
 
-enum script_run_t
+typedef enum
 {
     SCRIPT_RUN_ONCE,
     SCRIPT_RUN_ALWAYS,
     SCRIPT_RUN_NEVER,
     SCRIPT_RUN_END,
-};
+} script_run_t;
 
 void script_run(int fd);
+const char *script_run_state_to_string(script_run_t state);

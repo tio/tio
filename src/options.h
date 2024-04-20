@@ -83,11 +83,11 @@ struct option_t
     uint32_t rs485_config_flags;
     int32_t rs485_delay_rts_before_send;
     int32_t rs485_delay_rts_after_send;
-    enum alert_t alert;
+    alert_t alert;
     bool complete_sub_configs;
     const char *script;
     const char *script_filename;
-    enum script_run_t script_run;
+    script_run_t script_run;
     unsigned int timestamp_timeout;
 };
 
@@ -98,7 +98,7 @@ void options_parse(int argc, char *argv[]);
 void options_parse_final(int argc, char *argv[]);
 
 void line_pulse_duration_option_parse(const char *arg);
-enum script_run_t script_run_option_parse(const char *arg);
+script_run_t script_run_option_parse(const char *arg);
 
 input_mode_t input_mode_option_parse(const char *arg);
 output_mode_t output_mode_option_parse(const char *arg);

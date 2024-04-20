@@ -35,6 +35,7 @@
 #include "tty.h"
 #include "xymodem.h"
 #include "log.h"
+#include "script.h"
 
 #define MAX_BUFFER_SIZE 2000 // Maximum size of circular buffer
 
@@ -522,4 +523,19 @@ void script_run(int fd)
     }
 
     lua_close(L);
+}
+
+const char *script_run_state_to_string(script_run_t state)
+{
+    switch (state)
+    {
+        case SCRIPT_RUN_ONCE:
+            return "once";
+        case SCRIPT_RUN_ALWAYS:
+            return "always";
+        case SCRIPT_RUN_NEVER:
+            return "never";
+        default:
+            return "Unknown";
+    }
 }

@@ -19,6 +19,7 @@
  * 02110-1301, USA.
  */
 
+#include "alert.h"
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,9 +29,9 @@
 #include "print.h"
 #include "options.h"
 
-enum alert_t alert_option_parse(const char *arg)
+alert_t alert_option_parse(const char *arg)
 {
-    enum alert_t alert = option.alert; // Default
+    alert_t alert = option.alert; // Default
 
     if (arg != NULL)
     {
@@ -106,5 +107,20 @@ void alert_disconnect(void)
             break;
         default:
             break;
+    }
+}
+
+const char *alert_state_to_string(alert_t state)
+{
+    switch (state)
+    {
+        case ALERT_NONE:
+            return "none";
+        case ALERT_BELL:
+            return "bell";
+        case ALERT_BLINK:
+            return "blink";
+        default:
+            return "Unknown";
     }
 }
