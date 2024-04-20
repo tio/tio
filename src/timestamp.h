@@ -21,7 +21,7 @@
 
 #pragma once
 
-enum timestamp_t
+typedef enum
 {
     TIMESTAMP_NONE,
     TIMESTAMP_24HOUR,
@@ -29,8 +29,8 @@ enum timestamp_t
     TIMESTAMP_24HOUR_DELTA,
     TIMESTAMP_ISO8601,
     TIMESTAMP_END,
-};
+} timestamp_t;
 
 char *timestamp_current_time(void);
-const char* timestamp_state_to_string(enum timestamp_t timestamp);
-enum timestamp_t timestamp_option_parse(const char *arg);
+const char* timestamp_state_to_string(timestamp_t timestamp);
+timestamp_t timestamp_option_parse(const char *arg);

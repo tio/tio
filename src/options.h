@@ -67,7 +67,7 @@ struct option_t
     bool log_append;
     bool log_strip;
     bool local_echo;
-    enum timestamp_t timestamp;
+    timestamp_t timestamp;
     const char *log_filename;
     const char *log_directory;
     const char *map;

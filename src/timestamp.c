@@ -94,7 +94,7 @@ char *timestamp_current_time(void)
     return (len < TIME_STRING_SIZE_MAX) ? time_string : NULL;
 }
 
-const char* timestamp_state_to_string(enum timestamp_t timestamp)
+const char* timestamp_state_to_string(timestamp_t timestamp)
 {
     switch (timestamp)
     {
@@ -124,9 +124,9 @@ const char* timestamp_state_to_string(enum timestamp_t timestamp)
     }
 }
 
-enum timestamp_t timestamp_option_parse(const char *arg)
+timestamp_t timestamp_option_parse(const char *arg)
 {
-    enum timestamp_t timestamp = TIMESTAMP_24HOUR; // Default
+    timestamp_t timestamp = TIMESTAMP_24HOUR; // Default
 
     if (arg != NULL)
     {
