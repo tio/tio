@@ -376,7 +376,7 @@ void *tty_stdin_input_thread(void *arg)
                             exit(EXIT_SUCCESS);
                             break;
                         case KEY_SHIFT_F:
-                            tio_printf("Flushed data I/O channels")
+                            tio_printf("Flushed data I/O buffers")
                             tcflush(device_fd, TCIOFLUSH);
                             break;
                         default:
