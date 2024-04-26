@@ -31,40 +31,61 @@ when used in combination with [tmux](https://tmux.github.io).
 ## 2. Features
 
  * Easily connect to serial TTY devices
- * Automatic connect and reconnect
  * Sensible defaults (115200 8n1)
  * Support for non-standard baud rates
  * Support for mark and space parity
+ * Automatic connection management
+   * Automatic reconnect
+   * Automatically connect to first new appearing serial device
+   * Automatically connect to latest registered serial device
+ * Connect to same port/device combination via unique topology ID (TID)
+   * Useful for reconnecting when serial device has no serial device by ID
  * X-modem (1K/CRC) and Y-modem file upload
  * Support for RS-485 mode
- * List available serial devices by ID
+ * List available serial devices
+   * By device
+     * Including topology ID, uptime, driver, description
+     * Sorted by uptime (newest device listed last)
+   * By ID
+   * By path
  * Show RX/TX statistics
  * Toggle serial lines
  * Pulse serial lines with configurable pulse duration
  * Local echo support
  * Remapping of characters (nl, cr-nl, bs, lowercase to uppercase, etc.)
- * Switchable independent input and output mode (normal vs hex)
+ * Switchable independent input and output
+   * Normal mode
+   * Hex mode
+   * Line mode (input only)
  * Timestamp support
    * Per line in normal output mode
    * Output timeout timestamps in hex output mode
  * Support for delayed output
    * Per character
    * Per line
- * Log to file with automatic or manual naming of log file
+ * Log to file
+   * Automatic naming of log file (default)
+   * Configurable directory for saving automatic named log files
+   * Manual naming of log file
+   * Overwrite (default) or append to log file
+   * Strip control characters and escape sequences
  * Configuration file support
- * Activate sub-configurations by name or pattern
- * Redirect I/O to UNIX socket or IPv4/v6 network socket for scripting or TTY sharing
+   * Support for sub-configurations
+   * Activate sub-configurations by name or pattern
+ * Redirect I/O to UNIX socket or IPv4/v6 network socket
+   * Useful for scripting or TTY sharing
  * Pipe input and/or output
  * Bash completion on options, serial device names, and sub-configuration names
- * Configurable text color
+ * Configurable tio message text color
+   * Supports NO_COLOR env variable as per no-color.org
  * Visual or audible alert on connect/disconnect
  * Remapping of prefix key
- * Support NO_COLOR env variable as per no-color.org
  * Lua scripting support for automation
-   * Run script manually or automatically at connect once/always/never
+   * Run script manually or automatically at connect (once/always/never)
    * Simple expect/send like functionality with support for regular expressions
    * Manipulate port control lines (useful for microcontroller reset/boot etc.)
    * Send files via x/y-modem protocol
+   * Search for serial devices
  * Man page documentation
  * Plays nicely with [tmux](https://tmux.github.io)
 
@@ -78,9 +99,9 @@ For more usage details please see the man page documentation
 The command-line interface is straightforward as reflected in the output from
 'tio --help':
 ```
-Usage: tio [<options>] <tty-device|sub-config>
+Usage: tio [<options>] <tty-device|sub-config|tid>
 
-Connect to TTY device directly or via sub-configuration.
+Connect to TTY device directly or via sub-configuration or topology ID.
 
 Options:
   -b, --baudrate <bps>                   Baud rate (default: 115200)
@@ -91,15 +112,19 @@ Options:
   -o, --output-delay <ms>                Output character delay (default: 0)
   -O, --output-line-delay <ms>           Output line delay (default: 0)
       --line-pulse-duration <duration>   Set line pulse duration
-  -n, --no-autoconnect                   Disable automatic connect
+  -a, --auto-connect new|latest|direct   Automatic connect strategy (default: direct)
+      --exclude-devices <pattern>        Exclude devices by pattern
+      --exclude-drivers <pattern>        Exclude drivers by pattern
+      --exclude-tids <pattern>           Exclude topology IDs by pattern
+  -n, --no-reconnect                     Do not reconnect
   -e, --local-echo                       Enable local echo
       --input-mode normal|hex|line       Select input mode (default: normal)
       --output-mode normal|hex           Select output mode (default: normal)
   -t, --timestamp                        Enable line timestamp
       --timestamp-format <format>        Set timestamp format (default: 24hour)
       --timestamp-timeout <ms>           Set timestamp timeout (default: 200)
-  -L, --list-devices                     List available serial devices by ID
-  -l, --log                              Enable log to file
+  -l, --list                             List available serial devices
+  -L, --log                              Enable log to file
       --log-file <filename>              Set log filename
       --log-directory <path>             Set log directory path for automatic named logs
       --log-append                       Append to log file
@@ -125,7 +150,7 @@ See the man page for more details.
 By default tio automatically connects to the provided TTY device if present.
 If the device is not present, it will wait for it to appear and then connect.
 If the connection is lost (eg. device is unplugged), it will wait for the
-device to reappear and then reconnect. However, if the `--no-autoconnect`
+device to reappear and then reconnect. However, if the `--no-reconnect`
 option is provided, tio will exit if the device is not present or an
 established connection is lost.
 
@@ -150,16 +175,21 @@ $ tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 Using serial devices by ID ensures that tio automatically reconnects to the
 correct serial device if it is disconnected and then reconnected.
 
-List available serial devices by ID:
+List available serial devices:
 ```
-$ tio --list-devices
+$ tio --list
 ```
-Note: One can also use tio shell completion on /dev which will automatically
-list all available serial TTY devices.
+Note: One can also use tio bash shell completion on /dev which will
+automatically list all available serial TTY devices by ID.
 
 Log to file with autogenerated filename:
 ```
 $ tio --log /dev/ttyUSB0
+```
+
+Log to file with filename:
+```
+$ tio --log --log-file my-log.txt
 ```
 
 Enable ISO8601 timestamps per line:
@@ -182,6 +212,80 @@ Pipe command to serial device and wait for line response within 1 second:
 $ echo "*IDN?" | tio /dev/ttyACM0 --script "expect('\r\n', 1000)" --mute
 KORAD KD3305P V4.2 SN:32475045
 ```
+
+### 3.1.2 Different ways to connect to serial devices
+
+Using tio there are up to 4 recommended ways to connect to a specific serial
+device:
+
+ * Connect by ID
+   * Example: ```tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTCHUV56-if00-port0```
+ * Connect by topology ID
+   * Example: ```tio bCC2```
+ * Connect to enumerated device in /dev
+   * Example: ```tio /dev/ttyUSB4```
+ * Connect by path
+   * Example: ```tio /dev/serial/by-path/pci-0000:00:14.0-usb-0:8.1.3.1.4:1.0-port0```
+
+Which serial device to connect becomes more clear from tio's serial device
+listing which provides more information about each serial device. For example:
+```
+$ tio --list
+Device            TID     Uptime [s] Driver           Description
+----------------- ---- ------------- ---------------- --------------------------
+/dev/ttyS4        8xSh     32532.317 port             16550A UART
+/dev/ttyS5        HJhB     32530.578 port             16550A UART
+/dev/ttyUSB3      yW07     32464.194 ftdi_sio         TTL232RG-VREG3V3
+/dev/ttyUSB4      bCC2     26066.573 ftdi_sio         TTL232R-3V3
+/dev/ttyUSB0      g5q4       136.717 ftdi_sio         Flyswatter2
+/dev/ttyUSB1      h5q4       136.715 ftdi_sio         Flyswatter2
+/dev/ttyACM0      EOEs        10.449 cdc_acm          ST-Link VCP Ctrl
+
+By-id
+--------------------------------------------------------------------------------
+/dev/serial/by-id/usb-FTDI_TTL232RG-VREG3V3_FT1NC2D0-if00-port0
+/dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTCHUV56-if00-port0
+/dev/serial/by-id/usb-TinCanTools_Flyswatter2_FS20000-if00-port0
+/dev/serial/by-id/usb-TinCanTools_Flyswatter2_FS20000-if01-port0
+/dev/serial/by-id/usb-STMicroelectronics_STLINK-V3_004900343438510234313939-if02
+
+By-path
+--------------------------------------------------------------------------------
+/dev/serial/by-path/pci-0000:00:14.0-usb-0:8.1.3.2.2:1.0-port0
+/dev/serial/by-path/pci-0000:00:14.0-usbv2-0:8.1.3.2.2:1.0-port0
+/dev/serial/by-path/pci-0000:00:14.0-usb-0:8.1.3.1.4:1.0-port0
+/dev/serial/by-path/pci-0000:00:14.0-usbv2-0:8.1.3.1.4:1.0-port0
+/dev/serial/by-path/pci-0000:00:14.0-usb-0:6.3:1.0-port0
+/dev/serial/by-path/pci-0000:00:14.0-usbv2-0:6.3:1.0-port0
+/dev/serial/by-path/pci-0000:00:14.0-usb-0:6.3:1.1-port0
+/dev/serial/by-path/pci-0000:00:14.0-usbv2-0:6.3:1.1-port0
+/dev/serial/by-path/pci-0000:00:14.0-usb-0:6.4:1.2
+/dev/serial/by-path/pci-0000:00:14.0-usbv2-0:6.4:1.2
+```
+
+Note: The topology ID (TID) is a special hash of the full topology path of the
+connected device. This means that every time e.g. a USB serial device is
+plugged into to the exact same USB hub chain it will get the exact same TID.
+This helps solve the problem of reconnecting to serical devices which do not
+provide a unique device by ID.
+
+Additonally tio offers two convenient ways of connecting to serial devices:
+
+ * Connect automatically to first new appearing serial device
+   * ```tio --auto-connect new```
+ * Connect automatically to latest registered serial device
+   * ```tio --auto-connect latest```
+
+It is also possible to use excludes to affect strategy decisions:
+
+ * Exclude devices by pattern
+   * Example: ```tio --auto-connect new --exclude-devices "/dev/ttyACM?,/dev/ttyUSB2"```
+ * Exclude drivers by pattern
+   * Example: ```tio --auto-connect new --exclude-drivers "cdc_acm,ftdi_sio"```
+ * Exclude topology IDs by pattern
+   * Example: ```tio --auto-connect new --exclude-tids "EOEs"```
+
+Note: Pattern matching supports '*' and '?'. Use comma separation to define multiple patterns.
 
 ### 3.2 Key commands
 
@@ -237,6 +341,15 @@ In addition to the Lua API tio makes the following functions available:
         Send file using x/y-modem protocol.
 
         Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
+  tty_search()
+        Search for serial devices.
+
+        Returns a table of number indexed tables, one for each serial device
+        found. Each of these tables contains the serial device information accessible
+        via the following string indexed elements "path", "tid", "uptime", "driver",
+        "description".
+
+        Returns nil if no serial devices are found.
 
   exit(code)
         Exit with code.
@@ -299,7 +412,7 @@ color = 10
 [rpi3]
 device = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 baudrate = 115200
-no-autoconnect = enable
+no-reconnect = enable
 log = enable
 log-file = rpi3.log
 line-pulse-duration = DTR=200,RTS=150

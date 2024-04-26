@@ -61,12 +61,15 @@ enum opt_t
     OPT_SCRIPT_RUN,
     OPT_INPUT_MODE,
     OPT_OUTPUT_MODE,
+    OPT_EXCLUDE_DEVICES,
+    OPT_EXCLUDE_DRIVERS,
+    OPT_EXCLUDE_TIDS,
 };
 
 /* Default options */
 struct option_t option =
 {
-    .tty_device = "",
+    .target = "",
     .baudrate = 115200,
     .databits = 8,
     .flow = "none",
@@ -80,7 +83,8 @@ struct option_t option =
     .dsr_pulse_duration = 100,
     .dcd_pulse_duration = 100,
     .ri_pulse_duration = 100,
-    .no_autoconnect = false,
+    .no_reconnect = false,
+    .auto_connect = AUTO_CONNECT_DIRECT,
     .log = false,
     .log_append = false,
     .log_filename = NULL,
@@ -107,15 +111,18 @@ struct option_t option =
     .script_filename = NULL,
     .script_run = SCRIPT_RUN_ALWAYS,
     .timestamp_timeout = 200,
+    .exclude_devices = NULL,
+    .exclude_drivers = NULL,
+    .exclude_tids = NULL,
 };
 
 void print_help(char *argv[])
 {
     UNUSED(argv);
 
-    printf("Usage: tio [<options>] <tty-device|sub-config>\n");
+    printf("Usage: tio [<options>] <tty-device|sub-config|tid>\n");
     printf("\n");
-    printf("Connect to TTY device directly or via sub-configuration.\n");
+    printf("Connect to TTY device directly or via sub-configuration or topology ID.\n");
     printf("\n");
     printf("Options:\n");
     printf("  -b, --baudrate <bps>                   Baud rate (default: 115200)\n");
@@ -126,15 +133,19 @@ void print_help(char *argv[])
     printf("  -o, --output-delay <ms>                Output character delay (default: 0)\n");
     printf("  -O, --output-line-delay <ms>           Output line delay (default: 0)\n");
     printf("      --line-pulse-duration <duration>   Set line pulse duration\n");
-    printf("  -n, --no-autoconnect                   Disable automatic connect\n");
+    printf("  -a, --auto-connect new|latest|direct   Automatic connect strategy (default: direct)\n");
+    printf("      --exclude-devices <pattern>        Exclude devices by pattern\n");
+    printf("      --exclude-drivers <pattern>        Exclude drivers by pattern\n");
+    printf("      --exclude-tids <pattern>           Exclude topology IDs by pattern\n");
+    printf("  -n, --no-reconnect                     Do not reconnect\n");
     printf("  -e, --local-echo                       Enable local echo\n");
     printf("      --input-mode normal|hex|line       Select input mode (default: normal)\n");
     printf("      --output-mode normal|hex           Select output mode (default: normal)\n");
     printf("  -t, --timestamp                        Enable line timestamp\n");
     printf("      --timestamp-format <format>        Set timestamp format (default: 24hour)\n");
     printf("      --timestamp-timeout <ms>           Set timestamp timeout (default: 200)\n");
-    printf("  -L, --list-devices                     List available serial devices by ID\n");
-    printf("  -l, --log                              Enable log to file\n");
+    printf("  -l, --list                             List available serial devices\n");
+    printf("  -L, --log                              Enable log to file\n");
     printf("      --log-file <filename>              Set log filename\n");
     printf("      --log-directory <path>             Set log directory path for automatic named logs\n");
     printf("      --log-append                       Append to log file\n");
@@ -155,6 +166,44 @@ void print_help(char *argv[])
     printf("Options and sub-configurations may be set via configuration file.\n");
     printf("\n");
     printf("See the man page for more details.\n");
+}
+
+const char *auto_connect_state_to_string(auto_connect_t strategy)
+{
+    switch (strategy)
+    {
+        case AUTO_CONNECT_DIRECT:
+            return "direct";
+        case AUTO_CONNECT_NEW:
+            return "new";
+        case AUTO_CONNECT_LATEST:
+            return "latest";
+        default:
+            return "Unknown";
+    }
+}
+
+auto_connect_t auto_connect_option_parse(const char *arg)
+{
+    auto_connect_t auto_connect = option.auto_connect; // Default
+
+    if (arg != NULL)
+    {
+        if (strcmp(arg, "direct") == 0)
+        {
+            return AUTO_CONNECT_DIRECT;
+        }
+        else if (strcmp(arg, "new") == 0)
+        {
+            return AUTO_CONNECT_NEW;
+        }
+        else if (strcmp(arg, "latest") == 0)
+        {
+            return AUTO_CONNECT_LATEST;
+        }
+    }
+
+    return auto_connect;
 }
 
 void line_pulse_duration_option_parse(const char *arg)
@@ -312,7 +361,7 @@ script_run_t script_run_option_parse(const char *arg)
 
 void options_print()
 {
-    tio_printf(" Device: %s", option.tty_device);
+    tio_printf(" Device: %s", device_name);
     tio_printf(" Baudrate: %u", option.baudrate);
     tio_printf(" Databits: %d", option.databits);
     tio_printf(" Flow: %s", option.flow);
@@ -323,7 +372,8 @@ void options_print()
     tio_printf(" Timestamp timeout: %u", option.timestamp_timeout);
     tio_printf(" Output delay: %d", option.output_delay);
     tio_printf(" Output line delay: %d", option.output_line_delay);
-    tio_printf(" Auto connect: %s", option.no_autoconnect ? "disabled" : "enabled");
+    tio_printf(" Automatic connect strategy: %s", auto_connect_state_to_string(option.auto_connect));
+    tio_printf(" Automatic reconnect: %s", option.no_reconnect ? "disabled" : "enabled");
     tio_printf(" Pulse duration: DTR=%d RTS=%d CTS=%d DSR=%d DCD=%d RI=%d", option.dtr_pulse_duration,
                                                                             option.rts_pulse_duration,
                                                                             option.cts_pulse_duration,
@@ -385,13 +435,17 @@ void options_parse(int argc, char *argv[])
             {"output-delay",         required_argument, 0, 'o'                     },
             {"output-line-delay" ,   required_argument, 0, 'O'                     },
             {"line-pulse-duration",  required_argument, 0, OPT_LINE_PULSE_DURATION },
-            {"no-autoconnect",       no_argument,       0, 'n'                     },
+            {"auto-connect",         required_argument, 0, 'a'                     },
+            {"exclude-devices",      required_argument, 0, OPT_EXCLUDE_DEVICES     },
+            {"exclude-drivers",      required_argument, 0, OPT_EXCLUDE_DRIVERS     },
+            {"exclude-tids",         required_argument, 0, OPT_EXCLUDE_TIDS        },
+            {"no-reconnect",         no_argument,       0, 'n'                     },
             {"local-echo",           no_argument,       0, 'e'                     },
             {"timestamp",            no_argument,       0, 't'                     },
             {"timestamp-format",     required_argument, 0, OPT_TIMESTAMP_FORMAT    },
             {"timestamp-timeout",    required_argument, 0, OPT_TIMESTAMP_TIMEOUT   },
-            {"list-devices",         no_argument,       0, 'L'                     },
-            {"log",                  no_argument,       0, 'l'                     },
+            {"list",                 no_argument,       0, 'l'                     },
+            {"log",                  no_argument,       0, 'L'                     },
             {"log-file",             required_argument, 0, OPT_LOG_FILE            },
             {"log-directory",        required_argument, 0, OPT_LOG_DIRECTORY       },
             {"log-append",           no_argument,       0, OPT_LOG_APPEND          },
@@ -418,7 +472,7 @@ void options_parse(int argc, char *argv[])
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:O:netLlS:m:c:xrvh", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:O:a:netLlS:m:c:xrvh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
@@ -468,8 +522,24 @@ void options_parse(int argc, char *argv[])
                 line_pulse_duration_option_parse(optarg);
                 break;
 
+            case 'a':
+                option.auto_connect = auto_connect_option_parse(optarg);
+                break;
+
+            case OPT_EXCLUDE_DEVICES:
+                option.exclude_devices = optarg;
+                break;
+
+            case OPT_EXCLUDE_DRIVERS:
+                option.exclude_drivers = optarg;
+                break;
+
+            case OPT_EXCLUDE_TIDS:
+                option.exclude_tids = optarg;
+                break;
+
             case 'n':
-                option.no_autoconnect = true;
+                option.no_reconnect = true;
                 break;
 
             case 'e':
@@ -489,12 +559,12 @@ void options_parse(int argc, char *argv[])
                 break;
 
             case 'L':
-                list_serial_devices();
-                exit(EXIT_SUCCESS);
+                option.log = true;
                 break;
 
             case 'l':
-                option.log = true;
+                list_serial_devices();
+                exit(EXIT_SUCCESS);
                 break;
 
             case OPT_LOG_FILE:
@@ -611,24 +681,33 @@ void options_parse(int argc, char *argv[])
         }
     }
 
-    /* Assume first non-option is the tty device name */
-    if (strcmp(option.tty_device, ""))
+    /* Assume first non-option is the target (tty device, sub-config, tid) */
+    if (strcmp(option.target, ""))
+    {
             optind++;
+    }
     else if (optind < argc)
-        option.tty_device = argv[optind++];
+    {
+        option.target = argv[optind++];
+    }
 
     if (option.complete_sub_configs)
     {
         return;
     }
 
-    if (strlen(option.tty_device) == 0)
+    if (option.auto_connect != AUTO_CONNECT_DIRECT)
     {
-        tio_error_printf("Missing tty device or sub-configuration name");
+        return;
+    }
+
+    if (strlen(option.target) == 0)
+    {
+        tio_error_printf("Missing tty device, sub-configuration or topology ID");
         exit(EXIT_FAILURE);
     }
 
-    /* Print any remaining command line arguments (unknown options) */
+    /* Print any remaining command line arguments as unknown */
     if (optind < argc)
     {
         fprintf(stderr, "Error: Unknown argument ");
@@ -643,8 +722,8 @@ void options_parse(int argc, char *argv[])
 
 void options_parse_final(int argc, char *argv[])
 {
-    /* Preserve tty device which may have been set by configuration file */
-    const char *tty_device = option.tty_device;
+    /* Preserve target which may have been set by configuration file */
+    const char *target = option.target;
 
     /* Do 2nd pass to override settings set by configuration file */
     optind = 1; // Reset option index to restart scanning of argv
@@ -653,16 +732,16 @@ void options_parse_final(int argc, char *argv[])
 #ifdef __CYGWIN__
     unsigned char portnum;
     char *tty_win;
-    if ( ((strncmp("COM", tty_device, 3) == 0)
-        || (strncmp("com", tty_device, 3) == 0) )
-        && (sscanf(tty_device + 3, "%hhu", &portnum) == 1)
+    if ( ((strncmp("COM", target, 3) == 0)
+        || (strncmp("com", target, 3) == 0) )
+        && (sscanf(target + 3, "%hhu", &portnum) == 1)
         && (portnum > 0) ) 
     {
         asprintf(&tty_win, "/dev/ttyS%hhu", portnum - 1);
-        tty_device = tty_win;
+        target = tty_win;
     }
 #endif
 
-    /* Restore tty device */
-    option.tty_device = tty_device;
+    /* Restore target */
+    option.target = target;
 }

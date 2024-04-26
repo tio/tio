@@ -20,7 +20,10 @@
  */
 
 #include "config.h"
+#include <ctype.h>
+#include <dirent.h>
 #include <regex.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -29,6 +32,7 @@
 #include <time.h>
 #include <errno.h>
 #include <sys/poll.h>
+#include <termios.h>
 #include "error.h"
 #include "print.h"
 #include "options.h"
@@ -72,22 +76,6 @@ int ctrl_key_code(unsigned char key)
     }
 
     return -1;
-}
-
-bool fs_dir_exists(const char *path)
-{
-    struct stat st;
-
-    if (stat(path, &st) != 0)
-    {
-        return false;
-    }
-    else if (!S_ISDIR(st.st_mode))
-    {
-        return false;
-    }
-
-    return true;
 }
 
 bool regex_match(const char *string, const char *pattern)
@@ -140,4 +128,117 @@ int read_poll(int fd, void *data, size_t len, int timeout)
 
     /* Timeout */
     return ret;
+}
+
+// Function to calculate djb2 hash of string
+unsigned long djb2_hash(const unsigned char *str)
+{
+    unsigned long hash = 5381;
+    int c;
+
+    while ((c = *str++))
+    {
+        hash = ((hash << 5) + hash) + c; // hash * 33 + c
+    }
+
+    return hash;
+}
+
+// Function to encode a number to base62
+char *base62_encode(unsigned long num)
+{
+    const char base62_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    char *output = (char *) malloc(5); // 4 characters + null terminator
+    if (output == NULL)
+    {
+        tio_error_print("Memory allocation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    for (int i = 0; i < 4; ++i)
+    {
+        output[i] = base62_chars[num % 62];
+        num /= 62;
+    }
+    output[4] = '\0';
+
+    return output;
+}
+
+// Function to return current time
+double get_current_time(void)
+{
+    struct timespec current_time_ts;
+
+    if (clock_gettime(CLOCK_REALTIME, &current_time_ts) == -1)
+    {
+        // Error
+        return -1;
+    }
+
+    return current_time_ts.tv_sec + current_time_ts.tv_nsec / 1e9;
+}
+
+// Function to match string with comma separated patterns which supports '*' and '?'
+static bool is_match(const char *str, const char *pattern)
+{
+    // If both string and pattern reach end, they match
+    if (*str == '\0' && *pattern == '\0')
+    {
+        return true;
+    }
+
+    // If pattern reaches end but string has characters left, no match
+    if (*pattern == '\0')
+    {
+        return false;
+    }
+
+    // If current characters match or pattern has '?', move to the next character in both
+    if (*str == *pattern || *pattern == '?')
+    {
+        return is_match(str + 1, pattern + 1);
+    }
+
+    // If current pattern character is '*', check for matches by moving string or pattern
+    if (*pattern == '*')
+    {
+        // '*' matches zero or more characters, so try all possibilities
+        // Move pattern to the next character and check if remaining pattern matches remaining string
+        // Move string to the next character and check if current pattern matches remaining string
+        return is_match(str, pattern + 1) || is_match(str + 1, pattern);
+    }
+
+    // No match
+    return false;
+}
+
+bool match_any_pattern(const char *str, const char *patterns)
+{
+    if ((str == NULL) || (patterns == NULL))
+    {
+        return false;
+    }
+
+    char *patterns_copy = strdup(patterns);
+    if (patterns_copy == NULL)
+    {
+        tio_error_print("Memory allocation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    char *token = strtok(patterns_copy, ",");
+    while (token != NULL)
+    {
+        if (is_match(str, token))
+        {
+            free(patterns_copy);
+            return true;
+        }
+        token = strtok(NULL, ",");
+    }
+
+    free(patterns_copy);
+
+    return false;
 }

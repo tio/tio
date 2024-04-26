@@ -121,8 +121,9 @@ int main(int argc, char *argv[])
     tty_input_thread_wait_ready();
 
     /* Connect to tty device */
-    if (option.no_autoconnect)
+    if (option.no_reconnect)
     {
+        tty_search();
         status = tty_connect();
     }
     else
@@ -131,7 +132,7 @@ int main(int argc, char *argv[])
         while (true)
         {
             tty_wait_for_device();
-            status = tty_connect();
+            tty_connect();
         }
     }
 

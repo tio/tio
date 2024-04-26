@@ -22,10 +22,31 @@
 #pragma once
 
 #include <stdbool.h>
+#include <glib.h>
 
 #define LINE_HIGH true
 #define LINE_LOW false
 
+#define TOPOLOGY_ID_SIZE 4
+
+typedef enum
+{
+    AUTO_CONNECT_DIRECT,
+    AUTO_CONNECT_NEW,
+    AUTO_CONNECT_LATEST,
+    AUTO_CONNECT_END,
+} auto_connect_t;
+
+typedef struct
+{
+    char *tid;
+    double uptime;
+    char *path;
+    char *driver;
+    char *description;
+} device_t;
+
+extern const char *device_name;
 extern bool interactive_mode;
 extern bool map_i_nl_cr;
 extern bool map_i_cr_nl;
@@ -43,3 +64,5 @@ void tty_line_set(int fd, int mask, bool value);
 void tty_line_toggle(int fd, int mask);
 void tty_line_config(int mask, bool value);
 void tty_line_config_apply(void);
+void tty_search(void);
+GList *tty_search_for_serial_devices(void);

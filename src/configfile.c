@@ -54,7 +54,7 @@ struct config_t
     char *section_name;
     char *match;
 
-    char *tty;
+    char *target;
     char *flow;
     char *parity;
     char *log_filename;
@@ -63,6 +63,9 @@ struct config_t
     char *script;
     char *script_filename;
     bool script_run;
+    char *exclude_devices;
+    char *exclude_drivers;
+    char *exclude_tids;
 };
 
 static struct config_t c;
@@ -151,8 +154,8 @@ static int data_handler(void *user, const char *section, const char *name,
         // Set configuration parameter if found
         if (!strcmp(name, "device") || !strcmp(name, "tty"))
         {
-            asprintf(&c.tty, value, c.match);
-            option.tty_device = c.tty;
+            asprintf(&c.target, value, c.match);
+            option.target = c.target;
         }
         else if (!strcmp(name, "baudrate"))
         {
@@ -188,9 +191,13 @@ static int data_handler(void *user, const char *section, const char *name,
         {
             line_pulse_duration_option_parse(value);
         }
-        else if (!strcmp(name, "no-autoconnect"))
+        else if (!strcmp(name, "no-reconnect"))
         {
-            option.no_autoconnect = read_boolean(value, name);
+            option.no_reconnect = read_boolean(value, name);
+        }
+        else if (!strcmp(name, "auto-connect"))
+        {
+            option.auto_connect = auto_connect_option_parse(value);
         }
         else if (!strcmp(name, "log"))
         {
@@ -313,6 +320,21 @@ static int data_handler(void *user, const char *section, const char *name,
         else if (!strcmp(name, "script-run"))
         {
             option.script_run = script_run_option_parse(value);
+        }
+        else if (!strcmp(name, "exclude-devices"))
+        {
+            c.exclude_devices = strdup(value);
+            option.exclude_devices = c.exclude_devices;
+        }
+        else if (!strcmp(name, "exclude-drivers"))
+        {
+            c.exclude_drivers = strdup(value);
+            option.exclude_drivers = c.exclude_drivers;
+        }
+        else if (!strcmp(name, "exclude-tids"))
+        {
+            c.exclude_tids = strdup(value);
+            option.exclude_tids = c.exclude_tids;
         }
         else
         {
@@ -460,8 +482,8 @@ void config_file_parse(void)
         return;
     }
 
-    // Set user input which may be tty device or sub config
-    c.user = option.tty_device;
+    // Set user input which may be tty device or sub config or tid
+    c.user = option.target;
 
     if (!c.user)
     {
@@ -504,7 +526,7 @@ void config_file_parse(void)
 
 void config_exit(void)
 {
-    free(c.tty);
+    free(c.target);
     free(c.flow);
     free(c.parity);
     free(c.log_filename);

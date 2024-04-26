@@ -18,7 +18,11 @@ _tio()
           -o --output-delay \
           -o --output-line-delay \
              --line-pulse-duration \
-          -n --no-autoconnect \
+          -a --auto-connect \
+             --exclude-devices \
+             --exclude-drivers \
+             --exclude-tids \
+          -n --no-reconnect \
           -e --local-echo \
           -l --log \
              --log-file \
@@ -29,7 +33,7 @@ _tio()
           -t --timestamp \
              --timestamp-format \
              --timestamp-timeout \
-          -L --list-devices \
+          -L --list \
           -c --color \
           -S --socket \
              --input-mode \
@@ -79,7 +83,11 @@ _tio()
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
-        -n | --no-autoconnect)
+        -a | --auto-connect)
+            COMPREPLY=( $(compgen -W "new latest none" -- ${cur}) )
+            return 0
+            ;;
+        -n | --no-reconnect)
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
@@ -123,7 +131,7 @@ _tio()
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
-        -L | --list-devices)
+        -L | --list)
             COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;

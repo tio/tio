@@ -1,7 +1,7 @@
 /*
  * tio - a serial device I/O tool
  *
- * Copyright (c) 2014-2022  Martin Lund
+ * Copyright (c) 2014-2024  Martin Lund
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,16 +24,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#define UNUSED(expr) do { (void)(expr); } while (0)
-
-void delay(long ms);
-long string_to_long(char *string);
-int ctrl_key_code(unsigned char key);
-void alert_connect(void);
-void alert_disconnect(void);
-bool regex_match(const char *string, const char *pattern);
-unsigned long djb2_hash(const unsigned char *str);
-char *base62_encode(unsigned long num);
-int read_poll(int fd, void *data, size_t len, int timeout);
-double get_current_time(void);
-bool match_any_pattern(const char *str, const char *patterns);
+bool fs_dir_exists(const char *path);
+bool fs_file_exists(const char *format, ...);
+char* fs_search_directory(const char *dir_path, const char *dirname);
+ssize_t fs_read_file_stripped(char *buf, size_t bufsiz, const char *format, ...);
+double fs_get_creation_time(const char *path);

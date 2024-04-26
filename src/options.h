@@ -29,6 +29,7 @@
 #include "script.h"
 #include "timestamp.h"
 #include "alert.h"
+#include "tty.h"
 
 typedef enum
 {
@@ -48,7 +49,7 @@ typedef enum
 /* Options */
 struct option_t
 {
-    const char *tty_device;
+    const char *target;
     unsigned int baudrate;
     int databits;
     char *flow;
@@ -62,7 +63,8 @@ struct option_t
     unsigned int dsr_pulse_duration;
     unsigned int dcd_pulse_duration;
     unsigned int ri_pulse_duration;
-    bool no_autoconnect;
+    bool no_reconnect;
+    auto_connect_t auto_connect;
     bool log;
     bool log_append;
     bool log_strip;
@@ -89,6 +91,9 @@ struct option_t
     const char *script_filename;
     script_run_t script_run;
     unsigned int timestamp_timeout;
+    const char *exclude_devices;
+    const char *exclude_drivers;
+    const char *exclude_tids;
 };
 
 extern struct option_t option;
@@ -102,3 +107,5 @@ script_run_t script_run_option_parse(const char *arg);
 
 input_mode_t input_mode_option_parse(const char *arg);
 output_mode_t output_mode_option_parse(const char *arg);
+auto_connect_t auto_connect_option_parse(const char *arg);
+const char *auto_connect_state_to_string(auto_connect_t strategy);

@@ -62,13 +62,37 @@ OPTIONS
 
               The default pulse duration for each line is 100 ms.
 
-       -n, --no-autoconnect
+       -a, --auto-connect new|latest|direct
 
-              Disable automatic connect.
+              Automatically connect to serial device according to one of the following strategies:
 
-              By default tio automatically connects to the provided device if present. If the device is not present, it will wait for it to appear and then connect. If the connection is lost (eg. device disconnects), it will wait for the device to reappear and then reconnect.
+              new       Automatically connect to first new appearing serial device.
 
-              However, if the --no-autoconnect option is provided, tio will exit if the device is not present or an established connection is lost.
+              latest    Automatically connect to latest registered serial device.
+
+              direct    Connect directly to specified TTY device.
+
+              All the listed strategies automatically reconnects according to strategy if device is not available or connection is lost.
+
+              Default value is "direct".
+
+           --exclude-devices <pattern>
+
+              Exclude devices by pattern ('*' and '?' supported).
+
+           --exclude-drivers <pattern>
+
+              Exclude drivers by pattern ('*' and '?' supported).
+
+           --exclude-tids <pattern>
+
+              Exclude topology IDs by pattern ('*' and '?' supported).
+
+       -n, --no-reconnect
+
+              Do not reconnect.
+
+              This means that tio will exit if it fails to connect to device or an established connection is lost.
 
        -e, --local-echo
 
@@ -92,11 +116,19 @@ OPTIONS
 
               Default format is 24hour
 
-       -L, --list-devices
+           --timestamp-timeout <ms>
 
-              List available serial devices by ID.
+              Set timestamp timeout value in milliseconds.
 
-       -l, --log
+              This value only takes effect in hex output mode where timestamps are only printed after elapsed timeout time of no output activity from tty device.
+
+              Default value is 200.
+
+       -l, --list
+
+              List available serial devices.
+
+       -L, --log
 
               Enable log to file.
 
@@ -148,9 +180,15 @@ OPTIONS
 
               If defining more than one flag, the flags must be comma separated.
 
-           --input-mode normal|hex
+           --input-mode normal|hex|line
 
-              Set input mode. In hex input mode bytes can be sent by typing the two-character hexadecimal representation of the 1 byte value, e.g.: to send 0xA you must type 0a or 0A.
+              Set input mode.
+
+              In normal mode input characters are sent immediately as they are typed.
+
+              In hex input mode bytes can be sent by typing the two-character hexadecimal representation of the 1 byte value, e.g.: to send 0xA you must type 0a or 0A.
+
+              In line input mode input characters are sent when you press enter. The only editing feature supported in this mode is backspace.
 
               Default value is "normal".
 
@@ -215,6 +253,10 @@ OPTIONS
               It will sound the bell once or blink once on successful connect. Likewise it will sound the bell twice or blink twice on disconnect.
 
               Default value is "none".
+
+       --mute
+
+              Mute tio messages.
 
        --script <string>
 
@@ -293,6 +335,10 @@ SCRIPT API
        expect(string, timeout)
              Expect string - waits for string to match or timeout before continueing.  Supports regular expressions. Special characters must be escaped with '\\'.  Timeout is in milliseconds, defaults to 0 meaning it will wait forever.
 
+             Returns 1 on successful match, 0 on timeout, or -1 on invalid regular expression.
+
+             On successful match it also returns the match string as second return value.
+
        send(string)
              Send string.
 
@@ -300,6 +346,13 @@ SCRIPT API
              Send file using x/y-modem protocol.
 
              Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
+
+       tty_search()
+             Search for serial devices.
+
+             Returns a table of number indexed tables, one for each serial device found.  Each of these tables contains the serial device information accessible via the following string indexed elements "path", "tid", "uptime", "driver", "description".
+
+             Returns nil if no serial devices are found.
 
        exit(code)
              Exit with exit code.
@@ -369,7 +422,7 @@ CONFIGURATION FILE
 
        line-pulse-duration      Set line pulse duration
 
-       no-autoconnect           Disable automatic connect
+       no-reconnect             Do not reconnect
 
        log                      Enable log to file
 
@@ -387,13 +440,15 @@ CONFIGURATION FILE
 
        timestamp-format         Set timestamp format
 
+       timestamp-timeout        Set timestamp timeout
+
        map                      Map characters on input or output
 
        color                    Colorize tio text using ANSI color code ranging from 0 to 255
 
-       input-mode               Set input mode.
+       input-mode               Set input mode
 
-       output-mode              Set output mode.
+       output-mode              Set output mode
 
        socket                   Set socket to redirect I/O to
 
@@ -405,11 +460,13 @@ CONFIGURATION FILE
 
        alert                    Set alert action on connect/disconnect
 
+       mute                     Mute tio messages
+
        script                   Run script from string
 
        script-file              Run script from file
 
-       script-run               Run script on connect.
+       script-run               Run script on connect
 
 CONFIGURATION FILE EXAMPLES
        To change the default configuration simply set options like so:
@@ -530,6 +587,6 @@ WEBSITE
        Visit https://tio.github.io
 
 AUTHOR
-       Created by Martin Lund <martin.lund@keep-it-simple.com>.
+       Maintained by Martin Lund <martin.lund@keep-it-simple.com>.
 
-tio 2.8                                                                                                                                    2023-09-19                                                                                                                                    tio(1)
+tio 2.9                                                                                                                                    2024-04-14                                                                                                                                    tio(1)

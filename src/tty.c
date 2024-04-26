@@ -19,7 +19,11 @@
  * 02110-1301, USA.
  */
 
+#if defined(__linux__)
+#include <linux/serial.h>
+#endif
 #include "config.h"
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
@@ -42,6 +46,7 @@
 #include <time.h>
 #include <dirent.h>
 #include <pthread.h>
+#include <glib.h>
 #include "config.h"
 #include "configfile.h"
 #include "tty.h"
@@ -58,11 +63,13 @@
 #include "misc.h"
 #include "script.h"
 #include "xymodem.h"
+#include "fs.h"
 
 /* tty device listing configuration */
 
 #if defined(__linux__)
 #define PATH_SERIAL_DEVICES "/dev/serial/by-id/"
+#define PATH_SERIAL_DEVICES_BY_PATH "/dev/serial/by-path/"
 #define PREFIX_TTY_DEVICES ""
 #elif defined(__FreeBSD__)
 #define PATH_SERIAL_DEVICES "/dev/"
@@ -158,6 +165,8 @@ bool map_ign_cr = false;
 
 char key_hit = 0xff;
 
+const char* device_name;
+GList *device_list = NULL;
 static struct termios tio, tio_old, stdout_new, stdout_old, stdin_new, stdin_old;
 static unsigned long rx_total = 0, tx_total = 0;
 static bool connected = false;
@@ -1336,6 +1345,539 @@ void tty_configure(void)
     free(buffer);
 }
 
+static bool is_serial_device(const char *format, ...)
+{
+    char filename[PATH_MAX];
+    struct winsize ws;
+    int bytes_printed;
+    int status = true;
+    struct stat st;
+    va_list args;
+    int fd = -1;
+
+    va_start(args, format);
+    bytes_printed = vsnprintf(filename, sizeof(filename), format, args);
+    va_end(args);
+
+    if (bytes_printed < 0)
+    {
+        return false;
+    }
+
+    if (stat(filename, &st) != 0)
+    {
+        return false;
+    }
+
+    // Make sure it is a character device
+    if ((st.st_mode & S_IFMT) != S_IFCHR)
+    {
+        return false;
+    }
+
+    fd = open(filename, O_RDONLY | O_NONBLOCK | O_NOCTTY);
+    if (fd == -1)
+    {
+        return false;
+    }
+
+    // Make sure it is a tty
+    status = isatty(fd);
+    if (status == 0)
+    {
+        goto error;
+    }
+
+    // Serial devices do not have rows and columns
+    status = ioctl(fd, TIOCGWINSZ, &ws);
+    if (status == 0)
+    {
+        status = true;
+        if (ws.ws_row && ws.ws_col)
+        {
+            status = false;
+            goto error;
+        }
+    }
+
+error:
+    close(fd);
+    return status;
+}
+
+static void list_serial_devices_by_id(void)
+{
+    DIR *d = opendir(PATH_SERIAL_DEVICES);
+    if (d)
+    {
+        struct dirent *dir;
+
+        printf("By-id\n");
+        printf("--------------------------------------------------------------------------------\n");
+
+        while ((dir = readdir(d)) != NULL)
+        {
+            if ((strcmp(dir->d_name, ".")) && (strcmp(dir->d_name, "..")))
+            {
+                if (!strncmp(dir->d_name, PREFIX_TTY_DEVICES, sizeof(PREFIX_TTY_DEVICES) - 1))
+                {
+                    if (is_serial_device("%s%s", PATH_SERIAL_DEVICES, dir->d_name))
+                    {
+                        printf("%s%s\n", PATH_SERIAL_DEVICES, dir->d_name);
+                    }
+                }
+            }
+        }
+        closedir(d);
+    }
+}
+
+static void list_serial_devices_by_path(void)
+{
+#ifdef PATH_SERIAL_DEVICES_BY_PATH
+
+    DIR *d = opendir(PATH_SERIAL_DEVICES_BY_PATH);
+    if (d)
+    {
+        struct dirent *dir;
+
+        printf("\nBy-path\n");
+        printf("--------------------------------------------------------------------------------\n");
+
+        while ((dir = readdir(d)) != NULL)
+        {
+            if ((strcmp(dir->d_name, ".")) && (strcmp(dir->d_name, "..")))
+            {
+                if (!strncmp(dir->d_name, "", sizeof("") - 1))
+                {
+                    if (is_serial_device("%s%s", PATH_SERIAL_DEVICES_BY_PATH, dir->d_name))
+                    {
+                        printf("%s%s\n", PATH_SERIAL_DEVICES_BY_PATH, dir->d_name);
+                    }
+                }
+            }
+        }
+        closedir(d);
+    }
+#endif
+}
+
+static gint compare_uptime(gconstpointer a, gconstpointer b)
+{
+    device_t *device_a = (device_t *) a;
+    device_t *device_b = (device_t *) b;
+
+    // Make sure we end up with device with smallest uptime last in list
+    if (device_a->uptime > device_b->uptime)
+        return -1;
+    else if (device_a->uptime < device_b->uptime)
+        return 1;
+    else
+        return 0;
+}
+
+#if defined(__linux__)
+
+// Function to get serial port type as a string
+const char* get_serial_port_type(const char* port_name)
+{
+    int fd;
+    static struct serial_struct serial_info;
+
+    // Open the serial port
+    fd = open(port_name, O_RDWR);
+    if (fd == -1)
+    {
+        return "";
+    }
+
+    // Get serial port information
+    if (ioctl(fd, TIOCGSERIAL, &serial_info) == -1)
+    {
+        close(fd);
+        return "";
+    }
+
+    // Close the serial port
+    close(fd);
+
+    // Return the serial port type as a string
+    switch (serial_info.type)
+    {
+        case PORT_UNKNOWN:
+            return "Unknown";
+
+        case PORT_8250:
+            return "8250 UART";
+
+        case PORT_16450:
+            return "16450 UART";
+
+        case PORT_16550:
+            return "16550 UART";
+
+        case PORT_16550A:
+            return "16550A UART";
+
+        case PORT_16650:
+            return "16650 UART";
+
+        case PORT_16650V2:
+            return "16650V2 UART";
+
+        case PORT_16750:
+            return "16750 UART";
+
+        case PORT_STARTECH:
+            return "Startech UART";
+
+        case PORT_16850:
+            return "16850 UART";
+
+        case PORT_16C950:
+            return "16C950 UART";
+
+        case PORT_16654:
+            return "16654 UART";
+
+        case PORT_RSA:
+            return "RSA UART";
+
+        default:
+            return "";
+    }
+}
+
+#else
+
+const char* get_serial_port_type(const char* port_name)
+{
+    return "";
+}
+
+#endif
+
+static void search_reset(void)
+{
+    GList *iter;
+
+    if (g_list_length(device_list) == 0)
+    {
+        return;
+    }
+
+    // Free data of all list elements
+    for (iter = device_list; iter != NULL; iter = g_list_next(iter))
+    {
+        device_t *device = (device_t *) iter->data;
+        g_free(device->tid);
+        g_free(device->path);
+        g_free(device->driver);
+        g_free(device->description);
+    }
+
+    // Free all list elements
+    g_list_free_full(device_list, g_free);
+
+    // Indicate an empty list
+    device_list = NULL;
+}
+
+GList *tty_search_for_serial_devices(void)
+{
+    DIR *dir;
+    char path[PATH_MAX] = {};
+    char device_path[PATH_MAX] = {};
+    char driver_path[PATH_MAX] = {};
+    double current_time, creation_time;
+    ssize_t length;
+
+    search_reset();
+
+    // Open the sysfs directory for the tty subsystem
+    dir = opendir("/sys/class/tty");
+    if (!dir)
+    {
+        // Error
+        return NULL;
+    }
+
+    current_time = get_current_time();
+
+    // Iterate through each device in the subsystem directory
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL)
+    {
+        // Skip . and .. entries
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+        {
+            continue;
+        }
+
+        // Skip non serial devices
+        if (is_serial_device("/dev/%s", entry->d_name) == false)
+        {
+            continue;
+        }
+
+        // Construct the path to the device's device symlink
+        snprintf(path, sizeof(path), "/sys/class/tty/%s/device", entry->d_name);
+
+        // Read the device symlink to get the device path
+        // Example symlinks:
+        //  /sys/class/tty/ttyUSB0/device -> ../../../ttyUSB0
+        //  /sys/class/tty/ttyACM0/device -> ../../../3-6.4:1.2
+        length = readlink(path, device_path, sizeof(device_path) - 1);
+        if (length == -1)
+        {
+            continue;
+        }
+
+        // Null-terminate the string
+        device_path[length] = '\0';
+
+        // Extract last part of device path (string after last '/')
+        // Example resulting device_name:
+        //  "ttyUSB0"
+        //  "3-6.4:1.2"
+        char *device_name = strrchr(device_path, '/');
+        device_name++; // Move past the '/'
+
+        // Find that part in /sys/devices and return first result string
+        // Example devices_path:
+        //  "/sys/devices/pci0000:00/0000:00:14.0/usb3/3-6/3-6.3/3-6.3:1.0/ttyUSB0"
+        //  "/sys/devices/pci0000:00/0000:00:14.0/usb3/3-6/3-6.4/3-6.4:1.2"
+        char *devices_path = fs_search_directory("/sys/devices", device_name);
+        if (devices_path == NULL)
+        {
+            continue;
+        }
+
+        // Remove last part if it contains device short name (e.g ttyUSB0)
+        // Example resulting devices_path:
+        //  "/sys/devices/pci0000:00/0000:00:14.0/usb3/3-6/3-6.3/3-6.3:1.0"
+        //  "/sys/devices/pci0000:00/0000:00:14.0/usb3/3-6/3-6.4/3-6.4:1.2"
+        char *last_part = strrchr(devices_path, '/');
+        last_part++;
+        if (strcmp(last_part, entry->d_name) == 0)
+        {
+            // Remove last part (string after last '/')
+            char *slash = strrchr(devices_path, '/');
+            int index = (int) (slash - devices_path);
+            devices_path[index] = '\0';
+        }
+
+        // Hash remaining string to get unique topology ID
+        unsigned long hash = djb2_hash((const unsigned char *)devices_path);
+        char *tid = base62_encode(hash);
+        free(devices_path);
+
+        // Construct the path to the device's driver symlink
+        snprintf(path, sizeof(path), "/sys/class/tty/%s/device/driver", entry->d_name);
+
+        // Read the symlink to get the driver's path
+        length = readlink(path, driver_path, sizeof(driver_path) - 1);
+        if (length == -1)
+        {
+            continue;
+        }
+
+        // Null-terminate the string
+        driver_path[length] = '\0';
+
+        // Extract the driver name from the path
+        char *driver = strrchr(driver_path, '/');
+        if (driver == NULL)
+        {
+            continue;
+        }
+        driver++; // Move past the last '/'
+
+        // Construct the path to the TTY device file
+        snprintf(path, sizeof(path), "/dev/%s", entry->d_name);
+
+        // Calculate uptime
+        creation_time = fs_get_creation_time(path);
+        double uptime = current_time - creation_time;
+
+        // Read sysfs files to get best possible description of the driver
+        char description[50] = {};
+        length = fs_read_file_stripped(description, sizeof(description), "/sys/class/tty/%s/device/interface", entry->d_name);
+        if (length == -1)
+        {
+            length = fs_read_file_stripped(description, sizeof(description), "/sys/class/tty/%s/device/../interface", entry->d_name);
+        }
+        if (length == -1)
+        {
+            length = fs_read_file_stripped(description, sizeof(description), "/sys/class/tty/%s/device/../../product", entry->d_name);
+        }
+        if (length == -1)
+        {
+            snprintf(description, sizeof(description), "%s", get_serial_port_type(path));
+        }
+
+        // Do not add devices excluded by exclude patterns
+        if (match_any_pattern(path, option.exclude_devices))
+        {
+            continue;
+        }
+        if (match_any_pattern(driver, option.exclude_drivers))
+        {
+            continue;
+        }
+        if (match_any_pattern(tid, option.exclude_tids))
+        {
+            continue;
+        }
+
+        // Allocate new device item for device list
+        device_t *device = g_new0(device_t, 1);
+        if (device == NULL)
+        {
+            continue;
+        }
+
+        // Fill in device information
+        device->path = g_strdup(path);
+        device->tid = g_strdup(tid);
+        device->uptime = uptime;
+        device->driver = g_strdup(driver);
+        device->description = g_strdup(description);
+
+        // Add device information to device list
+        device_list = g_list_append(device_list, device);
+    }
+
+    if (g_list_length(device_list) == 0)
+    {
+        // Return NULL if no serial devices found
+        return NULL;
+    }
+
+    // Sort device list device with respect to uptime
+    device_list = g_list_sort(device_list, compare_uptime);
+
+    closedir(dir);
+
+    return device_list;
+}
+
+void list_serial_devices(void)
+{
+    tty_search_for_serial_devices();
+
+    if (g_list_length(device_list) > 0)
+    {
+        printf("Device            TID     Uptime [s] Driver           Description\n");
+        printf("----------------- ---- ------------- ---------------- --------------------------\n");
+
+        // Iterate through the device list
+        GList *iter;
+        for (iter = device_list; iter != NULL; iter = g_list_next(iter))
+        {
+            device_t *device = (device_t *) iter->data;
+
+            // Print device information
+            printf("%-17s %4s %13.3f %-16s %s\n", device->path, device->tid, device->uptime, device->driver, device->description);
+        }
+        printf("\n");
+    }
+
+    list_serial_devices_by_id();
+    list_serial_devices_by_path();
+}
+
+void tty_search(void)
+{
+    GList *iter;
+    device_t *device = NULL;
+    double uptime_minimum = 0;
+    bool no_new = true;
+
+    switch (option.auto_connect)
+    {
+        case AUTO_CONNECT_NEW:
+            tty_search_for_serial_devices();
+
+            // Save smallest uptime
+            if (g_list_length(device_list) > 0)
+            {
+                // Get latest registered device (smallest uptime)
+                GList *last = g_list_last(device_list);
+                device = last->data;
+                uptime_minimum = device->uptime;
+            }
+
+            tio_printf("Waiting for tty device..");
+
+            while (no_new)
+            {
+                tty_search_for_serial_devices();
+
+                // Iterate through the device list generated by search
+                for (iter = device_list; iter != NULL; iter = g_list_next(iter))
+                {
+                    device = (device_t *) iter->data;
+
+                    // Find first new device
+                    if (device->uptime < uptime_minimum)
+                    {
+                        // Match found -> update device
+                        device_name = device->path;
+                        no_new = false;
+                        break;
+                    }
+                }
+                if (no_new)
+                {
+                    usleep(500*1000); // Sleep 0.5 s
+                }
+            }
+            return;
+
+        case AUTO_CONNECT_LATEST:
+            tty_search_for_serial_devices();
+            if (g_list_length(device_list) > 0)
+            {
+                // Get latest registered device (smallest uptime)
+                GList *last = g_list_last(device_list);
+                device = last->data;
+                device_name = device->path;
+            }
+            return;
+
+        case AUTO_CONNECT_DIRECT:
+            if (strlen(option.target) == TOPOLOGY_ID_SIZE)
+            {
+                // Potential topology ID detected -> trigger device search
+                tty_search_for_serial_devices();
+
+                // Iterate through the device list generated by search
+                for (iter = device_list; iter != NULL; iter = g_list_next(iter))
+                {
+                    device = (device_t *) iter->data;
+
+                    if (strcmp(device->tid, option.target) == 0)
+                    {
+                        // Topology ID match found -> use corresponding device name
+                        device_name = device->path;
+
+                        return;
+                    }
+                }
+            }
+
+            // Fallback to using tty device provided via cmdline target
+            device_name = option.target;
+            break;
+
+        default:
+            // Should never be reached
+            tio_printf("Unknown connection strategy");
+            exit(EXIT_FAILURE);
+    }
+}
+
 void tty_wait_for_device(void)
 {
     fd_set rdfs;
@@ -1349,6 +1891,8 @@ void tty_wait_for_device(void)
     /* Loop until device pops up */
     while (true)
     {
+        tty_search();
+
         if (interactive_mode)
         {
             /* In interactive mode, while waiting for tty device, we need to
@@ -1400,7 +1944,7 @@ void tty_wait_for_device(void)
         }
 
         /* Test for accessible device file */
-        status = access(option.tty_device, R_OK);
+        status = access(device_name, R_OK);
         if (status == 0)
         {
             last_errno = 0;
@@ -1549,7 +2093,7 @@ int tty_connect(void)
     struct timeval tval_before = {}, tval_now, tval_result;
 
     /* Open tty device */
-    device_fd = open(option.tty_device, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    device_fd = open(device_name, O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (device_fd < 0)
     {
         tio_error_printf_silent("Could not open tty device (%s)", strerror(errno));
@@ -1575,7 +2119,7 @@ int tty_connect(void)
     tcflush(device_fd, TCIOFLUSH);
 
     /* Print connect status */
-    tio_printf("Connected");
+    tio_printf("Connected to %s", device_name);
     connected = true;
     print_tainted = false;
 
@@ -2019,22 +2563,3 @@ error_open:
     return TIO_ERROR;
 }
 
-void list_serial_devices(void)
-{
-    DIR *d = opendir(PATH_SERIAL_DEVICES);
-    if (d)
-    {
-        struct dirent *dir;
-        while ((dir = readdir(d)) != NULL)
-        {
-            if ((strcmp(dir->d_name, ".")) && (strcmp(dir->d_name, "..")))
-            {
-                if (!strncmp(dir->d_name, PREFIX_TTY_DEVICES, sizeof(PREFIX_TTY_DEVICES) - 1))
-                {
-                    printf("%s%s\n", PATH_SERIAL_DEVICES, dir->d_name);
-                }
-            }
-        }
-        closedir(d);
-    }
-}

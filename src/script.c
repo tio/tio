@@ -36,6 +36,7 @@
 #include "xymodem.h"
 #include "log.h"
 #include "script.h"
+#include "fs.h"
 
 #define MAX_BUFFER_SIZE 2000 // Maximum size of circular buffer
 
@@ -43,6 +44,9 @@ static int device_fd;
 static char circular_buffer[MAX_BUFFER_SIZE];
 static char match_string[MAX_BUFFER_SIZE];
 static int buffer_size = 0;
+
+static char init_script[] =
+"\n";
 
 // lua: sleep(seconds)
 static int sleep_(lua_State *L)
@@ -401,6 +405,60 @@ static int exit_(lua_State *L)
     return 0;
 }
 
+// lua: list = tty_search()
+static int tty_search_(lua_State *L)
+{
+    UNUSED(L);
+    GList *iter;
+    int i = 1;
+
+    GList *device_list = tty_search_for_serial_devices();
+
+    if (device_list == NULL)
+    {
+        return 0;
+    }
+
+    // Create a new table
+    lua_newtable(L);
+
+    // Iterate through found devices
+    for (iter = device_list; iter != NULL; iter = g_list_next(iter))
+    {
+        device_t *device = (device_t *) iter->data;
+
+        // Create a new sub-table for each serial device
+        lua_newtable(L);
+
+        // Add elements to the table
+        lua_pushstring(L, "path");
+        lua_pushstring(L, device->path);
+        lua_settable(L, -3);
+
+        lua_pushstring(L, "tid");
+        lua_pushstring(L, device->tid);
+        lua_settable(L, -3);
+
+        lua_pushstring(L, "uptime");
+        lua_pushnumber(L, device->uptime);
+        lua_settable(L, -3);
+
+        lua_pushstring(L, "driver");
+        lua_pushstring(L, device->driver);
+        lua_settable(L, -3);
+
+        lua_pushstring(L, "description");
+        lua_pushstring(L, device->description);
+        lua_settable(L, -3);
+
+        // Set the sub-table as a row in the main table
+        lua_rawseti(L, -2, i++);
+    }
+
+    // Return table
+    return 1;
+}
+
 static void script_buffer_run(lua_State *L, const char *script_buffer)
 {
     int error;
@@ -410,7 +468,7 @@ static void script_buffer_run(lua_State *L, const char *script_buffer)
     if (error)
     {
         tio_warning_printf("lua: %s\n", lua_tostring(L, -1));
-        lua_pop(L, 1);  /* pop error message from the stack */
+        lua_pop(L, 1);  /* Pop error message from the stack */
     }
 }
 
@@ -429,6 +487,7 @@ static const struct luaL_Reg tio_lib[] =
     { "read", read_string},
     { "expect", expect},
     { "exit", exit_},
+    { "tty_search", tty_search_},
     {NULL, NULL}
 };
 
@@ -451,12 +510,26 @@ static void luaL_setfuncs (lua_State *L, const luaL_Reg *l, int nup)
 }
 #endif
 
+static void load_init_script(lua_State *L)
+{
+    int error;
+
+    error = luaL_loadbuffer(L, init_script, strlen(init_script), "tio") || lua_pcall(L, 0, 0, 0);
+    if (error)
+    {
+        tio_error_print("%s\n", lua_tostring(L, -1));
+        lua_pop(L, 1); // Pop error message from the stack
+    }
+}
+
 int lua_register_tio(lua_State *L)
 {
     // Register lxi functions
     lua_getglobal(L, "_G");
     luaL_setfuncs(L, tio_lib, 0);
     lua_pop(L, 1);
+
+    load_init_script(L);
 
     return 0;
 }

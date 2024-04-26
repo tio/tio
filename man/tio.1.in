@@ -80,17 +80,48 @@ The default pulse duration for each line is 100 ms.
 .RE
 
 .TP
-.BR \-n ", " \-\-no\-autoconnect
+.BR "\-a, \-\-auto\-connect new|latest|direct"
 
-Disable automatic connect.
+Automatically connect to serial device according to one of the following
+strategies:
 
-By default tio automatically connects to the provided device if present. If the
-device is not present, it will wait for it to appear and then connect. If the
-connection is lost (eg. device disconnects), it will wait for the device to
-reappear and then reconnect.
+.RS
+.TP 10n
+.IP "\fBnew"
+Automatically connect to first new appearing serial device.
+.IP "\fBlatest"
+Automatically connect to latest registered serial device.
+.IP "\fBdirect"
+Connect directly to specified TTY device.
+.P
+All the listed strategies automatically reconnects according to strategy if
+device is not available or connection is lost.
+.P
+Default value is "direct".
+.RE
 
-However, if the \fB\-\-no\-autoconnect\fR option is provided, tio will exit if
-the device is not present or an established connection is lost.
+.TP
+.BR "    \-\-exclude\-devices \fI<pattern>"
+
+Exclude devices by pattern ('*' and '?' supported).
+
+.TP
+.BR "    \-\-exclude\-drivers \fI<pattern>"
+
+Exclude drivers by pattern ('*' and '?' supported).
+
+.TP
+.BR "    \-\-exclude\-tids \fI<pattern>"
+
+Exclude topology IDs by pattern ('*' and '?' supported).
+
+.TP
+.BR \-n ", " \-\-no\-reconnect
+
+Do not reconnect.
+
+This means that tio will exit if it fails to connect to device or an
+established connection is lost.
 
 .TP
 .BR \-e ", " "\-\-local\-echo
@@ -103,7 +134,7 @@ Enable local echo.
 Enable line timestamp.
 
 .TP
-.BR "    \-\-timestamp\-format \fI<format>
+.BR "    \-\-timestamp\-format \fI<format>"
 
 Set timestamp format to any of the following timestamp formats:
 .RS
@@ -122,7 +153,7 @@ Default format is \fB24hour\fR
 .RE
 
 .TP
-.BR "    \-\-timestamp\-timeout \fI<ms>
+.BR "    \-\-timestamp\-timeout \fI<ms>"
 
 Set timestamp timeout value in milliseconds.
 
@@ -132,12 +163,12 @@ printed after elapsed timeout time of no output activity from tty device.
 Default value is 200.
 
 .TP
-.BR \-L ", " \-\-list\-devices
+.BR \-l ", " \-\-list
 
-List available serial devices by ID.
+List available serial devices.
 
 .TP
-.BR \-l ", " \-\-log
+.BR \-L ", " \-\-log
 
 Enable log to file.
 
@@ -401,6 +432,17 @@ Send string.
 Send file using x/y-modem protocol.
 
 Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
+
+.IP "\fBtty_search()"
+Search for serial devices.
+
+Returns a table of number indexed tables, one for each serial device found.
+Each of these tables contains the serial device information accessible via the
+following string indexed elements "path", "tid", "uptime", "driver",
+"description".
+
+Returns nil if no serial devices are found.
+
 .IP "\fBexit(code)"
 Exit with exit code.
 .IP "\fBhigh(line)"
@@ -476,8 +518,8 @@ Set output character delay
 Set output line delay
 .IP "\fBline-pulse-duration"
 Set line pulse duration
-.IP "\fBno-autoconnect"
-Disable automatic connect
+.IP "\fBno-reconnect"
+Do not reconnect
 .IP "\fBlog"
 Enable log to file
 .IP "\fBlog-file"
@@ -501,9 +543,9 @@ Map characters on input or output
 .IP "\fBcolor"
 Colorize tio text using ANSI color code ranging from 0 to 255
 .IP "\fBinput-mode"
-Set input mode.
+Set input mode
 .IP "\fBoutput-mode"
-Set output mode.
+Set output mode
 .IP "\fBsocket"
 Set socket to redirect I/O to
 .IP "\fBprefix-ctrl-key"
@@ -521,7 +563,7 @@ Run script from string
 .IP "\fBscript-file"
 Run script from file
 .IP "\fBscript-run"
-Run script on connect.
+Run script on connect
 
 .SH "CONFIGURATION FILE EXAMPLES"
 

@@ -93,7 +93,7 @@ void error_exit(void)
         /* Print error */
         error_printf_("Error: %s", error[0]);
     }
-    else if ((error[1][0] != 0) && (option.no_autoconnect))
+    else if ((error[1][0] != 0) && (option.no_reconnect))
     {
         /* Print silent error */
         error_printf_("Error: %s", error[1]);
