@@ -20,7 +20,7 @@ I/O operations.
 
 ### 1.1 Motivation
 
-To make a simpler serial device tool for talking with serial TTY devices with
+To make a simpler serial device tool for working with serial TTY devices with
 less focus on classic terminal/modem features and more focus on the needs of
 embedded developers and hackers.
 
@@ -77,7 +77,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Pipe input and/or output
  * Bash completion on options, serial device names, and sub-configuration names
  * Configurable tio message text color
-   * Supports NO_COLOR env variable as per no-color.org
+   * Supports NO_COLOR env variable as per [no-color.org](https://no-color.org)
  * Visual or audible alert on connect/disconnect
  * Remapping of prefix key
  * Lua scripting support for automation
@@ -276,7 +276,8 @@ Additonally tio offers two convenient ways of connecting to serial devices:
  * Connect automatically to latest registered serial device
    * ```tio --auto-connect latest```
 
-It is also possible to use excludes to affect strategy decisions:
+It is also possible to use excludes to affect which serial devices are involved
+in the strategy decisions:
 
  * Exclude devices by pattern
    * Example: ```tio --auto-connect new --exclude-devices "/dev/ttyACM?,/dev/ttyUSB2"```
@@ -341,6 +342,7 @@ In addition to the Lua API tio makes the following functions available:
         Send file using x/y-modem protocol.
 
         Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
+
   tty_search()
         Search for serial devices.
 
