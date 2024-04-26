@@ -22,8 +22,8 @@ if (1 == found) then
         expect("Password:")
         send(login.password .. "\n")
     else
-        print("\r\nDon't know login info for " .. hostname .. "\r\n")
+        io.write("\r\nDon't know login info for " .. hostname .. "\r\n")
     end
 else
-    print("\r\nDidn't find a login prompt\r\n")
+    io.write("\r\nDidn't find a login prompt\r\n")
 end
