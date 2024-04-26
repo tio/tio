@@ -33,6 +33,7 @@
 #include <errno.h>
 #include <sys/poll.h>
 #include <termios.h>
+#include <fnmatch.h>
 #include "error.h"
 #include "print.h"
 #include "options.h"
@@ -179,66 +180,33 @@ double get_current_time(void)
     return current_time_ts.tv_sec + current_time_ts.tv_nsec / 1e9;
 }
 
-// Function to match string with comma separated patterns which supports '*' and '?'
-static bool is_match(const char *str, const char *pattern)
+bool match_patterns(const char *string, const char *patterns)
 {
-    // If both string and pattern reach end, they match
-    if (*str == '\0' && *pattern == '\0')
-    {
-        return true;
-    }
+    char *pattern;
+    char *patterns_copy;
 
-    // If pattern reaches end but string has characters left, no match
-    if (*pattern == '\0')
+    if ((string == NULL) || (patterns == NULL))
     {
         return false;
     }
 
-    // If current characters match or pattern has '?', move to the next character in both
-    if (*str == *pattern || *pattern == '?')
-    {
-        return is_match(str + 1, pattern + 1);
-    }
+    patterns_copy = strdup(patterns);
 
-    // If current pattern character is '*', check for matches by moving string or pattern
-    if (*pattern == '*')
+    // Tokenize the patterns string using strtok
+    pattern = strtok(patterns_copy, ",");
+    while (pattern != NULL)
     {
-        // '*' matches zero or more characters, so try all possibilities
-        // Move pattern to the next character and check if remaining pattern matches remaining string
-        // Move string to the next character and check if current pattern matches remaining string
-        return is_match(str, pattern + 1) || is_match(str + 1, pattern);
-    }
-
-    // No match
-    return false;
-}
-
-bool match_any_pattern(const char *str, const char *patterns)
-{
-    if ((str == NULL) || (patterns == NULL))
-    {
-        return false;
-    }
-
-    char *patterns_copy = strdup(patterns);
-    if (patterns_copy == NULL)
-    {
-        tio_error_print("Memory allocation failed");
-        exit(EXIT_FAILURE);
-    }
-
-    char *token = strtok(patterns_copy, ",");
-    while (token != NULL)
-    {
-        if (is_match(str, token))
+        // Check if the string matches the current pattern
+        if (fnmatch(pattern, string, 0) == 0)
         {
             free(patterns_copy);
             return true;
         }
-        token = strtok(NULL, ",");
+
+        // Move to the next pattern
+        pattern = strtok(NULL, ",");
     }
 
     free(patterns_copy);
-
     return false;
 }

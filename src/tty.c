@@ -1717,15 +1717,15 @@ GList *tty_search_for_serial_devices(void)
         }
 
         // Do not add devices excluded by exclude patterns
-        if (match_any_pattern(path, option.exclude_devices))
+        if (match_patterns(path, option.exclude_devices))
         {
             continue;
         }
-        if (match_any_pattern(driver, option.exclude_drivers))
+        if (match_patterns(driver, option.exclude_drivers))
         {
             continue;
         }
-        if (match_any_pattern(tid, option.exclude_tids))
+        if (match_patterns(tid, option.exclude_tids))
         {
             continue;
         }
