@@ -175,6 +175,15 @@ $ tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 Using serial devices by ID ensures that tio automatically reconnects to the
 correct serial device if it is disconnected and then reconnected.
 
+If no serial device by ID is available it is also possible to connect via
+topology ID (TID):
+```
+$ tio bCC2
+```
+The TID is unique and will stay the same as long as your USB serial port device
+plugs into the same USB topology (same ports, same hubs, etc.). This way tio
+will successfully reconnect to the same device when reconnected.
+
 List available serial devices:
 ```
 $ tio --list
