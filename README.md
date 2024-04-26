@@ -272,11 +272,11 @@ By-path
 /dev/serial/by-path/pci-0000:00:14.0-usbv2-0:6.4:1.2
 ```
 
-Note: The topology ID (TID) is a special hash of the full topology path of the
-connected device. This means that every time e.g. a USB serial device is
-plugged into to the exact same USB hub chain it will get the exact same TID.
-This helps solve the problem of reconnecting to serical devices which do not
-provide a unique device by ID.
+Note: The topology ID (TID) is a unique hash of the full topology path of the
+connected device. This means that every time e.g. a USB serial port device is
+plugged into to the exact same USB topology (same ports, same hubs, etc.) it
+will get the exact same TID. This helps solve the problem of reconnecting to
+serical devices which do not provide a unique device by ID.
 
 Additonally tio offers two convenient ways of connecting to serial devices:
 
