@@ -182,7 +182,7 @@ $ tio bCC2
 ```
 The TID is unique and will stay the same as long as your USB serial port device
 plugs into the same USB topology (same ports, same hubs, etc.). This way tio
-will successfully reconnect to the same device when reconnected.
+will successfully reconnect to the same device each time.
 
 List available serial devices:
 ```
