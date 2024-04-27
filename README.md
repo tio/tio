@@ -227,14 +227,25 @@ KORAD KD3305P V4.2 SN:32475045
 Using tio there are up to 4 recommended ways to connect to a specific serial
 device:
 
- * Connect by ID
-   * Example: ```tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTCHUV56-if00-port0```
- * Connect by topology ID
-   * Example: ```tio bCC2```
- * Connect to enumerated device in /dev
-   * Example: ```tio /dev/ttyUSB4```
- * Connect by path
-   * Example: ```tio /dev/serial/by-path/pci-0000:00:14.0-usb-0:8.1.3.1.4:1.0-port0```
+Connect by ID (preferred method):
+```
+$ tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTCHUV56-if00-port0
+```
+
+Connect by topology ID:
+```
+$ tio bCC2
+```
+
+Connect to enumerated device in /dev:
+```
+$ tio /dev/ttyUSB4
+```
+
+Connect by path:
+```
+$ tio /dev/serial/by-path/pci-0000:00:14.0-usb-0:8.1.3.1.4:1.0-port0
+```
 
 Which serial device to connect becomes more clear from tio's serial device
 listing which provides more information about each serial device. For example:
@@ -280,20 +291,33 @@ serical devices which do not provide a unique device by ID.
 
 Additonally tio offers two convenient ways of connecting to serial devices:
 
- * Connect automatically to first new appearing serial device
-   * ```tio --auto-connect new```
- * Connect automatically to latest registered serial device
-   * ```tio --auto-connect latest```
+(1) Connect automatically to first new appearing serial device:
+```
+$ tio --auto-connect new
+```
+
+(2) Connect automatically to latest registered serial device:
+```
+$ tio --auto-connect latest
+```
 
 It is also possible to use excludes to affect which serial devices are involved
 in the strategy decisions:
 
- * Exclude devices by pattern
-   * Example: ```tio --auto-connect new --exclude-devices "/dev/ttyACM?,/dev/ttyUSB2"```
- * Exclude drivers by pattern
-   * Example: ```tio --auto-connect new --exclude-drivers "cdc_acm,ftdi_sio"```
- * Exclude topology IDs by pattern
-   * Example: ```tio --auto-connect new --exclude-tids "EOEs"```
+Exclude devices by pattern:
+```
+$ tio --auto-connect new --exclude-devices "/dev/ttyACM?,/dev/ttyUSB2"
+```
+
+Exclude drivers by pattern:
+```
+$ tio --auto-connect new --exclude-drivers "cdc_acm,ftdi_sio"
+```
+
+Exclude topology IDs by pattern:
+```
+$ tio --auto-connect new --exclude-tids "EOEs"
+```
 
 Note: Pattern matching supports '*' and '?'. Use comma separation to define multiple patterns.
 
