@@ -86,7 +86,7 @@ struct option_t
     int32_t rs485_delay_rts_before_send;
     int32_t rs485_delay_rts_after_send;
     alert_t alert;
-    bool complete_sub_configs;
+    bool complete_profiles;
     const char *script;
     const char *script_filename;
     script_run_t script_run;

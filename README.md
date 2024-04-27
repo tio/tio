@@ -70,12 +70,12 @@ when used in combination with [tmux](https://tmux.github.io).
    * Overwrite (default) or append to log file
    * Strip control characters and escape sequences
  * Configuration file support
-   * Support for sub-configurations
-   * Activate sub-configurations by name or pattern
+   * Support for configuration profiles
+   * Activate configuration profiles by name or pattern
  * Redirect I/O to UNIX socket or IPv4/v6 network socket
    * Useful for scripting or TTY sharing
  * Pipe input and/or output
- * Bash completion on options, serial device names, and sub-configuration names
+ * Bash completion on options, serial device names, and profile names
  * Configurable tio message text color
    * Supports NO_COLOR env variable as per [no-color.org](https://no-color.org)
  * Visual or audible alert on connect/disconnect
@@ -99,9 +99,9 @@ For more usage details please see the man page documentation
 The command-line interface is straightforward as reflected in the output from
 'tio --help':
 ```
-Usage: tio [<options>] <tty-device|sub-config|tid>
+Usage: tio [<options>] <tty-device|profile|tid>
 
-Connect to TTY device directly or via sub-configuration or topology ID.
+Connect to TTY device directly or via configuration profile or topology ID.
 
 Options:
   -b, --baudrate <bps>                   Baud rate (default: 115200)
@@ -142,7 +142,7 @@ Options:
   -v, --version                          Display version
   -h, --help                             Display help
 
-Options and sub-configurations may be set via configuration file.
+Options and profiles may be set via configuration file.
 
 See the man page for more details.
 ```
@@ -428,9 +428,9 @@ following locations in the order listed:
  - $HOME/.config/tio/config
  - $HOME/.tioconfig
 
-The configuration file supports sub-configurations using named sections which can
-be activated via the command-line by name or pattern. A sub-configuration
-specifies which TTY device to connect to and other options.
+The configuration file supports profiles using named sections which can be
+activated via the command-line by name or pattern. A profile specifies which
+TTY device to connect to and other options.
 
 ### 3.4.1 Examples
 
@@ -470,7 +470,7 @@ device = /dev/ttyUSB%s
 color = 14
 ```
 
-To use a specific sub-configuration by name simply start tio like so:
+To use a specific profile by name simply start tio like so:
 ```
 $ tio rpi3
 ```

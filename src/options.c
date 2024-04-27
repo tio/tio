@@ -54,7 +54,7 @@ enum opt_t
     OPT_RS485,
     OPT_RS485_CONFIG,
     OPT_ALERT,
-    OPT_COMPLETE_SUB_CONFIGS,
+    OPT_COMPLETE_PROFILES,
     OPT_MUTE,
     OPT_SCRIPT,
     OPT_SCRIPT_FILE,
@@ -106,7 +106,7 @@ struct option_t option =
     .rs485_delay_rts_before_send = -1,
     .rs485_delay_rts_after_send = -1,
     .alert = ALERT_NONE,
-    .complete_sub_configs = false,
+    .complete_profiles = false,
     .script = NULL,
     .script_filename = NULL,
     .script_run = SCRIPT_RUN_ALWAYS,
@@ -120,9 +120,9 @@ void print_help(char *argv[])
 {
     UNUSED(argv);
 
-    printf("Usage: tio [<options>] <tty-device|sub-config|tid>\n");
+    printf("Usage: tio [<options>] <tty-device|profile|tid>\n");
     printf("\n");
-    printf("Connect to TTY device directly or via sub-configuration or topology ID.\n");
+    printf("Connect to TTY device directly or via configuration profile or topology ID.\n");
     printf("\n");
     printf("Options:\n");
     printf("  -b, --baudrate <bps>                   Baud rate (default: 115200)\n");
@@ -163,7 +163,7 @@ void print_help(char *argv[])
     printf("  -v, --version                          Display version\n");
     printf("  -h, --help                             Display help\n");
     printf("\n");
-    printf("Options and sub-configurations may be set via configuration file.\n");
+    printf("Options and profiles may be set via configuration file.\n");
     printf("\n");
     printf("See the man page for more details.\n");
 }
@@ -464,7 +464,7 @@ void options_parse(int argc, char *argv[])
             {"script-run",           required_argument, 0, OPT_SCRIPT_RUN          },
             {"version",              no_argument,       0, 'v'                     },
             {"help",                 no_argument,       0, 'h'                     },
-            {"complete-sub-configs", no_argument,       0, OPT_COMPLETE_SUB_CONFIGS},
+            {"complete-profiles",    no_argument,       0, OPT_COMPLETE_PROFILES   },
             {0,                      0,                 0,  0                      }
         };
 
@@ -667,8 +667,8 @@ void options_parse(int argc, char *argv[])
                 exit(EXIT_SUCCESS);
                 break;
 
-            case OPT_COMPLETE_SUB_CONFIGS:
-                option.complete_sub_configs = true;
+            case OPT_COMPLETE_PROFILES:
+                option.complete_profiles = true;
                 break;
 
             case '?':
@@ -681,7 +681,7 @@ void options_parse(int argc, char *argv[])
         }
     }
 
-    /* Assume first non-option is the target (tty device, sub-config, tid) */
+    /* Assume first non-option is the target (tty device, profile, tid) */
     if (strcmp(option.target, ""))
     {
             optind++;
@@ -691,7 +691,7 @@ void options_parse(int argc, char *argv[])
         option.target = argv[optind++];
     }
 
-    if (option.complete_sub_configs)
+    if (option.complete_profiles)
     {
         return;
     }
@@ -703,7 +703,7 @@ void options_parse(int argc, char *argv[])
 
     if (strlen(option.target) == 0)
     {
-        tio_error_printf("Missing tty device, sub-configuration or topology ID");
+        tio_error_printf("Missing tty device, profile or topology ID");
         exit(EXIT_FAILURE);
     }
 

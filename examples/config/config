@@ -32,7 +32,7 @@ rs-485 = disable
 alert = none
 script-run = always
 
-# Sub-configurations
+# Configuration profiles
 
 [rpi3]
 baudrate = 115200

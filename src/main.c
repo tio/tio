@@ -45,9 +45,9 @@ int main(int argc, char *argv[])
     /* Parse command-line options (1st pass) */
     options_parse(argc, argv);
 
-    if (option.complete_sub_configs)
+    if (option.complete_profiles)
     {
-        config_file_show_sub_configurations();
+        config_file_show_profiles();
         return status;
     }
 

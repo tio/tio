@@ -6,7 +6,7 @@ tio \- a serial device I/O tool
 .SH "SYNOPSIS"
 .PP
 .B tio
-.RI "[" <options> "] " "<tty-device|sub-config>"
+.RI "[" <options> "] " "<tty-device|profile|tid>"
 
 .SH "DESCRIPTION"
 .PP
@@ -481,11 +481,11 @@ listed:
 .I $HOME/.tioconfig
 
 .PP
-Labels can be used to group settings into named sub-configurations which can be
-activated from the command-line when starting tio.
+Labels can be used to group settings into named configuration profiles which
+can be activated from the command-line when starting tio.
 
 .PP
-\fBtio\fR will try to match the user input to a sub-configuration by name or by
+\fBtio\fR will try to match the user input to a configuration profile by name or by
 pattern to get the TTY device and other options.
 
 .PP
@@ -585,7 +585,7 @@ line-pulse-duration = DTR=200,RTS=400
 .RE
 
 .TP
-Named sub-configurations can be added via labels:
+Named configuration profiles can be added via labels:
 
 .RS
 .nf
@@ -599,7 +599,7 @@ color = 11
 .RE
 
 .TP
-Activate the sub-configuration by name:
+Activate the configuration profile by name:
 
 $ tio rpi3
 
@@ -609,7 +609,8 @@ Which is equivalent to:
 $ tio -b 115200 -c 11 /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 
 .TP
-A sub-configuration can also be activated by its pattern which supports regular expressions:
+A configuration profile can also be activated by its pattern which supports
+regular expressions:
 
 .RS
 .nf
@@ -623,7 +624,7 @@ baudrate = 115200
 .RE
 
 .TP
-Activate the sub-configuration by pattern match:
+Activate the configuration profile by pattern match:
 
 $ tio usb12
 
@@ -633,7 +634,8 @@ Which is equivalent to:
 $ tio -b 115200 /dev/ttyUSB12
 
 .TP
-It is also possible to combine use of sub-configuration and command-line options. For example:
+It is also possible to combine use of configuration profile and command-line
+options. For example:
 
 $ tio -l -t usb12
 

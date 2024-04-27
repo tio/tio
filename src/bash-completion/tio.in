@@ -197,14 +197,14 @@ _tio()
             ;;
     esac
 
-    sub_configs="`tio --complete-sub-configs`"
+    profiles="`tio --complete-profiles`"
 
     if [ -d /dev/serial/by-id ]; then
         ttys=$(printf '%s\n' /dev/tty* /dev/serial/by-id/*)
     else
         ttys=$(printf '%s\n' /dev/tty*)
     fi
-    COMPREPLY=( $(compgen -W "${ttys} ${sub_configs}" -- ${cur}) )
+    COMPREPLY=( $(compgen -W "${ttys} ${profiles}" -- ${cur}) )
     return 0
 }
 

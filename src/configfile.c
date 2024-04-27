@@ -455,7 +455,7 @@ static int resolve_config_file(void)
     return -EINVAL;
 }
 
-void config_file_show_sub_configurations(void)
+void config_file_show_profiles(void)
 {
     memset(&c, 0, sizeof(struct config_t));
 
@@ -482,7 +482,7 @@ void config_file_parse(void)
         return;
     }
 
-    // Set user input which may be tty device or sub config or tid
+    // Set user input which may be tty device or profile or tid
     c.user = option.target;
 
     if (!c.user)
@@ -513,7 +513,7 @@ void config_file_parse(void)
         }
     }
 
-    // Parse settings of found section (sub config)
+    // Parse settings of found section (profile)
     ret = ini_parse(c.path, data_handler, NULL);
     if (ret < 0)
     {
@@ -544,7 +544,7 @@ void config_file_print(void)
         tio_printf(" Active configuration file: %s", c.path);
         if (c.section_name != NULL)
         {
-            tio_printf(" Active sub-configuration: %s", c.section_name);
+            tio_printf(" Active configuration profile: %s", c.section_name);
         }
     }
 }
