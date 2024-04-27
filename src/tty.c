@@ -1648,14 +1648,14 @@ GList *tty_search_for_serial_devices(void)
         // Example resulting device_name:
         //  "ttyUSB0"
         //  "3-6.4:1.2"
-        char *device_name = strrchr(device_path, '/');
-        device_name++; // Move past the '/'
+        char *last_part = strrchr(device_path, '/');
+        last_part++; // Move past the '/'
 
         // Find that part in /sys/devices and return first result string
         // Example devices_path:
         //  "/sys/devices/pci0000:00/0000:00:14.0/usb3/3-6/3-6.3/3-6.3:1.0/ttyUSB0"
         //  "/sys/devices/pci0000:00/0000:00:14.0/usb3/3-6/3-6.4/3-6.4:1.2"
-        char *devices_path = fs_search_directory("/sys/devices", device_name);
+        char *devices_path = fs_search_directory("/sys/devices", last_part);
         if (devices_path == NULL)
         {
             continue;
@@ -1665,7 +1665,7 @@ GList *tty_search_for_serial_devices(void)
         // Example resulting devices_path:
         //  "/sys/devices/pci0000:00/0000:00:14.0/usb3/3-6/3-6.3/3-6.3:1.0"
         //  "/sys/devices/pci0000:00/0000:00:14.0/usb3/3-6/3-6.4/3-6.4:1.2"
-        char *last_part = strrchr(devices_path, '/');
+        last_part = strrchr(devices_path, '/');
         last_part++;
         if (strcmp(last_part, entry->d_name) == 0)
         {
