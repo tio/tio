@@ -1,5 +1,170 @@
 
-=== tio v2.8 ===
+=== tio v3.0 ===
+
+
+
+Changes since tio v2.8:
+
+ * Disable DEC Special Graphics at exit if vt100
+
+   If a vt100 terminal receives the Shift In character '\016' it will
+   enable the 7 bit DEC Special Graphics character set used for line drawing.
+
+   For most users this can happen due to line noise from the tty device and
+   will likely mess up your terminal even after tio exits.
+
+   To better handle this we want to make sure that tio disables this mode
+   by sending the Shift Out character '\017' at exit.
+
+   This mechanism will only activate if environment variable TERM assumes
+   value "vt100".
+
+ * Add hexN output mode
+
+   Adds support for hexN mode where N is a number in the range 1 to 4096
+   which defines how many hex values will be printed before a line break.
+
+   In short, it defines the width of the hex output.
+
+   In this mode, if timestamps are enabled they will be added to each hex
+   line.
+
+ * Make sure to reset tainted state
+
+ * Rename sub-config to profile
+
+   Because better naming.
+
+ * Use lua io.write() instead of print()
+
+   io.write() gives better output control as print() is hardcoded to always
+   print a newline.
+
+ * Add new ways to manage serial devices
+
+    * Rename --list-devices to --list
+
+    * Rename --no-autoconnect to --no-reconnect
+
+    * Switch -l and -L options
+
+      * -l now lists available serial devices
+
+      * -L enables log to file
+
+    * Add option --auto-connect <strategy>
+
+      * Supported strategies:
+
+        * "new" - Waits to connect first new appearing serial device
+
+        * "latest" - Connects to latest registered serial device
+
+        * "direct" - Connect directly to specified serial device (default)
+
+    * Add options to exclude serial devices from auto connect strategy by
+      pattern
+
+      * Supported exclude options:
+
+        * --exclude-devices <pattern>
+
+          Example: '--exclude-devices "/dev/ttyUSB2,/dev/ttyS?"'
+
+        * --exclude-drivers <pattern>
+
+          Example: '--exclude-drivers "cdc_acm"'
+
+        * --exclude-tids <pattern>
+
+          Example: '--exclude-tids "yW07,bCC2"'
+
+        * Patterns support '*' and '?'
+
+    * Connect to same port/device combination via unique topology ID (TID)
+
+      * Topology ID is a 4 digit base62 encoded hash of a device topology
+        string coming from the Linux kernel. This means that whenever you
+        plug in the same e.g. USB serial port device to the same USB hub
+        port connected via the exact same hub topology all the way to your
+        computer, you will get the same unique TID.
+
+      * Useful for stable reconnections when serial device has no serial
+        device by ID
+
+      * For now, only tested on Linux.
+
+    * Reworked and improved listing of serial devices to show serial devices:
+
+      * By device
+
+        * Including TID, uptime, driver, and description.
+
+        * Sorted by uptime (newest device listed last)
+
+      * By unique topology ID
+
+      * By ID
+
+      * By path
+
+    * Add script interface 'list = tty_search()' for searching for serial
+      devices.
+
+ * Clean up timestamp enum definition
+
+ * Add missing options to show configuration
+
+ * Update description of mute option
+
+ * Add lua read_string() function
+
+ * Don't forget to log output in lua expect()
+
+ * Generalize automatic login example for Linux
+
+ * Fix log output in hex output mode
+
+ * Add timeout based timestamps in hex output mode
+
+   This change reintroduces timestamping in hex output mode but based on
+   timeout instead of new lines which made no sense. This means that
+   timestamps will only be printed when timeout time has elapsed with no
+   output activity from serial device.
+
+   Adds option --timestamp-timeout <ms> for setting the timeout value in
+   milliseconds.
+
+   Defaults to 200 ms.
+
+ * Do not echo CR in line input and hex output mode
+
+ * Improve switched messages
+
+ * Extend lua expect() to also return matched string
+
+ * Add automatic login script example
+
+ * Organize examples directory
+
+ * Fix local echo in line mode
+
+ * Fix line input mode
+
+   Do not forward input characters to tty device before a line is input via
+   carriage return.
+
+ * Introduce basic line input mode
+
+ * Cleanup global variable name shadowing
+
+Davis C:
+
+ * Updated login example with new expect logic
+
+ * Reset buffer size at start of expect
+
+ * Return 1 when `expect` matches
 
 
 
