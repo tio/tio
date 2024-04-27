@@ -2086,7 +2086,7 @@ int tty_connect(void)
     char   line_buffer[BUFSIZ] = {};
     static bool first = true;
     int    status;
-    bool   next_timestamp = false;
+    bool   do_timestamp = false;
     char*  now = NULL;
     unsigned int line_index = 0;
     static char previous_char[2] = {};
@@ -2128,7 +2128,7 @@ int tty_connect(void)
 
     if (option.timestamp)
     {
-        next_timestamp = true;
+        do_timestamp = true;
     }
 
     /* Manage print output mode */
@@ -2260,7 +2260,7 @@ int tty_connect(void)
                 rx_total += bytes_read;
 
                 // Manage timeout based timestamping in hex mode
-                if (option.output_mode == OUTPUT_MODE_HEX)
+                if ((option.output_mode == OUTPUT_MODE_HEX) && (option.hex_n_value == 0))
                 {
                     if (option.timestamp != TIMESTAMP_NONE)
                     {
@@ -2276,7 +2276,7 @@ int tty_connect(void)
                                 {
                                     log_printf("\r\n[%s] ", now);
                                 }
-                                next_timestamp = false;
+                                do_timestamp = false;
                             }
                         }
                         tval_before = tval_now;
@@ -2286,24 +2286,85 @@ int tty_connect(void)
                 /* Process input byte by byte */
                 for (int i=0; i<bytes_read; i++)
                 {
+                    static unsigned long count = 0;
+
                     input_char = input_buffer[i];
 
-                    /* Print timestamp on new line if enabled */
-                    if (option.output_mode == OUTPUT_MODE_NORMAL)
+                    /* Handle timestamps */
+                    switch (option.output_mode)
                     {
-                        if ((next_timestamp && input_char != '\n' && input_char != '\r'))
-                        {
-                            now = timestamp_current_time();
-                            if (now)
+                        case OUTPUT_MODE_NORMAL:
+                            // Support timestamp per line
+                            if ((do_timestamp && input_char != '\n' && input_char != '\r'))
                             {
-                                ansi_printf_raw("[%s] ", now);
-                                if (option.log)
+                                now = timestamp_current_time();
+                                if (now)
                                 {
-                                    log_printf("[%s] ", now);
+                                    ansi_printf_raw("[%s] ", now);
+                                    if (option.log)
+                                    {
+                                        log_printf("[%s] ", now);
+                                    }
+                                    do_timestamp = false;
                                 }
-                                next_timestamp = false;
                             }
-                        }
+                            break;
+
+                        case OUTPUT_MODE_HEX:
+                            // Support hexN mode
+                            if (option.hex_n_value > 0)
+                            {
+                                static bool first = true;
+                                if ((count % option.hex_n_value) == 0)
+                                {
+                                    if (option.timestamp != TIMESTAMP_NONE)
+                                    {
+                                        now = timestamp_current_time();
+                                        if (first)
+                                        {
+                                            ansi_printf_raw("[%s] ", now);
+                                            if (option.log)
+                                            {
+                                                log_printf("[%s] ", now);
+                                            }
+                                            first = false;
+                                        }
+                                        else
+                                        {
+                                            ansi_printf_raw("\r\n[%s] ", now);
+                                            if (option.log)
+                                            {
+                                                log_printf("\n[%s] ", now);
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (first)
+                                        {
+                                            // Do nothing
+                                        }
+                                        else
+                                        {
+                                            putchar('\r');
+                                            putchar('\n');
+
+                                            if (option.log)
+                                            {
+                                                log_putc('\n');
+                                            }
+                                            first = false;
+                                        }
+                                    }
+                                }
+                            }
+                            count++;
+                        break;
+
+                        default:
+                            tio_error_printf("Unknown outut mode");
+                            exit(EXIT_FAILURE);
+                        break;
                     }
 
                     /* Convert MSB to LSB bit order */
@@ -2324,7 +2385,7 @@ int tty_connect(void)
                         print('\n');
                         if (option.timestamp)
                         {
-                            next_timestamp = true;
+                            do_timestamp = true;
                         }
                     }
                     else if ((input_char == '\f') && (map_i_ff_escc) && (!map_o_msblsb))
@@ -2350,7 +2411,7 @@ int tty_connect(void)
 
                     if (input_char == '\n' && option.timestamp)
                     {
-                        next_timestamp = true;
+                        do_timestamp = true;
                     }
                 }
             }

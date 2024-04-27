@@ -248,9 +248,14 @@ editing feature supported in this mode is backspace.
 Default value is "normal".
 
 .TP
-.BR "    \-\-output\-mode " normal|hex
+.BR "    \-\-output\-mode " normal|hex|hexN
 
-Set output mode. In hex mode each incoming byte is printed out as a 1 byte hex value.
+Set output mode.
+
+In hex mode each incoming byte is printed out as a 1 byte hex value.
+
+In hexN mode, N is a number less than or equal to 4096 which defines how many
+hex values will be printed before a line break.
 
 Default value is "normal".
 

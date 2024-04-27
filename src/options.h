@@ -94,6 +94,7 @@ struct option_t
     const char *exclude_devices;
     const char *exclude_drivers;
     const char *exclude_tids;
+    int hex_n_value;
 };
 
 extern struct option_t option;

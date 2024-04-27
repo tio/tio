@@ -20,6 +20,7 @@
  */
 
 #include "config.h"
+#include <regex.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
@@ -40,6 +41,8 @@
 #include "alert.h"
 #include "log.h"
 #include "script.h"
+
+#define HEX_N_VALUE_MAX 4096
 
 enum opt_t
 {
@@ -114,6 +117,7 @@ struct option_t option =
     .exclude_devices = NULL,
     .exclude_drivers = NULL,
     .exclude_tids = NULL,
+    .hex_n_value = 0,
 };
 
 void print_help(char *argv[])
@@ -140,7 +144,7 @@ void print_help(char *argv[])
     printf("  -n, --no-reconnect                     Do not reconnect\n");
     printf("  -e, --local-echo                       Enable local echo\n");
     printf("      --input-mode normal|hex|line       Select input mode (default: normal)\n");
-    printf("      --output-mode normal|hex           Select output mode (default: normal)\n");
+    printf("      --output-mode normal|hex|hexN      Select output mode (default: normal, N <= %d)\n", HEX_N_VALUE_MAX);
     printf("  -t, --timestamp                        Enable line timestamp\n");
     printf("      --timestamp-format <format>        Set timestamp format (default: 24hour)\n");
     printf("      --timestamp-timeout <ms>           Set timestamp timeout (default: 200)\n");
@@ -268,6 +272,61 @@ void line_pulse_duration_option_parse(const char *arg)
     free(buffer);
 }
 
+// Function to parse the input string
+int parse_hexN_string(const char *input_string)
+{
+    regmatch_t match[2]; // One for entire match, one for the optional N
+    int n_value = 0;
+    regex_t regex;
+    int ret;
+
+    // Compile the regular expression to match "hex" and optionally capture N
+    ret = regcomp(&regex, "^hex([0-9]+)?$", REG_EXTENDED);
+    if (ret)
+    {
+        tio_error_printf("Could not compile regex\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Execute the regular expression
+    ret = regexec(&regex, input_string, 2, match, 0);
+    if (!ret)
+    {
+        // If there is a match, extract the N value if present
+        if (match[1].rm_so != -1)
+        {
+            char n_value_str[32]; // Assume max 32 digits for the numerical value
+            strncpy(n_value_str, input_string + match[1].rm_so, match[1].rm_eo - match[1].rm_so);
+            n_value_str[match[1].rm_eo - match[1].rm_so] = '\0'; // Null-terminate the string
+            n_value = atoi(n_value_str);
+
+            if ((n_value > HEX_N_VALUE_MAX) || (n_value == 0))
+            {
+                n_value = -1;
+            }
+        }
+        else
+        {
+            n_value = 0;
+        }
+    }
+    else if (ret == REG_NOMATCH)
+    {
+        n_value = -1;
+    }
+    else
+    {
+        char msgbuf[100];
+        regerror(ret, &regex, msgbuf, sizeof(msgbuf));
+        tio_error_printf("Regex match failed: %s\n", msgbuf);
+        exit(EXIT_FAILURE);
+    }
+
+    regfree(&regex);
+
+    return n_value;
+}
+
 input_mode_t input_mode_option_parse(const char *arg)
 {
     if (strcmp("normal", arg) == 0)
@@ -291,12 +350,15 @@ input_mode_t input_mode_option_parse(const char *arg)
 
 output_mode_t output_mode_option_parse(const char *arg)
 {
+    int n = 0;
+
     if (strcmp("normal", arg) == 0)
     {
         return OUTPUT_MODE_NORMAL;
     }
-    else if (strcmp("hex", arg) == 0)
+    else if ((n = parse_hexN_string(arg)) != -1)
     {
+        option.hex_n_value = n;
         return OUTPUT_MODE_HEX;
     }
     else
