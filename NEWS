@@ -29,8 +29,6 @@ Changes since tio v2.8:
    In this mode, if timestamps are enabled they will be added to each hex
    line.
 
- * Make sure to reset tainted state
-
  * Rename sub-config to profile
 
    Because better naming.
@@ -137,8 +135,6 @@ Changes since tio v2.8:
 
    Defaults to 200 ms.
 
- * Do not echo CR in line input and hex output mode
-
  * Improve switched messages
 
  * Extend lua expect() to also return matched string
@@ -146,13 +142,6 @@ Changes since tio v2.8:
  * Add automatic login script example
 
  * Organize examples directory
-
- * Fix local echo in line mode
-
- * Fix line input mode
-
-   Do not forward input characters to tty device before a line is input via
-   carriage return.
 
  * Introduce basic line input mode
 
