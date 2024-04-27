@@ -77,6 +77,7 @@ extern char ansi_format[];
         fprintf (stdout, "\r[%s] Warning: " format "\r\n", timestamp_current_time(), ## args); \
         else \
         ansi_printf("[%s] Warning: " format, timestamp_current_time(), ## args); \
+        print_tainted = false; \
     } \
 }
 
@@ -90,6 +91,7 @@ extern char ansi_format[];
         fprintf (stdout, "\r[%s] Error: " format "\r\n", timestamp_current_time(), ## args); \
         else \
         ansi_printf("[%s] Error: " format, timestamp_current_time(), ## args); \
+        print_tainted = false; \
     } \
 }
 
