@@ -1067,6 +1067,14 @@ void stdin_configure(void)
 void stdout_restore(void)
 {
     tcsetattr(STDOUT_FILENO, TCSANOW, &stdout_old);
+
+    // If terminal is vt100
+    if (option.vt100)
+    {
+      // Disable DEC Special Graphics character set just in case it was randomly
+      // enabled by noise from serial device.
+      putchar('\017');
+    }
 }
 
 void stdout_configure(void)

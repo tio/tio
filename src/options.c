@@ -118,6 +118,7 @@ struct option_t option =
     .exclude_drivers = NULL,
     .exclude_tids = NULL,
     .hex_n_value = 0,
+    .vt100 = false,
 };
 
 void print_help(char *argv[])
@@ -485,6 +486,13 @@ void options_parse(int argc, char *argv[])
     if (no_color != NULL && no_color[0] != '\0')
     {
         option.color = -1;
+    }
+
+    // Check for vt100 terminal
+    char *term = getenv("TERM");
+    if ((term != NULL) && (!strcmp(term, "vt100")))
+    {
+        option.vt100 = true;
     }
 
     while (1)
