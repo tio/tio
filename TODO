@@ -1,21 +1,13 @@
-* Add additional hex mode formats
+ * Support traditional hex output format such as:
 
- - Support traditional hex output format such as:
-
-  00000000  74 65 73 74 20 74 65 73  74 20 74 65 73 74 20 74  |test test test t|
-  00000010  65 73 74 64 66 0a 61 0a  66 61 0a 66 0a 61 73 66  |estdf.a.fa.f.asf|
-  00000020  64 61 64 73 66 61 73 66  64 61 73 64 66 61 64 73  |dadsfasfdasdfads|
-  00000030  66 0a 61 73 64 66 61 64  73 66 61 73 64 66 61 73  |f.asdfadsfasdfas|
-  00000040  64 66 0a 61 73 64 66 61  64 73 66 61 73 64 66 61  |df.asdfadsfasdfa|
-  00000050  73 64 66 66 64 61 73 64  66 0a 0a 31 32 33 31 0a  |sdffdasdf..1231.|
-  00000060  65 32 31 64 73 77 65 64  0a 0a                    |e21dswed..|
-  0000006a
-
-  With configurable width output (4, 8, 16 bytes etc.). E.g. config file:
-
-   hex-mode-width = 16
-
-  With and without timestamp support for each broken up line.
+   00000000  74 65 73 74 20 74 65 73  74 20 74 65 73 74 20 74  |test test test t|
+   00000010  65 73 74 64 66 0a 61 0a  66 61 0a 66 0a 61 73 66  |estdf.a.fa.f.asf|
+   00000020  64 61 64 73 66 61 73 66  64 61 73 64 66 61 64 73  |dadsfasfdasdfads|
+   00000030  66 0a 61 73 64 66 61 64  73 66 61 73 64 66 61 73  |f.asdfadsfasdfas|
+   00000040  64 66 0a 61 73 64 66 61  64 73 66 61 73 64 66 61  |df.asdfadsfasdfa|
+   00000050  73 64 66 66 64 61 73 64  66 0a 0a 31 32 33 31 0a  |sdffdasdf..1231.|
+   00000060  65 32 31 64 73 77 65 64  0a 0a                    |e21dswed..|
+   0000006a
 
  * Add support for activity based time stamping in normal output mode
 
