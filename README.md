@@ -299,20 +299,20 @@ plugged into to the exact same USB topology (same ports, same hubs, etc.) it
 will get the exact same TID. This helps solve the problem of reconnecting to
 serical devices which do not provide a unique device by ID.
 
-Additonally tio offers two convenient ways of connecting to serial devices:
+Additonally tio offers two convenient ways of connecting to serial devices.
 
-(1) Connect automatically to first new appearing serial device:
+Connect automatically to first new appearing serial device:
 ```
 $ tio --auto-connect new
 ```
 
-(2) Connect automatically to latest registered serial device:
+Connect automatically to latest registered serial device:
 ```
 $ tio --auto-connect latest
 ```
 
-It is also possible to use excludes to affect which serial devices are involved
-in the strategy decisions:
+It is also possible to use exclude options to affect which serial devices are
+involved in the strategy decisions:
 
 Exclude devices by pattern:
 ```
