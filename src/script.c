@@ -211,10 +211,6 @@ static int send(lua_State *L)
     }
 
     ret = write(device_fd, string, strlen(string));
-    if (ret < 0)
-    {
-        tio_error_print("%s\n", strerror(errno));
-    }
 
     lua_pushnumber(L, ret);
 
@@ -281,7 +277,7 @@ static int read_string(lua_State *L)
     char *buffer = malloc(size);
     if (buffer == NULL)
     {
-        ret = -3; // Read buffer allocation failed
+        ret = -1; // Error
         goto error;
     }
 
@@ -293,12 +289,12 @@ static int read_string(lua_State *L)
     ssize_t bytes_read = read_poll(device_fd, buffer, size, timeout);
     if (bytes_read < 0)
     {
-        ret = -1; // Read error
+        ret = -1; // Error
         goto error;
     }
     else if (bytes_read == 0)
     {
-        ret = -2; // Timeout
+        ret = 0; // Timeout
         goto error;
     }
 

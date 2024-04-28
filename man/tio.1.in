@@ -427,12 +427,15 @@ Expect string - waits for string to match or timeout before continueing.
 Supports regular expressions. Special characters must be escaped with '\\\\'.
 Timeout is in milliseconds, defaults to 0 meaning it will wait forever.
 
-Returns 1 on successful match, 0 on timeout, or -1 on invalid regular expression.
+Returns 1 on successful match, 0 on timeout, or -1 on error.
 
 On successful match it also returns the match string as second return value.
 
 .IP "\fBsend(string)"
 Send string.
+
+Returns number of bytes written on success or -1 on error.
+
 .IP "\fBmodem_send(file, protocol)"
 Send file using x/y-modem protocol.
 
@@ -447,6 +450,12 @@ following string indexed elements "path", "tid", "uptime", "driver",
 "description".
 
 Returns nil if no serial devices are found.
+
+.IP "\fBread(size, timeout)"
+Read from serial device. If timeout is 0 or not provided it will wait forever
+until data is ready to read.
+
+Returns number of bytes read on success, 0 on timeout, or -1 on error.
 
 .IP "\fBexit(code)"
 Exit with exit code.

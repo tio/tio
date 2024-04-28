@@ -371,63 +371,71 @@ Tio suppots Lua scripting to easily automate interaction with the tty device.
 In addition to the Lua API tio makes the following functions available:
 
 ```
-  expect(string, timeout)
-        Expect string - waits for string to match or timeout before continueing.
+expect(string, timeout)
+      Expect string - waits for string to match or timeout before continueing.
+      Supports regular expressions. Special characters must be escaped with '\\'.
+      Timeout is in milliseconds, defaults to 0 meaning it will wait forever.
 
-        Supports regular expressions. Special characters must be escaped with '\\'.
+      Returns 1 on successful match, 0 on timeout, or -1 on error.
 
-        Timeout is in milliseconds, defaults to 0 meaning it will wait forever.
+      On successful match it also returns the match string as second return value.
 
-  send(string)
-        Send string.
+send(string)
+      Send string.
 
-  modem_send(file, protocol)
-        Send file using x/y-modem protocol.
+      Returns number of bytes written on success or -1 on error.
 
-        Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
+modem_send(file, protocol)
+      Send file using x/y-modem protocol.
 
-  tty_search()
-        Search for serial devices.
+      Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
 
-        Returns a table of number indexed tables, one for each serial device
-        found. Each of these tables contains the serial device information accessible
-        via the following string indexed elements "path", "tid", "uptime", "driver",
-        "description".
+tty_search()
+      Search for serial devices.
 
-        Returns nil if no serial devices are found.
+      Returns a table of number indexed tables, one for each serial device
+      found.  Each of these tables contains the serial device information accessible
+      via the following string indexed elements "path", "tid", "uptime", "driver",
+      "description".
 
-  exit(code)
-        Exit with code.
+      Returns nil if no serial devices are found.
 
-  high(line)
-        Set tty line high.
+read(size, timeout)
+      Read from serial device. If timeout is 0 or not provided it will wait
+      forever until data is ready to read.
 
-  low(line)
-        Set tty line low.
+      Returns number of bytes read on success, 0 on timeout, or -1 on error.
 
-  toggle(line)
-        Toggle the tty line.
+exit(code)
+      Exit with exit code.
 
-  sleep(seconds)
-        Sleep for seconds.
+high(line)
+      Set tty line high.
 
-  msleep(ms)
-        Sleep for milliseconds.
+low(line)
+      Set tty line low.
 
-  config_high(line)
-        Set tty line state configuration to high.
+toggle(line)
+      Toggle the tty line.
 
-  config_low(line)
-        Set tty line state configuration to low.
+sleep(seconds)
+      Sleep for seconds.
 
-  apply_config()
-        Apply tty line state configuration.
+msleep(ms)
+      Sleep for miliseconds.
 
-        Using the line state configuration API instead of high()/low() will
-        help to make the lines physically switch as simultaneously as possible.
-        This may solve timing issues on some platforms.
+config_high(line)
+      Set tty line state configuration to high.
 
-  Note: Line can be any of DTR, RTS, CTS, DSR, CD, RI
+config_low(line)
+      Set tty line state configuration to low.
+
+apply_config()
+      Apply tty line state configuration. Using the line state configuration
+      API instead of high()/low() will help to make the lines physically switch as
+      simultaneously as possible. This may solve timing issues on some platforms.
+
+Note: Line can be any of DTR, RTS, CTS, DSR, CD, RI
 ```
 
 ### 3.4 Configuration file
