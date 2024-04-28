@@ -2322,20 +2322,20 @@ int tty_connect(void)
                             // Support hexN mode
                             if (option.hex_n_value > 0)
                             {
-                                static bool first = true;
+                                static bool first_ = true;
                                 if ((count % option.hex_n_value) == 0)
                                 {
                                     if (option.timestamp != TIMESTAMP_NONE)
                                     {
                                         now = timestamp_current_time();
-                                        if (first)
+                                        if (first_)
                                         {
                                             ansi_printf_raw("[%s] ", now);
                                             if (option.log)
                                             {
                                                 log_printf("[%s] ", now);
                                             }
-                                            first = false;
+                                            first_ = false;
                                         }
                                         else
                                         {
@@ -2348,7 +2348,7 @@ int tty_connect(void)
                                     }
                                     else
                                     {
-                                        if (first)
+                                        if (first_)
                                         {
                                             // Do nothing
                                         }
@@ -2361,7 +2361,7 @@ int tty_connect(void)
                                             {
                                                 log_putc('\n');
                                             }
-                                            first = false;
+                                            first_ = false;
                                         }
                                     }
                                 }
