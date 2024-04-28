@@ -197,17 +197,17 @@ It is recommended to connect serial TTY devices by ID:
 ```
 $ tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTCHUV56-if00-port0
 ```
-Using serial devices by ID helps ensure that tio automatically reconnects to
-the same serial device when reattached, even when it enumerates differently.
+Note: Using serial devices by ID helps ensure that tio automatically reconnects
+to the same serial device when reattached, even when it enumerates differently.
 
 If no serial device by ID is available it is recommended to connect via
 topology ID (TID):
 ```
 $ tio bCC2
 ```
-The TID is unique and will stay the same as long as your USB serial port device
-plugs into the same USB topology (same ports, same hubs, etc.). This way it is
-possible for tio to successfully reconnect to the same device.
+Note: The TID is unique and will stay the same as long as your USB serial port
+device plugs into the same USB topology (same ports, same hubs, etc.). This way
+it is possible for tio to successfully reconnect to the same device.
 
 Connect automatically to first new appearing serial device:
 ```
