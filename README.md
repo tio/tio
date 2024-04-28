@@ -119,7 +119,7 @@ Options:
   -n, --no-reconnect                     Do not reconnect
   -e, --local-echo                       Enable local echo
       --input-mode normal|hex|line       Select input mode (default: normal)
-      --output-mode normal|hex|hexN      Select output mode (default: normal, N <= 4096)
+      --output-mode normal|hex|hexN      Select output mode (default: normal)
   -t, --timestamp                        Enable line timestamp
       --timestamp-format <format>        Set timestamp format (default: 24hour)
       --timestamp-timeout <ms>           Set timestamp timeout (default: 200)

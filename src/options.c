@@ -145,7 +145,7 @@ void print_help(char *argv[])
     printf("  -n, --no-reconnect                     Do not reconnect\n");
     printf("  -e, --local-echo                       Enable local echo\n");
     printf("      --input-mode normal|hex|line       Select input mode (default: normal)\n");
-    printf("      --output-mode normal|hex|hexN      Select output mode (default: normal, N <= %d)\n", HEX_N_VALUE_MAX);
+    printf("      --output-mode normal|hex|hexN      Select output mode (default: normal)\n");
     printf("  -t, --timestamp                        Enable line timestamp\n");
     printf("      --timestamp-format <format>        Set timestamp format (default: 24hour)\n");
     printf("      --timestamp-timeout <ms>           Set timestamp timeout (default: 200)\n");
