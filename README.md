@@ -83,7 +83,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Lua scripting support for automation
    * Run script manually or automatically at connect (once/always/never)
    * Simple expect/send like functionality with support for regular expressions
-   * Manipulate port control lines (useful for microcontroller reset/boot etc.)
+   * Manipulate port modem lines (useful for microcontroller reset/boot etc.)
    * Send files via x/y-modem protocol
    * Search for serial devices
  * Man page documentation
@@ -400,7 +400,7 @@ color = 12
 
 [esp32]
 device = /dev/serial/by-id/usb-0403_6014-if00-port0
-script = high(DTR); low(RTS); msleep(100); low(DTR); high(RTS); msleep(100); low(RTS)
+script = set{DTR=high,RTS=low}; msleep(100); set{DTR=low,RTS=high}; msleep(100); set{RTS=low}
 script-run = once
 color = 13
 
