@@ -262,6 +262,11 @@ Pipe data to the serial device:
 $ cat data.bin | tio /dev/ttyUSB0
 ```
 
+Manipulate modem lines on connect:
+```
+$ tio --script "set{DTR=high,RTS=low}; msleep(100); set{DTR=toggle,RTS=toggle}" /dev/ttyUSB0
+```
+
 Pipe command to serial device and wait for line response within 1 second:
 ```
 $ echo "*IDN?" | tio /dev/ttyACM0 --script "expect('\r\n', 1000)" --mute
