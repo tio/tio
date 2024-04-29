@@ -181,19 +181,27 @@ char* fs_search_directory(const char *dir_path, const char *dirname)
 // Function to return creation time of file
 double fs_get_creation_time(const char *path)
 {
-    struct statx stx;
 
-    int fd = open(path, O_RDONLY);
-    if (fd == -1)
+#if defined(__APPLE__) || defined(__MACH__)
+    // Use stat on macOS to access creation time
+    struct stat st;
+
+    if (stat(path, &st) != 0)
     {
-        // Error
         return -1;
     }
 
-    int ret = statx(fd, "", AT_EMPTY_PATH, STATX_ALL, &stx);
-    if (ret == -1)
+    return st.st_birthtimespec.tv_sec + st.st_birthtimespec.tv_nsec / 1e9;
+#else
+    struct statx stx;
+    int fd = open(path, O_RDONLY);
+    if (fd == -1)
     {
-        // Error
+        return -1;
+    }
+
+    if (statx(fd, "", AT_EMPTY_PATH, STATX_ALL, &stx) != 0)
+    {
         close(fd);
         return -1;
     }
@@ -202,4 +210,5 @@ double fs_get_creation_time(const char *path)
     close(fd);
 
     return stx.stx_btime.tv_sec + stx.stx_btime.tv_nsec / 1e9;
+#endif
 }
