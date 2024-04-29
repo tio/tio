@@ -726,7 +726,7 @@ $ tio --rs-485 --rs-485-config=RTS_ON_SEND=1,RX_DURING_TX /dev/ttyUSB0
 .TP
 Manipulate DTR and RTS lines upon first connect to reset connected microcontroller:
 
-$ tio --script "high(DTR); low(RTS); msleep(100); toggle(DTR)" --script-run once /dev/ttyUSB0
+$ tio --script "set{DTR=high,RTS=low}; msleep(100); set{RTS=toggle}" --script-run once /dev/ttyUSB0
 
 .TP
 Automatically log in to connected OS:
