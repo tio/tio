@@ -692,6 +692,11 @@ expect -i $uart "prompt> "
 .RE
 
 .TP
+It is also possible to use the expect/send script functionality to e.g. automate logins:
+
+$ tio --script 'expect("login: "); send("root\\n"); expect("Password: "); send("root\\n")' /dev/ttyUSB0
+
+.TP
 Redirect device I/O to network file socket for remote TTY sharing:
 
 $ tio --socket inet:4444 /dev/ttyUSB0
