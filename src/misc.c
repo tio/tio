@@ -19,6 +19,7 @@
  * 02110-1301, USA.
  */
 
+#define _GNU_SOURCE  // For FNM_EXTMATCH
 #include "config.h"
 #include <ctype.h>
 #include <dirent.h>
@@ -197,7 +198,7 @@ bool match_patterns(const char *string, const char *patterns)
     while (pattern != NULL)
     {
         // Check if the string matches the current pattern
-        if (fnmatch(pattern, string, 0) == 0)
+        if (fnmatch(pattern, string, FNM_EXTMATCH) == 0)
         {
             free(patterns_copy);
             return true;
