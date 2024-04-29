@@ -137,13 +137,6 @@ typedef enum
     SUBCOMMAND_XMODEM,
 } sub_command_t;
 
-typedef struct
-{
-    int mask;
-    bool value;
-    bool reserved;
-} tty_line_config_t;
-
 const char random_array[] =
 {
 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x28, 0x20, 0x28, 0x0A, 0x20,
@@ -190,7 +183,6 @@ static pthread_t thread;
 static int pipefd[2];
 static pthread_mutex_t mutex_input_ready = PTHREAD_MUTEX_INITIALIZER;
 static char line[LINE_SIZE_MAX];
-static tty_line_config_t line_config[6] = { };
 
 static void optional_local_echo(char c)
 {
@@ -483,28 +475,12 @@ static const char *tty_line_name(int mask)
     }
 }
 
-void tty_line_config(int mask, bool value)
+void tty_line_set(int fd, tty_line_config_t line_config[])
 {
-    int i = 0;
-
-    for (i=0; i<6; i++)
-    {
-        if ((line_config[i].mask == mask) || (line_config[i].reserved == false))
-        {
-            line_config[i].mask = mask;
-            line_config[i].value = value;
-            line_config[i].reserved = true;
-            break;
-        }
-    }
-}
-
-void tty_line_config_apply(void)
-{
-    int i = 0;
     static int state;
+    int i = 0;
 
-    if (ioctl(device_fd, TIOCMGET, &state) < 0)
+    if (ioctl(fd, TIOCMGET, &state) < 0)
     {
         tio_warning_printf("Could not get line state (%s)", strerror(errno));
         return;
@@ -514,55 +490,33 @@ void tty_line_config_apply(void)
     {
         if (line_config[i].reserved)
         {
-            if (line_config[i].value)
-            {
-                // High
-                state &= ~line_config[i].mask;
-                tio_printf("Setting %s to HIGH", tty_line_name(line_config[i].mask));
-            }
-            else
+            if (line_config[i].value == 0)
             {
                 // Low
                 state |= line_config[i].mask;
                 tio_printf("Setting %s to LOW", tty_line_name(line_config[i].mask));
             }
+            else if (line_config[i].value == 1)
+            {
+                // High
+                state &= ~line_config[i].mask;
+                tio_printf("Setting %s to HIGH", tty_line_name(line_config[i].mask));
+            }
+            else if (line_config[i].value == 2)
+            {
+                // Toggle
+                state ^= line_config[i].mask;
 
-            line_config[i].reserved = true;
+                if (state & line_config[i].mask)
+                {
+                    tio_printf("Setting %s to LOW", tty_line_name(line_config[i].mask));
+                }
+                else
+                {
+                    tio_printf("Setting %s to HIGH", tty_line_name(line_config[i].mask));
+                }
+            }
         }
-    }
-
-    if (ioctl(device_fd, TIOCMSET, &state) < 0)
-    {
-        tio_warning_printf("Could not set line state configuration (%s)", strerror(errno));
-    }
-
-    // Reset configuration
-    for (i=0; i<6; i++)
-    {
-        line_config[i].reserved = false;
-        line_config[i].mask = -1;
-    }
-}
-
-void tty_line_set(int fd, int mask, bool value)
-{
-    int state;
-
-    if (ioctl(fd, TIOCMGET, &state) < 0)
-    {
-        tio_warning_printf("Could not get line state (%s)", strerror(errno));
-        return;
-    }
-
-    if (value)
-    {
-        state &= ~mask;
-        tio_printf("Setting %s to HIGH", tty_line_name(mask));
-    }
-    else
-    {
-        state |= mask;
-        tio_printf("Setting %s to LOW", tty_line_name(mask));
     }
 
     if (ioctl(fd, TIOCMSET, &state) < 0)

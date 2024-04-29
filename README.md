@@ -343,17 +343,12 @@ read(size, timeout)
 
       Returns number of bytes read on success, 0 on timeout, or -1 on error.
 
-exit(code)
-      Exit with exit code.
+set{line=state, ...}
+      Set state of one or multiple tty modem lines.
 
-high(line)
-      Set tty line high.
+      Line can be any of DTR, RTS, CTS, DSR, CD, RI
 
-low(line)
-      Set tty line low.
-
-toggle(line)
-      Toggle the tty line.
+      State is high, low, or toggle.
 
 sleep(seconds)
       Sleep for seconds.
@@ -361,18 +356,8 @@ sleep(seconds)
 msleep(ms)
       Sleep for miliseconds.
 
-config_high(line)
-      Set tty line state configuration to high.
-
-config_low(line)
-      Set tty line state configuration to low.
-
-apply_config()
-      Apply tty line state configuration. Using the line state configuration
-      API instead of high()/low() will help to make the lines physically switch as
-      simultaneously as possible. This may solve timing issues on some platforms.
-
-Note: Line can be any of DTR, RTS, CTS, DSR, CD, RI
+exit(code)
+      Exit with exit code.
 ```
 
 ### 3.4 Configuration file

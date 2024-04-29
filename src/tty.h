@@ -46,6 +46,13 @@ typedef struct
     char *description;
 } device_t;
 
+typedef struct
+{
+    int mask;
+    int value;
+    bool reserved;
+} tty_line_config_t;
+
 extern const char *device_name;
 extern bool interactive_mode;
 extern bool map_i_nl_cr;
@@ -60,9 +67,6 @@ void tty_wait_for_device(void);
 void list_serial_devices(void);
 void tty_input_thread_create(void);
 void tty_input_thread_wait_ready(void);
-void tty_line_set(int fd, int mask, bool value);
-void tty_line_toggle(int fd, int mask);
-void tty_line_config(int mask, bool value);
-void tty_line_config_apply(void);
+void tty_line_set(int fd, tty_line_config_t line_config[]);
 void tty_search(void);
 GList *tty_search_for_serial_devices(void);

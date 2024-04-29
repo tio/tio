@@ -1,7 +1,5 @@
-high(DTR)
-low(RTS)
+set{DTR=high, RTS=low}
 msleep(100)
-low(DTR)
-high(RTS)
+set{DTR=low, RTS=high}
 msleep(100)
-low(RTS)
+set{RTS=toggle}

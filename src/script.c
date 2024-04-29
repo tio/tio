@@ -45,8 +45,16 @@ static char circular_buffer[MAX_BUFFER_SIZE];
 static char match_string[MAX_BUFFER_SIZE];
 static int buffer_size = 0;
 
-static char init_script[] =
-"\n";
+static char script_init[] =
+"function set(arg)\n"
+"    local dtr = arg.DTR or -1\n"
+"    local rts = arg.RTS or -1\n"
+"    local cts = arg.CTS or -1\n"
+"    local dsr = arg.DSR or -1\n"
+"    local cd = arg.CD or -1\n"
+"    local ri = arg.RI or -1\n"
+"    line_set(dtr, rts, cts, dsr, cd, ri)\n"
+"end\n";
 
 // lua: sleep(seconds)
 static int sleep_(lua_State *L)
@@ -82,87 +90,56 @@ static int msleep(lua_State *L)
     return 0;
 }
 
-// lua: high(line)
-static int high(lua_State *L)
+// lua: line_set(dtr,rts,cts,dsr,cd,ri)
+static int line_set(lua_State *L)
 {
-    long line = lua_tointeger(L, 1);
+    tty_line_config_t line_config[6] = { };
 
-    if (line < 0)
+    int dtr = lua_tointeger(L, 1);
+    int rts = lua_tointeger(L, 2);
+    int cts = lua_tointeger(L, 3);
+    int dsr = lua_tointeger(L, 4);
+    int cd = lua_tointeger(L, 5);
+    int ri = lua_tointeger(L, 6);
+
+    if (dtr != -1)
     {
-        return 0;
+        line_config[0].mask = TIOCM_DTR;
+        line_config[0].value = dtr;
+        line_config[0].reserved = true;
+    }
+    if (rts != -1)
+    {
+        line_config[1].mask = TIOCM_RTS;
+        line_config[1].value = rts;
+        line_config[1].reserved = true;
+    }
+    if (cts != -1)
+    {
+        line_config[2].mask = TIOCM_CTS;
+        line_config[2].value = cts;
+        line_config[2].reserved = true;
+    }
+    if (dsr != -1)
+    {
+        line_config[3].mask = TIOCM_DSR;
+        line_config[3].value = dsr;
+        line_config[3].reserved = true;
+    }
+    if (cd != -1)
+    {
+        line_config[4].mask = TIOCM_CD;
+        line_config[4].value = cd;
+        line_config[4].reserved = true;
+    }
+    if (ri != -1)
+    {
+        line_config[5].mask = TIOCM_RI;
+        line_config[5].value = ri;
+        line_config[5].reserved = true;
     }
 
-    tty_line_set(device_fd, line, LINE_HIGH);
-
-    return 0;
-}
-
-// lua: low(line)
-static int low(lua_State *L)
-{
-    long line = lua_tointeger(L, 1);
-
-    if (line < 0)
-    {
-        return 0;
-    }
-
-    tty_line_set(device_fd, line, LINE_LOW);
-
-    return 0;
-}
-
-// lua: toggle(line)
-static int toggle(lua_State *L)
-{
-    long line = lua_tointeger(L, 1);
-
-    if (line < 0)
-    {
-        return 0;
-    }
-
-    tty_line_toggle(device_fd, line);
-
-    return 0;
-}
-
-// lua: config_high(line)
-static int config_high(lua_State *L)
-{
-    long line = lua_tointeger(L, 1);
-
-    if (line < 0)
-    {
-        return 0;
-    }
-
-    tty_line_config(line, true);
-
-    return 0;
-}
-
-// lua: config_low(line)
-static int config_low(lua_State *L)
-{
-    long line = lua_tointeger(L, 1);
-
-    if (line < 0)
-    {
-        return 0;
-    }
-
-    tty_line_config(line, false);
-
-    return 0;
-}
-
-// lua: config_apply(line)
-static int config_apply(lua_State *L)
-{
-    UNUSED(L);
-
-    tty_line_config_apply();
+    tty_line_set(device_fd, line_config);
 
     return 0;
 }
@@ -472,12 +449,7 @@ static const struct luaL_Reg tio_lib[] =
 {
     { "sleep", sleep_},
     { "msleep", msleep},
-    { "high", high},
-    { "low", low},
-    { "toggle", toggle},
-    { "config_high", config_high},
-    { "config_low", config_low},
-    { "config_apply", config_apply},
+    { "line_set", line_set},
     { "modem_send", modem_send},
     { "send", send},
     { "read", read_string},
@@ -506,11 +478,11 @@ static void luaL_setfuncs (lua_State *L, const luaL_Reg *l, int nup)
 }
 #endif
 
-static void load_init_script(lua_State *L)
+static void script_load(lua_State *L)
 {
     int error;
 
-    error = luaL_loadbuffer(L, init_script, strlen(init_script), "tio") || lua_pcall(L, 0, 0, 0);
+    error = luaL_loadbuffer(L, script_init, strlen(script_init), "tio") || lua_pcall(L, 0, 0, 0);
     if (error)
     {
         tio_error_print("%s\n", lua_tostring(L, -1));
@@ -525,7 +497,8 @@ int lua_register_tio(lua_State *L)
     luaL_setfuncs(L, tio_lib, 0);
     lua_pop(L, 1);
 
-    load_init_script(L);
+    // Load lua init script
+    script_load(L);
 
     return 0;
 }
@@ -554,12 +527,9 @@ void script_set_global(lua_State *L, const char *name, long value)
 
 void script_set_globals(lua_State *L)
 {
-    script_set_global(L, "DTR", TIOCM_DTR);
-    script_set_global(L, "RTS", TIOCM_RTS);
-    script_set_global(L, "CTS", TIOCM_CTS);
-    script_set_global(L, "DSR", TIOCM_DSR);
-    script_set_global(L, "CD", TIOCM_CD);
-    script_set_global(L, "RI", TIOCM_RI);
+    script_set_global(L, "toggle", 2);
+    script_set_global(L, "high", 1);
+    script_set_global(L, "low", 0);
     script_set_global(L, "XMODEM_CRC", XMODEM_CRC);
     script_set_global(L, "XMODEM_1K", XMODEM_1K);
     script_set_global(L, "YMODEM", YMODEM);
