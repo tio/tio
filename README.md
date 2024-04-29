@@ -348,6 +348,8 @@ read(size, timeout)
 
       Returns number of bytes read on success, 0 on timeout, or -1 on error.
 
+      On success, returns read string as second return value.
+
 set{line=state, ...}
       Set state of one or multiple tty modem lines.
 
