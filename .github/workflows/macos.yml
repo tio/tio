@@ -21,10 +21,10 @@ jobs:
 
     - name: Install dependencies
       run: |
-        brew install meson ninja pkg-config glib inih lua
+        brew install meson ninja inih lua
 
     - name: Build
       run: |
         meson setup build
         meson compile -C build --verbose
-        meson install -C build --verbose
+        meson install -C build
