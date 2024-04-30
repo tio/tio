@@ -1,0 +1,30 @@
+name: macOS build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        brew install meson ninja pkg-config glib inih lua
+
+    - name: Build
+      run: |
+        meson setup build
+        meson compile -C build --verbose
+        meson install -C build --verbose
