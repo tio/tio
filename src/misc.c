@@ -198,7 +198,11 @@ bool match_patterns(const char *string, const char *patterns)
     while (pattern != NULL)
     {
         // Check if the string matches the current pattern
-        if (fnmatch(pattern, string, FNM_EXTMATCH) == 0)
+        #ifdef FNM_EXTMATCH
+            if (fnmatch(pattern, string, FNM_EXTMATCH) == 0)
+        #else
+            if (fnmatch(pattern, string, 0) == 0)
+        #endif
         {
             free(patterns_copy);
             return true;
