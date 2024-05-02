@@ -676,7 +676,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                         tty_line_poke(device_fd, TIOCM_RI, line_mode, option.ri_pulse_duration);
                         break;
                     default:
-                        tio_warning_printf("Invalid line number");
+                        tio_error_print("Invalid line number");
                         break;
                 }
                 break;
@@ -704,6 +704,10 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                             tio_printf("Press any key to abort transfer");
                             tio_printf("%s", xymodem_send(device_fd, line, XMODEM_CRC) < 0 ? "Aborted" : "Done");
                         }
+                        break;
+
+                    default:
+                        tio_error_print("Invalid protocol option");
                         break;
                 }
                 break;
