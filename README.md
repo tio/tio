@@ -412,8 +412,8 @@ script-run = once
 color = 13
 
 [usb devices]
-pattern = usb([0-9]*)
-device = /dev/ttyUSB%s
+pattern = ^usb([0-9]*)
+device = /dev/ttyUSB%m1
 color = 14
 ```
 

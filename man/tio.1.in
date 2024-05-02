@@ -622,7 +622,7 @@ regular expressions:
 .nf
 .eo
 [usb device]
-pattern = usb([0-9]*)
+pattern = ^usb([0-9]*)
 device = /dev/ttyUSB%m1
 baudrate = 115200
 .ec

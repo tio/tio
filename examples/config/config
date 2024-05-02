@@ -56,8 +56,8 @@ log-strip = true
 color = 11
 
 [usb]
-pattern = usb([0-9]*)
-device = /dev/ttyUSB%s
+pattern = ^usb([0-9]*)
+device = /dev/ttyUSB%m1
 color = 12
 
 [rs-485-device]
