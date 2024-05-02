@@ -1332,19 +1332,19 @@ static bool is_serial_device(const char *format, ...)
         return false;
     }
 
-    if (stat(filename, &st) != 0)
+    fd = open(filename, O_RDONLY | O_NONBLOCK | O_NOCTTY);
+    if (fd == -1)
+    {
+        return false;
+    }
+
+    if (fstat(fd, &st) == -1)
     {
         return false;
     }
 
     // Make sure it is a character device
     if ((st.st_mode & S_IFMT) != S_IFCHR)
-    {
-        return false;
-    }
-
-    fd = open(filename, O_RDONLY | O_NONBLOCK | O_NOCTTY);
-    if (fd == -1)
     {
         return false;
     }
