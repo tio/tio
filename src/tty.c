@@ -2324,6 +2324,7 @@ int tty_connect(void)
                                         if (first_)
                                         {
                                             // Do nothing
+                                            first_ = false;
                                         }
                                         else
                                         {
@@ -2334,7 +2335,6 @@ int tty_connect(void)
                                             {
                                                 log_putc('\n');
                                             }
-                                            first_ = false;
                                         }
                                     }
                                 }
