@@ -21,7 +21,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        brew install meson ninja inih lua
+        brew install meson ninja lua
 
     - name: Build
       run: |

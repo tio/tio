@@ -21,7 +21,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo apt-get install -y bash-completion git meson libinih-dev liblua5.2-dev libglib2.0-dev
+        sudo apt-get install -y bash-completion git meson liblua5.2-dev libglib2.0-dev
 
     - name: Build
       run: |
