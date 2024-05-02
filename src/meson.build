@@ -37,9 +37,6 @@ endif
 tio_dep = [
   dependency('threads', required: true),
   dependency('glib-2.0', required: true),
-  dependency('inih', required: true,
-                     fallback : ['libinih', 'inih_dep'],
-                     default_options: ['default_library=static', 'distro_install=false']),
   lua_dep
 ]
 

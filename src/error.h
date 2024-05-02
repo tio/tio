@@ -21,6 +21,10 @@
 
 #pragma once
 
+#include <stdbool.h>
+
+extern bool error_normal;
+
 #define TIO_SUCCESS 0
 #define TIO_ERROR   1
 
@@ -28,3 +32,4 @@ void tio_error_printf(const char *format, ...);
 void tio_error_printf_silent(const char *format, ...);
 void error_exit(void);
 void error_enter_session_mode(void);
+void switch_error_output_mode(void);

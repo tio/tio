@@ -128,7 +128,7 @@ void rs485_print_config(void)
     tio_printf("  RTS_AFTER_SEND: %s", (rs485_config.flags & SER_RS485_RTS_AFTER_SEND) ? "high" : "low");
     tio_printf("  RTS_DELAY_BEFORE_SEND = %d", rs485_config.delay_rts_before_send);
     tio_printf("  RTS_DELAY_AFTER_SEND = %d", rs485_config.delay_rts_after_send);
-    tio_printf("  RX_DURING_TX: %s", (rs485_config.flags & SER_RS485_RX_DURING_TX) ? "enabled" : "disabled");
+    tio_printf("  RX_DURING_TX: %s", (rs485_config.flags & SER_RS485_RX_DURING_TX) ? "true" : "false");
 }
 
 int rs485_mode_enable(int fd)

@@ -158,7 +158,7 @@ bool map_ign_cr = false;
 
 char key_hit = 0xff;
 
-const char* device_name;
+const char* device_name = NULL;
 GList *device_list = NULL;
 static struct termios tio, tio_old, stdout_new, stdout_old, stdin_new, stdin_old;
 static unsigned long rx_total = 0, tx_total = 0;
@@ -1154,25 +1154,26 @@ void tty_configure(void)
     }
 
     /* Set flow control */
-    if (strcmp("hard", option.flow) == 0)
+    switch (option.flow)
     {
-        tio.c_cflag |= CRTSCTS;
-        tio.c_iflag &= ~(IXON | IXOFF | IXANY);
-    }
-    else if (strcmp("soft", option.flow) == 0)
-    {
-        tio.c_cflag &= ~CRTSCTS;
-        tio.c_iflag |= IXON | IXOFF;
-    }
-    else if (strcmp("none", option.flow) == 0)
-    {
-        tio.c_cflag &= ~CRTSCTS;
-        tio.c_iflag &= ~(IXON | IXOFF | IXANY);
-    }
-    else
-    {
-        tio_error_printf("Invalid flow control");
-        exit(EXIT_FAILURE);
+        case FLOW_NONE:
+            tio.c_cflag &= ~CRTSCTS;
+            tio.c_iflag &= ~(IXON | IXOFF | IXANY);
+            break;
+
+        case FLOW_HARD:
+            tio.c_cflag |= CRTSCTS;
+            tio.c_iflag &= ~(IXON | IXOFF | IXANY);
+            break;
+
+        case FLOW_SOFT:
+            tio.c_cflag &= ~CRTSCTS;
+            tio.c_iflag |= IXON | IXOFF;
+            break;
+
+        default:
+            tio_error_printf("Invalid flow control");
+            exit(EXIT_FAILURE);
     }
 
     /* Set stopbits */
@@ -1190,36 +1191,37 @@ void tty_configure(void)
     }
 
     /* Set parity */
-    if (strcmp("odd", option.parity) == 0)
+    switch (option.parity)
     {
-        tio.c_cflag |= PARENB;
-        tio.c_cflag |= PARODD;
-    }
-    else if (strcmp("even", option.parity) == 0)
-    {
-        tio.c_cflag |= PARENB;
-        tio.c_cflag &= ~PARODD;
-    }
-    else if (strcmp("none", option.parity) == 0)
-    {
-        tio.c_cflag &= ~PARENB;
-    }
-    else if ( strcmp("mark", option.parity) == 0)
-    {
-        tio.c_cflag |= PARENB;
-        tio.c_cflag |= PARODD;
-        tio.c_cflag |= CMSPAR;
-    }
-    else if ( strcmp("space", option.parity) == 0)
-    {
-        tio.c_cflag |= PARENB;
-        tio.c_cflag &= ~PARODD;
-        tio.c_cflag |= CMSPAR;
-    }
-    else
-    {
-        tio_error_printf("Invalid parity");
-        exit(EXIT_FAILURE);
+        case PARITY_NONE:
+            tio.c_cflag &= ~PARENB;
+            break;
+
+        case PARITY_ODD:
+            tio.c_cflag |= PARENB;
+            tio.c_cflag |= PARODD;
+            break;
+
+        case PARITY_EVEN:
+            tio.c_cflag |= PARENB;
+            tio.c_cflag &= ~PARODD;
+            break;
+
+        case PARITY_MARK:
+            tio.c_cflag |= PARENB;
+            tio.c_cflag |= PARODD;
+            tio.c_cflag |= CMSPAR;
+            break;
+
+        case PARITY_SPACE:
+            tio.c_cflag |= PARENB;
+            tio.c_cflag &= ~PARODD;
+            tio.c_cflag |= CMSPAR;
+            break;
+
+        default:
+            tio_error_printf("Invalid parity");
+            exit(EXIT_FAILURE);
     }
 
     /* Control, input, output, local modes for tty device */
@@ -1809,7 +1811,14 @@ void tty_search(void)
             return;
 
         case AUTO_CONNECT_DIRECT:
-            if (strlen(option.target) == TOPOLOGY_ID_SIZE)
+            if (config.device != NULL)
+            {
+                // Prioritize any found pattern first
+                device_name = config.device;
+
+                return;
+            }
+            else if (strlen(option.target) == TOPOLOGY_ID_SIZE)
             {
                 // Potential topology ID detected -> trigger device search
                 tty_search_for_serial_devices();
@@ -1827,6 +1836,12 @@ void tty_search(void)
                         return;
                     }
                 }
+            }
+
+            if (config.device != NULL)
+            {
+                device_name = config.device;
+                break;
             }
 
             // Fallback to using tty device provided via cmdline target

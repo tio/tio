@@ -54,22 +54,6 @@ void delay(long ms)
     nanosleep(&ts, NULL);
 }
 
-long string_to_long(char *string)
-{
-    long result;
-    char *end_token;
-
-    errno = 0;
-    result = strtol(string, &end_token, 10);
-    if ((errno != 0) || (*end_token != 0))
-    {
-        printf("Error: Invalid digit\n");
-        exit(EXIT_FAILURE);
-    }
-
-    return result;
-}
-
 int ctrl_key_code(unsigned char key)
 {
     if ((key >= 'a') && (key <= 'z'))

@@ -29,7 +29,5 @@ typedef enum
     ALERT_END,
 } alert_t;
 
-alert_t alert_option_parse(const char *arg);
 void alert_connect(void);
 void alert_disconnect(void);
-const char *alert_state_to_string(alert_t state);

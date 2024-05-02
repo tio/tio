@@ -87,10 +87,18 @@ extern char ansi_format[];
     { \
         if (print_tainted) \
         putchar('\n'); \
-        if (option.color < 0) \
-        fprintf (stdout, "\r[%s] Error: " format "\r\n", timestamp_current_time(), ## args); \
-        else \
-        ansi_printf("[%s] Error: " format, timestamp_current_time(), ## args); \
+        if (option.color < 0) { \
+            if (error_normal) \
+                fprintf (stdout, "Error: " format "\n", ## args); \
+            else \
+                fprintf (stdout, "\r[%s] Error: " format "\r\n", timestamp_current_time(), ## args); \
+        } \
+        else { \
+            if (error_normal) \
+            { ansi_printf("Error: " format, ## args); }\
+            else \
+            { ansi_printf("[%s] Error: " format, timestamp_current_time(), ## args); }\
+        } \
         print_tainted = false; \
     } \
 }

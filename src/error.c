@@ -35,6 +35,12 @@
 
 static char error[2][1000];
 static bool in_session = false;
+bool error_normal = true;
+
+void switch_error_output_mode(void)
+{
+    error_normal = false;
+}
 
 void error_enter_session_mode(void)
 {

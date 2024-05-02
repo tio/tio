@@ -32,5 +32,4 @@ typedef enum
 } timestamp_t;
 
 char *timestamp_current_time(void);
-const char* timestamp_state_to_string(timestamp_t timestamp);
-timestamp_t timestamp_option_parse(const char *arg);
+

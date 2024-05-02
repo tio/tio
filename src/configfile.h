@@ -22,6 +22,15 @@
 
 #pragma once
 
+struct config_t
+{
+    char *path;
+    char *active_group;
+    char *device;
+};
+
+extern struct config_t config;
+
 void config_file_print(void);
 void config_file_parse(void);
 void config_exit(void);

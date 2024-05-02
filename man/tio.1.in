@@ -623,7 +623,7 @@ regular expressions:
 .eo
 [usb device]
 pattern = usb([0-9]*)
-device = /dev/ttyUSB%s
+device = /dev/ttyUSB%m1
 baudrate = 115200
 .ec
 .fi
@@ -635,7 +635,7 @@ Activate the configuration profile by pattern match:
 $ tio usb12
 
 .TP
-Which is equivalent to:
+Which becomes equivalent to:
 
 $ tio -b 115200 /dev/ttyUSB12
 

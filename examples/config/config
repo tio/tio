@@ -15,22 +15,22 @@ databits = 8
 flow = none
 stopbits = 1
 parity = none
-prefix-ctrl-key = t
 output-delay = 0
 output-line-delay = 0
 auto-connect = direct
-no-reconnect = disable
+no-reconnect = false
+local-echo = false
 input-mode = normal
 output-mode = normal
-timestamp = disable
-log = disable
-log-append = disable
-log-strip = disable
-local-echo = disable
+timestamp = false
+log = false
+log-append = false
+log-strip = false
 color = bold
-rs-485 = disable
+rs-485 = false
 alert = none
 script-run = always
+prefix-ctrl-key = t
 
 # Configuration profiles
 
@@ -50,9 +50,9 @@ color = 10
 [tincan]
 baudrate = 9600
 device = /dev/serial/by-id/usb-TinCanTools_Flyswatter2_FS20000-if00-port0
-log = enable
+log = true
 log-file = tincan.log
-log-strip = enable
+log-strip = true
 color = 11
 
 [usb]
@@ -62,7 +62,7 @@ color = 12
 
 [rs-485-device]
 device = /dev/ttyUSB0
-rs-485 = enable
+rs-485 = true
 rs-485-config = RTS_ON_SEND=1,RTS_AFTER_SEND=1,RTS_DELAY_BEFORE_SEND=60,RTS_DELAY_AFTER_SEND=80,RX_DURING_TX
 color = 13
 
@@ -71,4 +71,3 @@ device = /dev/ttyUSB0
 color = 14
 script = high(DTR); low(RTS); msleep(100); low(DTR); high(RTS); msleep(100); low(RTS)
 script-run = always
-

@@ -385,7 +385,7 @@ Example configuration file:
 
 ```
 # Defaults
-baudrate = 9600
+baudrate = 115200
 databits = 8
 parity = none
 stopbits = 1
@@ -393,15 +393,15 @@ color = 10
 
 [rpi3]
 device = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
-baudrate = 115200
-no-reconnect = enable
-log = enable
+no-reconnect = true
+log = true
 log-file = rpi3.log
 line-pulse-duration = DTR=200,RTS=150
 color = 11
 
 [svf2]
 device = /dev/ttyUSB0
+baudrate = 9600
 script = expect("login: "); send("root\n"); expect("Password: "); send("root\n")
 color = 12
 

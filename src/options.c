@@ -20,6 +20,7 @@
  */
 
 #include "config.h"
+#include <assert.h>
 #include <regex.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -75,9 +76,9 @@ struct option_t option =
     .target = "",
     .baudrate = 115200,
     .databits = 8,
-    .flow = "none",
+    .flow = FLOW_NONE,
     .stopbits = 1,
-    .parity = "none",
+    .parity = PARITY_NONE,
     .output_delay = 0,
     .output_line_delay = 0,
     .dtr_pulse_duration = 100,
@@ -121,7 +122,7 @@ struct option_t option =
     .vt100 = false,
 };
 
-void print_help(char *argv[])
+void option_print_help(char *argv[])
 {
     UNUSED(argv);
 
@@ -173,7 +174,270 @@ void print_help(char *argv[])
     printf("See the man page for more details.\n");
 }
 
-const char *auto_connect_state_to_string(auto_connect_t strategy)
+int option_string_to_integer(const char *string, int *value, const char *desc, int min, int max)
+{
+    int val;
+    char *end_token;
+
+    errno = 0;
+    val = strtol(string, &end_token, 10);
+    if ((errno != 0) || (*end_token != 0))
+    {
+        if (desc != NULL)
+        {
+            tio_error_print("Invalid %s '%s'", desc, string);
+            exit(EXIT_FAILURE);
+        }
+        else
+        {
+            tio_error_print("Invalid digit '%s'", string);
+            exit(EXIT_FAILURE);
+        }
+        return -1;
+    }
+    else
+    {
+        if ((val < min) || (val > max))
+        {
+            if (desc != NULL)
+            {
+                tio_error_print("Invalid %s '%s'", desc, string);
+                exit(EXIT_FAILURE);
+            }
+            else
+            {
+                tio_error_print("Invalid digit '%s'", string);
+                exit(EXIT_FAILURE);
+            }
+            return -1;
+        }
+        else
+        {
+            *value = val;
+        }
+    }
+
+    return 0;
+}
+
+void option_parse_flow(const char *arg, flow_t *flow)
+{
+    assert(arg != NULL);
+
+    /* Parse flow control */
+    if (strcmp("hard", arg) == 0)
+    {
+        *flow = FLOW_HARD;
+    }
+    else if (strcmp("soft", arg) == 0)
+    {
+        *flow = FLOW_SOFT;
+    }
+    else if (strcmp("none", arg) == 0)
+    {
+        *flow = FLOW_NONE;
+    }
+    else
+    {
+        tio_error_print("Invalid flow control '%s'", arg);
+        exit(EXIT_FAILURE);
+    }
+}
+
+const char *option_flow_to_string(flow_t flow)
+{
+    switch (flow)
+    {
+        case FLOW_NONE:
+            return "none";
+        case FLOW_HARD:
+            return "hard";
+        case FLOW_SOFT:
+            return "soft";
+        default:
+            return "unknown";
+    }
+}
+
+void option_parse_parity(const char *arg, parity_t *parity)
+{
+    assert(arg != NULL);
+
+    if (strcmp("none", arg) == 0)
+    {
+        *parity = PARITY_NONE;
+    }
+    else if (strcmp("odd", arg) == 0)
+    {
+        *parity = PARITY_ODD;
+    }
+    else if (strcmp("even", arg) == 0)
+    {
+        *parity = PARITY_EVEN;
+    }
+    else if (strcmp("mark", arg) == 0)
+    {
+        *parity = PARITY_MARK;
+    }
+    else if (strcmp("space", arg) == 0)
+    {
+        *parity = PARITY_SPACE;
+    }
+    else
+    {
+        tio_error_print("Invalid parity '%s'", arg);
+        exit(EXIT_FAILURE);
+    }
+}
+
+const char *option_parity_to_string(parity_t parity)
+{
+    switch (parity)
+    {
+        case PARITY_NONE:
+            return "none";
+        case PARITY_ODD:
+            return "odd";
+        case PARITY_EVEN:
+            return "even";
+        case PARITY_MARK:
+            return "mark";
+        case PARITY_SPACE:
+            return "space";
+        default:
+            return "unknown";
+    }
+}
+
+void option_parse_color(const char *arg, int *color)
+{
+    int value;
+
+    assert(arg != NULL);
+
+    if (strcmp(optarg, "list") == 0)
+    {
+        // Print available color codes
+        printf("Available color codes:\n");
+        for (int i=0; i<=255; i++)
+        {
+            printf(" \e[1;38;5;%dmThis is color code %d\e[0m\n", i, i);
+        }
+        exit(EXIT_SUCCESS);
+    }
+    else if (strcmp(arg, "none") == 0)
+    {
+        *color = -1; // No color
+    }
+    else if (strcmp(arg, "bold") == 0)
+    {
+        *color = 256; // Bold
+    }
+    else
+    {
+        if (option_string_to_integer(arg, &value, "color code", 0, 255) == 0)
+        {
+            *color = value;
+        }
+    }
+}
+
+void option_parse_alert(const char *arg, alert_t *alert)
+{
+    assert(arg != NULL);
+
+    if (strcmp(arg, "none") == 0)
+    {
+        *alert = ALERT_NONE;
+    }
+    else if (strcmp(arg, "bell") == 0)
+    {
+        *alert = ALERT_BELL;
+    }
+    else if (strcmp(arg, "blink") == 0)
+    {
+        *alert = ALERT_BLINK;
+    }
+    else
+    {
+        tio_error_print("Invalid alert '%s'", arg);
+        exit(EXIT_FAILURE);
+    }
+}
+
+const char* option_timestamp_format_to_string(timestamp_t timestamp)
+{
+    switch (timestamp)
+    {
+        case TIMESTAMP_NONE:
+            return "none";
+            break;
+
+        case TIMESTAMP_24HOUR:
+            return "24hour";
+            break;
+
+        case TIMESTAMP_24HOUR_START:
+            return "24hour-start";
+            break;
+
+        case TIMESTAMP_24HOUR_DELTA:
+            return "24hour-delta";
+            break;
+
+        case TIMESTAMP_ISO8601:
+            return "iso8601";
+            break;
+
+        default:
+            return "unknown";
+            break;
+    }
+}
+
+void option_parse_timestamp(const char *arg, timestamp_t *timestamp)
+{
+    assert(arg != NULL);
+
+    if (strcmp(arg, "24hour") == 0)
+    {
+        *timestamp = TIMESTAMP_24HOUR;
+    }
+    else if (strcmp(arg, "24hour-start") == 0)
+    {
+        *timestamp = TIMESTAMP_24HOUR_START;
+    }
+    else if (strcmp(arg, "24hour-delta") == 0)
+    {
+        *timestamp = TIMESTAMP_24HOUR_DELTA;
+    }
+    else if (strcmp(arg, "iso8601") == 0)
+    {
+        *timestamp = TIMESTAMP_ISO8601;
+    }
+    else
+    {
+        tio_error_print("Invalid timestamp '%s'", arg);
+        exit(EXIT_FAILURE);
+    }
+}
+
+const char *option_alert_state_to_string(alert_t state)
+{
+    switch (state)
+    {
+        case ALERT_NONE:
+            return "none";
+        case ALERT_BELL:
+            return "bell";
+        case ALERT_BLINK:
+            return "blink";
+        default:
+            return "unknown";
+    }
+}
+
+const char *option_auto_connect_state_to_string(auto_connect_t strategy)
 {
     switch (strategy)
     {
@@ -184,38 +448,43 @@ const char *auto_connect_state_to_string(auto_connect_t strategy)
         case AUTO_CONNECT_LATEST:
             return "latest";
         default:
-            return "Unknown";
+            return "unknown";
     }
 }
 
-auto_connect_t auto_connect_option_parse(const char *arg)
+void option_parse_auto_connect(const char *arg, auto_connect_t *auto_connect)
 {
-    auto_connect_t auto_connect = option.auto_connect; // Default
+    assert(arg != NULL);
 
     if (arg != NULL)
     {
         if (strcmp(arg, "direct") == 0)
         {
-            return AUTO_CONNECT_DIRECT;
+            *auto_connect = AUTO_CONNECT_DIRECT;
         }
         else if (strcmp(arg, "new") == 0)
         {
-            return AUTO_CONNECT_NEW;
+            *auto_connect = AUTO_CONNECT_NEW;
         }
         else if (strcmp(arg, "latest") == 0)
         {
-            return AUTO_CONNECT_LATEST;
+            *auto_connect = AUTO_CONNECT_LATEST;
+        }
+        else
+        {
+            tio_error_print("Invalid auto-connect strategy '%s'", arg);
+            exit(EXIT_FAILURE);
         }
     }
-
-    return auto_connect;
 }
 
-void line_pulse_duration_option_parse(const char *arg)
+void option_parse_line_pulse_duration(const char *arg)
 {
     bool token_found = true;
     char *token = NULL;
     char *buffer = strdup(arg);
+
+    assert(arg != NULL);
 
     while (token_found == true)
     {
@@ -259,6 +528,11 @@ void line_pulse_duration_option_parse(const char *arg)
                 {
                     option.ri_pulse_duration = value;
                 }
+                else
+                {
+                    tio_error_print("Invalid line '%s'", keyname);
+                    exit(EXIT_FAILURE);
+                }
             }
             else
             {
@@ -274,7 +548,7 @@ void line_pulse_duration_option_parse(const char *arg)
 }
 
 // Function to parse the input string
-int parse_hexN_string(const char *input_string)
+int option_parse_hexN_string(const char *input_string)
 {
     regmatch_t match[2]; // One for entire match, one for the optional N
     int n_value = 0;
@@ -285,7 +559,7 @@ int parse_hexN_string(const char *input_string)
     ret = regcomp(&regex, "^hex([0-9]+)?$", REG_EXTENDED);
     if (ret)
     {
-        tio_error_printf("Could not compile regex\n");
+        tio_error_print("Could not compile regex");
         exit(EXIT_FAILURE);
     }
 
@@ -319,7 +593,7 @@ int parse_hexN_string(const char *input_string)
     {
         char msgbuf[100];
         regerror(ret, &regex, msgbuf, sizeof(msgbuf));
-        tio_error_printf("Regex match failed: %s\n", msgbuf);
+        tio_error_print("Regex match failed: %s", msgbuf);
         exit(EXIT_FAILURE);
     }
 
@@ -328,48 +602,52 @@ int parse_hexN_string(const char *input_string)
     return n_value;
 }
 
-input_mode_t input_mode_option_parse(const char *arg)
+void option_parse_input_mode(const char *arg, input_mode_t *mode)
 {
+    assert(arg != NULL);
+
     if (strcmp("normal", arg) == 0)
     {
-        return INPUT_MODE_NORMAL;
+        *mode = INPUT_MODE_NORMAL;
     }
     else if (strcmp("hex", arg) == 0)
     {
-        return INPUT_MODE_HEX;
+        *mode = INPUT_MODE_HEX;
     }
     else if (strcmp("line", arg) == 0)
     {
-        return INPUT_MODE_LINE;
+        *mode = INPUT_MODE_LINE;
     }
     else
     {
-        tio_error_printf("Invalid input mode option");
+        tio_error_print("Invalid input mode '%s'", arg);
         exit(EXIT_FAILURE);
     }
 }
 
-output_mode_t output_mode_option_parse(const char *arg)
+void option_parse_output_mode(const char *arg, output_mode_t *mode)
 {
     int n = 0;
 
+    assert(arg != NULL);
+
     if (strcmp("normal", arg) == 0)
     {
-        return OUTPUT_MODE_NORMAL;
+        *mode = OUTPUT_MODE_NORMAL;
     }
-    else if ((n = parse_hexN_string(arg)) != -1)
+    else if ((n = option_parse_hexN_string(arg)) != -1)
     {
         option.hex_n_value = n;
-        return OUTPUT_MODE_HEX;
+        *mode = OUTPUT_MODE_HEX;
     }
     else
     {
-        tio_error_printf("Invalid output mode option");
+        tio_error_print("Invalid output mode '%s'", arg);
         exit(EXIT_FAILURE);
     }
 }
 
-const char *input_mode_by_string(input_mode_t mode)
+const char *option_input_mode_to_string(input_mode_t mode)
 {
     switch (mode)
     {
@@ -386,7 +664,7 @@ const char *input_mode_by_string(input_mode_t mode)
     return NULL;
 }
 
-const char *output_mode_by_string(output_mode_t mode)
+const char *option_output_mode_to_string(output_mode_t mode)
 {
     switch (mode)
     {
@@ -401,23 +679,25 @@ const char *output_mode_by_string(output_mode_t mode)
     return NULL;
 }
 
-script_run_t script_run_option_parse(const char *arg)
+void option_parse_script_run(const char *arg, script_run_t *script_run)
 {
+    assert(arg != NULL);
+
     if (strcmp("once", arg) == 0)
     {
-        return SCRIPT_RUN_ONCE;
+        *script_run = SCRIPT_RUN_ONCE;
     }
     else if (strcmp("always", arg) == 0)
     {
-        return SCRIPT_RUN_ALWAYS;
+        *script_run = SCRIPT_RUN_ALWAYS;
     }
     else if (strcmp("never", arg) == 0)
     {
-        return SCRIPT_RUN_NEVER;
+        *script_run = SCRIPT_RUN_NEVER;
     }
     else
     {
-        tio_error_printf("Invalid script run option");
+        tio_error_print("Invalid script run option '%s'", arg);
         exit(EXIT_FAILURE);
     }
 }
@@ -427,25 +707,25 @@ void options_print()
     tio_printf(" Device: %s", device_name);
     tio_printf(" Baudrate: %u", option.baudrate);
     tio_printf(" Databits: %d", option.databits);
-    tio_printf(" Flow: %s", option.flow);
+    tio_printf(" Flow: %s", option_flow_to_string(option.flow));
     tio_printf(" Stopbits: %d", option.stopbits);
-    tio_printf(" Parity: %s", option.parity);
-    tio_printf(" Local echo: %s", option.local_echo ? "enabled" : "disabled");
-    tio_printf(" Timestamp: %s", timestamp_state_to_string(option.timestamp));
+    tio_printf(" Parity: %s", option_parity_to_string(option.parity));
+    tio_printf(" Local echo: %s", option.local_echo ? "true" : "false");
+    tio_printf(" Timestamp: %s", option_timestamp_format_to_string(option.timestamp));
     tio_printf(" Timestamp timeout: %u", option.timestamp_timeout);
     tio_printf(" Output delay: %d", option.output_delay);
     tio_printf(" Output line delay: %d", option.output_line_delay);
-    tio_printf(" Automatic connect strategy: %s", auto_connect_state_to_string(option.auto_connect));
-    tio_printf(" Automatic reconnect: %s", option.no_reconnect ? "disabled" : "enabled");
+    tio_printf(" Automatic connect strategy: %s", option_auto_connect_state_to_string(option.auto_connect));
+    tio_printf(" Automatic reconnect: %s", option.no_reconnect ? "true" : "false");
     tio_printf(" Pulse duration: DTR=%d RTS=%d CTS=%d DSR=%d DCD=%d RI=%d", option.dtr_pulse_duration,
                                                                             option.rts_pulse_duration,
                                                                             option.cts_pulse_duration,
                                                                             option.dsr_pulse_duration,
                                                                             option.dcd_pulse_duration,
                                                                             option.ri_pulse_duration);
-    tio_printf(" Input mode: %s", input_mode_by_string(option.input_mode));
-    tio_printf(" Output mode: %s", output_mode_by_string(option.output_mode));
-    tio_printf(" Alert: %s", alert_state_to_string(option.alert));
+    tio_printf(" Input mode: %s", option_input_mode_to_string(option.input_mode));
+    tio_printf(" Output mode: %s", option_output_mode_to_string(option.output_mode));
+    tio_printf(" Alert: %s", option_alert_state_to_string(option.alert));
     if (option.map[0] != 0)
     {
         tio_printf(" Map flags: %s", option.map);
@@ -457,8 +737,8 @@ void options_print()
         {
             tio_printf(" Log file directory: %s", option.log_directory);
         }
-        tio_printf(" Log append: %s", option.log_append ? "enabled" : "disabled");
-        tio_printf(" Log strip: %s", option.log_strip ? "enabled" : "disabled");
+        tio_printf(" Log append: %s", option.log_append ? "true" : "false");
+        tio_printf(" Log strip: %s", option.log_strip ? "true" : "false");
     }
     if (option.socket)
     {
@@ -477,7 +757,7 @@ void options_parse(int argc, char *argv[])
 
     if (argc == 1)
     {
-        print_help(argv);
+        option_print_help(argv);
         exit(EXIT_SUCCESS);
     }
 
@@ -563,39 +843,39 @@ void options_parse(int argc, char *argv[])
                 break;
 
             case 'b':
-                option.baudrate = string_to_long(optarg);
+                option_string_to_integer(optarg, &option.baudrate, "baudrate", 0, INT_MAX);
                 break;
 
             case 'd':
-                option.databits = string_to_long(optarg);
+                option_string_to_integer(optarg, &option.databits, "databits", 5, 8);
                 break;
 
             case 'f':
-                option.flow = optarg;
+                option_parse_flow(optarg, &option.flow);
                 break;
 
             case 's':
-                option.stopbits = string_to_long(optarg);
+                option_string_to_integer(optarg, &option.stopbits, "stopbits", 1, 2);
                 break;
 
             case 'p':
-                option.parity = optarg;
+                option_parse_parity(optarg, &option.parity);
                 break;
 
             case 'o':
-                option.output_delay = string_to_long(optarg);
+                option_string_to_integer(optarg, &option.output_delay, "output delay", 0, INT_MAX);
                 break;
 
             case 'O':
-                option.output_line_delay = string_to_long(optarg);
+                option_string_to_integer(optarg, &option.output_line_delay, "output line delay", 0, INT_MAX);
                 break;
 
             case OPT_LINE_PULSE_DURATION:
-                line_pulse_duration_option_parse(optarg);
+                option_parse_line_pulse_duration(optarg);
                 break;
 
             case 'a':
-                option.auto_connect = auto_connect_option_parse(optarg);
+                option_parse_auto_connect(optarg, &option.auto_connect);
                 break;
 
             case OPT_EXCLUDE_DEVICES:
@@ -623,11 +903,11 @@ void options_parse(int argc, char *argv[])
                 break;
 
             case OPT_TIMESTAMP_FORMAT:
-                option.timestamp = timestamp_option_parse(optarg);
+                option_parse_timestamp(optarg, &option.timestamp);
                 break;
 
             case OPT_TIMESTAMP_TIMEOUT:
-                option.timestamp_timeout = string_to_long(optarg);
+                option_string_to_integer(optarg, &option.timestamp_timeout, "timestamp timeout", 0, INT_MAX);
                 break;
 
             case 'L':
@@ -664,41 +944,15 @@ void options_parse(int argc, char *argv[])
                 break;
 
             case 'c':
-                if (!strcmp(optarg, "list"))
-                {
-                    // Print available color codes
-                    printf("Available color codes:\n");
-                    for (int i=0; i<=255; i++)
-                    {
-                        printf(" \e[1;38;5;%dmThis is color code %d\e[0m\n", i, i);
-                    }
-                    exit(EXIT_SUCCESS);
-                }
-                else if (!strcmp(optarg, "none"))
-                {
-                    option.color = -1; // No color
-                    break;
-                }
-                else if (!strcmp(optarg, "bold"))
-                {
-                    option.color = 256; // Bold
-                    break;
-                }
-
-                option.color = string_to_long(optarg);
-                if ((option.color < 0) || (option.color > 255))
-                {
-                    tio_error_printf("Invalid color code");
-                    exit(EXIT_FAILURE);
-                }
+                option_parse_color(optarg, &option.color);
                 break;
 
             case OPT_INPUT_MODE:
-                option.input_mode = input_mode_option_parse(optarg);
+                option_parse_input_mode(optarg, &option.input_mode);
                 break;
 
             case OPT_OUTPUT_MODE:
-                option.output_mode = output_mode_option_parse(optarg);
+                option_parse_output_mode(optarg, &option.output_mode);
                 break;
 
             case OPT_RS485:
@@ -710,7 +964,7 @@ void options_parse(int argc, char *argv[])
                 break;
 
             case OPT_ALERT:
-                option.alert = alert_option_parse(optarg);
+                option_parse_alert(optarg, &option.alert);
                 break;
 
             case OPT_MUTE:
@@ -726,7 +980,7 @@ void options_parse(int argc, char *argv[])
                 break;
 
             case OPT_SCRIPT_RUN:
-                option.script_run = script_run_option_parse(optarg);
+                option_parse_script_run(optarg, &option.script_run);
                 break;
 
             case 'v':
@@ -735,7 +989,7 @@ void options_parse(int argc, char *argv[])
                 break;
 
             case 'h':
-                print_help(argv);
+                option_print_help(argv);
                 exit(EXIT_SUCCESS);
                 break;
 
@@ -775,7 +1029,7 @@ void options_parse(int argc, char *argv[])
 
     if (strlen(option.target) == 0)
     {
-        tio_error_printf("Missing tty device, profile or topology ID");
+        tio_error_print("Missing tty device, profile or topology ID");
         exit(EXIT_FAILURE);
     }
 
@@ -794,9 +1048,6 @@ void options_parse(int argc, char *argv[])
 
 void options_parse_final(int argc, char *argv[])
 {
-    /* Preserve target which may have been set by configuration file */
-    const char *target = option.target;
-
     /* Do 2nd pass to override settings set by configuration file */
     optind = 1; // Reset option index to restart scanning of argv
     options_parse(argc, argv);
@@ -804,16 +1055,13 @@ void options_parse_final(int argc, char *argv[])
 #ifdef __CYGWIN__
     unsigned char portnum;
     char *tty_win;
-    if ( ((strncmp("COM", target, 3) == 0)
-        || (strncmp("com", target, 3) == 0) )
-        && (sscanf(target + 3, "%hhu", &portnum) == 1)
+    if ( ((strncmp("COM", option.target, 3) == 0)
+        || (strncmp("com", option.target, 3) == 0) )
+        && (sscanf(option.target + 3, "%hhu", &portnum) == 1)
         && (portnum > 0) ) 
     {
         asprintf(&tty_win, "/dev/ttyS%hhu", portnum - 1);
-        target = tty_win;
+        option.target = tty_win;
     }
 #endif
-
-    /* Restore target */
-    option.target = target;
 }

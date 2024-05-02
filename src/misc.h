@@ -27,10 +27,7 @@
 #define UNUSED(expr) do { (void)(expr); } while (0)
 
 void delay(long ms);
-long string_to_long(char *string);
 int ctrl_key_code(unsigned char key);
-void alert_connect(void);
-void alert_disconnect(void);
 bool regex_match(const char *string, const char *pattern);
 unsigned long djb2_hash(const unsigned char *str);
 char *base62_encode(unsigned long num);

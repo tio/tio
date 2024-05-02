@@ -49,20 +49,20 @@ typedef enum
 /* Options */
 struct option_t
 {
-    const char *target;
-    unsigned int baudrate;
+    char *target;
+    int baudrate;
     int databits;
-    char *flow;
+    flow_t flow;
     int stopbits;
-    char *parity;
+    parity_t parity;
     int output_delay;
     int output_line_delay;
-    unsigned int dtr_pulse_duration;
-    unsigned int rts_pulse_duration;
-    unsigned int cts_pulse_duration;
-    unsigned int dsr_pulse_duration;
-    unsigned int dcd_pulse_duration;
-    unsigned int ri_pulse_duration;
+    int dtr_pulse_duration;
+    int rts_pulse_duration;
+    int cts_pulse_duration;
+    int dsr_pulse_duration;
+    int dcd_pulse_duration;
+    int ri_pulse_duration;
     bool no_reconnect;
     auto_connect_t auto_connect;
     bool log;
@@ -70,15 +70,15 @@ struct option_t
     bool log_strip;
     bool local_echo;
     timestamp_t timestamp;
-    const char *log_filename;
-    const char *log_directory;
-    const char *map;
-    const char *socket;
+    char *log_filename;
+    char *log_directory;
+    char *map;
+    char *socket;
     int color;
     input_mode_t input_mode;
     output_mode_t output_mode;
-    unsigned char prefix_code;
-    unsigned char prefix_key;
+    char prefix_code;
+    char prefix_key;
     bool prefix_enabled;
     bool mute;
     bool rs485;
@@ -87,13 +87,13 @@ struct option_t
     int32_t rs485_delay_rts_after_send;
     alert_t alert;
     bool complete_profiles;
-    const char *script;
-    const char *script_filename;
+    char *script;
+    char *script_filename;
     script_run_t script_run;
-    unsigned int timestamp_timeout;
-    const char *exclude_devices;
-    const char *exclude_drivers;
-    const char *exclude_tids;
+    int timestamp_timeout;
+    char *exclude_devices;
+    char *exclude_drivers;
+    char *exclude_tids;
     int hex_n_value;
     bool vt100;
 };
@@ -104,10 +104,20 @@ void options_print();
 void options_parse(int argc, char *argv[]);
 void options_parse_final(int argc, char *argv[]);
 
-void line_pulse_duration_option_parse(const char *arg);
-script_run_t script_run_option_parse(const char *arg);
+int option_string_to_integer(const char *string, int *value, const char *desc, int min, int max);
 
-input_mode_t input_mode_option_parse(const char *arg);
-output_mode_t output_mode_option_parse(const char *arg);
-auto_connect_t auto_connect_option_parse(const char *arg);
-const char *auto_connect_state_to_string(auto_connect_t strategy);
+void option_parse_flow(const char *arg, flow_t *flow);
+void option_parse_parity(const char *arg, parity_t *parity);
+
+void option_parse_output_mode(const char *arg, output_mode_t *mode);
+void option_parse_input_mode(const char *arg, input_mode_t *mode);
+
+void option_parse_line_pulse_duration(const char *arg);
+void option_parse_script_run(const char *arg, script_run_t *script_run);
+void option_parse_alert(const char *arg, alert_t *alert);
+
+void option_parse_auto_connect(const char *arg, auto_connect_t *auto_connect);
+const char *option_auto_connect_state_to_string(auto_connect_t strategy);
+
+void option_parse_timestamp(const char *arg, timestamp_t *timestamp);
+const char* option_timestamp_format_to_string(timestamp_t timestamp);

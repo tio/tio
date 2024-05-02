@@ -71,6 +71,9 @@ int main(int argc, char *argv[])
         interactive_mode = false;
     }
 
+    /* Switch error output format */
+    switch_error_output_mode();
+
     /* Configure output terminal */
     if (isatty(fileno(stdout)))
     {

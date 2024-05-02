@@ -29,29 +29,6 @@
 #include "print.h"
 #include "options.h"
 
-alert_t alert_option_parse(const char *arg)
-{
-    alert_t alert = option.alert; // Default
-
-    if (arg != NULL)
-    {
-        if (strcmp(arg, "none") == 0)
-        {
-            return ALERT_NONE;
-        }
-        else if (strcmp(arg, "bell") == 0)
-        {
-            return ALERT_BELL;
-        }
-        else if (strcmp(arg, "blink") == 0)
-        {
-            return ALERT_BLINK;
-        }
-    }
-
-    return alert;
-}
-
 void blink_background(void)
 {
     // Turn on reverse video
@@ -107,20 +84,5 @@ void alert_disconnect(void)
             break;
         default:
             break;
-    }
-}
-
-const char *alert_state_to_string(alert_t state)
-{
-    switch (state)
-    {
-        case ALERT_NONE:
-            return "none";
-        case ALERT_BELL:
-            return "bell";
-        case ALERT_BLINK:
-            return "blink";
-        default:
-            return "Unknown";
     }
 }

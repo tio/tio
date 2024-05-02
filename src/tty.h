@@ -31,6 +31,22 @@
 
 typedef enum
 {
+    FLOW_NONE,
+    FLOW_HARD,
+    FLOW_SOFT,
+} flow_t;
+
+typedef enum
+{
+    PARITY_NONE,
+    PARITY_ODD,
+    PARITY_EVEN,
+    PARITY_MARK,
+    PARITY_SPACE,
+} parity_t;
+
+typedef enum
+{
     AUTO_CONNECT_DIRECT,
     AUTO_CONNECT_NEW,
     AUTO_CONNECT_LATEST,
