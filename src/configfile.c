@@ -385,6 +385,7 @@ void config_file_show_profiles(void)
         {
             continue;
         }
+        printf("%s ", group[i]);
     }
 
     g_strfreev(group);
