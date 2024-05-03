@@ -389,7 +389,7 @@ TTY device to connect to and other options.
 Example configuration file:
 
 ```
-# Defaults
+[default]
 baudrate = 115200
 databits = 8
 parity = none

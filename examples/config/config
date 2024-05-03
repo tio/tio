@@ -9,7 +9,7 @@
 #  $HOME/.config/tio/config
 #  $HOME/.tioconfig
 
-# Defaults
+[default]
 baudrate = 115200
 databits = 8
 flow = none
@@ -69,5 +69,5 @@ color = 13
 [esp32]
 device = /dev/ttyUSB0
 color = 14
-script = high(DTR); low(RTS); msleep(100); low(DTR); high(RTS); msleep(100); low(RTS)
+script = set{DTR=high,RTS=low}; msleep(100); set{DTR=low,RTS=high}; msleep(100); set{RTS=low}
 script-run = always
