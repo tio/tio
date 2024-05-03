@@ -1817,12 +1817,17 @@ void tty_search(void)
         case AUTO_CONNECT_DIRECT:
             if (config.device != NULL)
             {
-                // Prioritize any found pattern first
+                // Prioritize any device result of the configuration file first
+                // Meaning a pattern or section/group have been matched the cmdline target.
                 device_name = config.device;
-
-                return;
             }
-            else if (strlen(option.target) == TOPOLOGY_ID_SIZE)
+            else
+            {
+                // Fallback to use the target direcly
+                device_name = option.target;
+            }
+
+            if (strlen(device_name) == TOPOLOGY_ID_SIZE)
             {
                 // Potential topology ID detected -> trigger device search
                 tty_search_for_serial_devices();
@@ -1832,7 +1837,7 @@ void tty_search(void)
                 {
                     device = (device_t *) iter->data;
 
-                    if (strcmp(device->tid, option.target) == 0)
+                    if (strcmp(device->tid, device_name) == 0)
                     {
                         // Topology ID match found -> use corresponding device name
                         device_name = device->path;
@@ -1841,15 +1846,6 @@ void tty_search(void)
                     }
                 }
             }
-
-            if (config.device != NULL)
-            {
-                device_name = config.device;
-                break;
-            }
-
-            // Fallback to using tty device provided via cmdline target
-            device_name = option.target;
             break;
 
         default:
