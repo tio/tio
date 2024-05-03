@@ -5,6 +5,8 @@
 
 Changes since tio v3.0:
 
+ * List available profiles in --list output
+
  * Always message when saving log file
 
  * Add support for using TID as device in config file
