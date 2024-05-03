@@ -647,7 +647,7 @@ void config_list_targets(void)
         {
             continue;
         }
-        printf("%-20s ", group[i]);
+        printf("%-19s ", group[i]);
         if (j++ % 4 == 0)
         {
             putchar('\n');
