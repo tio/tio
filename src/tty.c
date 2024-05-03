@@ -68,24 +68,19 @@
 /* tty device listing configuration */
 
 #if defined(__linux__)
-#define PATH_SERIAL_DEVICES "/dev/serial/by-id/"
-#define PATH_SERIAL_DEVICES_BY_PATH "/dev/serial/by-path/"
-#define PREFIX_TTY_DEVICES ""
+#define PATH_SERIAL_DEVICES "/dev"
+#define PATH_SERIAL_DEVICES_BY_ID "/dev/serial/by-id"
+#define PATH_SERIAL_DEVICES_BY_PATH "/dev/serial/by-path"
 #elif defined(__FreeBSD__)
-#define PATH_SERIAL_DEVICES "/dev/"
-#define PREFIX_TTY_DEVICES "cua"
+#define PATH_SERIAL_DEVICES "/dev"
 #elif defined(__APPLE__)
-#define PATH_SERIAL_DEVICES "/dev/"
-#define PREFIX_TTY_DEVICES "tty."
+#define PATH_SERIAL_DEVICES "/dev"
 #elif defined(__CYGWIN__)
-#define PATH_SERIAL_DEVICES "/dev/"
-#define PREFIX_TTY_DEVICES "ttyS"
+#define PATH_SERIAL_DEVICES "/dev"
 #elif defined(__HAIKU__)
-#define PATH_SERIAL_DEVICES "/dev/ports/"
-#define PREFIX_TTY_DEVICES ""
+#define PATH_SERIAL_DEVICES "/dev/ports"
 #else
-#define PATH_SERIAL_DEVICES "/dev/"
-#define PREFIX_TTY_DEVICES "tty"
+#define PATH_SERIAL_DEVICES "/dev"
 #endif
 
 #ifndef CMSPAR
@@ -1375,7 +1370,8 @@ error:
 
 static void list_serial_devices_by_id(void)
 {
-    DIR *d = opendir(PATH_SERIAL_DEVICES);
+#ifdef PATH_SERIAL_DEVICES_BY_ID
+    DIR *d = opendir(PATH_SERIAL_DEVICES_BY_ID);
     if (d)
     {
         struct dirent *dir;
@@ -1387,23 +1383,20 @@ static void list_serial_devices_by_id(void)
         {
             if ((strcmp(dir->d_name, ".")) && (strcmp(dir->d_name, "..")))
             {
-                if (!strncmp(dir->d_name, PREFIX_TTY_DEVICES, sizeof(PREFIX_TTY_DEVICES) - 1))
+                if (is_serial_device("%s/%s", PATH_SERIAL_DEVICES_BY_ID, dir->d_name))
                 {
-                    if (is_serial_device("%s%s", PATH_SERIAL_DEVICES, dir->d_name))
-                    {
-                        printf("%s%s\n", PATH_SERIAL_DEVICES, dir->d_name);
-                    }
+                    printf("%s/%s\n", PATH_SERIAL_DEVICES_BY_ID, dir->d_name);
                 }
             }
         }
         closedir(d);
     }
+#endif
 }
 
 static void list_serial_devices_by_path(void)
 {
 #ifdef PATH_SERIAL_DEVICES_BY_PATH
-
     DIR *d = opendir(PATH_SERIAL_DEVICES_BY_PATH);
     if (d)
     {
@@ -1416,12 +1409,9 @@ static void list_serial_devices_by_path(void)
         {
             if ((strcmp(dir->d_name, ".")) && (strcmp(dir->d_name, "..")))
             {
-                if (!strncmp(dir->d_name, "", sizeof("") - 1))
+                if (is_serial_device("%s/%s", PATH_SERIAL_DEVICES_BY_PATH, dir->d_name))
                 {
-                    if (is_serial_device("%s%s", PATH_SERIAL_DEVICES_BY_PATH, dir->d_name))
-                    {
-                        printf("%s%s\n", PATH_SERIAL_DEVICES_BY_PATH, dir->d_name);
-                    }
+                    printf("%s/%s\n", PATH_SERIAL_DEVICES_BY_PATH, dir->d_name);
                 }
             }
         }
@@ -1551,6 +1541,8 @@ static void search_reset(void)
     device_list = NULL;
 }
 
+#if defined(__linux__)
+
 GList *tty_search_for_serial_devices(void)
 {
     DIR *dir;
@@ -1566,7 +1558,6 @@ GList *tty_search_for_serial_devices(void)
     dir = opendir("/sys/class/tty");
     if (!dir)
     {
-        // Error
         return NULL;
     }
 
@@ -1729,6 +1720,88 @@ GList *tty_search_for_serial_devices(void)
 
     return device_list;
 }
+
+#else
+
+GList *tty_search_for_serial_devices(void)
+{
+    DIR *dir;
+    char path[PATH_MAX] = {};
+    double current_time, creation_time;
+
+    search_reset();
+
+    // Open the directory containing serial devices
+    dir = opendir(PATH_SERIAL_DEVICES);
+    if (!dir)
+    {
+        return NULL;
+    }
+
+    current_time = get_current_time();
+
+    // Iterate through each device in the subsystem directory
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL)
+    {
+        // Skip . and .. entries
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+        {
+            continue;
+        }
+
+        // Construct the path to the TTY device file
+        snprintf(path, sizeof(path), PATH_SERIAL_DEVICES "/%s", entry->d_name);
+
+        // Skip non serial devices
+        if (is_serial_device(path) == false)
+        {
+            continue;
+        }
+
+        // Calculate uptime
+        creation_time = fs_get_creation_time(path);
+        double uptime = current_time - creation_time;
+
+        // Do not add devices excluded by exclude patterns
+        if (match_patterns(path, option.exclude_devices))
+        {
+            continue;
+        }
+
+        // Allocate new device item for device list
+        device_t *device = g_new0(device_t, 1);
+        if (device == NULL)
+        {
+            continue;
+        }
+
+        // Fill in device information
+        device->path = g_strdup(path);
+        device->tid = "";
+        device->uptime = uptime;
+        device->driver = "";
+        device->description = "";
+
+        // Add device information to device list
+        device_list = g_list_append(device_list, device);
+    }
+
+    if (g_list_length(device_list) == 0)
+    {
+        // Return NULL if no serial devices found
+        return NULL;
+    }
+
+    // Sort device list device with respect to uptime
+    device_list = g_list_sort(device_list, compare_uptime);
+
+    closedir(dir);
+
+    return device_list;
+}
+
+#endif
 
 void list_serial_devices(void)
 {

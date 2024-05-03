@@ -178,21 +178,11 @@ char* fs_search_directory(const char *dir_path, const char *dirname)
     return NULL;
 }
 
+#if defined(__linux__)
+
 // Function to return creation time of file
 double fs_get_creation_time(const char *path)
 {
-
-#if defined(__APPLE__) || defined(__MACH__)
-    // Use stat on macOS to access creation time
-    struct stat st;
-
-    if (stat(path, &st) != 0)
-    {
-        return -1;
-    }
-
-    return st.st_birthtimespec.tv_sec + st.st_birthtimespec.tv_nsec / 1e9;
-#else
     struct statx stx;
     int fd = open(path, O_RDONLY);
     if (fd == -1)
@@ -210,5 +200,35 @@ double fs_get_creation_time(const char *path)
     close(fd);
 
     return stx.stx_btime.tv_sec + stx.stx_btime.tv_nsec / 1e9;
-#endif
 }
+
+#elif defined(__APPLE__) || defined(__MACH__)
+
+double fs_get_creation_time(const char *path)
+{
+    // Use stat on macOS to access creation time
+    struct stat st;
+
+    if (stat(path, &st) != 0)
+    {
+        return -1;
+    }
+
+    return st.st_birthtimespec.tv_sec + st.st_birthtimespec.tv_nsec / 1e9;
+}
+
+#else
+
+double fs_get_creation_time(const char *path)
+{
+    struct stat st;
+
+    if (stat(path, &st) != 0)
+    {
+        return -1;
+    }
+
+    return (double) st.st_ctime;
+}
+
+#endif
