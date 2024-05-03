@@ -311,7 +311,68 @@ ctrl-t ? to list the available key commands.
 
 If needed, the prefix key (ctrl-t) can be remapped via configuration file.
 
-### 3.3 Lua script API
+### 3.3 Configuration file
+
+Options can be set via the configuration file first found in any of the
+following locations in the order listed:
+ - $XDG_CONFIG_HOME/tio/config
+ - $HOME/.config/tio/config
+ - $HOME/.tioconfig
+
+The configuration file supports profiles using named sections which can be
+activated via the command-line by name or pattern. A profile specifies which
+TTY device to connect to and other options.
+
+### 3.3.1 Example
+
+Example configuration file:
+
+```
+[default]
+baudrate = 115200
+databits = 8
+parity = none
+stopbits = 1
+color = 10
+
+[rpi3]
+device = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
+no-reconnect = true
+log = true
+log-file = rpi3.log
+line-pulse-duration = DTR=200,RTS=150
+color = 11
+
+[svf2]
+device = /dev/ttyUSB0
+baudrate = 9600
+script = expect("login: "); send("root\n"); expect("Password: "); send("root\n")
+color = 12
+
+[esp32]
+device = /dev/serial/by-id/usb-0403_6014-if00-port0
+script = set{DTR=high,RTS=low}; msleep(100); set{DTR=low,RTS=high}; msleep(100); set{RTS=low}
+script-run = once
+color = 13
+
+[usb-devices]
+pattern = ^usb([0-9]*)
+device = /dev/ttyUSB%m1
+color = 14
+```
+
+To use a specific profile by name simply start tio like so:
+```
+$ tio rpi3
+```
+Or by pattern match:
+```
+$ tio usb12
+```
+
+Another more elaborate configuration file example is available [here](examples/config/config).
+
+### 3.4 Lua script API
 
 Tio suppots Lua scripting to easily automate interaction with the tty device.
 
@@ -371,67 +432,6 @@ msleep(ms)
 exit(code)
       Exit with exit code.
 ```
-
-### 3.4 Configuration file
-
-Options can be set via the configuration file first found in any of the
-following locations in the order listed:
- - $XDG_CONFIG_HOME/tio/config
- - $HOME/.config/tio/config
- - $HOME/.tioconfig
-
-The configuration file supports profiles using named sections which can be
-activated via the command-line by name or pattern. A profile specifies which
-TTY device to connect to and other options.
-
-### 3.4.1 Examples
-
-Example configuration file:
-
-```
-[default]
-baudrate = 115200
-databits = 8
-parity = none
-stopbits = 1
-color = 10
-
-[rpi3]
-device = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
-no-reconnect = true
-log = true
-log-file = rpi3.log
-line-pulse-duration = DTR=200,RTS=150
-color = 11
-
-[svf2]
-device = /dev/ttyUSB0
-baudrate = 9600
-script = expect("login: "); send("root\n"); expect("Password: "); send("root\n")
-color = 12
-
-[esp32]
-device = /dev/serial/by-id/usb-0403_6014-if00-port0
-script = set{DTR=high,RTS=low}; msleep(100); set{DTR=low,RTS=high}; msleep(100); set{RTS=low}
-script-run = once
-color = 13
-
-[usb-devices]
-pattern = ^usb([0-9]*)
-device = /dev/ttyUSB%m1
-color = 14
-```
-
-To use a specific profile by name simply start tio like so:
-```
-$ tio rpi3
-```
-Or by pattern match:
-```
-$ tio usb12
-```
-
-Another more elaborate configuration file example is available [here](examples/config/config).
 
 ## 4. Installation
 
