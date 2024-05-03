@@ -1,5 +1,90 @@
 
-=== tio v3.0 ===
+=== tio v3.1 ===
+
+
+
+Changes since tio v3.0:
+
+ * Fix use of invalid flag with regexec()
+
+ * Fix potential buffer overflow in match_and_replace()
+
+ * Fix profile autocompletion
+
+ * Remove inih dependency from CI builds
+
+ * Replace use of stat() with fstat()
+
+   For better security.
+
+ * Fix hexN output mode
+
+ * Update pattern matching example
+
+ * Fix submenu response when invalid key hit
+
+ * Replace inih with glib key file parser
+
+   After including the use of glib we might as well replace inih
+   with the glib key file parser.
+
+   All configuraiton file parsing has been reworked and also the options
+   parsing has been cleaned up, resulting in better and stricter
+   configuration file and option value checks.
+
+   Compared to old, configuration files now requires any default
+   configurations to be put in a group/section named [default].
+
+   Configuration file keywords such as "enable", "disable", "on",
+   "off", "yes", "no", "0", "1" have been retired. Now only "true" and
+   "false" apply to boolean configuration options. This is done to simplify
+   things and avoid any confusion.
+
+   The pattern option feature has been reworked so now the user can now
+   access the full match string and any matching subexpression using the
+   %mN syntax.
+
+   For example:
+
+   [usb devices]
+   pattern = usb([0-9]*)
+   device = /dev/ttyUSB%m1
+
+   Then when using tio:
+   $ tio usb12
+
+      %m0 = 'usb12'  // Full match string
+      %m1 = 12       // First match subexpression
+
+   Which results in device = /dev/ttyUSB12
+
+ * Remove CircleCI
+
+   Replaced with github workflow CI.
+
+ * Add github workflow for Ubuntu build
+
+ * Enable extended pattern matching
+
+   So that the exclude options can also work as include using special
+   pattern syntax.
+
+   For example, to only include /dev/ttyUSB* devices simply do:
+
+   $ tio --exclude-devices=!(/dev/ttyUSB*) --list
+
+   See the man page of fnmatch() for all available extended pattern
+   options.
+
+ * Update lua read() description
+
+Rui Chen:
+
+ * fix: add build patch for `FNM_EXTMATCH`
+
+ * feat: add macos workflow
+
+ * fix: add macos build patch for `fs_get_creation_time`
 
 
 
