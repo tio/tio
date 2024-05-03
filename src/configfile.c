@@ -407,7 +407,7 @@ static void replace_substring(char *str, const char *substr, const char *replace
 static char *match_and_replace(const char *str, const char *pattern, char *device)
 {
     char replacement_str[PATH_MAX] = {};
-    char m_key[13] = {};
+    char m_key[14] = {};
     regex_t regex;
 
     assert(str != NULL);
