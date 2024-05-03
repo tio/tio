@@ -211,8 +211,9 @@ topology ID (TID):
 $ tio bCC2
 ```
 Note: The TID is unique and will stay the same as long as your USB serial port
-device plugs into the same USB topology (same ports, same hubs, etc.). This way
-it is possible for tio to successfully reconnect to the same device.
+device plugs into the same USB topology (same ports, same hubs, same
+connections, etc.). This way it is possible for tio to successfully reconnect
+to the same device.
 
 Connect automatically to first new appearing serial device:
 ```
