@@ -165,7 +165,7 @@ Default value is 200.
 .TP
 .BR \-l ", " \-\-list
 
-List available serial devices.
+List available targets (serial devices, TIDs, configuration profiles).
 
 .TP
 .BR \-L ", " \-\-log
@@ -173,7 +173,8 @@ List available serial devices.
 Enable log to file.
 
 The log file will be automatically named using the following format
-tio_DEVICE_YYYY-MM-DDTHH:MM:SS.log.
+tio_TARGET_YYYY-MM-DDTHH:MM:SS.log. Target being the command line target such
+as tty-device, tid, or configuration profile.
 
 The filename can be manually set using the \-\-log-file option.
 

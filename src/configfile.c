@@ -603,3 +603,58 @@ void config_file_print(void)
         }
     }
 }
+
+void config_list_targets(void)
+{
+    memset(&config, 0, sizeof(struct config_t));
+
+    // Find config file
+    if (config_file_resolve() != 0)
+    {
+        // None found
+        return;
+    }
+
+    GKeyFile *keyfile;
+    GError *error = NULL;
+
+    keyfile = g_key_file_new();
+
+    if (!g_key_file_load_from_file(keyfile, config.path, G_KEY_FILE_NONE, &error))
+    {
+        tio_error_print("Failure loading file: %s", error->message);
+        g_error_free(error);
+        return;
+    }
+
+    // Get all group names
+    gsize num_groups;
+    gchar **group = g_key_file_get_groups(keyfile, &num_groups);
+
+    if (num_groups == 0)
+    {
+        return;
+    }
+
+    printf("\nConfiguration profiles\n");
+    printf("--------------------------------------------------------------------------------\n");
+
+    int j = 1;
+    for (gsize i = 0; i < num_groups; i++)
+    {
+        // Skip default group
+        if (strcmp(group[i], CONFIG_GROUP_NAME_DEFAULT) == 0)
+        {
+            continue;
+        }
+        printf("%-20s ", group[i]);
+        if (j++ % 4 == 0)
+        {
+            putchar('\n');
+        }
+    }
+    putchar('\n');
+
+    g_strfreev(group);
+    g_key_file_free(keyfile);
+}

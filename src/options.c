@@ -42,6 +42,7 @@
 #include "alert.h"
 #include "log.h"
 #include "script.h"
+#include "configfile.h"
 
 #define HEX_N_VALUE_MAX 4096
 
@@ -150,7 +151,7 @@ void option_print_help(char *argv[])
     printf("  -t, --timestamp                        Enable line timestamp\n");
     printf("      --timestamp-format <format>        Set timestamp format (default: 24hour)\n");
     printf("      --timestamp-timeout <ms>           Set timestamp timeout (default: 200)\n");
-    printf("  -l, --list                             List available serial devices\n");
+    printf("  -l, --list                             List available serial devices, TIDs, and profiles\n");
     printf("  -L, --log                              Enable log to file\n");
     printf("      --log-file <filename>              Set log filename\n");
     printf("      --log-directory <path>             Set log directory path for automatic named logs\n");
@@ -916,6 +917,7 @@ void options_parse(int argc, char *argv[])
 
             case 'l':
                 list_serial_devices();
+                config_list_targets();
                 exit(EXIT_SUCCESS);
                 break;
 

@@ -35,3 +35,4 @@ void config_file_print(void);
 void config_file_parse(void);
 void config_exit(void);
 void config_file_show_profiles(void);
+void config_list_targets(void);
