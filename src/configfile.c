@@ -417,6 +417,7 @@ static char *match_and_replace(const char *str, const char *pattern, char *devic
     char *string = malloc(strlen(device) + PATH_MAX);
     if (string == NULL)
     {
+        tio_debug_printf("Failure allocating string memory\n");
         return NULL;
     }
     strcpy(string, device);
@@ -434,11 +435,12 @@ static char *match_and_replace(const char *str, const char *pattern, char *devic
     if (regcomp(&regex, pattern, REG_EXTENDED) != 0)
     {
         // Failure to compile regular expression
-        return NULL;
+        tio_error_print("Failure compiling regular expression '%s'\n", pattern);
+        exit(EXIT_FAILURE);
     }
 
     regmatch_t matches[regex.re_nsub + 1];
-    int status = regexec(&regex, str, regex.re_nsub + 1, matches, REG_EXTENDED);
+    int status = regexec(&regex, str, regex.re_nsub + 1, matches, 0);
     if (status == 0)
     {
         tio_debug_printf("Full match: ");
@@ -469,13 +471,14 @@ static char *match_and_replace(const char *str, const char *pattern, char *devic
     }
     else if (status == REG_NOMATCH)
     {
+        tio_debug_printf("No regex match\n");
         goto error;
     }
     else
     {
         char error_message[100];
         regerror(status, &regex, error_message, sizeof(error_message));
-        tio_error_print("Regex match failed: %s", error_message);
+        tio_debug_printf("Regex match failed: %s", error_message);
         goto error;
     }
 
