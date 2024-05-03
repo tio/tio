@@ -231,6 +231,7 @@ void log_close(void)
     if (fp != NULL)
     {
         fclose(fp);
+        tio_printf("Saved log to file %s", log_filename);
         fp = NULL;
         log_filename = NULL;
     }
@@ -240,7 +241,6 @@ void log_exit(void)
 {
     if ((option.log) && (log_filename != NULL))
     {
-        tio_printf("Saved log to file %s", log_filename);
         log_close();
     }
 }
