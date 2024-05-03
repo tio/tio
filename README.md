@@ -214,11 +214,6 @@ Note: The TID is unique and will stay the same as long as your USB serial port
 device plugs into the same USB topology (same ports, same hubs, etc.). This way
 it is possible for tio to successfully reconnect to the same device.
 
-To connection via configuration profile simply do:
-```
-tio stm32
-```
-
 Connect automatically to first new appearing serial device:
 ```
 $ tio --auto-connect new
