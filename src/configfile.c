@@ -636,7 +636,7 @@ void config_list_targets(void)
         return;
     }
 
-    printf("\nConfiguration profiles\n");
+    printf("\nConfiguration profiles (%s)\n", config.path);
     printf("--------------------------------------------------------------------------------\n");
 
     int j = 1;
