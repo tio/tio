@@ -5,6 +5,8 @@
 
 Changes since tio v3.0:
 
+ * Improve --list feature on non-linux platform
+
  * List available profiles in --list output
 
  * Always message when saving log file
