@@ -191,6 +191,11 @@ By-path
 /dev/serial/by-path/pci-0000:00:14.0-usb-0:6.4:1.0-port0
 /dev/serial/by-path/pci-0000:00:14.0-usbv2-0:6.3:1.2
 /dev/serial/by-path/pci-0000:00:14.0-usb-0:6.3:1.2
+
+Configuration profiles
+--------------------------------------------------------------------------------
+rpi3                stm32               esp32               am64-evm
+imx8mp-evk          nucleo-h743zi2      usb-devices
 ```
 
 It is recommended to connect serial TTY devices by ID:
@@ -208,6 +213,11 @@ $ tio bCC2
 Note: The TID is unique and will stay the same as long as your USB serial port
 device plugs into the same USB topology (same ports, same hubs, etc.). This way
 it is possible for tio to successfully reconnect to the same device.
+
+To connection via configuration profile simply do:
+```
+tio stm32
+```
 
 Connect automatically to first new appearing serial device:
 ```
