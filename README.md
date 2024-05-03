@@ -192,7 +192,7 @@ By-path
 /dev/serial/by-path/pci-0000:00:14.0-usbv2-0:6.3:1.2
 /dev/serial/by-path/pci-0000:00:14.0-usb-0:6.3:1.2
 
-Configuration profiles
+Configuration profiles (/home/lundmar/.config/tio/config)
 --------------------------------------------------------------------------------
 rpi3                stm32               esp32               am64-evm
 imx8mp-evk          nucleo-h743zi2      usb-devices
