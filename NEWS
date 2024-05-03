@@ -5,6 +5,8 @@
 
 Changes since tio v3.0:
 
+ * Add support for using TID as device in config file
+
  * Fix use of invalid flag with regexec()
 
  * Fix potential buffer overflow in match_and_replace()
