@@ -3,7 +3,8 @@
 
 # tio - a serial device I/O tool
 
-[![](https://img.shields.io/circleci/build/github/tio/tio)](https://circleci.com/github/tio/tio/tree/master)
+[![](https://img.shields.io/github/actions/workflow/status/tio/tio/ubuntu.yml?label=GNU%2FLinux)](https://github.com/tio/tio/actions/workflows/ubuntu.yml)
+[![](https://img.shields.io/github/actions/workflow/status/tio/tio/macos.yml?label=MacOS)](https://github.com/tio/tio/actions/workflows/macos.yml)
 [![](https://img.shields.io/github/v/release/tio/tio?sort=semver)](https://github.com/tio/tio/releases)
 [![](https://img.shields.io/repology/repositories/tio)](https://repology.org/project/tio/versions)
 <!-- [![](https://img.shields.io/tokei/lines/github/tio/tio)](https://github.com/tio/tio) -->
