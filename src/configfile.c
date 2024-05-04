@@ -653,7 +653,10 @@ void config_list_targets(void)
             putchar('\n');
         }
     }
-    putchar('\n');
+    if ((j-1) % 4 != 0)
+    {
+        putchar('\n');
+    }
 
     g_strfreev(group);
     g_key_file_free(keyfile);
