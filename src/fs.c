@@ -178,7 +178,7 @@ char* fs_search_directory(const char *dir_path, const char *dirname)
     return NULL;
 }
 
-#if defined(__linux__)
+#if defined(__linux__) && defined(STATX_BTIME)
 
 // Function to return creation time of file
 double fs_get_creation_time(const char *path)
