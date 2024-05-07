@@ -89,15 +89,15 @@ extern char ansi_format[];
         putchar('\n'); \
         if (option.color < 0) { \
             if (error_normal) \
-                fprintf (stdout, "Error: " format "\n", ## args); \
+                fprintf (stderr, "Error: " format "\n", ## args); \
             else \
-                fprintf (stdout, "\r[%s] Error: " format "\r\n", timestamp_current_time(), ## args); \
+                fprintf (stderr, "\r[%s] Error: " format "\r\n", timestamp_current_time(), ## args); \
         } \
         else { \
             if (error_normal) \
-            { ansi_printf("Error: " format, ## args); }\
+            { ansi_error_printf("Error: " format, ## args); }\
             else \
-            { ansi_printf("[%s] Error: " format, timestamp_current_time(), ## args); }\
+            { ansi_error_printf("[%s] Error: " format, timestamp_current_time(), ## args); }\
         } \
         print_tainted = false; \
     } \
