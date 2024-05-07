@@ -80,60 +80,16 @@ _tio()
             COMPREPLY=( $(compgen -W "1 10 100" -- ${cur}) )
             return 0
             ;;
-        --line-pulse-duration)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-            return 0
-            ;;
         -a | --auto-connect)
             COMPREPLY=( $(compgen -W "new latest none" -- ${cur}) )
-            return 0
-            ;;
-        -n | --no-reconnect)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-            return 0
-            ;;
-        -e | --local-echo)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-            return 0
-            ;;
-        -l | --log)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-            return 0
-            ;;
-        --log-file)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-            return 0
-            ;;
-        --log-directory)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-            return 0
-            ;;
-        --log-append)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-            return 0
-            ;;
-        --log-strip)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
         -m | --map)
             COMPREPLY=( $(compgen -W "ICRNL IGNCR INLCR IFFESCC INLCRNL OCRNL ODELBS ONLCRNL MSB2LSB" -- ${cur}) )
             return 0
             ;;
-        -t | --timestamp)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-            return 0
-            ;;
         --timestamp-format)
             COMPREPLY=( $(compgen -W "24hour 24hour-start 24hour-delta iso8601" -- ${cur}) )
-            return 0
-            ;;
-        --timestamp-timeout)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-            return 0
-            ;;
-        -L | --list)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
         -c | --color)
@@ -152,10 +108,6 @@ _tio()
             COMPREPLY=( $(compgen -W "normal hex"  -- ${cur}) )
             return 0
             ;;
-        --rs-485)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-            return 0
-            ;;
         --rs-485-config)
             COMPREPLY=( $(compgen -W "RTS_ON_SEND RTS_AFTER_SEND RTS_DELAY_BEFORE_SEND RTS_DELAY_AFTER_SEND RX_DURING_TX"  -- ${cur}) )
             return 0
@@ -164,32 +116,8 @@ _tio()
             COMPREPLY=( $(compgen -W "none bell blink"  -- ${cur}) )
             return 0
             ;;
-        --mute)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-            return 0
-            ;;
-        --script)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-            return 0
-            ;;
-        --script-file)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-            return 0
-            ;;
         --script-run)
             COMPREPLY=( $(compgen -W "once always never"  -- ${cur}) )
-            return 0
-            ;;
-        --exec)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-            return 0
-            ;;
-        -v | --version)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-            return 0
-            ;;
-        -h | --help)
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
         *)
