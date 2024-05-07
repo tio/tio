@@ -580,7 +580,7 @@ To change the default configuration simply set options like so:
 .RS
 .nf
 .eo
-# Defaults
+[default]
 baudrate = 9600
 databits = 8
 parity = none
