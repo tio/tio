@@ -4,7 +4,7 @@ NAME
        tio - a serial device I/O tool
 
 SYNOPSIS
-       tio [<options>] <tty-device|sub-config>
+       tio [<options>] <tty-device|profile|tid>
 
 DESCRIPTION
        tio is a serial device tool which features a straightforward command-line and configuration file interface to easily connect to serial TTY devices for basic I/O operations.
@@ -126,13 +126,13 @@ OPTIONS
 
        -l, --list
 
-              List available serial devices.
+              List available targets (serial devices, TIDs, configuration profiles).
 
        -L, --log
 
               Enable log to file.
 
-              The log file will be automatically named using the following format tio_DEVICE_YYYY-MM-DDTHH:MM:SS.log.
+              The log file will be automatically named using the following format tio_TARGET_YYYY-MM-DDTHH:MM:SS.log. Target being the command line target such as tty-device, tid, or configuration profile.
 
               The filename can be manually set using the --log-file option.
 
@@ -192,9 +192,13 @@ OPTIONS
 
               Default value is "normal".
 
-           --output-mode normal|hex
+           --output-mode normal|hex|hexN
 
-              Set output mode. In hex mode each incoming byte is printed out as a 1 byte hex value.
+              Set output mode.
+
+              In hex mode each incoming byte is printed out as a 1 byte hex value.
+
+              In hexN mode, N is a number less than or equal to 4096 which defines how many hex values will be printed before a line break.
 
               Default value is "normal".
 
@@ -335,12 +339,14 @@ SCRIPT API
        expect(string, timeout)
              Expect string - waits for string to match or timeout before continueing.  Supports regular expressions. Special characters must be escaped with '\\'.  Timeout is in milliseconds, defaults to 0 meaning it will wait forever.
 
-             Returns 1 on successful match, 0 on timeout, or -1 on invalid regular expression.
+             Returns 1 on successful match, 0 on timeout, or -1 on error.
 
              On successful match it also returns the match string as second return value.
 
        send(string)
              Send string.
+
+             Returns number of bytes written on success or -1 on error.
 
        modem_send(file, protocol)
              Send file using x/y-modem protocol.
@@ -354,17 +360,19 @@ SCRIPT API
 
              Returns nil if no serial devices are found.
 
-       exit(code)
-             Exit with exit code.
+       read(size, timeout)
+             Read from serial device. If timeout is 0 or not provided it will wait forever until data is ready to read.
 
-       high(line)
-             Set tty line high.
+             Returns number of bytes read on success, 0 on timeout, or -1 on error.
 
-       low(line)
-             Set tty line low.
+             On success, returns read string as second return value.
 
-       toggle(line)
-             Toggle the tty line.
+       set{line=state, ...}
+             Set state of one or multiple tty modem lines.
+
+             Line can be any of DTR, RTS, CTS, DSR, CD, RI
+
+             State is high, low, or toggle.
 
        sleep(seconds)
              Sleep for seconds.
@@ -372,16 +380,8 @@ SCRIPT API
        msleep(ms)
              Sleep for miliseconds.
 
-       config_high(line)
-             Set tty line state configuration to high.
-
-       config_low(line)
-             Set tty line state configuration to low.
-
-       apply_config()
-             Apply tty line state configuration. Using the line state configuration API instead of high()/low() will help to make the lines physically switch as simultaneously as possible. This may solve timing issues on some platforms.
-
-       Note: Line can be any of DTR, RTS, CTS, DSR, CD, RI
+       exit(code)
+             Exit with exit code.
 
 CONFIGURATION FILE
        Options can be set via configuration file using the INI format. tio uses the configuration file first found in the following locations in the order listed:
@@ -392,9 +392,9 @@ CONFIGURATION FILE
 
        $HOME/.tioconfig
 
-       Labels can be used to group settings into named sub-configurations which can be activated from the command-line when starting tio.
+       Labels can be used to group settings into named configuration profiles which can be activated from the command-line when starting tio.
 
-       tio will try to match the user input to a sub-configuration by name or by pattern to get the TTY device and other options.
+       tio will try to match the user input to a configuration profile by name or by pattern to get the TTY device and other options.
 
        Options without any label change the default options.
 
@@ -471,7 +471,7 @@ CONFIGURATION FILE
 CONFIGURATION FILE EXAMPLES
        To change the default configuration simply set options like so:
 
-              # Defaults
+              [default]
               baudrate = 9600
               databits = 8
               parity = none
@@ -479,14 +479,14 @@ CONFIGURATION FILE EXAMPLES
               color = 10
               line-pulse-duration = DTR=200,RTS=400
 
-       Named sub-configurations can be added via labels:
+       Named configuration profiles can be added via labels:
 
               [rpi3]
               device = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
               baudrate = 115200
               color = 11
 
-       Activate the sub-configuration by name:
+       Activate the configuration profile by name:
 
               $ tio rpi3
 
@@ -494,22 +494,24 @@ CONFIGURATION FILE EXAMPLES
 
               $ tio -b 115200 -c 11 /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 
-       A sub-configuration can also be activated by its pattern which supports regular expressions:
+       A configuration profile can also be activated by its pattern which supports
+              regular expressions:
 
-              [usb device]
-              pattern = usb([0-9]*)
-              device = /dev/ttyUSB%s
+              [usb-devices]
+              pattern = ^usb([0-9]*)
+              device = /dev/ttyUSB%m1
               baudrate = 115200
 
-       Activate the sub-configuration by pattern match:
+       Activate the configuration profile by pattern match:
 
               $ tio usb12
 
-       Which is equivalent to:
+       Which becomes equivalent to:
 
               $ tio -b 115200 /dev/ttyUSB12
 
-       It is also possible to combine use of sub-configuration and command-line options. For example:
+       It is also possible to combine use of configuration profile and command-line
+              options. For example:
 
               $ tio -l -t usb12
 
@@ -551,6 +553,10 @@ EXAMPLES
               send -i $uart "ls -la\n"
               expect -i $uart "prompt> "
 
+       It is also possible to use the expect/send script functionality to e.g. automate logins:
+
+              $ tio --script 'expect("login: "); send("root\n"); expect("Password: "); send("root\n")' /dev/ttyUSB0
+
        Redirect device I/O to network file socket for remote TTY sharing:
 
               $ tio --socket inet:4444 /dev/ttyUSB0
@@ -577,7 +583,7 @@ EXAMPLES
 
        Manipulate DTR and RTS lines upon first connect to reset connected microcontroller:
 
-              $ tio --script "high(DTR); low(RTS); msleep(100); toggle(DTR)" --script-run once /dev/ttyUSB0
+              $ tio --script "set{DTR=high,RTS=low}; msleep(100); set{RTS=toggle}" --script-run once /dev/ttyUSB0
 
        Automatically log in to connected OS:
 
@@ -589,4 +595,4 @@ WEBSITE
 AUTHOR
        Maintained by Martin Lund <martin.lund@keep-it-simple.com>.
 
-tio 2.9                                                                                                                                    2024-04-14                                                                                                                                    tio(1)
+tio 3.1                                                                                                                                    2024-05-03                                                                                                                                    tio(1)
