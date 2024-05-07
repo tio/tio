@@ -282,6 +282,7 @@ static void config_parse_keys(GKeyFile *key_file, char *group)
         g_free((void *)string);
         string = NULL;
     }
+    config_get_string(key_file, group, "exec", &option.exec, NULL);
     config_get_string(key_file, group, "prefix-ctrl-key", &string, NULL);
     if (string != NULL)
     {

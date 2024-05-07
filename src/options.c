@@ -69,6 +69,7 @@ enum opt_t
     OPT_EXCLUDE_DEVICES,
     OPT_EXCLUDE_DRIVERS,
     OPT_EXCLUDE_TIDS,
+    OPT_EXEC,
 };
 
 /* Default options */
@@ -121,6 +122,7 @@ struct option_t option =
     .exclude_tids = NULL,
     .hex_n_value = 0,
     .vt100 = false,
+    .exec = NULL,
 };
 
 void option_print_help(char *argv[])
@@ -167,6 +169,7 @@ void option_print_help(char *argv[])
     printf("      --script <string>                  Run script from string\n");
     printf("      --script-file <filename>           Run script from file\n");
     printf("      --script-run once|always|never     Run script on connect (default: always)\n");
+    printf("      --exec <command>                   Execute shell command with I/O redirected to device\n");
     printf("  -v, --version                          Display version\n");
     printf("  -h, --help                             Display help\n");
     printf("\n");
@@ -815,6 +818,7 @@ void options_parse(int argc, char *argv[])
             {"script",               required_argument, 0, OPT_SCRIPT              },
             {"script-file",          required_argument, 0, OPT_SCRIPT_FILE         },
             {"script-run",           required_argument, 0, OPT_SCRIPT_RUN          },
+            {"exec",                 required_argument, 0, OPT_EXEC                },
             {"version",              no_argument,       0, 'v'                     },
             {"help",                 no_argument,       0, 'h'                     },
             {"complete-profiles",    no_argument,       0, OPT_COMPLETE_PROFILES   },
@@ -983,6 +987,10 @@ void options_parse(int argc, char *argv[])
 
             case OPT_SCRIPT_RUN:
                 option_parse_script_run(optarg, &option.script_run);
+                break;
+
+            case OPT_EXEC:
+                option.exec = optarg;
                 break;
 
             case 'v':

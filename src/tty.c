@@ -2277,6 +2277,12 @@ int tty_connect(void)
         exit(EXIT_SUCCESS);
     }
 
+    if (option.exec != NULL)
+    {
+        int status = execute_shell_command(device_fd, option.exec);
+        exit(status);
+    }
+
     /* Input loop */
     while (true)
     {

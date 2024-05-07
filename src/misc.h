@@ -34,3 +34,4 @@ char *base62_encode(unsigned long num);
 int read_poll(int fd, void *data, size_t len, int timeout);
 double get_current_time(void);
 bool match_patterns(const char *string, const char *patterns);
+int execute_shell_command(int fd, const char *command);

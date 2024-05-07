@@ -33,6 +33,7 @@
 #include <time.h>
 #include <errno.h>
 #include <sys/poll.h>
+#include <sys/wait.h>
 #include <termios.h>
 #include <fnmatch.h>
 #include "error.h"
@@ -198,4 +199,62 @@ bool match_patterns(const char *string, const char *patterns)
 
     free(patterns_copy);
     return false;
+}
+
+// Function that forks subprocess, redirects its stdin and stdout to the
+// specified filedescriptor, and runs command.
+int execute_shell_command(int fd, const char *command)
+{
+    pid_t pid;
+    int status;
+
+    // Fork a child process
+    pid = fork();
+    if (pid == -1)
+    {
+        // Error occurred
+        tio_error_print("fork() failed (%s)", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+    else if (pid == 0)
+    {
+        // Child process
+
+        tio_printf("Executing shell command '%s'", command);
+
+        // Redirect stdout and stderr to the file descriptor
+        if (dup2(fd, STDOUT_FILENO) == -1 || dup2(fd, STDERR_FILENO) == -1)
+        {
+            tio_error_print("dup2() failed (%s)", strerror(errno));
+            exit(EXIT_FAILURE);
+        }
+
+        // Execute the shell command
+        execl("/bin/sh", "sh", "-c", command, (char *)NULL);
+
+        // If execlp() returns, it means an error occurred
+        perror("execlp");
+        tio_error_print("execlp() failed (%s)", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        // Parent process
+
+        // Wait for the child process to finish
+        waitpid(pid, &status, 0);
+
+        if (WIFEXITED(status))
+        {
+            tio_printf("Command exited with status %d", WEXITSTATUS(status));
+            return WEXITSTATUS(status);
+        }
+        else
+        {
+            tio_error_printf("Child process exited abnormally\n");
+            return -1;
+        }
+    }
+
+    return 0;
 }

@@ -45,6 +45,7 @@ _tio()
              --script \
              --script-file \
              --script-run \
+             --exec \
           -v --version \
           -h --help"
 
@@ -177,6 +178,10 @@ _tio()
             ;;
         --script-run)
             COMPREPLY=( $(compgen -W "once always never"  -- ${cur}) )
+            return 0
+            ;;
+        --exec)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
         -v | --version)

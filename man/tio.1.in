@@ -359,6 +359,11 @@ Run script on connect once, always, or never.
 Default value is "always".
 
 .TP
+.BR "\-\-exec \fI<command>
+
+Execute shell command with I/O redirected to device
+
+.TP
 .BR \-v ", " \-\-version
 
 Display program version.
@@ -571,6 +576,9 @@ Run script from string
 Run script from file
 .IP "\fBscript-run"
 Run script on connect
+.IP "\fBexec"
+Execute shell command with I/O redirected to device
+
 
 .SH "CONFIGURATION FILE EXAMPLES"
 

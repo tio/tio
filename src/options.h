@@ -96,6 +96,7 @@ struct option_t
     char *exclude_tids;
     int hex_n_value;
     bool vt100;
+    char *exec;
 };
 
 extern struct option_t option;
