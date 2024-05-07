@@ -353,6 +353,9 @@ static int config_file_resolve(void)
 
 void config_file_show_profiles(void)
 {
+    GKeyFile *keyfile;
+    GError *error = NULL;
+
     memset(&config, 0, sizeof(struct config_t));
 
     // Find config file
@@ -361,9 +364,6 @@ void config_file_show_profiles(void)
         // None found - stop parsing
         return;
     }
-
-    GKeyFile *keyfile;
-    GError *error = NULL;
 
     keyfile = g_key_file_new();
 
@@ -458,10 +458,10 @@ static char *match_and_replace(const char *str, const char *pattern, char *devic
         {
             tio_debug_printf("Subexpression %d match: ", i);
             int k = 0;
-            for (int j = matches[i].rm_so; j < matches[i].rm_eo; j++)
+            for (int l = matches[i].rm_so; l < matches[i].rm_eo; l++)
             {
-                tio_debug_printf_raw("%c", str[j]);
-                replacement_str[k++] = str[j];
+                tio_debug_printf_raw("%c", str[l]);
+                replacement_str[k++] = str[l];
             }
             replacement_str[k] = '\0';
             sprintf(m_key, "%%m%d", i);
@@ -541,11 +541,11 @@ void config_file_parse(void)
             }
 
             // Lookup 'pattern' key
-            GError *error = NULL;
             gchar *pattern = g_key_file_get_string(keyfile, group[i], "pattern", &error);
             if (error != NULL)
             {
                 g_error_free(error);
+                error = NULL;
                 continue;
             }
 
@@ -554,6 +554,7 @@ void config_file_parse(void)
             if (error != NULL)
             {
                 g_error_free(error);
+                error = NULL;
                 continue;
             }
 
@@ -564,14 +565,14 @@ void config_file_parse(void)
             if (config.device != NULL)
             {
                 // Match found - save device
-                char *device = strdup(config.device);
+                device = strdup(config.device);
 
-                // Parse found group
+                // Parse found group (may replace config.device)
                 config_parse_keys(keyfile, group[i]);
 
                 // Update configuration
                 config.active_group = strdup(group[i]);
-                config.device = device;
+                config.device = device; // Restore new device string
 
                 break;
             }
