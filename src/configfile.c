@@ -624,7 +624,6 @@ void config_list_targets(void)
 
     if (!g_key_file_load_from_file(keyfile, config.path, G_KEY_FILE_NONE, &error))
     {
-        tio_error_print("Failure loading file: %s", error->message);
         g_error_free(error);
         return;
     }
