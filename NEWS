@@ -1,5 +1,31 @@
 
-=== tio v3.1 ===
+=== tio v3.2 ===
+
+
+
+Changes since tio v3.1:
+
+ * Do not print error when using --list with broken config file
+
+ * Clean up completion script
+
+ * Add option '--exec <command>' for running shell command
+
+   Runs shell command with I/O redirected to device.
+
+ * Make sure all error output is directed to stderr
+
+ * Fix shadow variables
+
+ * Update man page
+
+ * Fix build on older GNU/Linux systems without statx
+
+ * Fix line ending in --list output
+
+ * Print location of configuratin file in --list output
+
+ * Fix alignment of profile listing
 
 
 
