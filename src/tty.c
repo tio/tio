@@ -2279,7 +2279,7 @@ int tty_connect(void)
 
     if (option.exec != NULL)
     {
-        int status = execute_shell_command(device_fd, option.exec);
+        status = execute_shell_command(device_fd, option.exec);
         exit(status);
     }
 
