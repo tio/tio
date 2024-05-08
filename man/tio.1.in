@@ -624,8 +624,7 @@ Which is equivalent to:
 $ tio -b 115200 -c 11 /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 
 .TP
-A configuration profile can also be activated by its pattern which supports
-regular expressions:
+A configuration profile can also be activated by its pattern which supports regular expressions:
 
 .RS
 .nf
@@ -649,8 +648,7 @@ Which becomes equivalent to:
 $ tio -b 115200 /dev/ttyUSB12
 
 .TP
-It is also possible to combine use of configuration profile and command-line
-options. For example:
+It is also possible to combine use of configuration profile and command-line options. For example:
 
 $ tio -l -t usb12
 
