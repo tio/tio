@@ -263,7 +263,7 @@ void socket_write(char input_char)
     {
         if (clientfds[i] != -1)
         {
-            if (write(clientfds[i], &input_char, 1) <= 0)
+            if (send(clientfds[i], &input_char, 1, MSG_NOSIGNAL) <= 0)
             {
                 tio_error_printf_silent("Failed to write to socket (%s)", strerror(errno));
                 close(clientfds[i]);
