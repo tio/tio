@@ -19,11 +19,6 @@
  * 02110-1301, USA.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include "options.h"
 #include "print.h"
 
 bool print_tainted = false;

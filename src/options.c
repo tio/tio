@@ -19,29 +19,14 @@
  * 02110-1301, USA.
  */
 
-#include "config.h"
 #include <assert.h>
 #include <regex.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <errno.h>
 #include <getopt.h>
-#include <termios.h>
-#include <limits.h>
-#include "options.h"
-#include "error.h"
+#include "config.h"
 #include "misc.h"
 #include "print.h"
-#include "tty.h"
 #include "rs485.h"
-#include "timestamp.h"
-#include "alert.h"
 #include "log.h"
-#include "script.h"
 #include "configfile.h"
 
 #define HEX_N_VALUE_MAX 4096

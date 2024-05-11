@@ -21,17 +21,8 @@
 
 #define __STDC_WANT_LIB_EXT2__ 1   // To access vasprintf
 
-#include "config.h"
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <stdbool.h>
-#include <string.h>
-#include <errno.h>
-#include "options.h"
 #include "print.h"
-#include "error.h"
-#include "timestamp.h"
 
 static char error[2][1000];
 static bool in_session = false;

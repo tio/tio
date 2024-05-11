@@ -23,7 +23,6 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include "misc.h"
 #include "error.h"
 #include "options.h"
 #include "timestamp.h"

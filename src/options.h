@@ -23,9 +23,6 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <limits.h>
-#include <termios.h>
-#include <sys/param.h>
 #include "script.h"
 #include "timestamp.h"
 #include "alert.h"

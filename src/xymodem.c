@@ -7,20 +7,14 @@
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
-#include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
-#include <sys/poll.h>
 #include <termios.h>
 #include "xymodem.h"
 #include "print.h"
+#include "misc.h"
 
 #define SOH 0x01
 #define STX 0x02

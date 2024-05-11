@@ -19,14 +19,12 @@
  * 02110-1301, USA.
  */
 
-#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
-#include <errno.h>
 #include <sys/ioctl.h>
-#include <stdbool.h>
 #include "options.h"
 #include "print.h"
-#include "error.h"
+#include "misc.h"
 
 #ifdef HAVE_RS485
 

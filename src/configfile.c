@@ -21,31 +21,17 @@
  */
 
 #define _GNU_SOURCE
-
-#include "config.h"
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdbool.h>
-#include <errno.h>
-#include <getopt.h>
-#include <termios.h>
-#include <assert.h>
-#include <limits.h>
+#include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
+#include <assert.h>
 #include <regex.h>
 #include <glib.h>
-#include "options.h"
 #include "configfile.h"
-#include "misc.h"
-#include "options.h"
-#include "error.h"
 #include "print.h"
 #include "rs485.h"
-#include "timestamp.h"
-#include "alert.h"
+#include "misc.h"
 
 #define CONFIG_GROUP_NAME_DEFAULT "default"
 

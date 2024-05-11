@@ -19,10 +19,10 @@
  * 02110-1301, USA.
  */
 
-#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "config.h"
 #include "options.h"
 #include "configfile.h"
 #include "tty.h"

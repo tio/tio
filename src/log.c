@@ -21,18 +21,9 @@
 
 #define __STDC_WANT_LIB_EXT2__ 1   // To access vasprintf
 
-#include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include <errno.h>
-#include <time.h>
 #include <sys/time.h>
 #include <libgen.h>
-#include "options.h"
 #include "print.h"
-#include "error.h"
 #include "fs.h"
 
 #define IS_ESC_CSI_INTERMEDIATE_CHAR(c) ((c >= 0x20) && (c <= 0x3F))
