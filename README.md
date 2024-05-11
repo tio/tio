@@ -73,6 +73,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Configuration file support
    * Support for configuration profiles
    * Activate configuration profiles by name or pattern
+ * Redirect I/O of shell command to serial device
  * Redirect I/O to UNIX socket or IPv4/v6 network socket
    * Useful for scripting or TTY sharing
  * Pipe input and/or output
