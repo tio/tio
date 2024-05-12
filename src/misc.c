@@ -26,6 +26,7 @@
 #include <sys/wait.h>
 #include <fnmatch.h>
 #include <regex.h>
+#include <errno.h>
 #include "print.h"
 
 void delay(long ms)

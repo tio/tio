@@ -22,6 +22,7 @@
 #include <assert.h>
 #include <regex.h>
 #include <getopt.h>
+#include <errno.h>
 #include "config.h"
 #include "misc.h"
 #include "print.h"

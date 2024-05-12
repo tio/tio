@@ -23,6 +23,7 @@
 
 #include <sys/time.h>
 #include <libgen.h>
+#include <errno.h>
 #include "print.h"
 #include "fs.h"
 
