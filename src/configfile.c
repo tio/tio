@@ -26,6 +26,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <assert.h>
+#include <errno.h>
 #include <regex.h>
 #include <glib.h>
 #include "configfile.h"
