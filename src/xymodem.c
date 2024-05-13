@@ -7,11 +7,12 @@
  *
  */
 
-#include <unistd.h>
 #include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
+#include <termios.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
-#include <termios.h>
 #include "xymodem.h"
 #include "print.h"
 #include "misc.h"
