@@ -89,7 +89,7 @@ when used in combination with [tmux](https://tmux.github.io).
    * Send files via x/y-modem protocol
    * Search for serial devices
  * Man page documentation
- * Plays nicely with [tmux](https://tmux.github.io)
+ * Plays nicely with [tmux](https://tmux.github.io) and similar terminal multiplexers
 
 ## 3. Usage
 
