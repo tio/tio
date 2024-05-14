@@ -188,6 +188,12 @@ static void optional_local_echo(char c)
 
     print(c);
 
+    if ((option.output_mode == OUTPUT_MODE_NORMAL) && (c == 127))
+    {
+        // Force destructive backspace
+        printf("\b \b");
+    }
+
     if (option.log)
     {
         log_putc(c);
