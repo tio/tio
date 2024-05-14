@@ -276,6 +276,10 @@ OPTIONS
 
               Default value is "always".
 
+       --exec <command>
+
+              Execute shell command with I/O redirected to device
+
        -v, --version
 
               Display program version.
@@ -468,6 +472,8 @@ CONFIGURATION FILE
 
        script-run               Run script on connect
 
+       exec                     Execute shell command with I/O redirected to device
+
 CONFIGURATION FILE EXAMPLES
        To change the default configuration simply set options like so:
 
@@ -494,8 +500,7 @@ CONFIGURATION FILE EXAMPLES
 
               $ tio -b 115200 -c 11 /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 
-       A configuration profile can also be activated by its pattern which supports
-              regular expressions:
+       A configuration profile can also be activated by its pattern which supports regular expressions:
 
               [usb-devices]
               pattern = ^usb([0-9]*)
@@ -510,8 +515,7 @@ CONFIGURATION FILE EXAMPLES
 
               $ tio -b 115200 /dev/ttyUSB12
 
-       It is also possible to combine use of configuration profile and command-line
-              options. For example:
+       It is also possible to combine use of configuration profile and command-line options. For example:
 
               $ tio -l -t usb12
 
@@ -553,7 +557,7 @@ EXAMPLES
               send -i $uart "ls -la\n"
               expect -i $uart "prompt> "
 
-       It is also possible to use the expect/send script functionality to e.g. automate logins:
+       It is also possible to use tio's own simpler expect/send script functionality to e.g. automate logins:
 
               $ tio --script 'expect("login: "); send("root\n"); expect("Password: "); send("root\n")' /dev/ttyUSB0
 
@@ -585,14 +589,10 @@ EXAMPLES
 
               $ tio --script "set{DTR=high,RTS=low}; msleep(100); set{RTS=toggle}" --script-run once /dev/ttyUSB0
 
-       Automatically log in to connected OS:
-
-              $ tio --script "expect('password:'); send('my_password\n')" /dev/ttyUSB0
-
 WEBSITE
        Visit https://tio.github.io
 
 AUTHOR
        Maintained by Martin Lund <martin.lund@keep-it-simple.com>.
 
-tio 3.1                                                                                                                                    2024-05-03                                                                                                                                    tio(1)
+tio 3.3                                                                                                                                    2024-05-08                                                                                                                                    tio(1)
