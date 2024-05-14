@@ -1,5 +1,21 @@
 
-=== tio v3.2 ===
+=== tio v3.3 ===
+
+
+
+Changes since tio v3.2:
+
+ * Force destructive backspace when using local echo
+
+   Only takes effect in normal output mode.
+
+ * Fix local-echo in configuration file
+
+ * Clean up includes
+
+ * Force socket write operation to ignore any signals
+
+ * Man page cleanup
 
 
 
