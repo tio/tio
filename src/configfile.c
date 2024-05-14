@@ -183,7 +183,7 @@ static void config_parse_keys(GKeyFile *key_file, char *group)
     config_get_string(key_file, group, "exclude-drivers", &option.exclude_devices, NULL);
     config_get_string(key_file, group, "exclude-tids", &option.exclude_devices, NULL);
     config_get_bool(key_file, group, "no-reconnect", &option.no_reconnect);
-    config_get_bool(key_file, group, "local-echo", &option.no_reconnect);
+    config_get_bool(key_file, group, "local-echo", &option.local_echo);
     config_get_string(key_file, group, "input-mode", &string, "normal", "hex", "line", NULL);
     if (string != NULL)
     {
