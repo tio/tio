@@ -22,7 +22,7 @@
 #define _GNU_SOURCE  // For FNM_EXTMATCH
 #include <unistd.h>
 #include <string.h>
-#include <sys/poll.h>
+#include <poll.h>
 #include <sys/wait.h>
 #include <fnmatch.h>
 #include <regex.h>

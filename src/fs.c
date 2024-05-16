@@ -32,7 +32,7 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <errno.h>
-#include <sys/poll.h>
+#include <poll.h>
 #include <termios.h>
 #include "error.h"
 #include "print.h"
