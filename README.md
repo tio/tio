@@ -33,14 +33,15 @@ when used in combination with [tmux](https://tmux.github.io).
 
  * Easily connect to serial TTY devices
  * Sensible defaults (115200 8n1)
- * Support for non-standard baud rates
- * Support for mark and space parity
  * Automatic connection management
+   * Automatic detection of serial ports
    * Automatic reconnect
    * Automatically connect to first new appearing serial device
    * Automatically connect to latest registered serial device
  * Connect to same port/device combination via unique topology ID (TID)
    * Useful for reconnecting when serial device has no serial device by ID
+ * Support for non-standard baud rates
+ * Support for mark and space parity
  * X-modem (1K/CRC) and Y-modem file upload
  * Support for RS-485 mode
  * List available serial devices
