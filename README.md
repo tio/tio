@@ -475,6 +475,12 @@ $ pacman -S tio
 
 The latest source releases can be found [here](https://github.com/tio/tio/releases).
 
+Before running the install steps make sure you have glib and lua libraries installed. For example:
+
+```
+sudo apt install libglib2.0-dev liblua5.2-dev
+```
+
 Install steps:
 ```
 $ meson setup build
