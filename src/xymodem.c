@@ -711,7 +711,7 @@ int xymodem_receive(int sio, const char *filename, modem_mode_t mode)
     int            rc, fd;
 
     /* Create new file */
-    fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC);
+    fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (fd < 0) {
         tio_error_print("Could not open file");
         return ERR;
