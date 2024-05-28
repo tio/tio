@@ -692,7 +692,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                         {
                             tio_printf("Sending file '%s'  ", line);
                             tio_printf("Press any key to abort transfer");
-                            tio_printf("%s", xymodem_send(device_fd, line, XMODEM_CRC) < 0 ? "Aborted" : "Done");
+                            tio_printf("%s", xymodem_send(device_fd, line, XMODEM_1K) < 0 ? "Aborted" : "Done");
                         }
                         break;
 
@@ -704,6 +704,17 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                             tio_printf("Sending file '%s'  ", line);
                             tio_printf("Press any key to abort transfer");
                             tio_printf("%s", xymodem_send(device_fd, line, XMODEM_CRC) < 0 ? "Aborted" : "Done");
+                        }
+                        break;
+
+                    case KEY_2:
+                        tio_printf("Receive file with XMODEM-CRC");
+                        tio_printf_raw("Enter file name: ");
+                        if (tio_readln())
+                        {
+                            tio_printf("Ready to receiving file '%s'  ", line);
+                            tio_printf("Press any key to abort transfer");
+                            tio_printf("%s", xymodem_receive(device_fd, line, XMODEM_CRC) < 0 ? "Aborted" : "Done");
                         }
                         break;
 
@@ -758,7 +769,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 tio_printf(" ctrl-%c t       Toggle line timestamp mode", option.prefix_key);
                 tio_printf(" ctrl-%c U       Toggle conversion to uppercase on output", option.prefix_key);
                 tio_printf(" ctrl-%c v       Show version", option.prefix_key);
-                tio_printf(" ctrl-%c x       Send file via Xmodem", option.prefix_key);
+                tio_printf(" ctrl-%c x       Send/Receive file via Xmodem", option.prefix_key);
                 tio_printf(" ctrl-%c y       Send file via Ymodem", option.prefix_key);
                 tio_printf(" ctrl-%c ctrl-%c  Send ctrl-%c character", option.prefix_key, option.prefix_key, option.prefix_key);
                 break;
@@ -956,8 +967,9 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
 
             case KEY_X:
                 tio_printf("Please enter which X modem protocol to use:");
-                tio_printf(" (0) XMODEM-1K");
-                tio_printf(" (1) XMODEM-CRC");
+                tio_printf(" (0) XMODEM-1K send");
+                tio_printf(" (1) XMODEM-CRC send");
+                tio_printf(" (2) XMODEM-CRC receive");
                 // Process next input character as sub command
                 sub_command = SUBCOMMAND_XMODEM;
                 break;

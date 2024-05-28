@@ -30,3 +30,5 @@ typedef enum {
 extern char key_hit;
 
 int xymodem_send(int sio, const char *filename, modem_mode_t mode);
+
+int xymodem_receive(int sio, const char *filename, modem_mode_t mode);
