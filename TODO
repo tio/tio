@@ -1,3 +1,24 @@
+ * Porting layer to support native win32 builds.
+  
+   Some of the work that needs to be done: 
+
+    All posix functions need to be platform independent, go though file by file:
+
+    termios.h
+    unistd.h has very limited functions
+    ENV different in config_file_resolve
+    errno
+    sys/ioctl.h
+    sys/poll.h
+    socket, may need a new thread
+    Serial, RS485, character mapping
+    Communication pipe
+
+    Port enumerate, all devices of the same type have the same name (eg. USB
+    Serial Device for ttyACM) -> which makes regex not meaningful (kind of a
+    good thing since libtre in Mingw has too much dependencies makes binary too
+    big)
+
  * Support traditional hex output format such as:
 
    00000000  74 65 73 74 20 74 65 73  74 20 74 65 73 74 20 74  |test test test t|
