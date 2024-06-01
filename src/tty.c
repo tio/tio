@@ -110,6 +110,7 @@
 #define KEY_P 0x70
 #define KEY_Q 0x71
 #define KEY_R 0x72
+#define KEY_SHIFT_R 0x52
 #define KEY_S 0x73
 #define KEY_T 0x74
 #define KEY_U 0x55
@@ -765,6 +766,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 tio_printf(" ctrl-%c p       Pulse serial port line", option.prefix_key);
                 tio_printf(" ctrl-%c q       Quit", option.prefix_key);
                 tio_printf(" ctrl-%c r       Run script", option.prefix_key);
+                tio_printf(" ctrl-%c R       Execute shell command with I/O redirected to device", option.prefix_key);
                 tio_printf(" ctrl-%c s       Show statistics", option.prefix_key);
                 tio_printf(" ctrl-%c t       Toggle line timestamp mode", option.prefix_key);
                 tio_printf(" ctrl-%c U       Toggle conversion to uppercase on output", option.prefix_key);
@@ -922,7 +924,20 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
 
             case KEY_R:
                 /* Run script */
-                script_run(device_fd);
+                tio_printf("Run Lua script")
+                tio_printf_raw("Enter file name: ");
+                if (tio_readln())
+                    script_run(device_fd, line);
+                else
+                    script_run(device_fd, NULL);
+                break;
+
+            case KEY_SHIFT_R:
+                /* Execute shell command */
+                tio_printf("Execute shell command with I/O redirected to device");
+                tio_printf_raw("Enter command: ");
+                if (tio_readln())
+                    execute_shell_command(device_fd, line);
                 break;
 
             case KEY_S:
@@ -2281,7 +2296,7 @@ int tty_connect(void)
     /* Manage script activation */
     if (option.script_run != SCRIPT_RUN_NEVER)
     {
-        script_run(device_fd);
+        script_run(device_fd, NULL);
 
         if (option.script_run == SCRIPT_RUN_ONCE)
         {
