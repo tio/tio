@@ -29,5 +29,5 @@ typedef enum
     SCRIPT_RUN_END,
 } script_run_t;
 
-void script_run(int fd);
+void script_run(int fd, const char *script_filename);
 const char *script_run_state_to_string(script_run_t state);

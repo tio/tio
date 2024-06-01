@@ -535,7 +535,7 @@ void script_set_globals(lua_State *L)
     script_set_global(L, "YMODEM", YMODEM);
 }
 
-void script_run(int fd)
+void script_run(int fd, const char *script_filename)
 {
     lua_State *L;
 
@@ -550,7 +550,12 @@ void script_run(int fd)
     // Initialize globals
     script_set_globals(L);
 
-    if (option.script_filename != NULL)
+    if (script_filename != NULL)
+    {
+        tio_printf("Running script %s", script_filename);
+        script_file_run(L, script_filename);
+    }
+    else if (option.script_filename != NULL)
     {
         tio_printf("Running script %s", option.script_filename);
         script_file_run(L, option.script_filename);

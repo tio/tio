@@ -304,6 +304,7 @@ ctrl-t ? to list the available key commands.
 [15:02:53.269]  ctrl-t p       Pulse serial port line
 [15:02:53.269]  ctrl-t q       Quit
 [15:02:53.269]  ctrl-t r       Run script
+[15:02:53.269]  ctrl-t R       Execute shell command with I/O redirected to device
 [15:02:53.269]  ctrl-t s       Show statistics
 [15:02:53.269]  ctrl-t t       Toggle line timestamp mode
 [15:02:53.269]  ctrl-t U       Toggle conversion to uppercase on output

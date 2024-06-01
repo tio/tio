@@ -405,6 +405,8 @@ Pulse serial port line
 Quit
 .IP "\fBctrl-t r"
 Run script
+.IP "\fBctrl-t R"
+Execute shell command with I/O redirected to device
 .IP "\fBctrl-t s"
 Show TX/RX statistics
 .IP "\fBctrl-t t"
