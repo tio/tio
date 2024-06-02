@@ -95,7 +95,12 @@
 #define KEY_3 0x33
 #define KEY_4 0x34
 #define KEY_5 0x35
+#define KEY_6 0x36
+#define KEY_7 0x37
+#define KEY_8 0x38
+#define KEY_9 0x39
 #define KEY_QUESTION 0x3f
+#define KEY_A 0x61
 #define KEY_B 0x62
 #define KEY_C 0x63
 #define KEY_E 0x65
@@ -113,7 +118,6 @@
 #define KEY_SHIFT_R 0x52
 #define KEY_S 0x73
 #define KEY_T 0x74
-#define KEY_U 0x55
 #define KEY_V 0x76
 #define KEY_X 0x78
 #define KEY_Y 0x79
@@ -131,6 +135,7 @@ typedef enum
     SUBCOMMAND_LINE_TOGGLE,
     SUBCOMMAND_LINE_PULSE,
     SUBCOMMAND_XMODEM,
+    SUBCOMMAND_MAP,
 } sub_command_t;
 
 const char random_array[] =
@@ -724,6 +729,62 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                         break;
                 }
                 break;
+
+            case SUBCOMMAND_MAP:
+                switch (input_char)
+                {
+                    case KEY_0:
+                        tio.c_iflag ^= ICRNL;
+                        map_i_cr_nl = !map_i_cr_nl;
+                        tio_printf("ICRNL is %s", map_i_cr_nl ? "set" : "unset");
+                        break;
+                    case KEY_1:
+                        tio.c_iflag ^= IGNCR;
+                        map_ign_cr = !map_ign_cr;
+                        tio_printf("IGNCR is %s", map_ign_cr ? "set" : "unset");
+                        break;
+                    case KEY_2:
+                        map_i_ff_escc = !map_i_ff_escc;
+                        tio_printf("IFFESCC is %s", map_i_ff_escc ? "set" : "unset");
+                        break;
+                    case KEY_3:
+                        tio.c_iflag ^= INLCR;
+                        map_i_nl_cr = !map_i_nl_cr;
+                        tio_printf("INLCR is %s", map_i_nl_cr ? "set" : "unset");
+                        break;
+                    case KEY_4:
+                        map_i_nl_crnl = !map_i_nl_crnl;
+                        tio_printf("INLCRNL is %s", map_i_nl_crnl ? "set" : "unset");
+                        break;
+                    case KEY_5:
+                        map_o_cr_nl = !map_o_cr_nl;
+                        tio_printf("OCRNL is %s", map_o_cr_nl ? "set" : "unset");
+                        break;
+                    case KEY_6:
+                        map_o_del_bs = !map_o_del_bs;
+                        tio_printf("ODELBS is %s", map_o_del_bs ? "set" : "unset");
+                        break;
+                    case KEY_7:
+                        map_o_nl_crnl = !map_o_nl_crnl;
+                        tio_printf("ONLCRNL is %s", map_o_nl_crnl ? "set" : "unset");
+                        break;
+                    case KEY_8:
+                        map_o_ltu = !map_o_ltu;
+                        tio_printf("OLTU is %s", map_o_ltu ? "set" : "unset");
+                        break;
+                    case KEY_9:
+                        map_o_nulbrk = !map_o_nulbrk;
+                        tio_printf("ONULBRK is %s", map_o_nulbrk ? "set" : "unset");
+                        break;
+                    case KEY_A:
+                        map_o_msblsb = !map_o_msblsb;
+                        tio_printf("MSB2LSB is %s", map_o_msblsb ? "set" : "unset");
+                        break;
+                    default:
+                        tio_error_print("Invalid input");
+                        break;
+                }
+                break;
         }
 
         sub_command = SUBCOMMAND_NONE;
@@ -761,7 +822,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 tio_printf(" ctrl-%c i       Toggle input mode", option.prefix_key);
                 tio_printf(" ctrl-%c l       Clear screen", option.prefix_key);
                 tio_printf(" ctrl-%c L       Show line states", option.prefix_key);
-                tio_printf(" ctrl-%c m       Toggle MSB to LSB bit order", option.prefix_key);
+                tio_printf(" ctrl-%c m       Change mapping of characters on input or output", option.prefix_key);
                 tio_printf(" ctrl-%c o       Toggle output mode", option.prefix_key);
                 tio_printf(" ctrl-%c p       Pulse serial port line", option.prefix_key);
                 tio_printf(" ctrl-%c q       Quit", option.prefix_key);
@@ -769,7 +830,6 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 tio_printf(" ctrl-%c R       Execute shell command with I/O redirected to device", option.prefix_key);
                 tio_printf(" ctrl-%c s       Show statistics", option.prefix_key);
                 tio_printf(" ctrl-%c t       Toggle line timestamp mode", option.prefix_key);
-                tio_printf(" ctrl-%c U       Toggle conversion to uppercase on output", option.prefix_key);
                 tio_printf(" ctrl-%c v       Show version", option.prefix_key);
                 tio_printf(" ctrl-%c x       Send/Receive file via Xmodem", option.prefix_key);
                 tio_printf(" ctrl-%c y       Send file via Ymodem", option.prefix_key);
@@ -905,17 +965,33 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 break;
 
             case KEY_M:
-                /* Toggle bit order */
-                if (!map_o_msblsb)
-                {
-                    map_o_msblsb = true;
-                    tio_printf("Switched to reverse bit order");
-                }
-                else
-                {
-                    map_o_msblsb = false;
-                    tio_printf("Switched to normal bit order");
-                }
+                /* Change mapping of characters on input or output */
+                tio_printf("Please enter which mapping to set or unset:");
+                tio_printf(" (0) ICRNL: %s mapping CR to NL on input (unless IGNCR is set)",
+                        map_i_cr_nl ? "Unset" : "Set");
+                tio_printf(" (1) IGNCR: %s ignoring CR on input",
+                        map_ign_cr ? "Unset" : "Set");
+                tio_printf(" (2) IFFESCC: %s mapping FF to ESC-c on input",
+                        map_i_ff_escc ? "Unset" : "Set");
+                tio_printf(" (3) INLCR: %s mapping NL to CR on input",
+                        map_i_nl_cr ? "Unset" : "Set");
+                tio_printf(" (4) INLCRNL: %s mapping NL to CR-NL on input",
+                        map_i_nl_cr ? "Unset" : "Set");
+                tio_printf(" (5) OCRNL: %s mapping CR to NL on output",
+                        map_o_cr_nl ? "Unset" : "Set");
+                tio_printf(" (6) ODELBS: %s mapping DEL to BS on output",
+                        map_o_del_bs ? "Unset" : "Set");
+                tio_printf(" (7) ONLCRNL: %s mapping NL to CR-NL on output",
+                        map_o_nl_crnl ? "Unset" : "Set");
+                tio_printf(" (8) OLTU: %s mapping lowercase to uppercase on output",
+                        map_o_ltu ? "Unset" : "Set");
+                tio_printf(" (9) ONULBRK: %s mapping NUL to send break signal on output",
+                        map_o_nulbrk ? "Unset" : "Set");
+                tio_printf(" (a) MSB2LSB: %s mapping MSB bit order to LSB on output",
+                        map_o_msblsb ? "Unset" : "Set");
+
+                // Process next input character as sub command
+                sub_command = SUBCOMMAND_MAP;
                 break;
 
             case KEY_Q:
@@ -970,10 +1046,6 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                         tio_printf("Switched timestamp mode off");
                         break;
                 }
-                break;
-
-            case KEY_U:
-                map_o_ltu = !map_o_ltu;
                 break;
 
             case KEY_V:

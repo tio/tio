@@ -299,7 +299,7 @@ ctrl-t ? to list the available key commands.
 [15:02:53.269]  ctrl-t i       Toggle input mode
 [15:02:53.269]  ctrl-t l       Clear screen
 [15:02:53.269]  ctrl-t L       Show line states
-[15:02:53.269]  ctrl-t m       Toggle MSB to LSB bit order
+[15:02:53.269]  ctrl-t m       Change mapping of characters on input or output
 [15:02:53.269]  ctrl-t o       Toggle output mode
 [15:02:53.269]  ctrl-t p       Pulse serial port line
 [15:02:53.269]  ctrl-t q       Quit
@@ -307,7 +307,6 @@ ctrl-t ? to list the available key commands.
 [15:02:53.269]  ctrl-t R       Execute shell command with I/O redirected to device
 [15:02:53.269]  ctrl-t s       Show statistics
 [15:02:53.269]  ctrl-t t       Toggle line timestamp mode
-[15:02:53.269]  ctrl-t U       Toggle conversion to uppercase on output
 [15:02:53.269]  ctrl-t v       Show version
 [15:02:53.269]  ctrl-t x       Send file via Xmodem
 [15:02:53.269]  ctrl-t y       Send file via Ymodem
