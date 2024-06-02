@@ -85,7 +85,6 @@ struct option_t option =
     .local_echo = false,
     .timestamp = TIMESTAMP_NONE,
     .socket = NULL,
-    .map = "",
     .color = 256, // Bold
     .input_mode = INPUT_MODE_NORMAL,
     .output_mode = OUTPUT_MODE_NORMAL,
@@ -109,6 +108,17 @@ struct option_t option =
     .hex_n_value = 0,
     .vt100 = false,
     .exec = NULL,
+    .map_i_nl_cr = false,
+    .map_i_cr_nl = false,
+    .map_ign_cr = false,
+    .map_i_ff_escc = false,
+    .map_i_nl_crnl = false,
+    .map_o_cr_nl = false,
+    .map_o_nl_crnl = false,
+    .map_o_del_bs = false,
+    .map_o_ltu = false,
+    .map_o_nulbrk = false,
+    .map_o_msblsb = false,
 };
 
 void option_print_help(char *argv[])
@@ -692,6 +702,90 @@ void option_parse_script_run(const char *arg, script_run_t *script_run)
     }
 }
 
+void option_parse_mappings(const char *map)
+{
+    bool token_found = true;
+    char *token = NULL;
+    char *buffer;
+
+    if (map == NULL)
+    {
+        return;
+    }
+
+    /* Parse any specified input or output mappings */
+    buffer = strdup(map);
+    while (token_found == true)
+    {
+        if (token == NULL)
+        {
+            token = strtok(buffer,",");
+        }
+        else
+        {
+            token = strtok(NULL, ",");
+        }
+
+        if (token != NULL)
+        {
+            if (strcmp(token,"INLCR") == 0)
+            {
+                option.map_i_nl_cr = true;
+            }
+            else if (strcmp(token,"IGNCR") == 0)
+            {
+                option.map_ign_cr = true;
+            }
+            else if (strcmp(token,"ICRNL") == 0)
+            {
+                option.map_i_cr_nl = true;
+            }
+            else if (strcmp(token,"OCRNL") == 0)
+            {
+                option.map_o_cr_nl = true;
+            }
+            else if (strcmp(token,"ODELBS") == 0)
+            {
+                option.map_o_del_bs = true;
+            }
+            else if (strcmp(token,"IFFESCC") == 0)
+            {
+                option.map_i_ff_escc = true;
+            }
+            else if (strcmp(token,"INLCRNL") == 0)
+            {
+                option.map_i_nl_crnl = true;
+            }
+            else if (strcmp(token, "ONLCRNL") == 0)
+            {
+                option.map_o_nl_crnl = true;
+            }
+            else if (strcmp(token, "OLTU") == 0)
+            {
+                option.map_o_ltu = true;
+            }
+            else if (strcmp(token, "ONULBRK") == 0)
+            {
+                option.map_o_nulbrk = true;
+            }
+            else if (strcmp(token, "MSB2LSB") == 0)
+            {
+                option.map_o_msblsb = true;
+            }
+            else
+            {
+                printf("Error: Unknown mapping flag %s\n", token);
+                exit(EXIT_FAILURE);
+            }
+        }
+        else
+        {
+            token_found = false;
+        }
+    }
+    free(buffer);
+}
+
 void options_print()
 {
     tio_printf(" Device: %s", device_name);
@@ -928,7 +1022,7 @@ void options_parse(int argc, char *argv[])
                 break;
 
             case 'm':
-                option.map = optarg;
+                option_parse_mappings(optarg);
                 break;
 
             case 'c':

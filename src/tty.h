@@ -71,9 +71,6 @@ typedef struct
 
 extern const char *device_name;
 extern bool interactive_mode;
-extern bool map_i_nl_cr;
-extern bool map_i_cr_nl;
-extern bool map_ign_cr;
 
 void stdout_configure(void);
 void stdin_configure(void);

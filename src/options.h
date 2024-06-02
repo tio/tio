@@ -69,7 +69,6 @@ struct option_t
     timestamp_t timestamp;
     char *log_filename;
     char *log_directory;
-    char *map;
     char *socket;
     int color;
     input_mode_t input_mode;
@@ -94,6 +93,17 @@ struct option_t
     int hex_n_value;
     bool vt100;
     char *exec;
+    bool map_i_nl_cr;
+    bool map_i_cr_nl;
+    bool map_ign_cr;
+    bool map_i_ff_escc;
+    bool map_i_nl_crnl;
+    bool map_o_cr_nl;
+    bool map_o_nl_crnl;
+    bool map_o_del_bs;
+    bool map_o_ltu;
+    bool map_o_nulbrk;
+    bool map_o_msblsb;
 };
 
 extern struct option_t option;
@@ -119,3 +129,5 @@ const char *option_auto_connect_state_to_string(auto_connect_t strategy);
 
 void option_parse_timestamp(const char *arg, timestamp_t *timestamp);
 const char* option_timestamp_format_to_string(timestamp_t timestamp);
+
+void option_parse_mappings(const char *map);
