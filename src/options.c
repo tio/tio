@@ -716,10 +716,6 @@ void options_print()
     tio_printf(" Input mode: %s", option_input_mode_to_string(option.input_mode));
     tio_printf(" Output mode: %s", option_output_mode_to_string(option.output_mode));
     tio_printf(" Alert: %s", option_alert_state_to_string(option.alert));
-    if (option.map[0] != 0)
-    {
-        tio_printf(" Map flags: %s", option.map);
-    }
     if (option.log)
     {
         tio_printf(" Log file: %s", log_get_filename());
