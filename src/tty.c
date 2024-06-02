@@ -630,6 +630,32 @@ void tty_output_mode_set(output_mode_t mode)
     }
 }
 
+static void mappings_print(void)
+{
+    if (map_i_cr_nl || map_ign_cr || map_i_ff_escc || map_i_nl_cr ||
+            map_i_nl_crnl || map_o_cr_nl || map_o_del_bs || map_o_nl_crnl ||
+            map_o_ltu || map_o_nulbrk || map_o_msblsb)
+    {
+        tio_printf(" Mappings:%s%s%s%s%s%s%s%s%s%s%s",
+                map_i_cr_nl ? " ICRNL" : "",
+                map_ign_cr ? " IGNCR" : "",
+                map_i_ff_escc ? " IFFESCC" : "",
+                map_i_nl_cr ? " INLCR" : "",
+                map_i_nl_crnl ? " INLCRNL" : "",
+                map_o_cr_nl ? " OCRNL" : "",
+                map_o_del_bs ? " ODELBS" : "",
+                map_o_nl_crnl ? " ONLCRNL" : "",
+                map_o_ltu ? " OLTU" : "",
+                map_o_nulbrk ? " ONULBRK" : "",
+                map_o_msblsb ? " MSB2LSB" : "");
+    }
+    else
+    {
+        tio_printf(" Mappings: none");
+    }
+
+}
+
 void handle_command_sequence(char input_char, char *output_char, bool *forward)
 {
     char unused_char;
@@ -908,6 +934,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 {
                     rs485_print_config();
                 }
+                mappings_print();
                 break;
 
             case KEY_E:
