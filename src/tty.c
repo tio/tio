@@ -749,13 +749,13 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 switch (input_char)
                 {
                     case KEY_0:
-                        tio.c_iflag ^= ICRNL;
                         option.map_i_cr_nl = !option.map_i_cr_nl;
+                        tty_reconfigure();
                         tio_printf("ICRNL is %s", option.map_i_cr_nl ? "set" : "unset");
                         break;
                     case KEY_1:
-                        tio.c_iflag ^= IGNCR;
                         option.map_ign_cr = !option.map_ign_cr;
+                        tty_reconfigure();
                         tio_printf("IGNCR is %s", option.map_ign_cr ? "set" : "unset");
                         break;
                     case KEY_2:
@@ -763,8 +763,8 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                         tio_printf("IFFESCC is %s", option.map_i_ff_escc ? "set" : "unset");
                         break;
                     case KEY_3:
-                        tio.c_iflag ^= INLCR;
                         option.map_i_nl_cr = !option.map_i_nl_cr;
+                        tty_reconfigure();
                         tio_printf("INLCR is %s", option.map_i_nl_cr ? "set" : "unset");
                         break;
                     case KEY_4:
@@ -1362,6 +1362,17 @@ void tty_configure(void)
     if (option.map_i_cr_nl)
     {
         tio.c_iflag |= ICRNL;
+    }
+}
+
+void tty_reconfigure(void)
+{
+    tty_configure();
+
+    if (connected)
+    {
+        /* Activate new port settings */
+        tcsetattr(device_fd, TCSANOW, &tio);
     }
 }
 
