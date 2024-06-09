@@ -2593,43 +2593,6 @@ int tty_connect(void)
                                 case INPUT_MODE_LINE:
                                     switch (input_char)
                                     {
-                                        case 27: // Escape
-                                            forward = false;
-                                            break;
-
-                                        case '[':
-                                            if (previous_char[0] == 27)
-                                            {
-                                                forward = false;
-                                            }
-                                            break;
-
-                                        case 'A':
-                                        case 'B':
-                                        case 'C':
-                                        case 'D':
-                                            if ((previous_char[1] == 27) && (previous_char[0] == '['))
-                                            {
-                                                // Handle arrow keys
-                                                switch (input_char)
-                                                {
-                                                    case 'A': // Up arrow
-                                                        // Ignore
-                                                        break;
-                                                    case 'B': // Down arrow
-                                                        // Ignore
-                                                        break;
-                                                    case 'C': // Right arrow
-                                                        // Ignore
-                                                        break;
-                                                    case 'D': // Left arrow
-                                                        // Ignore
-                                                        break;
-                                                }
-                                                forward = false;
-                                            }
-                                            break;
-
                                         case '\b':
                                         case 127: // Backspace
                                             if (line_index)
