@@ -124,6 +124,7 @@ void socket_configure(void)
     struct sockaddr_in6 sockaddr_inet6 = {};
     struct sockaddr *sockaddr_p;
     socklen_t socklen;
+    int optval;
 
     /* Parse socket string */
 
@@ -222,6 +223,12 @@ void socket_configure(void)
     if (sockfd < 0)
     {
         tio_error_printf("Failed to create socket (%s)", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)))
+    {
+        tio_error_printf("Failed to set socket options (%s)", strerror(errno));
         exit(EXIT_FAILURE);
     }
 
