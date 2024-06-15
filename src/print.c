@@ -75,3 +75,15 @@ void print_tainted_set()
 {
     print_tainted = true;
 }
+
+void print(const char *format, ...)
+{
+    va_list args;
+
+    va_start(args, format);
+    vprintf(format, args);
+    fflush(stdout);
+    va_end(args);
+
+    print_tainted = false;
+}

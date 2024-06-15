@@ -134,6 +134,7 @@ extern char ansi_format[];
 #define tio_debug_printf_raw(format, args...)
 #endif
 
+void print(const char *format, ...);
 void print_hex(char c);
 void print_normal(char c);
 void print_init_ansi_formatting(void);

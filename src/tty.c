@@ -87,7 +87,8 @@
 #define CMSPAR   010000000000
 #endif
 
-#define LINE_SIZE_MAX 1000
+#define MAX_LINE_LEN PATH_MAX
+#define MAX_HISTORY 1000
 
 #define KEY_0 0x30
 #define KEY_1 0x31
@@ -162,7 +163,7 @@ static struct termios tio, tio_old, stdout_new, stdout_old, stdin_new, stdin_old
 static unsigned long rx_total = 0, tx_total = 0;
 static bool connected = false;
 static bool standard_baudrate = true;
-static void (*print)(char c);
+static void (*printchar)(char c);
 static int device_fd;
 static char hex_chars[2];
 static unsigned char hex_char_index = 0;
@@ -172,7 +173,7 @@ static char *tty_buffer_write_ptr = tty_buffer;
 static pthread_t thread;
 static int pipefd[2];
 static pthread_mutex_t mutex_input_ready = PTHREAD_MUTEX_INITIALIZER;
-static char line[LINE_SIZE_MAX];
+static char line[MAX_LINE_LEN];
 
 static void optional_local_echo(char c)
 {
@@ -181,7 +182,7 @@ static void optional_local_echo(char c)
         return;
     }
 
-    print(c);
+    printchar(c);
 
     if ((option.output_mode == OUTPUT_MODE_NORMAL) && (c == 127))
     {
@@ -580,13 +581,13 @@ static int tio_readln(void)
     char *p = line;
 
     /* Read line, accept BS and DEL as rubout characters */
-    for (p = line ; p < &line[LINE_SIZE_MAX-1]; )
+    for (p = line ; p < &line[MAX_LINE_LEN-1]; )
     {
         if (read(pipefd[0], p, 1) > 0)
         {
             if (*p == 0x08 || *p == 0x7f)
             {
-                if (p > line )
+                if (p > line)
                 {
                     write(STDOUT_FILENO, "\b \b", 3);
                     p--;
@@ -607,11 +608,11 @@ void tty_output_mode_set(output_mode_t mode)
     switch (mode)
     {
         case OUTPUT_MODE_NORMAL:
-            print = print_normal;
+            printchar = print_normal;
             break;
 
         case OUTPUT_MODE_HEX:
-            print = print_hex;
+            printchar = print_hex;
             break;
 
         case OUTPUT_MODE_END:
@@ -1191,7 +1192,7 @@ void stdout_configure(void)
     }
 
     /* At start use normal print function */
-    print = print_normal;
+    printchar = print_normal;
 
     /* Make sure we restore old stdout settings on exit */
     atexit(&stdout_restore);
@@ -2156,7 +2157,11 @@ void forward_to_tty(int fd, char output_char)
                 else
                 {
                     /* Send output to tty device */
-                    optional_local_echo(output_char);
+                    if (option.input_mode != INPUT_MODE_LINE)
+                    {
+                        optional_local_echo(output_char);
+                    }
+
                     if ((output_char == 0) && (option.map_o_nulbrk))
                     {
                         status = tcsendbreak(fd, 0);
@@ -2165,6 +2170,7 @@ void forward_to_tty(int fd, char output_char)
                     {
                         status = tty_write(fd, &output_char, 1);
                     }
+
                     if (status < 0)
                     {
                         tio_warning_printf("Could not write to tty device");
@@ -2195,19 +2201,32 @@ void forward_to_tty(int fd, char output_char)
     }
 }
 
+static void clear_line()
+{
+    print("\r\033[K");
+}
+
+static void print_line(const char *string, int cursor_pos)
+{
+    clear_line();
+    print("%s", string);
+    print("\r"); // Move the cursor back to the beginning
+    for (int i = 0; i < cursor_pos; ++i)
+    {
+        print("\x1b[C"); // Move the cursor right
+    }
+}
+
 int tty_connect(void)
 {
     fd_set rdfs;           /* Read file descriptor set */
     int    maxfd;          /* Maximum file descriptor used */
     char   input_char, output_char;
     char   input_buffer[BUFSIZ] = {};
-    char   line_buffer[BUFSIZ] = {};
     static bool first = true;
     int    status;
     bool   do_timestamp = false;
     char*  now = NULL;
-    unsigned int line_index = 0;
-    static char previous_char[2] = {};
     struct timeval tval_before = {}, tval_now, tval_result;
 
     /* Open tty device */
@@ -2350,6 +2369,20 @@ int tty_connect(void)
         status = execute_shell_command(device_fd, option.exec);
         exit(status);
     }
+
+    // Initialize readline like history
+    char *history[MAX_HISTORY];
+    int history_count = 0;
+    int history_index = 0;
+
+    for (int i = 0; i < MAX_HISTORY; ++i)
+    {
+        history[i] = NULL;
+    }
+
+    int line_length = 0;
+    int cursor_pos = 0;
+    int escape = 0;
 
     /* Input loop */
     while (true)
@@ -2505,8 +2538,8 @@ int tty_connect(void)
                     /* Map input character */
                     if ((input_char == '\n') && (option.map_i_nl_crnl) && (!option.map_o_msblsb))
                     {
-                        print('\r');
-                        print('\n');
+                        printchar('\r');
+                        printchar('\n');
                         if (option.timestamp)
                         {
                             do_timestamp = true;
@@ -2514,13 +2547,13 @@ int tty_connect(void)
                     }
                     else if ((input_char == '\f') && (option.map_i_ff_escc) && (!option.map_o_msblsb))
                     {
-                        print('\e');
-                        print('c');
+                        printchar('\e');
+                        printchar('c');
                     }
                     else
                     {
                         /* Print received tty character to stdout */
-                        print(input_char);
+                        printchar(input_char);
                     }
 
                     /* Write to log */
@@ -2593,57 +2626,155 @@ int tty_connect(void)
                                 case INPUT_MODE_LINE:
                                     switch (input_char)
                                     {
-                                        case '\b':
-                                        case 127: // Backspace
-                                            if (line_index)
-                                            {
-                                                printf("\b \b"); // Destructive backspace
-                                                line_index--;
-                                            }
-                                            forward = false;
-                                            break;
-
                                         case '\r': // Carriage return
+                                            if (line_length > 0)
+                                            {
+                                                // Save to history
+                                                if (history_count < MAX_HISTORY)
+                                                {
+                                                    history[history_count] = strndup(line, line_length);
+                                                    history_count++;
+                                                }
+                                                else
+                                            {
+                                                    free(history[0]);
+                                                    memmove(&history[0], &history[1], (MAX_HISTORY - 1) * sizeof(char*));
+                                                    history[MAX_HISTORY - 1] = strndup(line, line_length);
+                                                }
+                                            }
+
+                                            line[line_length] = '\0';
                                             if (option.local_echo == false)
                                             {
-                                                // Delete line
-                                                int i = line_index;
-                                                while (i--)
-                                                {
-                                                    printf("\b \b"); // Destructive backspace
-                                                }
+                                                clear_line();
                                             }
                                             else
                                             {
-                                                // Preserve line, go to next line
-                                                putchar('\r');
-                                                putchar('\n');
+                                                print("\r\n");
                                             }
 
-                                            // Write buffered line to tty device
-                                            tty_write(device_fd, line_buffer, line_index);
+                                            // Write line to tty device
+                                            tty_write(device_fd, line, line_length);
                                             tty_sync(device_fd);
-                                            line_index = 0;
+
+                                            line_length = 0;
+                                            cursor_pos = 0;
+                                            history_index = history_count;
+                                            escape = 0;
+                                            break;
+
+                                        case 127: // Backspace
+                                            if (cursor_pos > 0)
+                                            {
+                                                memmove(&line[cursor_pos - 1], &line[cursor_pos], line_length - cursor_pos);
+                                                line_length--;
+                                                cursor_pos--;
+                                                line[line_length] = '\0';
+                                                print_line(line, cursor_pos);
+                                            }
+                                            forward = false;
+                                            escape = 0;
+                                            break;
+
+                                        case 27: // Escape
+                                            escape = 1;
+                                            forward = false;
+                                            break;
+
+                                        case '[':
+                                            if (escape == 1)
+                                            {
+                                                escape = 2;
+                                            }
+                                            else
+                                            {
+                                                escape = 0;
+                                            }
+                                            break;
+
+                                        case 'A':
+                                            if (escape == 2)
+                                            {
+                                                // Up arrow
+                                                if (history_index > 0)
+                                                {
+                                                    history_index--;
+                                                    strncpy(line, history[history_index], MAX_LINE_LEN-1);
+                                                    line_length = strlen(line);
+                                                    cursor_pos = line_length;
+                                                    print_line(line, cursor_pos);
+                                                }
+                                            }
+                                            forward = false;
+                                            escape = 0;
+                                            break;
+
+                                        case 'B':
+                                            if (escape == 2)
+                                            {
+                                                // Down arrow
+                                                if (history_index < history_count - 1)
+                                                {
+                                                    history_index++;
+                                                    strncpy(line, history[history_index], MAX_LINE_LEN-1);
+                                                    line_length = strlen(line);
+                                                    cursor_pos = line_length;
+                                                    print_line(line, cursor_pos);
+                                                }
+                                                else if (history_index == history_count - 1)
+                                                {
+                                                    history_index++;
+                                                    line_length = 0;
+                                                    cursor_pos = 0;
+                                                    line[line_length] = '\0';
+                                                    print_line(line, cursor_pos);
+                                                }
+                                            }
+                                            forward = false;
+                                            escape = 0;
+                                            break;
+
+                                        case 'C':
+                                            if (escape == 2)
+                                            {
+                                                // Right arrow
+                                                if (cursor_pos < line_length)
+                                                {
+                                                    cursor_pos++;
+                                                    print("\x1b[C");
+                                                }
+                                            }
+                                            forward = false;
+                                            escape = 0;
+                                            break;
+
+                                        case 'D':
+                                            if (escape == 2)
+                                            {
+                                                    // Left arrow
+                                                    if (cursor_pos > 0)
+                                                    {
+                                                        cursor_pos--;
+                                                        print("\b");
+                                                    }
+                                            }
+                                            forward = false;
+                                            escape = 0;
                                             break;
 
                                         default:
-                                            if (line_index < BUFSIZ)
+                                            if (line_length < MAX_LINE_LEN - 1)
                                             {
-                                                putchar(input_char);
-                                                print_tainted_set();
-                                                line_buffer[line_index++] = input_char;
+                                                memmove(&line[cursor_pos + 1], &line[cursor_pos], line_length - cursor_pos);
+                                                line[cursor_pos] = input_char;
+                                                line_length++;
+                                                cursor_pos++;
+                                                line[line_length] = '\0';
+                                                print_line(line, cursor_pos);
                                             }
-                                            else
-                                            {
-                                                tio_error_print("Input exceeds maximum line length. Truncating.");
-                                            }
-                                            forward = false;
+                                            escape = 0;
+                                            break;
                                     }
-
-                                    // Save 2 latest stdin input characters
-                                    previous_char[1] = previous_char[0];
-                                    previous_char[0] = input_char;
-                                    break;
 
                                 default:
                                     break;
