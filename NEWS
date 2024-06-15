@@ -1,5 +1,52 @@
 
-=== tio v3.3 ===
+=== tio v3.4 ===
+
+
+
+Changes since tio v3.3:
+
+ * Update configuration output
+
+ * Clean up script run interaction text
+
+ * Fix unbounded writes
+
+ * Add history and editing feature to line input mode
+
+   Use up and down arrow keys to navigate history.
+
+   Use left and right arrow keys to move cursor back and forth.
+
+   We try mimic the behaviour of GNU readline which we can not use because
+   we also need to react to key commands.
+
+ * Reuse socket address
+
+   To avoid having to wait for socket timeout when restarting server.
+
+ * Fix line input mode
+
+   Fix so that ABCD are no longer ignored.
+
+ * Make sure ICRNL, IGNCR, INLCR take effect
+ 
+ * Include correct header for poll()
+
+ * Add group write permission to xymodem received file
+
+ * Fix missing open() flags in xymodem_receive()
+
+Vyacheslav Patkov:
+
+ * Show current mappings in the configuration printout
+
+ * Use "ctrl-t m" to change mappings interactively
+
+ * Prompt for Lua script or shell command in interactive session
+
+Eliot Alan Foss:
+
+ * Added support to receive XMODEM-CRC files from the connected serial port.
 
 
 
