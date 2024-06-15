@@ -408,13 +408,12 @@ static char *match_and_replace(const char *str, const char *pattern, char *devic
     assert(pattern != NULL);
     assert(device != NULL);
 
-    char *string = malloc(strlen(device) + PATH_MAX);
+    char *string = strndup(device, PATH_MAX);
     if (string == NULL)
     {
         tio_debug_printf("Failure allocating string memory\n");
         return NULL;
     }
-    strcpy(string, device);
 
     /* Find matches of pattern in str. For each match, replace any '%mN' in the
      * copy of the device string with the corresponding match subexpression and

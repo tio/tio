@@ -150,14 +150,7 @@ char* fs_search_directory(const char *dir_path, const char *dirname)
             // If it's a directory, check if it's the one we're looking for
             if (strcmp(entry->d_name, dirname) == 0)
             {
-                char* result = malloc(strlen(path) + 1);
-                if (result == NULL)
-                {
-                    // Error allocating memory
-                    closedir(dir);
-                    return NULL;
-                }
-                strcpy(result, path);
+                char *result = strndup(path, PATH_MAX);
                 closedir(dir);
                 return result;
             }
