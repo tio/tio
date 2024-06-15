@@ -341,7 +341,7 @@ SCRIPT API
        In addition to the Lua API tio makes the following functions available:
 
        expect(string, timeout)
-             Expect string - waits for string to match or timeout before continueing.  Supports regular expressions. Special characters must be escaped with '\\'.  Timeout is in milliseconds, defaults to 0 meaning it will wait forever.
+             Expect string - waits for string to match or timeout before continuing.  Supports regular expressions. Special characters must be escaped with '\\'.  Timeout is in milliseconds, defaults to 0 meaning it will wait forever.
 
              Returns 1 on successful match, 0 on timeout, or -1 on error.
 
@@ -382,7 +382,7 @@ SCRIPT API
              Sleep for seconds.
 
        msleep(ms)
-             Sleep for miliseconds.
+             Sleep for milliseconds.
 
        exit(code)
              Exit with exit code.
