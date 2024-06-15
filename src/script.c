@@ -513,7 +513,7 @@ void script_file_run(lua_State *L, const char *filename)
 
     if (luaL_dofile(L, filename))
     {
-        tio_warning_printf("lua: %s\n", lua_tostring(L, -1));
+        tio_warning_printf("lua: %s", lua_tostring(L, -1));
         lua_pop(L, 1);  /* pop error message from the stack */
         return;
     }

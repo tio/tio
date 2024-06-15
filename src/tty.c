@@ -1020,9 +1020,15 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 tio_printf("Run Lua script")
                 tio_printf_raw("Enter file name: ");
                 if (tio_readln())
+                {
+                    clear_line();
                     script_run(device_fd, line);
+                }
                 else
+                {
+                    clear_line();
                     script_run(device_fd, NULL);
+                }
                 break;
 
             case KEY_SHIFT_R:
@@ -2199,11 +2205,6 @@ void forward_to_tty(int fd, char output_char)
                 break;
         }
     }
-}
-
-static void clear_line()
-{
-    print("\r\033[K");
 }
 
 static void print_line(const char *string, int cursor_pos)

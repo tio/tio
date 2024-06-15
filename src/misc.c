@@ -247,3 +247,8 @@ int execute_shell_command(int fd, const char *command)
 
     return 0;
 }
+
+void clear_line()
+{
+    print("\r\033[K");
+}
