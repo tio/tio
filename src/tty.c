@@ -918,8 +918,8 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
 
             case KEY_C:
                 tio_printf("Configuration:");
-                options_print();
                 config_file_print();
+                options_print();
                 if (option.rs485)
                 {
                     rs485_print_config();
