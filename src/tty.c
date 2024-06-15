@@ -2520,7 +2520,7 @@ int tty_connect(void)
                         break;
 
                         default:
-                            tio_error_printf("Unknown outut mode");
+                            tio_error_printf("Unknown output mode");
                             exit(EXIT_FAILURE);
                         break;
                     }

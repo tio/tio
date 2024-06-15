@@ -429,7 +429,7 @@ In addition to the Lua API tio makes the following functions available:
 .TP 6n
 
 .IP "\fBexpect(string, timeout)"
-Expect string - waits for string to match or timeout before continueing.
+Expect string - waits for string to match or timeout before continuing.
 Supports regular expressions. Special characters must be escaped with '\\\\'.
 Timeout is in milliseconds, defaults to 0 meaning it will wait forever.
 
@@ -475,7 +475,7 @@ State is high, low, or toggle.
 .IP "\fBsleep(seconds)"
 Sleep for seconds.
 .IP "\fBmsleep(ms)"
-Sleep for miliseconds.
+Sleep for milliseconds.
 .IP "\fBexit(code)"
 Exit with exit code.
 
