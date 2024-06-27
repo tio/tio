@@ -20,7 +20,8 @@ tio_sources = [
   'alert.c',
   'xymodem.c',
   'script.c',
-  'fs.c'
+  'fs.c',
+  'readline.c'
 ]
 
 

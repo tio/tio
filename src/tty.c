@@ -64,6 +64,7 @@
 #include "script.h"
 #include "xymodem.h"
 #include "fs.h"
+#include "readline.h"
 
 /* tty device listing configuration */
 
@@ -86,9 +87,6 @@
 #ifndef CMSPAR
 #define CMSPAR   010000000000
 #endif
-
-#define MAX_LINE_LEN PATH_MAX
-#define MAX_HISTORY 1000
 
 #define KEY_0 0x30
 #define KEY_1 0x31
@@ -173,7 +171,7 @@ static char *tty_buffer_write_ptr = tty_buffer;
 static pthread_t thread;
 static int pipefd[2];
 static pthread_mutex_t mutex_input_ready = PTHREAD_MUTEX_INITIALIZER;
-static char line[MAX_LINE_LEN];
+static char line[PATH_MAX];
 
 static void optional_local_echo(char c)
 {
@@ -581,7 +579,7 @@ static int tio_readln(void)
     char *p = line;
 
     /* Read line, accept BS and DEL as rubout characters */
-    for (p = line ; p < &line[MAX_LINE_LEN-1]; )
+    for (p = line ; p < &line[PATH_MAX-1]; )
     {
         if (read(pipefd[0], p, 1) > 0)
         {
@@ -2207,17 +2205,6 @@ void forward_to_tty(int fd, char output_char)
     }
 }
 
-static void print_line(const char *string, int cursor_pos)
-{
-    clear_line();
-    print("%s", string);
-    print("\r"); // Move the cursor back to the beginning
-    for (int i = 0; i < cursor_pos; ++i)
-    {
-        print("\x1b[C"); // Move the cursor right
-    }
-}
-
 int tty_connect(void)
 {
     fd_set rdfs;           /* Read file descriptor set */
@@ -2372,18 +2359,7 @@ int tty_connect(void)
     }
 
     // Initialize readline like history
-    char *history[MAX_HISTORY];
-    int history_count = 0;
-    int history_index = 0;
-
-    for (int i = 0; i < MAX_HISTORY; ++i)
-    {
-        history[i] = NULL;
-    }
-
-    int line_length = 0;
-    int cursor_pos = 0;
-    int escape = 0;
+    readline_init();
 
     /* Input loop */
     while (true)
@@ -2628,152 +2604,17 @@ int tty_connect(void)
                                     switch (input_char)
                                     {
                                         case '\r': // Carriage return
-                                            if (line_length > 0)
-                                            {
-                                                // Save to history
-                                                if (history_count < MAX_HISTORY)
-                                                {
-                                                    history[history_count] = strndup(line, line_length);
-                                                    history_count++;
-                                                }
-                                                else
-                                            {
-                                                    free(history[0]);
-                                                    memmove(&history[0], &history[1], (MAX_HISTORY - 1) * sizeof(char*));
-                                                    history[MAX_HISTORY - 1] = strndup(line, line_length);
-                                                }
-                                            }
+                                            readline_input(input_char);
 
-                                            line[line_length] = '\0';
-                                            if (option.local_echo == false)
-                                            {
-                                                clear_line();
-                                            }
-                                            else
-                                            {
-                                                print("\r\n");
-                                            }
-
-                                            // Write line to tty device
-                                            tty_write(device_fd, line, line_length);
+                                            // Write current line to tty device
+                                            char *line = readline_get();
+                                            tty_write(device_fd, line, strlen(line));
                                             tty_sync(device_fd);
-
-                                            line_length = 0;
-                                            cursor_pos = 0;
-                                            history_index = history_count;
-                                            escape = 0;
-                                            break;
-
-                                        case 127: // Backspace
-                                            if (cursor_pos > 0)
-                                            {
-                                                memmove(&line[cursor_pos - 1], &line[cursor_pos], line_length - cursor_pos);
-                                                line_length--;
-                                                cursor_pos--;
-                                                line[line_length] = '\0';
-                                                print_line(line, cursor_pos);
-                                            }
-                                            forward = false;
-                                            escape = 0;
-                                            break;
-
-                                        case 27: // Escape
-                                            escape = 1;
-                                            forward = false;
-                                            break;
-
-                                        case '[':
-                                            if (escape == 1)
-                                            {
-                                                escape = 2;
-                                            }
-                                            else
-                                            {
-                                                escape = 0;
-                                            }
-                                            break;
-
-                                        case 'A':
-                                            if (escape == 2)
-                                            {
-                                                // Up arrow
-                                                if (history_index > 0)
-                                                {
-                                                    history_index--;
-                                                    strncpy(line, history[history_index], MAX_LINE_LEN-1);
-                                                    line_length = strlen(line);
-                                                    cursor_pos = line_length;
-                                                    print_line(line, cursor_pos);
-                                                }
-                                            }
-                                            forward = false;
-                                            escape = 0;
-                                            break;
-
-                                        case 'B':
-                                            if (escape == 2)
-                                            {
-                                                // Down arrow
-                                                if (history_index < history_count - 1)
-                                                {
-                                                    history_index++;
-                                                    strncpy(line, history[history_index], MAX_LINE_LEN-1);
-                                                    line_length = strlen(line);
-                                                    cursor_pos = line_length;
-                                                    print_line(line, cursor_pos);
-                                                }
-                                                else if (history_index == history_count - 1)
-                                                {
-                                                    history_index++;
-                                                    line_length = 0;
-                                                    cursor_pos = 0;
-                                                    line[line_length] = '\0';
-                                                    print_line(line, cursor_pos);
-                                                }
-                                            }
-                                            forward = false;
-                                            escape = 0;
-                                            break;
-
-                                        case 'C':
-                                            if (escape == 2)
-                                            {
-                                                // Right arrow
-                                                if (cursor_pos < line_length)
-                                                {
-                                                    cursor_pos++;
-                                                    print("\x1b[C");
-                                                }
-                                            }
-                                            forward = false;
-                                            escape = 0;
-                                            break;
-
-                                        case 'D':
-                                            if (escape == 2)
-                                            {
-                                                    // Left arrow
-                                                    if (cursor_pos > 0)
-                                                    {
-                                                        cursor_pos--;
-                                                        print("\b");
-                                                    }
-                                            }
-                                            forward = false;
-                                            escape = 0;
                                             break;
 
                                         default:
-                                            if (line_length < MAX_LINE_LEN - 1)
-                                            {
-                                                memmove(&line[cursor_pos + 1], &line[cursor_pos], line_length - cursor_pos);
-                                                line[cursor_pos] = input_char;
-                                                line_length++;
-                                                cursor_pos++;
-                                                line[line_length] = '\0';
-                                                print_line(line, cursor_pos);
-                                            }
-                                            escape = 0;
+                                            readline_input(input_char);
+                                            forward = false;
                                             break;
                                     }
 
