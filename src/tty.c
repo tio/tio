@@ -623,9 +623,9 @@ static void mappings_print(void)
     if (option.map_i_cr_nl || option.map_ign_cr || option.map_i_ff_escc ||
         option.map_i_nl_cr || option.map_i_nl_crnl || option.map_o_cr_nl ||
         option.map_o_del_bs || option.map_o_nl_crnl || option.map_o_ltu ||
-        option.map_o_nulbrk || option.map_o_msblsb)
+        option.map_o_nulbrk || option.map_o_msblsb || option.map_o_ign_cr)
     {
-        tio_printf(" Mappings:%s%s%s%s%s%s%s%s%s%s%s",
+        tio_printf(" Mappings:%s%s%s%s%s%s%s%s%s%s%s%s",
                 option.map_i_cr_nl ? " ICRNL" : "",
                 option.map_ign_cr ? " IGNCR" : "",
                 option.map_i_ff_escc ? " IFFESCC" : "",
@@ -636,6 +636,7 @@ static void mappings_print(void)
                 option.map_o_nl_crnl ? " ONLCRNL" : "",
                 option.map_o_ltu ? " OLTU" : "",
                 option.map_o_nulbrk ? " ONULBRK" : "",
+                option.map_o_ign_cr ? " OIGNCR" : "",
                 option.map_o_msblsb ? " MSB2LSB" : "");
     }
     else
@@ -791,6 +792,10 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                         tio_printf("ONULBRK is %s", option.map_o_nulbrk ? "set" : "unset");
                         break;
                     case KEY_A:
+                        option.map_o_ign_cr = !option.map_o_ign_cr;
+                        tio_printf("OIGNCR is %s", option.map_o_ign_cr ? "set" : "unset");
+                        break;
+                    case KEY_B:
                         option.map_o_msblsb = !option.map_o_msblsb;
                         tio_printf("MSB2LSB is %s", option.map_o_msblsb ? "set" : "unset");
                         break;
@@ -1002,7 +1007,9 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                         option.map_o_ltu ? "Unset" : "Set");
                 tio_printf(" (9) ONULBRK: %s mapping NUL to send break signal on output",
                         option.map_o_nulbrk ? "Unset" : "Set");
-                tio_printf(" (a) MSB2LSB: %s mapping MSB bit order to LSB on output",
+                tio_printf(" (a) OIGNCR: %s ignoring CR on output",
+                        option.map_o_ign_cr ? "Unset" : "Set");
+                tio_printf(" (b) MSB2LSB: %s mapping MSB bit order to LSB on output",
                         option.map_o_msblsb ? "Unset" : "Set");
 
                 // Process next input character as sub command
@@ -2132,6 +2139,10 @@ void forward_to_tty(int fd, char output_char)
     if ((output_char == '\r') && (option.map_o_cr_nl))
     {
         output_char = '\n';
+    }
+    if ((output_char == '\r') && (option.map_o_ign_cr))
+    {
+        return;
     }
 
     /* Map newline character */

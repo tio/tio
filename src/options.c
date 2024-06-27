@@ -119,6 +119,7 @@ struct option_t option =
     .map_o_ltu = false,
     .map_o_nulbrk = false,
     .map_o_msblsb = false,
+    .map_o_ign_cr = false,
 };
 
 void option_print_help(char *argv[])
@@ -767,6 +768,10 @@ void option_parse_mappings(const char *map)
             else if (strcmp(token, "ONULBRK") == 0)
             {
                 option.map_o_nulbrk = true;
+            }
+            else if (strcmp(token, "OIGNCR") == 0)
+            {
+                option.map_o_ign_cr = true;
             }
             else if (strcmp(token, "MSB2LSB") == 0)
             {
