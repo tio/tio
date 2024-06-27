@@ -85,5 +85,5 @@ void print(const char *format, ...)
     fflush(stdout);
     va_end(args);
 
-    print_tainted = false;
+    print_tainted = true;
 }
