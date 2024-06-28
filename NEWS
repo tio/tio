@@ -1,5 +1,21 @@
 
-=== tio v3.4 ===
+=== tio v3.5 ===
+
+
+
+Changes since tio v3.4:
+
+ * Add OIGNCR mapping flag
+
+   Ignores CR on output to serial device.
+
+ * Fix line input mode ignoring characters ABCD
+
+ * Fix tainted print
+
+Jakob Haufe:
+
+ * Fix typos
 
 
 
