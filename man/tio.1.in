@@ -201,8 +201,8 @@ Strip control characters and escape sequences from log.
 .TP
 .BR \-m ", " "\-\-map " \fI<flags>
 
-Map (replace, translate) characters on input/output to/from the serial device.
-The following mapping flags are supported:
+Map (replace, translate) characters on input to the serial device or output
+from the serial device. The following mapping flags are supported:
 
 .RS
 .TP 12n
