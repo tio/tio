@@ -5,6 +5,13 @@
 
 Changes since tio v3.4:
 
+ * Clarify input and output direction of map flags
+
+ * Rename mapping flag MSB2LSB to IMSB2LSB
+
+   This is the correct naming since we are changing the input bit order on
+   input from the serial device.
+
  * Add OIGNCR mapping flag
 
    Ignores CR on output to serial device.
