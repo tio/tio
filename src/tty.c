@@ -623,7 +623,7 @@ static void mappings_print(void)
     if (option.map_i_cr_nl || option.map_ign_cr || option.map_i_ff_escc ||
         option.map_i_nl_cr || option.map_i_nl_crnl || option.map_o_cr_nl ||
         option.map_o_del_bs || option.map_o_nl_crnl || option.map_o_ltu ||
-        option.map_o_nulbrk || option.map_o_msblsb || option.map_o_ign_cr)
+        option.map_o_nulbrk || option.map_i_msb2lsb || option.map_o_ign_cr)
     {
         tio_printf(" Mappings:%s%s%s%s%s%s%s%s%s%s%s%s",
                 option.map_i_cr_nl ? " ICRNL" : "",
@@ -631,13 +631,13 @@ static void mappings_print(void)
                 option.map_i_ff_escc ? " IFFESCC" : "",
                 option.map_i_nl_cr ? " INLCR" : "",
                 option.map_i_nl_crnl ? " INLCRNL" : "",
+                option.map_i_msb2lsb ? " IMSB2LSB" : "",
                 option.map_o_cr_nl ? " OCRNL" : "",
                 option.map_o_del_bs ? " ODELBS" : "",
                 option.map_o_nl_crnl ? " ONLCRNL" : "",
                 option.map_o_ltu ? " OLTU" : "",
                 option.map_o_nulbrk ? " ONULBRK" : "",
-                option.map_o_ign_cr ? " OIGNCR" : "",
-                option.map_o_msblsb ? " MSB2LSB" : "");
+                option.map_o_ign_cr ? " OIGNCR" : "");
     }
     else
     {
@@ -772,32 +772,32 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                         tio_printf("INLCRNL is %s", option.map_i_nl_crnl ? "set" : "unset");
                         break;
                     case KEY_5:
+                        option.map_i_msb2lsb = !option.map_i_msb2lsb;
+                        tio_printf("IMSB2LSB is %s", option.map_i_msb2lsb ? "set" : "unset");
+                        break;
+                    case KEY_6:
                         option.map_o_cr_nl = !option.map_o_cr_nl;
                         tio_printf("OCRNL is %s", option.map_o_cr_nl ? "set" : "unset");
                         break;
-                    case KEY_6:
+                    case KEY_7:
                         option.map_o_del_bs = !option.map_o_del_bs;
                         tio_printf("ODELBS is %s", option.map_o_del_bs ? "set" : "unset");
                         break;
-                    case KEY_7:
+                    case KEY_8:
                         option.map_o_nl_crnl = !option.map_o_nl_crnl;
                         tio_printf("ONLCRNL is %s", option.map_o_nl_crnl ? "set" : "unset");
                         break;
-                    case KEY_8:
+                    case KEY_9:
                         option.map_o_ltu = !option.map_o_ltu;
                         tio_printf("OLTU is %s", option.map_o_ltu ? "set" : "unset");
                         break;
-                    case KEY_9:
+                    case KEY_A:
                         option.map_o_nulbrk = !option.map_o_nulbrk;
                         tio_printf("ONULBRK is %s", option.map_o_nulbrk ? "set" : "unset");
                         break;
-                    case KEY_A:
+                    case KEY_B:
                         option.map_o_ign_cr = !option.map_o_ign_cr;
                         tio_printf("OIGNCR is %s", option.map_o_ign_cr ? "set" : "unset");
-                        break;
-                    case KEY_B:
-                        option.map_o_msblsb = !option.map_o_msblsb;
-                        tio_printf("MSB2LSB is %s", option.map_o_msblsb ? "set" : "unset");
                         break;
                     default:
                         tio_error_print("Invalid input");
@@ -997,20 +997,20 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                         option.map_i_nl_cr ? "Unset" : "Set");
                 tio_printf(" (4) INLCRNL: %s mapping NL to CR-NL on input",
                         option.map_i_nl_cr ? "Unset" : "Set");
-                tio_printf(" (5) OCRNL: %s mapping CR to NL on output",
+                tio_printf(" (5) IMSB2LSB: %s mapping MSB bit order to LSB on input",
+                        option.map_i_msb2lsb ? "Unset" : "Set");
+                tio_printf(" (6) OCRNL: %s mapping CR to NL on output",
                         option.map_o_cr_nl ? "Unset" : "Set");
-                tio_printf(" (6) ODELBS: %s mapping DEL to BS on output",
+                tio_printf(" (7) ODELBS: %s mapping DEL to BS on output",
                         option.map_o_del_bs ? "Unset" : "Set");
-                tio_printf(" (7) ONLCRNL: %s mapping NL to CR-NL on output",
+                tio_printf(" (8) ONLCRNL: %s mapping NL to CR-NL on output",
                         option.map_o_nl_crnl ? "Unset" : "Set");
-                tio_printf(" (8) OLTU: %s mapping lowercase to uppercase on output",
+                tio_printf(" (9) OLTU: %s mapping lowercase to uppercase on output",
                         option.map_o_ltu ? "Unset" : "Set");
-                tio_printf(" (9) ONULBRK: %s mapping NUL to send break signal on output",
+                tio_printf(" (a) ONULBRK: %s mapping NUL to send break signal on output",
                         option.map_o_nulbrk ? "Unset" : "Set");
-                tio_printf(" (a) OIGNCR: %s ignoring CR on output",
+                tio_printf(" (b) OIGNCR: %s ignoring CR on output",
                         option.map_o_ign_cr ? "Unset" : "Set");
-                tio_printf(" (b) MSB2LSB: %s mapping MSB bit order to LSB on output",
-                        option.map_o_msblsb ? "Unset" : "Set");
 
                 // Process next input character as sub command
                 sub_command = SUBCOMMAND_MAP;
@@ -2513,7 +2513,7 @@ int tty_connect(void)
                     }
 
                     /* Convert MSB to LSB bit order */
-                    if (option.map_o_msblsb)
+                    if (option.map_i_msb2lsb)
                     {
                         char ch = input_char;
                         input_char = 0;
@@ -2524,7 +2524,7 @@ int tty_connect(void)
                     }
 
                     /* Map input character */
-                    if ((input_char == '\n') && (option.map_i_nl_crnl) && (!option.map_o_msblsb))
+                    if ((input_char == '\n') && (option.map_i_nl_crnl) && (!option.map_i_msb2lsb))
                     {
                         printchar('\r');
                         printchar('\n');
@@ -2533,7 +2533,7 @@ int tty_connect(void)
                             do_timestamp = true;
                         }
                     }
-                    else if ((input_char == '\f') && (option.map_i_ff_escc) && (!option.map_o_msblsb))
+                    else if ((input_char == '\f') && (option.map_i_ff_escc) && (!option.map_i_msb2lsb))
                     {
                         printchar('\e');
                         printchar('c');

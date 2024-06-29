@@ -118,7 +118,7 @@ struct option_t option =
     .map_o_del_bs = false,
     .map_o_ltu = false,
     .map_o_nulbrk = false,
-    .map_o_msblsb = false,
+    .map_i_msb2lsb = false,
     .map_o_ign_cr = false,
 };
 
@@ -773,9 +773,9 @@ void option_parse_mappings(const char *map)
             {
                 option.map_o_ign_cr = true;
             }
-            else if (strcmp(token, "MSB2LSB") == 0)
+            else if (strcmp(token, "IMSB2LSB") == 0)
             {
-                option.map_o_msblsb = true;
+                option.map_i_msb2lsb = true;
             }
             else
             {

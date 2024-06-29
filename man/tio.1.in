@@ -216,6 +216,8 @@ Map FF to ESC-c on input
 Map NL to CR on input
 .IP "\fBINLCRNL"
 Map NL to CR-NL on input
+.IP "\fBIMSB2LSB"
+Map MSB bit order to LSB on input
 .IP "\fBOCRNL"
 Map CR to NL on output
 .IP "\fBODELBS"
@@ -228,8 +230,6 @@ Map lowercase characters to uppercase on output
 Map nul (zero) to send break signal on output
 .IP "\fBOIGNCR"
 Ignore CR on output
-.IP "\fBMSB2LSB"
-Map MSB bit order to LSB on output
 .P
 If defining more than one flag, the flags must be comma separated.
 .RE

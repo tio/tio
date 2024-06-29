@@ -103,7 +103,7 @@ struct option_t
     bool map_o_del_bs;
     bool map_o_ltu;
     bool map_o_nulbrk;
-    bool map_o_msblsb;
+    bool map_i_msb2lsb;
     bool map_o_ign_cr;
 };
 
