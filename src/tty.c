@@ -1407,6 +1407,14 @@ static bool is_serial_device(const char *format, ...)
         return false;
     }
 
+#if defined(__APPLE__)
+    // Make sure device name is on the form /dev/cu.* or /dev/tty.*
+    if ((strncmp(filename, "/dev/cu.", 8) != 0) && (strncmp(filename, "/dev/tty.", 9) != 0))
+    {
+        return false;
+    }
+#endif
+
     fd = open(filename, O_RDONLY | O_NONBLOCK | O_NOCTTY);
     if (fd == -1)
     {
