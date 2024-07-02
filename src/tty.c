@@ -2643,8 +2643,8 @@ int tty_connect(void)
                                         readline_input(input_char);
 
                                         // Write current line to tty device
-                                        char *line = readline_get();
-                                        tty_write(device_fd, line, strlen(line));
+                                        char *rl_line = readline_get();
+                                        tty_write(device_fd, rl_line, strlen(rl_line));
                                         tty_sync(device_fd);
                                     }
                                     else
