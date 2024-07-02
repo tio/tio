@@ -2637,22 +2637,22 @@ int tty_connect(void)
                                     break;
 
                                 case INPUT_MODE_LINE:
-                                    switch (input_char)
+                                    if (input_char == '\r')
                                     {
-                                        case '\r': // Carriage return
-                                            readline_input(input_char);
+                                        // Carriage return
+                                        readline_input(input_char);
 
-                                            // Write current line to tty device
-                                            char *line = readline_get();
-                                            tty_write(device_fd, line, strlen(line));
-                                            tty_sync(device_fd);
-                                            break;
-
-                                        default:
-                                            readline_input(input_char);
-                                            forward = false;
-                                            break;
+                                        // Write current line to tty device
+                                        char *line = readline_get();
+                                        tty_write(device_fd, line, strlen(line));
+                                        tty_sync(device_fd);
                                     }
+                                    else
+                                    {
+                                        readline_input(input_char);
+                                        forward = false;
+                                    }
+                                    break;
 
                                 default:
                                     break;
