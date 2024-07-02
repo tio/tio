@@ -172,6 +172,7 @@ static pthread_t thread;
 static int pipefd[2];
 static pthread_mutex_t mutex_input_ready = PTHREAD_MUTEX_INITIALIZER;
 static char line[PATH_MAX];
+static size_t listing_device_name_length_max = 0;
 
 static void optional_local_echo(char c)
 {
@@ -1627,6 +1628,9 @@ static void search_reset(void)
 
     // Indicate an empty list
     device_list = NULL;
+
+    // Reset max device name length
+    listing_device_name_length_max = 0;
 }
 
 #if defined(__linux__)
@@ -1793,6 +1797,12 @@ GList *tty_search_for_serial_devices(void)
 
         // Add device information to device list
         device_list = g_list_append(device_list, device);
+
+        // Update length of longest device name string
+        if (strlen(device->path) > listing_device_name_length_max)
+        {
+            listing_device_name_length_max = strlen(device->path);
+        }
     }
 
     if (g_list_length(device_list) == 0)
@@ -1897,8 +1907,14 @@ void list_serial_devices(void)
 
     if (g_list_length(device_list) > 0)
     {
-        printf("Device            TID     Uptime [s] Driver           Description\n");
-        printf("----------------- ---- ------------- ---------------- --------------------------\n");
+        if (listing_device_name_length_max < 17)
+        {
+            listing_device_name_length_max = 17;
+        }
+        print_padded("Device", listing_device_name_length_max, ' ');
+        printf(" TID     Uptime [s] Driver           Description\n");
+        print_padded("", listing_device_name_length_max, '-');
+        printf(" ---- ------------- ---------------- --------------------------\n");
 
         // Iterate through the device list
         GList *iter;
@@ -1907,7 +1923,8 @@ void list_serial_devices(void)
             device_t *device = (device_t *) iter->data;
 
             // Print device information
-            printf("%-17s %4s %13.3f %-16s %s\n", device->path, device->tid, device->uptime, device->driver, device->description);
+            print_padded(device->path, listing_device_name_length_max, ' ');
+            printf(" %4s %13.3f %-16s %s\n", device->tid, device->uptime, device->driver, device->description);
         }
         printf("\n");
     }

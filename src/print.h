@@ -140,3 +140,4 @@ void print_normal(char c);
 void print_init_ansi_formatting(void);
 void tio_printf_array(const char *array);
 void print_tainted_set(void);
+void print_padded(char *string, size_t length, char pad_char);

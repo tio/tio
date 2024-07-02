@@ -87,3 +87,26 @@ void print(const char *format, ...)
 
     print_tainted = true;
 }
+
+void print_padded(char *string, size_t length, char pad_char)
+{
+    size_t padding = 0;
+    size_t string_length = 0;
+    size_t i;
+
+    string_length = strlen(string);
+
+    if (string_length < length)
+    {
+        padding += length - string_length;
+        printf("%s", string);
+        for (i=0; i<padding; i++)
+        {
+            putchar(pad_char);
+        }
+    }
+    else
+    {
+        printf("%s", string);
+    }
+}
