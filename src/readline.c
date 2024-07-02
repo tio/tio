@@ -22,17 +22,16 @@
 #include "print.h"
 #include "misc.h"
 
-#define MAX_LINE_LEN PATH_MAX
-#define MAX_HISTORY 1000
+#define RL_LINE_LENGTH_MAX PATH_MAX
+#define RL_HISTORY_MAX 1000
 
-static char line[MAX_LINE_LEN] = {};
-static int history_count = 0;
-static int history_index = 0;
-static int line_length = 0;
-static int cursor_pos = 0;
-static int escape = 0;
-
-static char *history[MAX_HISTORY];
+static char rl_line[RL_LINE_LENGTH_MAX] = {};
+static char *rl_history[RL_HISTORY_MAX];
+static int rl_history_count = 0;
+static int rl_history_index = 0;
+static int rl_line_length = 0;
+static int rl_cursor_pos = 0;
+static int rl_escape = 0;
 
 static void print_line(const char *string, int cursor_pos)
 {
@@ -47,58 +46,58 @@ static void print_line(const char *string, int cursor_pos)
 
 void readline_init(void)
 {
-    history_count = 0;
-    history_index = 0;
+    rl_history_count = 0;
+    rl_history_index = 0;
 
-    for (int i = 0; i < MAX_HISTORY; ++i)
+    for (int i = 0; i < RL_HISTORY_MAX; ++i)
     {
-        history[i] = NULL;
+        rl_history[i] = NULL;
     }
 
-    line[0] = 0;
-    line_length = 0;
-    cursor_pos = 0;
-    escape = 0;
+    rl_line[0] = 0;
+    rl_line_length = 0;
+    rl_cursor_pos = 0;
+    rl_escape = 0;
 }
 
 char * readline_get(void)
 {
-    return line;
+    return rl_line;
 }
 
 static void readline_input_char(char input_char)
 {
-    if (line_length < MAX_LINE_LEN - 1)
+    if (rl_line_length < RL_LINE_LENGTH_MAX - 1)
     {
-        memmove(&line[cursor_pos + 1], &line[cursor_pos], line_length - cursor_pos);
-        line[cursor_pos] = input_char;
-        line_length++;
-        cursor_pos++;
-        line[line_length] = '\0';
-        print_line(line, cursor_pos);
+        memmove(&rl_line[rl_cursor_pos + 1], &rl_line[rl_cursor_pos], rl_line_length - rl_cursor_pos);
+        rl_line[rl_cursor_pos] = input_char;
+        rl_line_length++;
+        rl_cursor_pos++;
+        rl_line[rl_line_length] = '\0';
+        print_line(rl_line, rl_cursor_pos);
     }
-    escape = 0;
+    rl_escape = 0;
 }
 
 static void readline_input_cr(void)
 {
-    if (line_length > 0)
+    if (rl_line_length > 0)
     {
         // Save to history
-        if (history_count < MAX_HISTORY)
+        if (rl_history_count < RL_HISTORY_MAX)
         {
-            history[history_count] = strndup(line, line_length);
-            history_count++;
+            rl_history[rl_history_count] = strndup(rl_line, rl_line_length);
+            rl_history_count++;
         }
         else
     {
-            free(history[0]);
-            memmove(&history[0], &history[1], (MAX_HISTORY - 1) * sizeof(char*));
-            history[MAX_HISTORY - 1] = strndup(line, line_length);
+            free(rl_history[0]);
+            memmove(&rl_history[0], &rl_history[1], (RL_HISTORY_MAX - 1) * sizeof(char*));
+            rl_history[RL_HISTORY_MAX - 1] = strndup(rl_line, rl_line_length);
         }
     }
 
-    line[line_length] = '\0';
+    rl_line[rl_line_length] = '\0';
     if (option.local_echo == false)
     {
         clear_line();
@@ -108,54 +107,54 @@ static void readline_input_cr(void)
         print("\r\n");
     }
 
-    line_length = 0;
-    cursor_pos = 0;
-    history_index = history_count;
-    escape = 0;
+    rl_line_length = 0;
+    rl_cursor_pos = 0;
+    rl_history_index = rl_history_count;
+    rl_escape = 0;
 }
 
 static void readline_input_bs(void)
 {
-    if (cursor_pos > 0)
+    if (rl_cursor_pos > 0)
     {
-        memmove(&line[cursor_pos - 1], &line[cursor_pos], line_length - cursor_pos);
-        line_length--;
-        cursor_pos--;
-        line[line_length] = '\0';
-        print_line(line, cursor_pos);
+        memmove(&rl_line[rl_cursor_pos - 1], &rl_line[rl_cursor_pos], rl_line_length - rl_cursor_pos);
+        rl_line_length--;
+        rl_cursor_pos--;
+        rl_line[rl_line_length] = '\0';
+        print_line(rl_line, rl_cursor_pos);
     }
-    escape = 0;
+    rl_escape = 0;
 }
 
 static void readline_input_escape(void)
 {
-    escape = 1;
+    rl_escape = 1;
 }
 
 static void readline_input_left_bracket(void)
 {
-    if (escape == 1)
+    if (rl_escape == 1)
     {
-        escape = 2;
+        rl_escape = 2;
     }
     else
     {
-        escape = 0;
+        rl_escape = 0;
     }
 }
 
 static void readline_input_A(void)
 {
-    if (escape == 2)
+    if (rl_escape == 2)
     {
         // Up arrow
-        if (history_index > 0)
+        if (rl_history_index > 0)
         {
-            history_index--;
-            strncpy(line, history[history_index], MAX_LINE_LEN-1);
-            line_length = strlen(line);
-            cursor_pos = line_length;
-            print_line(line, cursor_pos);
+            rl_history_index--;
+            strncpy(rl_line, rl_history[rl_history_index], RL_LINE_LENGTH_MAX-1);
+            rl_line_length = strlen(rl_line);
+            rl_cursor_pos = rl_line_length;
+            print_line(rl_line, rl_cursor_pos);
         }
     }
     else
@@ -163,29 +162,29 @@ static void readline_input_A(void)
         readline_input_char('A');
     }
 
-    escape = 0;
+    rl_escape = 0;
 }
 
 static void readline_input_B(void)
 {
-    if (escape == 2)
+    if (rl_escape == 2)
     {
         // Down arrow
-        if (history_index < history_count - 1)
+        if (rl_history_index < rl_history_count - 1)
         {
-            history_index++;
-            strncpy(line, history[history_index], MAX_LINE_LEN-1);
-            line_length = strlen(line);
-            cursor_pos = line_length;
-            print_line(line, cursor_pos);
+            rl_history_index++;
+            strncpy(rl_line, rl_history[rl_history_index], RL_LINE_LENGTH_MAX-1);
+            rl_line_length = strlen(rl_line);
+            rl_cursor_pos = rl_line_length;
+            print_line(rl_line, rl_cursor_pos);
         }
-        else if (history_index == history_count - 1)
+        else if (rl_history_index == rl_history_count - 1)
         {
-            history_index++;
-            line_length = 0;
-            cursor_pos = 0;
-            line[line_length] = '\0';
-            print_line(line, cursor_pos);
+            rl_history_index++;
+            rl_line_length = 0;
+            rl_cursor_pos = 0;
+            rl_line[rl_line_length] = '\0';
+            print_line(rl_line, rl_cursor_pos);
         }
     }
     else
@@ -193,17 +192,17 @@ static void readline_input_B(void)
         readline_input_char('B');
     }
 
-    escape = 0;
+    rl_escape = 0;
 }
 
 static void readline_input_C(void)
 {
-    if (escape == 2)
+    if (rl_escape == 2)
     {
         // Right arrow
-        if (cursor_pos < line_length)
+        if (rl_cursor_pos < rl_line_length)
         {
-            cursor_pos++;
+            rl_cursor_pos++;
             print("\x1b[C");
         }
     }
@@ -212,17 +211,17 @@ static void readline_input_C(void)
         readline_input_char('C');
     }
 
-    escape = 0;
+    rl_escape = 0;
 }
 
 static void readline_input_D(void)
 {
-    if (escape == 2)
+    if (rl_escape == 2)
     {
         // Left arrow
-        if (cursor_pos > 0)
+        if (rl_cursor_pos > 0)
         {
-            cursor_pos--;
+            rl_cursor_pos--;
             print("\b");
         }
     }
@@ -231,7 +230,7 @@ static void readline_input_D(void)
         readline_input_char('D');
     }
 
-    escape = 0;
+    rl_escape = 0;
 }
 
 void readline_input(char input_char)
