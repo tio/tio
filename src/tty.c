@@ -1876,10 +1876,10 @@ GList *tty_search_for_serial_devices(void)
 
         // Fill in device information
         device->path = g_strdup(path);
-        device->tid = "";
+        device->tid = g_strdup("");
         device->uptime = uptime;
-        device->driver = "";
-        device->description = "";
+        device->driver = g_strdup("");
+        device->description = g_strdup("");
 
         // Add device information to device list
         device_list = g_list_append(device_list, device);
