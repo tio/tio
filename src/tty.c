@@ -2107,7 +2107,7 @@ void tty_wait_for_device(void)
         }
         else if (last_errno != errno)
         {
-            tio_warning_printf("Could not open tty device (%s)", strerror(errno));
+            tio_warning_printf("Could not open %s (%s)", device_name, strerror(errno));
             tio_printf("Waiting for tty device..");
             last_errno = errno;
         }
