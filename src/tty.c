@@ -1883,6 +1883,12 @@ GList *tty_search_for_serial_devices(void)
 
         // Add device information to device list
         device_list = g_list_append(device_list, device);
+
+        // Update length of longest device name string
+        if (strlen(device->path) > listing_device_name_length_max)
+        {
+            listing_device_name_length_max = strlen(device->path);
+        }
     }
 
     if (g_list_length(device_list) == 0)
