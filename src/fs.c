@@ -199,7 +199,6 @@ double fs_get_creation_time(const char *path)
 
 double fs_get_creation_time(const char *path)
 {
-    // Use stat on macOS to access creation time
     struct stat st;
 
     if (stat(path, &st) != 0)
@@ -207,7 +206,7 @@ double fs_get_creation_time(const char *path)
         return -1;
     }
 
-    return st.st_birthtimespec.tv_sec + st.st_birthtimespec.tv_nsec / 1e9;
+    return st.st_mtimespec.tv_sec + st.st_mtimespec.tv_nsec / 1e9;
 }
 
 #else
