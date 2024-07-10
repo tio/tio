@@ -34,12 +34,6 @@
 
    Already supported in hex output mode.
 
- * Advanced line mode
-
-   Current line mode only support backspace editing. Would be nice with arrow
-   key navigation left/right and insert/overwrite support. Also history browsing
-   pressing up/down.
-
  * Allow tio to connect to socket
 
    After some more consideration I think it makes sense to support connecting to a
