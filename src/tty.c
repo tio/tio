@@ -2232,11 +2232,17 @@ void forward_to_tty(int fd, char output_char)
                 {
                     handle_hex_prompt(output_char);
                 }
-                else
+                else if (option.input_mode == INPUT_MODE_NORMAL)
                 {
-                    if (option.input_mode == INPUT_MODE_NORMAL)
+                    ssize_t status = tty_write(device_fd, &output_char, 1);
+                    if (status < 0)
+                    {
+                        tio_warning_printf("Could not write to tty device");
+                    }
+                    else
                     {
                         optional_local_echo(output_char);
+                        tx_total++;
                     }
                 }
                 break;
