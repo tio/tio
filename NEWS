@@ -109,7 +109,7 @@ Changes since tio v3.1:
 
  * Fix line ending in --list output
 
- * Print location of configuratin file in --list output
+ * Print location of configuration file in --list output
 
  * Fix alignment of profile listing
 
@@ -148,7 +148,7 @@ Changes since tio v3.0:
    After including the use of glib we might as well replace inih
    with the glib key file parser.
 
-   All configuraiton file parsing has been reworked and also the options
+   All configuration file parsing has been reworked and also the options
    parsing has been cleaned up, resulting in better and stricter
    configuration file and option value checks.
 
@@ -202,9 +202,9 @@ Rui Chen:
 
  * fix: add build patch for `FNM_EXTMATCH`
 
- * feat: add macos workflow
+ * feat: add macOS workflow
 
- * fix: add macos build patch for `fs_get_creation_time`
+ * fix: add macOS build patch for `fs_get_creation_time`
 
 
 
@@ -429,11 +429,11 @@ Changes since tio v2.7:
 
  * Add lua modem_send(file,protocol)
 
- * Fix xymodem error print outs
+ * Fix xymodem error messages
 
  * Rework x/y-modem transfer command
 
-   Remove ctrl-t X optin and instead introduce submenu to ctrl-t x option
+   Remove ctrl-t X option and instead introduce submenu to ctrl-t x option
    for picking which xmodem protocol to use.
 
  * Update README
@@ -442,22 +442,22 @@ Changes since tio v2.7:
 
  * Add independent input and output mode
 
-   Replaces -x, --hexadecimal option with --intput-mode and --output-mode
+   Replaces -x, --hexadecimal option with --input-mode and --output-mode
    so it is possible to select hex or normal mode for both input and output
    independently.
 
-   To obtain same behaviour as -x, --hexadecimal use the following
+   To obtain same behavior as -x, --hexadecimal use the following
    configuration:
 
    input-mode = hex
    output-mode = hex
 
- * Fix file descriptor handling on MacOS
+ * Fix file descriptor handling on macOS
 
  * Add tty line configuration script API
 
    On some platforms calling high()/low() to switch line states result in
-   costly system calls whick makes it impossible to swith two or more tty
+   costly system calls which makes it impossible to switch two or more tty
    lines simultaneously.
 
    To help solve this timing issue we introduce a tty line state
@@ -493,7 +493,7 @@ Changes since tio v2.7:
    lines. Script is activated automatically on connect or manually via in
    session key command.
 
-   The Lua scripting feature opens up for many posibilities in the future
+   The Lua scripting feature opens up for many possibilities in the future
    such as adding expect like functionality to easily and programatically
    interact with the connected device.
 
@@ -590,7 +590,7 @@ Changes since tio v2.5:
 
    Add --log-append option which makes tio append to any existing log file.
 
-   This also changes the default behaviour of tio from appending to
+   This also changes the default behavior of tio from appending to
    overwriting any existing log file. Now you have to use this new option
    to make tio append.
 
@@ -924,7 +924,7 @@ Changes since tio v1.46:
 
 Victor Oliveira
 
- * add macports install instructions
+ * add MacPorts install instructions
 
 
 
@@ -1424,7 +1424,7 @@ Changes since tio v1.35:
  * Handle SIGHUP
 
    Handle SIGHUP so that the registered exit handlers are called to restore
-   the terminal back to its orignal state.
+   the terminal back to its original state.
 
  * Add color configuration support
 
@@ -1480,10 +1480,10 @@ Changes since tio v1.34:
 
  * Add support for configurable timestamp format
 
-   Also changes default timestamp format from ISO8601 to classic 24-hour
+   Also changes default timestamp format from ISO 8601 to classic 24-hour
    format as this is assumed to be the format that most users would prefer.
 
-   And reintroduces strict but optional ISO8601 format.
+   And reintroduces strict but optional ISO 8601 format.
 
    This feature allows to easily add more timestamp formats in the future.
 
@@ -1604,10 +1604,10 @@ Sylvain LAFRASSE:
 
 attila-v:
 
- * Refine timestamps with milliseconds and ISO-8601 format (#129).
+ * Refine timestamps with milliseconds and ISO 8601 format (#129).
 
    * Show milliseconds too in the timestamp (#114) and log file (#124)
-   * Change timestamp format to ISO-8601.
+   * Change timestamp format to ISO 8601.
 
 Yin Fengwei:
 
@@ -1686,7 +1686,7 @@ Lars Kellogg-Stedman:
 
 George Stark:
 
- * dont show line state if ioctl failed
+ * don't show line state if ioctl failed
 
  * add serial lines manual control
 
@@ -1699,9 +1699,9 @@ arichi:
 
 Mariusz Midor:
 
- * Newline: handle booth NL and CR
+ * Newline: handle both NL and CR
 
-   Flag ONLCRNL expects code \n after press Enter, but on some systems \r is send instead.
+   Flag ONLCRNL expects code \n after press Enter, but on some systems \r is sent instead.
 
 
 
@@ -2193,7 +2193,7 @@ Changes since tio v1.11:
    To display the total number of bytes transmitted/received simply perform the
    'ctrl-t s' command sequence.
 
-   This feature can be useful when eg. trying to detect non-printable
+   This feature can be useful when e.g. trying to detect non-printable
    characters.
 
  * Further simplification of key handling
