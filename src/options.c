@@ -172,6 +172,8 @@ void option_print_help(char *argv[])
     printf("\n");
     printf("Options and profiles may be set via configuration file.\n");
     printf("\n");
+    printf("In session you can press ctrl-%c ? to list available key commands.\n", option.prefix_key);
+    printf("\n");
     printf("See the man page for more details.\n");
 }
 
