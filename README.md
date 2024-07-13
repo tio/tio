@@ -126,7 +126,7 @@ Options:
   -t, --timestamp                        Enable line timestamp
       --timestamp-format <format>        Set timestamp format (default: 24hour)
       --timestamp-timeout <ms>           Set timestamp timeout (default: 200)
-  -l, --list                             List available serial devices
+  -l, --list                             List available serial devices, TIDs, and profiles
   -L, --log                              Enable log to file
       --log-file <filename>              Set log filename
       --log-directory <path>             Set log directory path for automatic named logs
@@ -142,10 +142,13 @@ Options:
       --script <string>                  Run script from string
       --script-file <filename>           Run script from file
       --script-run once|always|never     Run script on connect (default: always)
+      --exec <command>                   Execute shell command with I/O redirected to device
   -v, --version                          Display version
   -h, --help                             Display help
 
 Options and profiles may be set via configuration file.
+
+In session you can press ctrl-t ? to list available key commands.
 
 See the man page for more details.
 ```
