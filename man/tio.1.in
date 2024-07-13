@@ -373,10 +373,10 @@ Display program version.
 .BR \-h ", " \-\-help
 
 Display help.
-.SH "KEYS"
+.SH "KEY COMMANDS"
 .PP
 .TP 16n
-In session, all key strokes are forwarded to the serial device except the following key sequence: a prefix key (default: ctrl-t) followed by a command key. These sequences are intercepted as tio commands:
+In session, all key strokes are forwarded to the serial device except the following key sequence: a prefix key (default: ctrl-t) followed by a command key. These sequences are intercepted as key commands:
 .IP "\fBctrl-t ?"
 List available key commands
 .IP "\fBctrl-t b"
