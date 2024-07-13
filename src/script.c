@@ -149,6 +149,7 @@ static int modem_send(lua_State *L)
 {
     const char *file = lua_tostring(L, 1);
     int protocol = lua_tointeger(L, 2);
+    int ret;
 
     if (file == NULL)
     {
@@ -159,18 +160,21 @@ static int modem_send(lua_State *L)
     {
         case XMODEM_1K:
             tio_printf("Sending file '%s' using XMODEM-1K", file);
-            tio_printf("%s", xymodem_send(device_fd, file, XMODEM_1K) < 0 ? "Aborted" : "Done");
+            ret = xymodem_send(device_fd, file, XMODEM_1K);
+            tio_printf("%s", ret < 0 ? "Aborted" : "Done");
             break;
 
         case XMODEM_CRC:
             tio_printf("Sending file '%s' using XMODEM-CRC", file);
-            tio_printf("%s", xymodem_send(device_fd, file, XMODEM_CRC) < 0 ? "Aborted" : "Done");
-        break;
+            ret = xymodem_send(device_fd, file, XMODEM_CRC);
+            tio_printf("%s", ret < 0 ? "Aborted" : "Done");
+            break;
 
         case YMODEM:
             tio_printf("Sending file '%s' using YMODEM", file);
-            tio_printf("%s", xymodem_send(device_fd, file, YMODEM) < 0 ? "Aborted" : "Done");
-        break;
+            ret = xymodem_send(device_fd, file, YMODEM);
+            tio_printf("%s", ret < 0 ? "Aborted" : "Done");
+            break;
     }
 
     return 0;

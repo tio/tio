@@ -712,9 +712,12 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                         tio_printf_raw("Enter file name: ");
                         if (tio_readln())
                         {
+                            int ret;
+
                             tio_printf("Sending file '%s'  ", line);
                             tio_printf("Press any key to abort transfer");
-                            tio_printf("%s", xymodem_send(device_fd, line, XMODEM_1K) < 0 ? "Aborted" : "Done");
+                            ret = xymodem_send(device_fd, line, XMODEM_1K);
+                            tio_printf("%s", ret < 0 ? "Aborted" : "Done");
                         }
                         break;
 
@@ -723,9 +726,12 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                         tio_printf_raw("Enter file name: ");
                         if (tio_readln())
                         {
+                            int ret;
+
                             tio_printf("Sending file '%s'  ", line);
                             tio_printf("Press any key to abort transfer");
-                            tio_printf("%s", xymodem_send(device_fd, line, XMODEM_CRC) < 0 ? "Aborted" : "Done");
+                            ret = xymodem_send(device_fd, line, XMODEM_CRC);
+                            tio_printf("%s", ret < 0 ? "Aborted" : "Done");
                         }
                         break;
 
@@ -734,9 +740,12 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                         tio_printf_raw("Enter file name: ");
                         if (tio_readln())
                         {
+                            int ret;
+
                             tio_printf("Ready to receiving file '%s'  ", line);
                             tio_printf("Press any key to abort transfer");
-                            tio_printf("%s", xymodem_receive(device_fd, line, XMODEM_CRC) < 0 ? "Aborted" : "Done");
+                            ret = xymodem_send(device_fd, line, XMODEM_CRC);
+                            tio_printf("%s", ret < 0 ? "Aborted" : "Done");
                         }
                         break;
 
@@ -1094,9 +1103,12 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 tio_printf("Send file with YMODEM");
                 tio_printf_raw("Enter file name: ");
                 if (tio_readln()) {
+		    int ret;
+
                     tio_printf("Sending file '%s'  ", line);
                     tio_printf("Press any key to abort transfer");
-                    tio_printf("%s", xymodem_send(device_fd, line, YMODEM) < 0 ? "Aborted" : "Done");
+		    ret = xymodem_send(device_fd, line, YMODEM);
+                    tio_printf("%s", ret < 0 ? "Aborted" : "Done");
                 }
                 break;
 
