@@ -1,5 +1,15 @@
+ * Add support for nested configuration files
+
+   Add "include" directive to make it possible to include a configuration file
+   from another. For example:
+
+   [include work/config]
+
+   The feature should support including files that include other files etc.
+   (multi level nesting).
+
  * Porting layer to support native win32 builds.
-  
+
    Some of the work that needs to be done: 
 
     All posix functions need to be platform independent, go though file by file:
