@@ -581,6 +581,9 @@ Run script on connect
 .IP "\fBexec"
 Execute shell command with I/O redirected to device
 
+.PP
+It is possible to include the content of other configuration files using the
+include directive like so: "[include <file>]".
 
 .SH "CONFIGURATION FILE EXAMPLES"
 

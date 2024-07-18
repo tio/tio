@@ -26,6 +26,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <assert.h>
+#include <libgen.h>
 #include <errno.h>
 #include <regex.h>
 #include <glib.h>
@@ -35,8 +36,13 @@
 #include "misc.h"
 
 #define CONFIG_GROUP_NAME_DEFAULT "default"
+#define CONFIG_GROUP_INCLUDE_PREFIX "include "
+#define MAX_LINE_LENGTH 1024
 
 struct config_t config = {};
+
+static void config_file_load(const char *filename, GString *buffer, bool test);
+static void config_file_process(const char *filename, GString *buffer, GList **included_files, bool test);
 
 static void config_get_string(GKeyFile *key_file, gchar *group, gchar *key, char **dest, char *allowed_string, ...)
 {
@@ -347,9 +353,11 @@ static int config_file_resolve(void)
 
 void config_file_show_profiles(void)
 {
-    GKeyFile *keyfile;
+    GString *config_buffer;
     GError *error = NULL;
+    GKeyFile *keyfile;
 
+    // Reset configuration
     memset(&config, 0, sizeof(struct config_t));
 
     // Find config file
@@ -359,13 +367,16 @@ void config_file_show_profiles(void)
         return;
     }
 
-    keyfile = g_key_file_new();
+    // Load content of configuration file into buffer
+    config_buffer = g_string_new(NULL);
+    config_file_load(config.path, config_buffer, false);
 
-    if (!g_key_file_load_from_file(keyfile, config.path, G_KEY_FILE_NONE, &error))
+    // Load configuration
+    keyfile = g_key_file_new();
+    if (g_key_file_load_from_data(keyfile, config_buffer->str, config_buffer->len, G_KEY_FILE_NONE, &error) == false)
     {
-        tio_error_print("Failure loading file: %s", error->message);
         g_error_free(error);
-        return;
+        goto error_load;
     }
 
     // Get all group names
@@ -379,11 +390,20 @@ void config_file_show_profiles(void)
         {
             continue;
         }
+
+        // Skip group with include directive
+        if (strncmp(group[i], CONFIG_GROUP_INCLUDE_PREFIX, strlen(CONFIG_GROUP_INCLUDE_PREFIX)) == 0)
+        {
+            continue;
+        }
+
         printf("%s ", group[i]);
     }
 
     g_strfreev(group);
+error_load:
     g_key_file_free(keyfile);
+    g_string_free(config_buffer, TRUE);
 }
 
 static void replace_substring(char *str, const char *substr, const char *replacement)
@@ -483,6 +503,95 @@ error:
     return NULL;
 }
 
+static void config_file_process_line(const char *line, GString *buffer, GList **included_files, bool test)
+{
+    if (strncmp(line, "[include ", 9) == 0 && line[strlen(line) - 2] == ']')
+    {
+        char include_filename[MAX_LINE_LENGTH];
+
+        // Construct the format string safely
+        char format_string[50];
+        snprintf(format_string, sizeof(format_string), "[include %%%ds]", MAX_LINE_LENGTH - 1);
+
+        int ret = sscanf(line, format_string, include_filename);
+        if (ret != 1)
+        {
+            return;
+        }
+
+        // Remove the trailing ']' character
+        include_filename[strlen(include_filename) - 1] = '\0';
+
+        if (g_list_find_custom(*included_files, include_filename, (GCompareFunc)strcmp) != NULL)
+        {
+            // Already included, avoid recursion
+            return;
+        }
+
+        // Add to included files list
+        *included_files = g_list_append(*included_files, g_strdup(include_filename));
+
+        // Process the included file
+        config_file_process(include_filename, buffer, included_files, test);
+    }
+    else
+    {
+        // Normal line, add to buffer
+        g_string_append(buffer, line);
+    }
+}
+
+static void config_file_process(const char *filename, GString *buffer, GList **included_files, bool test)
+{
+    if (test)
+    {
+        // Test that configuration file can be parsed
+
+        GError *error = NULL;
+        GKeyFile *keyfile = g_key_file_new();
+
+        if (g_key_file_load_from_file(keyfile, filename, G_KEY_FILE_NONE, &error) == false)
+        {
+            tio_error_print("Failure loading file %s: %s", filename, error->message);
+            g_key_file_free(keyfile);
+            g_error_free(error);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    FILE *file = fopen(filename, "r");
+    if (file)
+    {
+        char line[MAX_LINE_LENGTH];
+        while (fgets(line, sizeof(line), file))
+        {
+            config_file_process_line(line, buffer, included_files, test);
+        }
+        fclose(file);
+    }
+}
+
+static void config_file_load(const char *filename, GString *buffer, bool test)
+{
+    char current_dir[PATH_MAX] = ".";
+    char *config_file_dir = dirname(strdup(config.path));
+    GList *included_files = NULL;
+
+    getcwd(current_dir, PATH_MAX);
+
+    // Change to the directory of the configuration file
+    chdir(config_file_dir);
+
+    config_file_process(filename, buffer, &included_files, test);
+
+    // Restore current directory
+    chdir(current_dir);
+
+    // Free memory
+    g_list_free_full(included_files, g_free);
+    free(config_file_dir);
+}
+
 void config_file_parse(void)
 {
     // Find config file
@@ -497,12 +606,18 @@ void config_file_parse(void)
         return;
     }
 
+    GString *config_buffer = g_string_new(NULL);
     GKeyFile *keyfile = g_key_file_new();
+    GList *included_files = NULL;
     GError *error = NULL;
 
-    if (g_key_file_load_from_file(keyfile, config.path, G_KEY_FILE_NONE, &error) == false)
+    config_file_load(config.path, config_buffer, true);
+
+    if (g_key_file_load_from_data(keyfile, config_buffer->str, config_buffer->len, G_KEY_FILE_NONE, &error) == false)
     {
         tio_error_print("Failure loading file %s: %s", config.path, error->message);
+        g_string_free(config_buffer, TRUE);
+        g_key_file_free(keyfile);
         g_error_free(error);
         exit(EXIT_FAILURE);
     }
@@ -574,7 +689,10 @@ void config_file_parse(void)
         g_strfreev(group);
     }
 
+    // Cleanup
     g_key_file_free(keyfile);
+    g_string_free(config_buffer, TRUE);
+    g_list_free_full(included_files, g_free);
 
     atexit(&config_exit);
 }
@@ -614,10 +732,14 @@ void config_list_targets(void)
 
     keyfile = g_key_file_new();
 
-    if (!g_key_file_load_from_file(keyfile, config.path, G_KEY_FILE_NONE, &error))
+    GString *config_buffer = g_string_new(NULL);
+
+    config_file_load(config.path, config_buffer, false);
+
+    if (g_key_file_load_from_data(keyfile, config_buffer->str, config_buffer->len, G_KEY_FILE_NONE, &error) == false)
     {
         g_error_free(error);
-        return;
+        goto cleanup;
     }
 
     // Get all group names
@@ -626,7 +748,7 @@ void config_list_targets(void)
 
     if (num_groups == 0)
     {
-        return;
+        goto cleanup;
     }
 
     printf("\nConfiguration profiles (%s)\n", config.path);
@@ -640,6 +762,13 @@ void config_list_targets(void)
         {
             continue;
         }
+
+        // Skip group with include directive
+        if (strncmp(group[i], CONFIG_GROUP_INCLUDE_PREFIX, strlen(CONFIG_GROUP_INCLUDE_PREFIX)) == 0)
+        {
+            continue;
+        }
+
         printf("%-19s ", group[i]);
         if (j++ % 4 == 0)
         {
@@ -652,5 +781,7 @@ void config_list_targets(void)
     }
 
     g_strfreev(group);
+cleanup:
     g_key_file_free(keyfile);
+    g_string_free(config_buffer, TRUE);
 }
