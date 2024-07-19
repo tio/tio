@@ -1,5 +1,57 @@
 
-=== tio v3.5 ===
+=== tio v3.6 (2024-07-19) ===
+
+
+
+Changes since tio v3.5 (2024-06-29):
+
+ * Add configuration file include directive
+
+   To include the contents of another configuration file simply do e.g.:
+
+   [include raspberrypi.conf]
+
+   Also, included file can include other files which can include other
+   files etc.
+
+   This feature is useful for managing many configuration files and sharing
+   configuration files with others.
+
+ * Mention how to list key commands in help output
+
+ * Fix hex output mode when using normal input mode
+
+   In this combination of modes the input character was not forwarded to
+   the tty device. This fix makes sure it is forwarded.
+
+ * Fix uptime on MacOS
+
+   On MacOS the birth time is apparently not available so we use
+   modification time instead.
+
+ * Improve warning upon failing connect
+
+   Add device path to warning when connect fails.
+
+ * Fix crashy search_reset() on macOS
+
+ * Clean up shadow variable
+
+ * Clean up readline code
+
+ * Improve listing of long device names
+
+ * Fix listing of serial devices on macOS
+
+Heinrich Schuchardt:
+
+ * Print correct 'Done' timestamp for X- and Y-modem transfers
+
+   Call tio_printf() after completing xymodem_send().
+
+Robert Lipe:
+
+ * Recompute listing_device_name_length_max for MacOS case, too.
 
 
 
