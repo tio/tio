@@ -101,7 +101,7 @@ For more usage details please see the man page documentation
 ### 3.1 Command-line
 
 The command-line interface is straightforward as reflected in the output from
-'tio --help':
+```tio --help```:
 ```
 Usage: tio [<options>] <tty-device|profile|tid>
 
