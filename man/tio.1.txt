@@ -290,8 +290,8 @@ OPTIONS
 
               Display help.
 
-KEYS
-       In session, all key strokes are forwarded to the serial device except the following key sequence: a prefix key (default: ctrl-t) followed by a command key. These sequences are intercepted as tio commands:
+KEY COMMANDS
+       In session, all key strokes are forwarded to the serial device except the following key sequence: a prefix key (default: ctrl-t) followed by a command key. These sequences are intercepted as key commands:
 
        ctrl-t ?        List available key commands
 
@@ -476,6 +476,8 @@ CONFIGURATION FILE
 
        exec                     Execute shell command with I/O redirected to device
 
+       It is possible to include the content of other configuration files using the include directive like so: "[include <file>]".
+
 CONFIGURATION FILE EXAMPLES
        To change the default configuration simply set options like so:
 
@@ -597,4 +599,4 @@ WEBSITE
 AUTHOR
        Maintained by Martin Lund <martin.lund@keep-it-simple.com>.
 
-tio 3.5                                                                                                                                    2024-06-15                                                                                                                                    tio(1)
+tio 3.6                                                                                                                                    2024-07-19                                                                                                                                    tio(1)
