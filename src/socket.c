@@ -226,7 +226,11 @@ void socket_configure(void)
         exit(EXIT_FAILURE);
     }
 
+#if defined(SO_NOSIGPIPE) && !defined(MSG_NOSIGNAL)
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR | SO_NOSIGPIPE, &optval, sizeof(optval)))
+#else
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)))
+#endif
     {
         tio_error_printf("Failed to set socket options (%s)", strerror(errno));
         exit(EXIT_FAILURE);
@@ -270,7 +274,12 @@ void socket_write(char input_char)
     {
         if (clientfds[i] != -1)
         {
+
+#if defined(SO_NOSIGPIPE) && !defined(MSG_NOSIGNAL)
+            if (send(clientfds[i], &input_char, 1, 0) <= 0)
+#else
             if (send(clientfds[i], &input_char, 1, MSG_NOSIGNAL) <= 0)
+#endif
             {
                 tio_error_printf_silent("Failed to write to socket (%s)", strerror(errno));
                 close(clientfds[i]);
