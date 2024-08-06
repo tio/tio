@@ -2669,7 +2669,6 @@ int tty_connect(void)
                                         // Write current line to tty device
                                         char *rl_line = readline_get();
                                         tty_write(device_fd, rl_line, strlen(rl_line));
-                                        tty_sync(device_fd);
                                     }
                                     else
                                     {
