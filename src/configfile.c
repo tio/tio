@@ -219,6 +219,7 @@ static void config_parse_keys(GKeyFile *key_file, char *group)
     config_get_integer(key_file, group, "timestamp-timeout", &option.timestamp_timeout, 0, INT_MAX);
     config_get_bool(key_file, group, "log", &option.log);
     config_get_string(key_file, group, "log-file", &option.log_filename, NULL);
+    config_get_string(key_file, group, "log-directory", &option.log_directory, NULL);
     config_get_bool(key_file, group, "log-append", &option.log_append);
     config_get_bool(key_file, group, "log-strip", &option.log_strip);
     config_get_string(key_file, group, "map", &string, NULL);
