@@ -76,6 +76,12 @@ char *timestamp_current_time(void)
             tm = localtime(&tv.tv_sec);
             len = strftime(time_string, sizeof(time_string), "%Y-%m-%dT%H:%M:%S", tm);
             break;
+        case TIMESTAMP_EPOCH:
+            // "1223" (seconds since Unix epoch, 1970-01-01 00:00:00Z)
+            tv = tv_now;
+            tm = localtime(&tv.tv_sec);
+            len = strftime(time_string, sizeof(time_string), "%s", tm);
+            break;
         default:
             return NULL;
     }
