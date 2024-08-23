@@ -392,6 +392,10 @@ const char* option_timestamp_format_to_string(timestamp_t timestamp)
             return "iso8601";
             break;
 
+        case TIMESTAMP_EPOCH:
+            return "epoch";
+            break;
+
         default:
             return "unknown";
             break;
@@ -417,6 +421,10 @@ void option_parse_timestamp(const char *arg, timestamp_t *timestamp)
     else if (strcmp(arg, "iso8601") == 0)
     {
         *timestamp = TIMESTAMP_ISO8601;
+    }
+    else if (strcmp(arg, "epoch") == 0)
+    {
+        *timestamp = TIMESTAMP_EPOCH;
     }
     else
     {
@@ -1151,7 +1159,7 @@ void options_parse_final(int argc, char *argv[])
     if ( ((strncmp("COM", option.target, 3) == 0)
         || (strncmp("com", option.target, 3) == 0) )
         && (sscanf(option.target + 3, "%hhu", &portnum) == 1)
-        && (portnum > 0) ) 
+        && (portnum > 0) )
     {
         asprintf(&tty_win, "/dev/ttyS%hhu", portnum - 1);
         option.target = tty_win;
