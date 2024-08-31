@@ -1,5 +1,32 @@
 
-=== tio v3.6 (2024-07-19) ===
+=== tio v3.7 (2024-08-31) ===
+
+
+
+Changes since tio v3.6 (2024-07-19):
+
+ * Remove unnecessary sync in line input mode
+
+   This caused a problem for some highly timing sensitive modem read-eval-print
+   loops because the input line and line termination characters (cr/nl) would be
+   shifted out on the UART with too big delay inbetween because of two
+   syncs.
+
+ * Fix socket send call on platforms without MSG_NOSIGNAL
+
+   To fix build issue encountered on MacOS Catalina but may apply to other
+   platforms.
+
+Steve Marple:
+
+ * Add "epoch" timestamp option
+
+   Add an option that prints the timestamp as the number of seconds since
+   the Unix epoch.
+
+Tomka Gergely:
+
+ * The log-directory options is not read from the configuration file.
 
 
 
