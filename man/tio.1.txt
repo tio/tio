@@ -601,4 +601,4 @@ WEBSITE
 AUTHOR
        Maintained by Martin Lund <martin.lund@keep-it-simple.com>.
 
-tio 3.6                                                                                                                                    2024-07-19                                                                                                                                    tio(1)
+tio 3.7                                                                                                                                    2024-08-31                                                                                                                                    tio(1)
