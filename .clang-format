@@ -1,0 +1,5 @@
+BasedOnStyle: llvm
+IndentWidth: 4
+AllowShortFunctionsOnASingleLine: None
+KeepEmptyLinesAtTheStartOfBlocks: false
+BreakBeforeBraces: Allman
