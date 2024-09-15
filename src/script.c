@@ -181,7 +181,7 @@ static int modem_send(lua_State *L)
 }
 
 // lua: send(string)
-static int send(lua_State *L)
+static int send_(lua_State *L)
 {
     const char *string = lua_tostring(L, 1);
     int ret;
@@ -455,7 +455,7 @@ static const struct luaL_Reg tio_lib[] =
     { "msleep", msleep},
     { "line_set", line_set},
     { "modem_send", modem_send},
-    { "send", send},
+    { "send", send_},
     { "read", read_string},
     { "expect", expect},
     { "exit", exit_},
