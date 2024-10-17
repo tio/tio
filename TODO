@@ -1,3 +1,5 @@
+ * Add mapping feature for printing non-printable characters
+
  * Porting layer to support native win32 builds.
 
    Some of the work that needs to be done: 
