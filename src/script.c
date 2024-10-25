@@ -37,6 +37,7 @@
 #include "log.h"
 #include "script.h"
 #include "fs.h"
+#include "timestamp.h"
 
 #define MAX_BUFFER_SIZE 2000 // Maximum size of circular buffer
 
@@ -301,6 +302,77 @@ error:
     return 2;
 }
 
+// lua: ret,string = read_ts(size, timeout)
+static int read_ts(lua_State *L)
+{
+    int size = lua_tointeger(L, 1) + 1; //plus one for null-terminated string
+    int timeout = lua_tointeger(L, 2);
+    int ret = 0;
+
+    char *buffer = malloc(size);
+    if (buffer == NULL)
+    {
+        ret = -1; // Error
+        goto error;
+    }
+
+    if (timeout == 0)
+    {
+        timeout = -1; // Wait forever
+    }
+
+    ssize_t bytes_read = read_poll(device_fd, buffer, size, timeout);
+    if (bytes_read < 0)
+    {
+        ret = -1; // Error
+        goto error;
+    }
+    else if (bytes_read == 0)
+    {
+        ret = 0; // Timeout
+        goto error;
+    }
+    else
+    {
+        buffer[bytes_read] = (char)0;
+    }
+
+    if (option.timestamp)
+    {
+        char *pTimeStampNow;
+        pTimeStampNow = timestamp_current_time();
+        if (pTimeStampNow)
+        {
+            tio_printf("%s", buffer); //does timestamps for us
+            if (option.log)
+            {
+                log_printf("\n[%s] %s", pTimeStampNow, buffer);
+            }
+        }
+    } else {
+        for (ssize_t i=0; i<bytes_read; i++)
+        {
+            putchar(buffer[i]);
+
+            if (option.log)
+            {
+                log_putc(buffer[i]);
+            }
+        }
+    }
+
+    ret = bytes_read;
+
+error:
+    lua_pushnumber(L, ret);
+    if (buffer != NULL)
+    {
+        lua_pushstring(L, buffer);
+        free(buffer);
+    }
+    return 2;
+}
+
 // lua: expect(string, timeout)
 static int expect(lua_State *L)
 {
@@ -457,6 +529,7 @@ static const struct luaL_Reg tio_lib[] =
     { "modem_send", modem_send},
     { "send", send_},
     { "read", read_string},
+    { "read_ts", read_ts },
     { "expect", expect},
     { "exit", exit_},
     { "tty_search", tty_search_},

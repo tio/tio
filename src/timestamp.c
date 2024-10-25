@@ -29,8 +29,6 @@
 #include "options.h"
 #include "timestamp.h"
 
-#define TIME_STRING_SIZE_MAX 24
-
 char *timestamp_current_time(void)
 {
     static char time_string[TIME_STRING_SIZE_MAX];
