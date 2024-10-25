@@ -23,6 +23,7 @@
 #include <regex.h>
 #include <getopt.h>
 #include <errno.h>
+#include "git-version.h"
 #include "config.h"
 #include "misc.h"
 #include "print.h"
@@ -1085,7 +1086,7 @@ void options_parse(int argc, char *argv[])
                 break;
 
             case 'v':
-                printf("tio v%s\n", VERSION);
+                printf("tio %s\n", GIT_VERSION);
                 exit(EXIT_SUCCESS);
                 break;
 

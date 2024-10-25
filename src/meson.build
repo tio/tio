@@ -1,5 +1,10 @@
+# Generate git version header
+git_version_h = vcs_tag(command : ['git', 'describe', '--tags', '--always', '--dirty'],
+                        input : 'git-version.h.in',
+                        output :'git-version.h',
+                        replace_string:'@GIT_VERSION@')
+
 config_h = configuration_data()
-config_h.set_quoted('VERSION', meson.project_version())
 config_h.set('BAUDRATE_CASES', baudrate_cases)
 configure_file(output: 'config.h', configuration: config_h)
 
@@ -21,7 +26,8 @@ tio_sources = [
   'xymodem.c',
   'script.c',
   'fs.c',
-  'readline.c'
+  'readline.c',
+  git_version_h
 ]
 
 
