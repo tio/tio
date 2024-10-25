@@ -32,5 +32,7 @@ typedef enum
     TIMESTAMP_END,
 } timestamp_t;
 
+#define TIME_STRING_SIZE_MAX 24
+
 char *timestamp_current_time(void);
 

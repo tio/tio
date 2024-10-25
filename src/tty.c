@@ -1615,6 +1615,7 @@ const char* get_serial_port_type(const char* port_name)
 
 const char* get_serial_port_type(const char* port_name)
 {
+    (void)port_name;
     return "";
 }
 
