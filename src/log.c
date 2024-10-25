@@ -19,8 +19,7 @@
  * 02110-1301, USA.
  */
 
-#define __STDC_WANT_LIB_EXT2__ 1   // To access vasprintf
-
+#define _GNU_SOURCE // To access vasprintf
 #include <sys/time.h>
 #include <libgen.h>
 #include <errno.h>
