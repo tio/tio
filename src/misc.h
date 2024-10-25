@@ -30,7 +30,7 @@ void delay(long ms);
 int ctrl_key_code(unsigned char key);
 bool regex_match(const char *string, const char *pattern);
 unsigned long djb2_hash(const unsigned char *str);
-char *base62_encode(unsigned long num);
+void *base62_encode(unsigned long num, char *output);
 int read_poll(int fd, void *data, size_t len, int timeout);
 double get_current_time(void);
 bool match_patterns(const char *string, const char *patterns);

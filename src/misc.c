@@ -121,10 +121,9 @@ unsigned long djb2_hash(const unsigned char *str)
 }
 
 // Function to encode a number to base62
-char *base62_encode(unsigned long num)
+void *base62_encode(unsigned long num, char *output)
 {
     const char base62_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    char *output = (char *) malloc(5); // 4 characters + null terminator
     if (output == NULL)
     {
         tio_error_print("Memory allocation failed");

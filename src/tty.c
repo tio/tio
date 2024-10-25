@@ -1735,7 +1735,8 @@ GList *tty_search_for_serial_devices(void)
 
         // Hash remaining string to get unique topology ID
         unsigned long hash = djb2_hash((const unsigned char *)devices_path);
-        char *tid = base62_encode(hash);
+        char tid[5];
+        base62_encode(hash, tid);
         free(devices_path);
 
         // Construct the path to the device's driver symlink
