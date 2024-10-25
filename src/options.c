@@ -19,6 +19,8 @@
  * 02110-1301, USA.
  */
 
+#define _GNU_SOURCE // To access vasprintf
+
 #include <assert.h>
 #include <regex.h>
 #include <getopt.h>

@@ -29,6 +29,7 @@
 #include <lauxlib.h>
 #include <lualib.h>
 #include <sys/ioctl.h>
+#include <ctype.h>
 #include "misc.h"
 #include "print.h"
 #include "options.h"
@@ -37,8 +38,11 @@
 #include "log.h"
 #include "script.h"
 #include "fs.h"
+#include "timestamp.h"
+#include "termios.h"
 
 #define MAX_BUFFER_SIZE 2000 // Maximum size of circular buffer
+#define READ_LINE_SIZE 4096 // read_line buffer length
 
 static int device_fd;
 static char circular_buffer[MAX_BUFFER_SIZE];
@@ -192,6 +196,8 @@ static int send_(lua_State *L)
     }
 
     ret = write(device_fd, string, strlen(string));
+    fsync(device_fd);  // flush these characters now
+    tcdrain(device_fd); //ensure we flushed characters to our device
 
     lua_pushnumber(L, ret);
 
@@ -248,10 +254,39 @@ static bool match_regex(regex_t *regex)
     return false;
 }
 
-// lua: ret,string = read_string(size, timeout)
+// Function to echo a buffer to stdout and to the log
+// per the option.timestamp and option.log settings
+static void echo_buffer(char buffer[], ssize_t len)
+{
+    if (option.timestamp)
+    {
+        char *pTimeStampNow;
+        pTimeStampNow = timestamp_current_time();
+        if (pTimeStampNow)
+        {
+            tio_printf("%s", buffer); //does timestamps for us
+            if (option.log)
+            {
+                log_printf("\n[%s] %s", pTimeStampNow, buffer);
+            }
+        }
+    } else {
+        for (ssize_t i=0; i<len; i++)
+        {
+            putchar(buffer[i]);
+
+            if (option.log)
+            {
+                log_putc(buffer[i]);
+            }
+        }
+    }
+}
+
+// lua: ret,string = read(size, timeout)
 static int read_string(lua_State *L)
 {
-    int size = lua_tointeger(L, 1);
+    int size = lua_tointeger(L, 1) + 1; //plus one for null-terminated string
     int timeout = lua_tointeger(L, 2);
     int ret = 0;
 
@@ -259,7 +294,7 @@ static int read_string(lua_State *L)
     if (buffer == NULL)
     {
         ret = -1; // Error
-        goto error;
+        goto error_rs;
     }
 
     if (timeout == 0)
@@ -271,33 +306,94 @@ static int read_string(lua_State *L)
     if (bytes_read < 0)
     {
         ret = -1; // Error
-        goto error;
+        goto error_rs;
     }
     else if (bytes_read == 0)
     {
         ret = 0; // Timeout
-        goto error;
+        goto error_rs;
     }
-
-    for (ssize_t i=0; i<bytes_read; i++)
+    else
     {
-        putchar(buffer[i]);
-
-        if (option.log)
-        {
-            log_putc(buffer[i]);
-        }
+        buffer[bytes_read] = (char)0;
     }
 
+    echo_buffer(&buffer[0], bytes_read);
     ret = bytes_read;
 
-error:
+error_rs:
     lua_pushnumber(L, ret);
     if (buffer != NULL)
     {
-        lua_pushstring(L, buffer);
+        lua_pushstring(L, ret > 0 ? buffer : "");
         free(buffer);
     }
+    else
+    {
+        lua_pushstring(L, ""); // give empty string to caller
+    }
+    return 2;
+}
+
+// lua: ret,string = read_line(timeout)
+static int read_line(lua_State *L)
+{
+    static char linebuf[READ_LINE_SIZE];
+    int timeout = lua_tointeger(L, 1); //ms
+    int ret = 0;
+    int read_result = 1; //enable reading input from device
+    char ch;
+    int bytes_read = 0;
+
+    linebuf[0] = '\0';
+    if (timeout == 0)
+    {
+        timeout = -1; // Wait forever
+    }
+
+    // loop reading input until a newline seen or timeout
+    while (true)
+    {
+        read_result = read_poll(device_fd, &ch, 1, timeout);
+        if (read_result < 0)
+        {
+            ret = -1; // Error
+            linebuf[bytes_read] = '\0';
+            goto error_rl;
+        }
+        else if (!read_result)
+        {
+            // Timeout returns a non-empty linebuf as a 'line'
+            ret = bytes_read;
+            linebuf[bytes_read] = '\0';
+            break;
+        }
+        else // we got a character, so handle it
+        {
+            if (ch == '\n')
+            {
+                linebuf[bytes_read] = '\0';
+                break;
+            }
+            else if (bytes_read <= (READ_LINE_SIZE-2))
+            {
+                if (isprint(ch)) // store all printable chars
+                {
+                    linebuf[bytes_read++] = ch;
+                }
+            }
+        }
+    }
+
+    if (bytes_read)
+    {
+        echo_buffer(linebuf, bytes_read);
+    }
+    ret = bytes_read;
+
+error_rl:
+    lua_pushnumber(L, ret);
+    lua_pushstring(L, linebuf);
     return 2;
 }
 
@@ -457,6 +553,7 @@ static const struct luaL_Reg tio_lib[] =
     { "modem_send", modem_send},
     { "send", send_},
     { "read", read_string},
+    { "read_line", read_line},
     { "expect", expect},
     { "exit", exit_},
     { "tty_search", tty_search_},
