@@ -375,6 +375,13 @@ SCRIPT API
 
              On success, returns read string as second return value.
 
+       read_ts(size, timeout)
+             Read from serial device. If timeout is 0 or not provided it will wait forever until data is ready to read.
+
+             Returns number of bytes read on success, 0 on timeout, or -1 on error.
+
+             On success, returns read string as second return value.  Additionally, emit timestamp to stdout and log file per options.timestamp and options.log.
+
        set{line=state, ...}
              Set state of one or multiple tty modem lines.
 
