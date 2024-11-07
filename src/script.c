@@ -255,7 +255,7 @@ static int read_string(lua_State *L)
     int timeout = lua_tointeger(L, 2);
     int ret = 0;
 
-    char *buffer = malloc(size);
+    char *buffer = calloc(1, size);
     if (buffer == NULL)
     {
         ret = -1; // Error
