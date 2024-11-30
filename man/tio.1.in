@@ -428,7 +428,8 @@ Send ctrl-t character
 .PP
 Tio suppots Lua scripting to easily automate interaction with the tty device.
 
-In addition to the Lua API tio makes the following functions available:
+In addition to the standard Lua API tio makes the following functions
+available:
 
 .TP 6n
 
@@ -440,26 +441,6 @@ Timeout is in milliseconds, defaults to 0 meaning it will wait forever.
 Returns 1 on successful match, 0 on timeout, or -1 on error.
 
 On successful match it also returns the match string as second return value.
-
-.IP "\fBsend(string)"
-Send string.
-
-Returns number of bytes written on success or -1 on error.
-
-.IP "\fBmodem_send(file, protocol)"
-Send file using x/y-modem protocol.
-
-Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
-
-.IP "\fBtty_search()"
-Search for serial devices.
-
-Returns a table of number indexed tables, one for each serial device found.
-Each of these tables contains the serial device information accessible via the
-following string indexed elements "path", "tid", "uptime", "driver",
-"description".
-
-Returns nil if no serial devices are found.
 
 .IP "\fBread(size, timeout)"
 Read from serial device. If timeout is 0 or not provided it will wait forever
@@ -479,6 +460,26 @@ Returns number of bytes read on success, 0 on timeout, or -1 on error.
 On success, returns the string that was read as second return value.  Also
 emits a single timestamp to stdout and log file per options.timestamp
 and options.log.
+
+.IP "\fBwrite(string)"
+Write string to serial device.
+
+Returns number of bytes written on success or -1 on error.
+
+.IP "\fBsend(file, protocol)"
+Send file using x/y-modem protocol.
+
+Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
+
+.IP "\fBtty_search()"
+Search for serial devices.
+
+Returns a table of number indexed tables, one for each serial device found.
+Each of these tables contains the serial device information accessible via the
+following string indexed elements "path", "tid", "uptime", "driver",
+"description".
+
+Returns nil if no serial devices are found.
 
 .IP "\fBset{line=state, ...}"
 Set state of one or multiple tty modem lines.

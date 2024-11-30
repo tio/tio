@@ -401,12 +401,30 @@ expect(string, timeout)
 
       On successful match it also returns the match string as second return value.
 
-send(string)
-      Send string.
+read(size, timeout)
+      Read from serial device. If timeout is 0 or not provided it will wait
+      forever until data is ready to read.
+
+      Returns number of bytes read on success, 0 on timeout, or -1 on error.
+
+      On success, returns read string as second return value.
+
+read_line(timeout)
+      Read line from serial device. If timeout is 0 or not provided it will
+      wait forever until data is ready to read.
+
+      Returns number of bytes read on success, 0 on timeout, or -1 on error.
+
+      On success, returns the string that was read as second return value.
+      Also emits a single timestamp to stdout and log file per options.timestamp
+      and options.log.
+
+write(string)
+      Write string to serial device.
 
       Returns number of bytes written on success or -1 on error.
 
-modem_send(file, protocol)
+send(file, protocol)
       Send file using x/y-modem protocol.
 
       Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
@@ -420,14 +438,6 @@ tty_search()
       "description".
 
       Returns nil if no serial devices are found.
-
-read(size, timeout)
-      Read from serial device. If timeout is 0 or not provided it will wait
-      forever until data is ready to read.
-
-      Returns number of bytes read on success, 0 on timeout, or -1 on error.
-
-      On success, returns read string as second return value.
 
 set{line=state, ...}
       Set state of one or multiple tty modem lines.

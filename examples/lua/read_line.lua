@@ -1,13 +1,13 @@
 read(1000, 8000) -- read initial config
-send("\n")
+write("\n")
 read(650, 100) -- main menu
-send("S") -- S menu
+write("S") -- S menu
 n = 1
 while n > 0 do -- while not empty, read more
   n, str = read_line(25)
 end
 while true do
-  send("t") -- query PV table
+  write("t") -- query PV table
   msleep(880)
   n = 1
   while n > 0 do -- while not empty, read more

@@ -18,9 +18,9 @@ if (1 == found) then
     local hostname = string.match(match_str, "^%w+")
     local login = logins[hostname]
     if (nil ~= login) then
-        send(login.username .. "\n")
+        write(login.username .. "\n")
         expect("Password:")
-        send(login.password .. "\n")
+        write(login.password .. "\n")
     else
         io.write("\r\nDon't know login info for " .. hostname .. "\r\n")
     end
