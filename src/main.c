@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "git-version.h"
+#include "version.h"
 #include "config.h"
 #include "options.h"
 #include "configfile.h"
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
     error_enter_session_mode();
 
     /* Print launch hints */
-    tio_printf("tio %s", GIT_VERSION);
+    tio_printf("tio %s", VERSION);
     if (interactive_mode)
     {
         tio_printf("Press ctrl-%c q to quit", option.prefix_key);

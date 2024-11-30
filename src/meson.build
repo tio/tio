@@ -1,8 +1,8 @@
-# Generate git version header
-git_version_h = vcs_tag(command : ['git', 'describe', '--tags', '--always', '--dirty'],
-                        input : 'git-version.h.in',
-                        output :'git-version.h',
-                        replace_string:'@GIT_VERSION@')
+# Generate version header
+version_h = vcs_tag(command : ['git', 'describe', '--tags', '--always', '--dirty'],
+                        input : 'version.h.in',
+                        output :'version.h',
+                        replace_string:'@VERSION@')
 
 config_h = configuration_data()
 config_h.set('BAUDRATE_CASES', baudrate_cases)
@@ -27,7 +27,7 @@ tio_sources = [
   'script.c',
   'fs.c',
   'readline.c',
-  git_version_h
+  version_h
 ]
 
 

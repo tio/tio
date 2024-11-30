@@ -22,7 +22,7 @@
 #if defined(__linux__)
 #include <linux/serial.h>
 #endif
-#include "git-version.h"
+#include "version.h"
 #include "config.h"
 #include <stdarg.h>
 #include <stdio.h>
@@ -1091,7 +1091,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 break;
 
             case KEY_V:
-                tio_printf("tio %s", GIT_VERSION);
+                tio_printf("tio %s", VERSION);
                 break;
 
             case KEY_X:
