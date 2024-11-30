@@ -359,7 +359,7 @@ color = 11
 [svf2]
 device = /dev/ttyUSB0
 baudrate = 9600
-script = expect("login: "); send("root\n"); expect("Password: "); send("root\n")
+script = expect("login: "); write("root\n"); expect("Password: "); write("root\n")
 color = 12
 
 [esp32]
