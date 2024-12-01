@@ -435,7 +435,7 @@ available:
 
 .IP "\fBexpect(string, timeout)"
 Expect string - waits for string to match or timeout before continuing.
-Supports regular expressions. Special characters must be escaped with '\\\\'.
+Supports regular expressions. Special characters must be escaped with '\e\e'.
 Timeout is in milliseconds, defaults to 0 meaning it will wait forever.
 
 Returns 1 on successful match, 0 on timeout, or -1 on error.
