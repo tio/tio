@@ -752,6 +752,11 @@ Likewise, to pipe data from file to the serial device:
 $ cat data.bin | tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
 
 .TP
+Map NL to CR-NL on input from device and DEL to BS on output to device:
+
+$ tio --map INLCRNL,ODELBS /dev/ttyUSB0
+
+.TP
 Enable RS-485 mode:
 
 $ tio --rs-485 --rs-485-config=RTS_ON_SEND=1,RX_DURING_TX /dev/ttyUSB0

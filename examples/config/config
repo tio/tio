@@ -71,3 +71,8 @@ device = /dev/ttyUSB0
 color = 14
 script = set{DTR=high,RTS=low}; msleep(100); set{DTR=low,RTS=high}; msleep(100); set{RTS=low}
 script-run = always
+
+[buspirate]
+device = /dev/ttyACM0
+map = INLCRNL,ODELBS
+color = 15

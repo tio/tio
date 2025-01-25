@@ -275,6 +275,11 @@ Redirect I/O to IPv4 network socket on port 4242:
 $ tio --socket inet:4242 /dev/ttyUSB0
 ```
 
+Map NL to CR-NL on input from device and DEL to BS on output to device:
+```
+$ tio --map INLCRNL,ODELBS /dev/ttyUSB0
+```
+
 Pipe data to the serial device:
 ```
 $ cat data.bin | tio /dev/ttyUSB0
