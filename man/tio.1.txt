@@ -1,4 +1,4 @@
-tio(1)                                                                                                                                   User Commands                                                                                                                                   tio(1)
+tio(1)                                                                                                         User Commands                                                                                                         tio(1)
 
 NAME
        tio - a serial device I/O tool
@@ -218,7 +218,8 @@ OPTIONS
 
               Redirect I/O to socket.
 
-              Any input from clients connected to the socket is sent on the serial port as if entered at the terminal where tio is running (except that ctrl-t sequences are not recognized), and any input from the serial port is multiplexed to the terminal and all connected clients.
+              Any  input from clients connected to the socket is sent on the serial port as if entered at the terminal where tio is running (except that ctrl-t sequences are not recognized), and any input from the serial port is multi‐
+              plexed to the terminal and all connected clients.
 
               Sockets remain open while the serial port is disconnected, and writes will block.
 
@@ -342,7 +343,7 @@ KEY COMMANDS
 SCRIPT API
        Tio suppots Lua scripting to easily automate interaction with the tty device.
 
-       In addition to the Lua API tio makes the following functions available:
+       In addition to the standard Lua API tio makes the following functions available:
 
        expect(string, timeout)
              Expect string - waits for string to match or timeout before continuing.  Supports regular expressions. Special characters must be escaped with '\\'.  Timeout is in milliseconds, defaults to 0 meaning it will wait forever.
@@ -351,29 +352,12 @@ SCRIPT API
 
              On successful match it also returns the match string as second return value.
 
-       send(string)
-             Send string.
-
-             Returns number of bytes written on success or -1 on error.
-
-       modem_send(file, protocol)
-             Send file using x/y-modem protocol.
-
-             Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
-
-       tty_search()
-             Search for serial devices.
-
-             Returns a table of number indexed tables, one for each serial device found.  Each of these tables contains the serial device information accessible via the following string indexed elements "path", "tid", "uptime", "driver", "description".
-
-             Returns nil if no serial devices are found.
-
        read(size, timeout)
              Read from serial device. If timeout is 0 or not provided it will wait forever until data is ready to read.
 
              Returns number of bytes read on success, 0 on timeout, or -1 on error.
 
-             On success, returns read string as second return value. Also emits a single timestamp to stdout and log file per options.timestamp and options.log.
+             On success, returns read string as second return value.  Also emits a single timestamp to stdout and log file per options.timestamp and options.log.
 
        read_line(timeout)
              Read line from serial device. If timeout is 0 or not provided it will wait forever until data is ready to read.
@@ -381,6 +365,24 @@ SCRIPT API
              Returns number of bytes read on success, 0 on timeout, or -1 on error.
 
              On success, returns the string that was read as second return value.  Also emits a single timestamp to stdout and log file per options.timestamp and options.log.
+
+       write(string)
+             Write string to serial device.
+
+             Returns number of bytes written on success or -1 on error.
+
+       send(file, protocol)
+             Send file using x/y-modem protocol.
+
+             Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
+
+       tty_search()
+             Search for serial devices.
+
+             Returns a table of number indexed tables, one for each serial device found.  Each of these tables contains the serial device information accessible via the following string indexed elements "path", "tid",  "uptime",  "dri‐
+             ver", "description".
+
+             Returns nil if no serial devices are found.
 
        set{line=state, ...}
              Set state of one or multiple tty modem lines.
@@ -572,7 +574,7 @@ EXAMPLES
 
        It is also possible to use tio's own simpler expect/send script functionality to e.g. automate logins:
 
-              $ tio --script 'expect("login: "); send("root\n"); expect("Password: "); send("root\n")' /dev/ttyUSB0
+              $ tio --script 'expect("login: "); write("root\n"); expect("Password: "); write("root\n")' /dev/ttyUSB0
 
        Redirect device I/O to network file socket for remote TTY sharing:
 
@@ -594,6 +596,10 @@ EXAMPLES
 
               $ cat data.bin | tio /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
 
+       Map NL to CR-NL on input from device and DEL to BS on output to device:
+
+              $ tio --map INLCRNL,ODELBS /dev/ttyUSB0
+
        Enable RS-485 mode:
 
               $ tio --rs-485 --rs-485-config=RTS_ON_SEND=1,RX_DURING_TX /dev/ttyUSB0
@@ -608,4 +614,4 @@ WEBSITE
 AUTHOR
        Maintained by Martin Lund <martin.lund@keep-it-simple.com>.
 
-tio 3.7                                                                                                                                    2024-08-31                                                                                                                                    tio(1)
+tio 3.8                                                                                                          2024-11-30                                                                                                          tio(1)
