@@ -998,7 +998,10 @@ void options_parse(int argc, char *argv[])
                 break;
 
             case 't':
-                option.timestamp = TIMESTAMP_24HOUR;
+                if (option.timestamp == TIMESTAMP_NONE)
+                {
+                    option.timestamp = TIMESTAMP_24HOUR;
+                }
                 break;
 
             case OPT_TIMESTAMP_FORMAT:

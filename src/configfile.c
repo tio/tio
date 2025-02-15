@@ -31,6 +31,7 @@
 #include <regex.h>
 #include <glib.h>
 #include "configfile.h"
+#include "timestamp.h"
 #include "print.h"
 #include "rs485.h"
 #include "misc.h"
@@ -148,7 +149,6 @@ static void config_get_bool(GKeyFile *key_file, gchar *group, gchar *key, bool *
 static void config_parse_keys(GKeyFile *key_file, char *group)
 {
     char *string = NULL;
-    bool boolean = false;
 
     config_get_string(key_file, group, "device", &config.device, NULL);
     config_get_integer(key_file, group, "baudrate", &option.baudrate, 0, INT_MAX);
@@ -204,17 +204,16 @@ static void config_parse_keys(GKeyFile *key_file, char *group)
         g_free((void *)string);
         string = NULL;
     }
-    config_get_bool(key_file, group, "timestamp", &boolean);
-    if (boolean == true)
+    config_get_bool(key_file, group, "timestamp", (bool*) &option.timestamp);
+    if (option.timestamp != TIMESTAMP_NONE)
     {
-        option.timestamp = TIMESTAMP_24HOUR;
-    }
-    config_get_string(key_file, group, "timestamp-format", &string, "24hour", "24hour-start", "24hour-delta", "iso8601", "epoch", NULL);
-    if (string != NULL)
-    {
-        option_parse_timestamp(string, &option.timestamp);
-        g_free((void *)string);
-        string = NULL;
+        config_get_string(key_file, group, "timestamp-format", &string, "24hour", "24hour-start", "24hour-delta", "iso8601", "epoch", NULL);
+        if (string != NULL)
+        {
+            option_parse_timestamp(string, &option.timestamp);
+            g_free((void *)string);
+            string = NULL;
+        }
     }
     config_get_integer(key_file, group, "timestamp-timeout", &option.timestamp_timeout, 0, INT_MAX);
     config_get_bool(key_file, group, "log", &option.log);
