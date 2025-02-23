@@ -1,3 +1,13 @@
+ * Add option to send file raw (no modem protocol)
+
+ * Add loopback option
+
+   Send received serial input back to output (for testing etc.)
+
+ * Add loopback support between two serial ports
+
+   Useful for traffic monitoring
+
  * Add mapping feature for printing non-printable characters
 
  * Porting layer to support native win32 builds.
