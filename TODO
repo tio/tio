@@ -1,3 +1,5 @@
+ * Support input and input mapping from lua scripts
+
  * Add option to send file raw (no modem protocol)
 
  * Add loopback option
