@@ -5,6 +5,7 @@
 
 [![](https://img.shields.io/github/actions/workflow/status/tio/tio/ubuntu.yml?label=Ubuntu)](https://github.com/tio/tio/actions/workflows/ubuntu.yml)
 [![](https://img.shields.io/github/actions/workflow/status/tio/tio/macos.yml?label=MacOS)](https://github.com/tio/tio/actions/workflows/macos.yml)
+[![](https://github.com/tio/tio/actions/workflows/codeql.yml/badge.svg)](https://github.com/tio/tio/actions/workflows/codeql.yml)
 [![](https://img.shields.io/codefactor/grade/github/tio/tio)](https://www.codefactor.io/repository/github/tio/tio)
 [![](https://img.shields.io/github/v/release/tio/tio?sort=semver)](https://github.com/tio/tio/releases)
 [![](https://img.shields.io/repology/repositories/tio)](https://repology.org/project/tio/versions)
