@@ -1184,10 +1184,6 @@ void stdout_configure(void)
 {
     int status;
 
-    /* Disable line buffering in stdout. This is necessary if we
-     * want things like local echo to work correctly. */
-    setvbuf(stdout, NULL, _IONBF, 0);
-
     /* Save current stdout settings */
     if (tcgetattr(STDOUT_FILENO, &stdout_old) < 0)
     {

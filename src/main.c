@@ -61,6 +61,10 @@ int main(int argc, char *argv[])
     /* Configure tty device */
     tty_configure();
 
+    /* Disable line buffering in stdout. This is necessary if we
+     * want things like local echo to work correctly. */
+    setvbuf(stdout, NULL, _IONBF, 0);
+
     /* Configure input terminal */
     if (isatty(fileno(stdin)))
     {
