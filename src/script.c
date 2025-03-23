@@ -207,6 +207,11 @@ static int write_(lua_State *L)
 // Function to add a character to the circular expect buffer
 static void expect_buffer_add(char c)
 {
+    if (!c)
+    {
+        return;
+    }
+
     if (buffer_size < MAX_BUFFER_SIZE)
     {
         circular_buffer[buffer_size++] = c;
