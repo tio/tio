@@ -1,5 +1,39 @@
+=== tio v3.9 (2025-04-12) ===
 
-=== tio v3.8 (2024-11-30) ===
+
+
+Changes since tio v3.8 (2024-11-30):
+
+ * Fix parsing of timestamp options
+
+ * codeql: Upgrade to upload-artifact@v4
+
+ * Update plaintext man page
+
+ * Add character mapping examples
+
+Samuel Holland:
+
+ * Don't add null characters to the expect buffer
+
+   They prevent regexec() from seeing the remainder of the buffer.
+
+V:
+
+ * Disable stdout buffering globally
+
+   This makes it possible to pipe output to other programs cleanly.
+
+Lubov66:
+
+ * docs: edited the license date
+
+Jakob Haufe:
+
+    Manpage: Fix backslash encoding
+
+    Literal backslash needs to be written as \e.
+
 
 
 Changes since tio v3.7 (2024-08-31):
