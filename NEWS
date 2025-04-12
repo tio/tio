@@ -30,9 +30,9 @@ Lubov66:
 
 Jakob Haufe:
 
-    Manpage: Fix backslash encoding
+ * Manpage: Fix backslash encoding
 
-    Literal backslash needs to be written as \e.
+   Literal backslash needs to be written as \e.
 
 
 
