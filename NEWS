@@ -12,6 +12,8 @@ Changes since tio v3.8 (2024-11-30):
 
  * Add character mapping examples
 
+ * Fix pattern matching memory corruption
+
 Samuel Holland:
 
  * Don't add null characters to the expect buffer
