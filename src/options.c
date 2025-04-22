@@ -116,6 +116,7 @@ struct option_t option =
     .map_ign_cr = false,
     .map_i_ff_escc = false,
     .map_i_nl_crnl = false,
+    .map_i_cr_crnl = false,
     .map_o_cr_nl = false,
     .map_o_nl_crnl = false,
     .map_o_del_bs = false,
@@ -769,6 +770,10 @@ void option_parse_mappings(const char *map)
             else if (strcmp(token,"INLCRNL") == 0)
             {
                 option.map_i_nl_crnl = true;
+            }
+            else if (strcmp(token,"ICRCRNL") == 0)
+            {
+                option.map_i_cr_crnl = true;
             }
             else if (strcmp(token, "ONLCRNL") == 0)
             {

@@ -168,6 +168,8 @@ OPTIONS
 
               INLCRNL     Map NL to CR-NL on input
 
+              ICRCRNL     Map CR to CR-NL on input
+
               IMSB2LSB    Map MSB bit order to LSB on input
 
               OCRNL       Map CR to NL on output

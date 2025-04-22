@@ -98,6 +98,7 @@ struct option_t
     bool map_ign_cr;
     bool map_i_ff_escc;
     bool map_i_nl_crnl;
+    bool map_i_cr_crnl;
     bool map_o_cr_nl;
     bool map_o_nl_crnl;
     bool map_o_del_bs;
