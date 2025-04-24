@@ -22,6 +22,15 @@
 #if defined(__linux__)
 #include <linux/serial.h>
 #endif
+
+#if defined(__APPLE__) || defined(__MACH__)
+#include <CoreFoundation/CoreFoundation.h>
+#include <IOKit/IOBSD.h>
+#include <IOKit/IOKitLib.h>
+#include <IOKit/serial/IOSerialKeys.h>
+#include <IOKit/usb/IOUSBLib.h>
+#endif
+
 #include "version.h"
 #include "config.h"
 #include <stdarg.h>
@@ -623,9 +632,9 @@ void tty_output_mode_set(output_mode_t mode)
 static void mappings_print(void)
 {
     if (option.map_i_cr_nl || option.map_ign_cr || option.map_i_ff_escc ||
-        option.map_i_nl_cr || option.map_i_nl_crnl || option.map_i_cr_crnl || 
-        option.map_o_cr_nl || option.map_o_del_bs || option.map_o_nl_crnl || 
-        option.map_o_ltu || option.map_o_nulbrk || option.map_i_msb2lsb || 
+        option.map_i_nl_cr || option.map_i_nl_crnl || option.map_i_cr_crnl ||
+        option.map_o_cr_nl || option.map_o_del_bs || option.map_o_nl_crnl ||
+        option.map_o_ltu || option.map_o_nulbrk || option.map_i_msb2lsb ||
         option.map_o_ign_cr)
     {
         tio_printf(" Mappings:%s%s%s%s%s%s%s%s%s%s%s%s%s",
@@ -1841,6 +1850,246 @@ GList *tty_search_for_serial_devices(void)
     return device_list;
 }
 
+#elif defined(__APPLE__) || defined(__MACH__)
+
+char *getPropertyString(io_object_t device, CFStringRef property)
+{
+    /* Validate inputs */
+    if (device == IO_OBJECT_NULL || property == NULL)
+    {
+        return NULL;
+    }
+
+    /* Attempt to get property */
+    CFTypeRef valueRef = IORegistryEntryCreateCFProperty(
+        device, property, kCFAllocatorDefault, 0);
+    if (!valueRef)
+    {
+        return NULL;
+    }
+
+    /* Ensure it's a CFString */
+    if (CFGetTypeID(valueRef) != CFStringGetTypeID())
+    {
+        CFRelease(valueRef);
+        return NULL;
+    }
+
+    /* Convert to C string */
+    CFIndex length = CFStringGetLength(valueRef);
+    CFIndex maxSize = CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8) + 1;
+    char *result = malloc(maxSize);
+
+    if (!result)
+    {
+        CFRelease(valueRef);
+        return NULL;
+    }
+
+    bool converted = CFStringGetCString(
+        (CFStringRef)valueRef,
+        result,
+        maxSize,
+        kCFStringEncodingUTF8
+    );
+
+    CFRelease(valueRef);
+
+    if (!converted)
+    {
+        free(result);
+        return NULL;
+    }
+
+    return result;
+}
+
+char *getDeviceLocation(io_object_t device)
+{
+    /* Validate device */
+    if (device == IO_OBJECT_NULL)
+    {
+        return strdup("Invalid Device");
+    }
+
+    /* Attempt to get location */
+    io_string_t location = {0};
+    kern_return_t result = IORegistryEntryGetLocationInPlane(
+        device, kIOServicePlane, location);
+
+    if (result != KERN_SUCCESS)
+    {
+        return strdup("Unknown Location");
+    }
+
+    /* Safely copy location */
+    size_t len = strnlen(location, sizeof(io_string_t));
+    char *trimmed_location = calloc(1, len + 1);
+
+    if (!trimmed_location)
+    {
+        return strdup("Memory Error");
+    }
+
+    memcpy(trimmed_location, location, len);
+    return trimmed_location;
+}
+
+// for __APPLE__
+GList *tty_search_for_serial_devices(void)
+{
+    GList *device_list = NULL;
+    io_iterator_t iter = IO_OBJECT_NULL;
+    CFMutableDictionaryRef matchingDict = NULL;
+    listing_device_name_length_max = 0;
+
+    /* Create matching dictionary for serial devices */
+    if (!(matchingDict = IOServiceMatching(kIOSerialBSDServiceValue)))
+    {
+        tio_error_print("Failed to create matching dictionary for serial devices");
+        return NULL;
+    }
+
+    /* Get matching services */
+    kern_return_t kernResult = IOServiceGetMatchingServices(
+        kIOMainPortDefault, matchingDict, &iter);
+    matchingDict = NULL;  /* Dictionary ownership transferred */
+
+    if (kernResult != KERN_SUCCESS)
+    {
+        tio_error_print("IOServiceGetMatchingServices failed: %d", kernResult);
+        return NULL;
+    }
+
+    /* Defensive check for iterator */
+    if (iter == IO_OBJECT_NULL)
+    {
+        tio_error_print("Invalid device iterator");
+        return NULL;
+    }
+
+    /* Iterate through serial devices and collect information */
+    for (io_object_t device; (device = IOIteratorNext(iter));)
+    {
+        char *devicePath = NULL, *locationID = NULL;
+        char *productName = NULL, *vendorName = NULL;
+        char tid[5] = {0};
+        double uptime = 0.0;
+
+        /* Get device path  - key determines if we get tty. or cu. */
+        //if (!(devicePath = getPropertyString(device, CFSTR(kIODialinDeviceKey))))
+        if (!(devicePath = getPropertyString(device, CFSTR(kIOCalloutDeviceKey))))
+        {
+            IOObjectRelease(device);
+            continue;  /* Skip devices without a path */
+        }
+
+        /* Update length of longest device name string */
+        listing_device_name_length_max =
+            strlen(devicePath) > listing_device_name_length_max
+            ? strlen(devicePath)
+            : listing_device_name_length_max;
+
+        /* Calculate uptime */
+        uptime = get_current_time() - fs_get_creation_time(devicePath);
+
+        /* Find USB device (if applicable) */
+        io_object_t usbDevice = IO_OBJECT_NULL;
+        kern_return_t usbResult = IORegistryEntryGetParentEntry(
+            device, kIOServicePlane, &usbDevice);
+
+        /* Traverse up the device tree to find a USB device */
+        while (usbResult == KERN_SUCCESS &&
+               !IOObjectConformsTo(usbDevice, "IOUSBDevice"))
+        {
+            io_object_t oldUsbDevice = usbDevice;
+            usbResult = IORegistryEntryGetParentEntry(
+                usbDevice, kIOServicePlane, &usbDevice);
+            IOObjectRelease(oldUsbDevice);
+        }
+
+        /* If we found a USB device */
+        if (usbResult == KERN_SUCCESS)
+        {
+            locationID = getDeviceLocation(usbDevice);
+
+            unsigned long hash2 = djb2_hash((const unsigned char *)(locationID ?: ""));
+            base62_encode(hash2, tid);
+
+            /* Get product and vendor names */
+            productName = getPropertyString(usbDevice, CFSTR("USB Product Name"));
+            vendorName = getPropertyString(usbDevice, CFSTR("USB Vendor Name"));
+
+            IOObjectRelease(usbDevice);
+        }
+
+        /* Create device structure */
+        device_t *device_info = g_new0(device_t, 1);
+        if (!device_info)
+        {
+            tio_error_print("Memory allocation failed for device_info");
+            free(devicePath);
+            free(locationID);
+            free(productName);
+            free(vendorName);
+            IOObjectRelease(device);
+            continue;
+        }
+
+        /* Populate device info */
+        *device_info = (device_t) {
+            .path = devicePath,
+            .tid = g_strdup(tid),
+            .uptime = uptime,
+            .driver = g_strdup(vendorName),
+            .description = g_strdup(productName ?: vendorName ?: "")
+        };
+
+        /* Add to device list */
+        device_list = g_list_append(device_list, device_info);
+
+        /* Clean up */
+        free(locationID);
+        free(productName);
+        free(vendorName);
+        IOObjectRelease(device);
+    }
+
+    /* Clean up iterator */
+    IOObjectRelease(iter);
+
+    /* Check if device list is empty */
+    if (!device_list)
+    {
+        tio_error_print("No serial devices found");
+        return NULL;
+    }
+
+    /* Sort device list by uptime */
+    device_list = g_list_sort(device_list, compare_uptime);
+
+    /* Print header for device listing */
+    print_padded("Device", listing_device_name_length_max, ' ');
+    printf(" TID      Uptime [s] Driver           Description\n");
+    print_padded("", listing_device_name_length_max, '-');
+    printf(" ---- -------------- ---------------- --------------------------\n");
+
+    /* Print sorted device list */
+    for (GList *l = device_list; l; l = l->next)
+    {
+        device_t *dev = l->data;
+        printf("%-*s %-4s %14.3f %-16s %s\n",
+               (int)listing_device_name_length_max, dev->path,
+               dev->tid ?: "",
+               dev->uptime,
+               dev->driver ?: "",
+               dev->description ?: "");
+    }
+    printf("\n");
+
+    return device_list;
+}
+
 #else
 
 GList *tty_search_for_serial_devices(void)
@@ -2121,8 +2370,21 @@ void tty_wait_for_device(void)
             }
             else if (status == -1)
             {
+#if defined(__CYGWIN__)
+                // Happens when port unpluged
+                if (errno == EACCES)
+                {
+                    goto error;
+                }
+#elif defined(__APPLE__)
+                if (errno == EBADF)
+                {
+                    break; // tty_disconnect() will be naturally triggered by atexit()
+                }
+#else
                 tio_error_printf("select() failed (%s)", strerror(errno));
                 exit(EXIT_FAILURE);
+#endif
             }
         }
 
@@ -2761,4 +3023,3 @@ error_read:
 error_open:
     return TIO_ERROR;
 }
-
