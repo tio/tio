@@ -47,6 +47,12 @@ tio_dep = [
   lua_dep
 ]
 
+if host_machine.system() == 'darwin'
+  iokit_dep = dependency('appleframeworks', modules: ['IOKit'], required: true)
+  corefoundation_dep = dependency('appleframeworks', modules: ['CoreFoundation'], required: true)
+  tio_dep += [iokit_dep, corefoundation_dep]
+endif
+
 tio_c_args = ['-Wno-unused-result']
 
 if enable_setspeed2
