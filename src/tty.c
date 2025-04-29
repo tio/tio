@@ -1938,7 +1938,7 @@ char *getDeviceLocation(io_object_t device)
 // for __APPLE__
 GList *tty_search_for_serial_devices(void)
 {
-    GList *device_list = NULL;
+    search_reset();
     io_iterator_t iter = IO_OBJECT_NULL;
     CFMutableDictionaryRef matchingDict = NULL;
     listing_device_name_length_max = 0;
