@@ -187,7 +187,9 @@ static int modem_send(lua_State *L)
 // lua: send(string)
 static int write_(lua_State *L)
 {
-    const char *string = lua_tostring(L, 1);
+    size_t len = 0;
+    const char *string = lua_tolstring(L, 1, &len);
+
     int ret;
 
     if (string == NULL)
@@ -195,7 +197,7 @@ static int write_(lua_State *L)
         return 0;
     }
 
-    ret = write(device_fd, string, strlen(string));
+    ret = write(device_fd, string, len);
     fsync(device_fd);  // flush these characters now
     tcdrain(device_fd); //ensure we flushed characters to our device
 
