@@ -2641,6 +2641,19 @@ int tty_connect(void)
     /* If stdin is a pipe forward all input to tty device */
     if (interactive_mode == false)
     {
+        // Set blocking mode for serial device (blocking write)
+        int flags = fcntl(device_fd, F_GETFL, 0);
+        if (flags == -1)
+        {
+            tio_error_printf("Could not read descriptor flags (%s)", strerror(errno));
+            exit(EXIT_FAILURE);
+        }
+        if (fcntl(device_fd, F_SETFL, flags & ~O_NONBLOCK) == -1)
+        {
+            tio_error_printf("Could not set descriptor flags (%s)", strerror(errno));
+            exit(EXIT_FAILURE);
+        }
+
         while (true)
         {
             int ret = read(pipefd[0], &input_char, 1);
