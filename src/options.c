@@ -400,6 +400,10 @@ const char* option_timestamp_format_to_string(timestamp_t timestamp)
             return "epoch";
             break;
 
+        case TIMESTAMP_EPOCH_USEC:
+            return "epoch-usec";
+            break;
+
         default:
             return "unknown";
             break;
@@ -429,6 +433,10 @@ void option_parse_timestamp(const char *arg, timestamp_t *timestamp)
     else if (strcmp(arg, "epoch") == 0)
     {
         *timestamp = TIMESTAMP_EPOCH;
+    }
+    else if (strcmp(arg, "epoch-usec") == 0)
+    {
+        *timestamp = TIMESTAMP_EPOCH_USEC;
     }
     else
     {

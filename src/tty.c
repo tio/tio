@@ -1100,6 +1100,9 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                     case TIMESTAMP_EPOCH:
                         tio_printf("Switched timestamp mode to epoch");
                         break;
+                    case TIMESTAMP_EPOCH_USEC:
+                        tio_printf("Switched timestamp mode to epoch with subdivision in microseconds");
+                        break;
                     case TIMESTAMP_END:
                         option.timestamp = TIMESTAMP_NONE;
                         tio_printf("Switched timestamp mode off");

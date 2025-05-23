@@ -207,7 +207,7 @@ static void config_parse_keys(GKeyFile *key_file, char *group)
     config_get_bool(key_file, group, "timestamp", (bool*) &option.timestamp);
     if (option.timestamp != TIMESTAMP_NONE)
     {
-        config_get_string(key_file, group, "timestamp-format", &string, "24hour", "24hour-start", "24hour-delta", "iso8601", "epoch", NULL);
+        config_get_string(key_file, group, "timestamp-format", &string, "24hour", "24hour-start", "24hour-delta", "iso8601", "epoch", "epoch-usec", NULL);
         if (string != NULL)
         {
             option_parse_timestamp(string, &option.timestamp);

@@ -150,6 +150,8 @@ Set timestamp format to any of the following timestamp formats:
 ISO8601 format ("YYYY-MM-DDThh:mm:ss.sss")
 .IP "\fBepoch"
 Seconds since Unix epoch (1970-01-01)
+.IP "\fBepoch-usec"
+Seconds since Unix epoch (1970-01-01) with subdivision in microseconds
 .PP
 Default format is \fB24hour\fR
 .RE
