@@ -116,6 +116,8 @@ OPTIONS
 
               epoch           Seconds since Unix epoch (1970-01-01)
 
+              epoch-usec      Seconds since Unix epoch (1970-01-01) with subdivision microseconds
+
               Default format is 24hour
 
            --timestamp-timeout <ms>

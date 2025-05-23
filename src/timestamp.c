@@ -75,6 +75,7 @@ char *timestamp_current_time(void)
             len = strftime(time_string, sizeof(time_string), "%Y-%m-%dT%H:%M:%S", tm);
             break;
         case TIMESTAMP_EPOCH:
+        case TIMESTAMP_EPOCH_USEC:
             // "N.sss" (seconds since Unix epoch, 1970-01-01 00:00:00Z)
             tv = tv_now;
             tm = localtime(&tv.tv_sec);
@@ -84,12 +85,18 @@ char *timestamp_current_time(void)
             return NULL;
     }
 
-    // Append milliseconds to all timestamps
+    // Append millis-/microseconds to all timestamps
     if (len)
     {
-        len = snprintf(time_string + len, TIME_STRING_SIZE_MAX - len, ".%03ld", (long)tv.tv_usec / 1000);
+        if ( option.timestamp == TIMESTAMP_EPOCH_USEC )
+        {
+           len = snprintf(time_string + len, TIME_STRING_SIZE_MAX - len, ".%06ld", (long)tv.tv_usec);
+        }
+        else
+        {
+            len = snprintf(time_string + len, TIME_STRING_SIZE_MAX - len, ".%03ld", (long)tv.tv_usec / 1000);
+        }
     }
-
     // Save previous time value for next run
     tv_previous = tv_now;
 
