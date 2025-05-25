@@ -447,8 +447,8 @@ Returns 1 on successful match, 0 on timeout, or -1 on error.
 On successful match it also returns the match string as second return value.
 
 .IP "\fBread(size, timeout)"
-Read from serial device. If timeout is 0 or not provided it will wait forever
-until data is ready to read.
+Read up to size bytes from serial device. If timeout is 0 or not provided it
+will wait forever until data is ready to read.
 
 Returns number of bytes read on success, 0 on timeout, or -1 on error.
 
