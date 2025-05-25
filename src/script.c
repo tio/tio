@@ -332,7 +332,11 @@ error_rs:
     lua_pushnumber(L, ret);
     if (buffer != NULL)
     {
-        lua_pushstring(L, ret > 0 ? buffer : "");
+        if (ret > 0) {
+            lua_pushlstring(L, buffer, ret);
+        } else {
+            lua_pushstring(L, "");
+        }
         free(buffer);
     }
     else
@@ -400,7 +404,7 @@ static int read_line(lua_State *L)
 
 error_rl:
     lua_pushnumber(L, ret);
-    lua_pushstring(L, linebuf);
+    lua_pushlstring(L, linebuf, ret);
     return 2;
 }
 
