@@ -1785,16 +1785,20 @@ GList *tty_search_for_serial_devices(void)
         creation_time = fs_get_creation_time(path);
         double uptime = current_time - creation_time;
 
-        // Read sysfs files to get best possible description of the driver
+        // Read sysfs files to get best possible description
         char description[50] = {};
-        length = fs_read_file_stripped(description, sizeof(description), "/sys/class/tty/%s/device/interface", entry->d_name);
-        if (length == -1)
-        {
-            length = fs_read_file_stripped(description, sizeof(description), "/sys/class/tty/%s/device/../interface", entry->d_name);
-        }
+        length = fs_read_file_stripped(description, sizeof(description), "/sys/class/tty/%s/device/../product", entry->d_name);
         if (length == -1)
         {
             length = fs_read_file_stripped(description, sizeof(description), "/sys/class/tty/%s/device/../../product", entry->d_name);
+        }
+        if (length == -1)
+        {
+            length = fs_read_file_stripped(description, sizeof(description), "/sys/class/tty/%s/device/interface", entry->d_name);
+        }
+        if (length == -1)
+        {
+            length = fs_read_file_stripped(description, sizeof(description), "/sys/class/tty/%s/device/../interface", entry->d_name);
         }
         if (length == -1)
         {
