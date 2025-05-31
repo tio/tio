@@ -53,7 +53,7 @@ if host_machine.system() == 'darwin'
   tio_dep += [iokit_dep, corefoundation_dep]
 endif
 
-tio_c_args = ['-Wshadow']
+tio_c_args = ['-Wshadow','-Wno-unused-result']
 
 if enable_setspeed2
   tio_c_args += '-DHAVE_TERMIOS2'
