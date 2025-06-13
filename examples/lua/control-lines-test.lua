@@ -1,5 +1,5 @@
-set{DTR=high, RTS=low}
-msleep(100)
-set{DTR=low, RTS=high}
-msleep(100)
-set{RTS=toggle}
+tio.set{DTR=high, RTS=low}
+tio.msleep(100)
+tio.set{DTR=low, RTS=high}
+tio.msleep(100)
+tio.set{RTS=toggle}

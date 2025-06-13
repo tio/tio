@@ -20,7 +20,6 @@
  */
 
 #include <errno.h>
-#include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -45,23 +44,87 @@
 #define READ_LINE_SIZE 4096 // read_line buffer length
 
 static int device_fd;
-static char circular_buffer[MAX_BUFFER_SIZE];
-static char match_string[MAX_BUFFER_SIZE];
-static int buffer_size = 0;
 
 static char script_init[] =
-"function set(arg)\n"
+"tio.set = function(arg)\n"
 "    local dtr = arg.DTR or -1\n"
 "    local rts = arg.RTS or -1\n"
 "    local cts = arg.CTS or -1\n"
 "    local dsr = arg.DSR or -1\n"
 "    local cd = arg.CD or -1\n"
 "    local ri = arg.RI or -1\n"
-"    line_set(dtr, rts, cts, dsr, cd, ri)\n"
-"end\n";
+"    tio.line_set(dtr, rts, cts, dsr, cd, ri)\n"
+"end\n"
+"tio.expect = function(pattern, timeout)\n"
+"    local str = ''\n"
+"    while true do\n"
+"        local c = tio.read(1, timeout)\n"
+"        if c then\n"
+"            str = str .. c\n"
+"            if string.match(str, pattern) then\n"
+"                return string.match(str, pattern)\n"
+"            end\n"
+"        else\n"
+"            return nil, str\n"
+"        end\n"
+"    end\n"
+"end\n"
+"tio.alwaysecho = true\n"
+"setmetatable(tio, tio)\n";
 
-// lua: sleep(seconds)
-static int sleep_(lua_State *L)
+static bool alwaysecho(lua_State *L)
+{
+    bool b;
+
+    lua_getglobal(L, "tio");
+    lua_getfield(L, -1, "alwaysecho");
+    b = lua_toboolean(L, -1);
+    lua_pop(L, 2);
+
+    return b;
+}
+
+static int api_echo(lua_State *L)
+{
+    size_t len = 0;
+    const char *str = luaL_checklstring(L, 1, &len);
+
+    if (option.timestamp)
+    {
+        char *pTimeStampNow = timestamp_current_time();
+        if (pTimeStampNow)
+        {
+            tio_printf("%s", str);
+            if (option.log)
+            {
+                log_printf("\n[%s] %s", pTimeStampNow, str);
+            }
+        }
+    } else {
+        for (size_t i=0; i<len; i++)
+        {
+            putchar(str[i]);
+
+            if (option.log)
+                log_putc(str[i]);
+        }
+    }
+
+    return 0;
+}
+
+static void maybe_echo(lua_State *L)
+{
+    if (alwaysecho(L))
+    {
+        lua_pushcfunction(L, api_echo);
+        lua_pushvalue(L, -2);
+        lua_call(L, 1, 0);
+    }
+}
+
+// lua: tio.sleep(seconds)
+static int api_sleep(lua_State *L)
 {
     long seconds = lua_tointeger(L, 1);
 
@@ -77,8 +140,8 @@ static int sleep_(lua_State *L)
     return 0;
 }
 
-// lua: msleep(miliseconds)
-static int msleep(lua_State *L)
+// lua: tio.msleep(miliseconds)
+static int api_msleep(lua_State *L)
 {
     long mseconds = lua_tointeger(L, 1);
     long useconds = mseconds * 1000;
@@ -94,7 +157,7 @@ static int msleep(lua_State *L)
     return 0;
 }
 
-// lua: line_set(dtr,rts,cts,dsr,cd,ri)
+// lua: tio.line_set(dtr,rts,cts,dsr,cd,ri)
 static int line_set(lua_State *L)
 {
     tty_line_config_t line_config[6] = { };
@@ -148,11 +211,11 @@ static int line_set(lua_State *L)
     return 0;
 }
 
-// lua: modem_send(file, protocol)
-static int modem_send(lua_State *L)
+// lua: tio.send(file, protocol)
+static int api_send(lua_State *L)
 {
-    const char *file = lua_tostring(L, 1);
-    int protocol = lua_tointeger(L, 2);
+    const char *file = luaL_checkstring(L, 1);
+    int protocol = luaL_checkinteger(L, 2);
     int ret;
 
     if (file == NULL)
@@ -184,313 +247,118 @@ static int modem_send(lua_State *L)
     return 0;
 }
 
-// lua: send(string)
-static int write_(lua_State *L)
+// lua: tio.write(string)
+static int api_write(lua_State *L)
 {
     size_t len = 0;
-    const char *string = lua_tolstring(L, 1, &len);
+    const char *string = luaL_checklstring(L, 1, &len);
+    ssize_t ret;
+    int attempts = 100;
 
-    int ret;
+    do {
+        ret = write(device_fd, string, len);
+        if (ret < 0)
+            return luaL_error(L, "%s", strerror(errno));
 
-    if (string == NULL)
-    {
-        return 0;
-    }
+        len -= ret;
+        string += ret;
+    } while (len > 0 && --attempts);
 
-    ret = write(device_fd, string, len);
+    if (len > 0)
+        return luaL_error(L, "partial write");
+
     fsync(device_fd);  // flush these characters now
     tcdrain(device_fd); //ensure we flushed characters to our device
 
-    lua_pushnumber(L, ret);
+    lua_getglobal(L, "tio");
 
     return 1;
 }
 
-// Function to add a character to the circular expect buffer
-static void expect_buffer_add(char c)
+// lua: tio.read(size, timeout)
+static int api_read(lua_State *L)
 {
-    if (!c)
-    {
-        return;
-    }
-
-    if (buffer_size < MAX_BUFFER_SIZE)
-    {
-        circular_buffer[buffer_size++] = c;
-    }
-    else
-    {
-        // Shift the buffer to accommodate the new character
-        memmove(circular_buffer, circular_buffer + 1, MAX_BUFFER_SIZE - 1);
-        circular_buffer[MAX_BUFFER_SIZE - 1] = c;
-    }
-}
-
-// Function to match against the circular expect buffer using regex
-static bool match_regex(regex_t *regex)
-{
-    char buffer[MAX_BUFFER_SIZE + 1]; // Temporary buffer for regex matching
-    const char *s = circular_buffer;
-    regmatch_t pmatch[1];
-    regoff_t len;
-
-    memcpy(buffer, circular_buffer, buffer_size);
-    buffer[buffer_size] = '\0'; // Null-terminate the buffer
-
-    // Match against the regex
-    int ret = regexec(regex, buffer, 1, pmatch, 0);
-    if (!ret)
-    {
-        // Match found
-        len = pmatch[0].rm_eo - pmatch[0].rm_so;
-        memcpy(match_string, s + pmatch[0].rm_so, len);
-        match_string[len] = '\0';
-
-        return true;
-    }
-    else if (ret == REG_NOMATCH)
-    {
-        // No match found, do nothing
-    }
-    else
-    {
-        // Error occurred during matching
-        tio_error_print("Regex match failed");
-    }
-
-    return false;
-}
-
-// Function to echo a buffer to stdout and to the log
-// per the option.timestamp and option.log settings
-static void echo_buffer(char buffer[], ssize_t len)
-{
-    if (option.timestamp)
-    {
-        char *pTimeStampNow;
-        pTimeStampNow = timestamp_current_time();
-        if (pTimeStampNow)
-        {
-            tio_printf("%s", buffer); //does timestamps for us
-            if (option.log)
-            {
-                log_printf("\n[%s] %s", pTimeStampNow, buffer);
-            }
-        }
-    } else {
-        for (ssize_t i=0; i<len; i++)
-        {
-            putchar(buffer[i]);
-
-            if (option.log)
-            {
-                log_putc(buffer[i]);
-            }
-        }
-    }
-}
-
-// lua: ret,string = read(size, timeout)
-static int read_string(lua_State *L)
-{
-    int size = lua_tointeger(L, 1) + 1; //plus one for null-terminated string
+    int size = luaL_checkinteger(L, 1);
     int timeout = lua_tointeger(L, 2);
-    int ret = 0;
-
-    char *buffer = calloc(1, size);
-    if (buffer == NULL)
-    {
-        ret = -1; // Error
-        goto error_rs;
-    }
 
     if (timeout == 0)
     {
         timeout = -1; // Wait forever
     }
 
-    ssize_t bytes_read = read_poll(device_fd, buffer, size, timeout);
-    if (bytes_read < 0)
+    luaL_Buffer buffer;
+    luaL_buffinit(L, &buffer);
+
+#if LUA_VERSION_NUM >= 502
+    char *p = luaL_prepbuffsize(&buffer, size);
+#else
+    if (size > LUAL_BUFFERSIZE)
+        return luaL_error(L, "buffer overflow, max size is: %d", LUAL_BUFFERSIZE);
+    char *p = luaL_prepbuffer(&buffer);
+#endif
+
+    ssize_t ret = read_poll(device_fd, p, size, timeout);
+    if (ret < 0)
+        return luaL_error(L, "%s", strerror(errno));
+
+    luaL_addsize(&buffer, ret);
+    luaL_pushresult(&buffer);
+
+    if (ret == 0)
     {
-        ret = -1; // Error
-        goto error_rs;
-    }
-    else if (bytes_read == 0)
-    {
-        ret = 0; // Timeout
-        goto error_rs;
+        // On timeout return nil instead of an empty string
+        lua_pop(L, 1);
+        lua_pushnil(L);
     }
     else
     {
-        buffer[bytes_read] = (char)0;
+        maybe_echo(L);
     }
 
-    echo_buffer(&buffer[0], bytes_read);
-    ret = bytes_read;
-
-error_rs:
-    lua_pushnumber(L, ret);
-    if (buffer != NULL)
-    {
-        if (ret > 0) {
-            lua_pushlstring(L, buffer, ret);
-        } else {
-            lua_pushstring(L, "");
-        }
-        free(buffer);
-    }
-    else
-    {
-        lua_pushstring(L, ""); // give empty string to caller
-    }
-    return 2;
+    return 1;
 }
 
-// lua: ret,string = read_line(timeout)
-static int read_line(lua_State *L)
-{
-    static char linebuf[READ_LINE_SIZE];
+// lua: string = tio.readline(timeout)
+static int api_readline(lua_State *L) {
     int timeout = lua_tointeger(L, 1); //ms
-    int ret = 0;
-    int read_result = 1; //enable reading input from device
+    luaL_Buffer b;
     char ch;
-    int bytes_read = 0;
 
-    linebuf[0] = '\0';
     if (timeout == 0)
     {
         timeout = -1; // Wait forever
     }
 
-    // loop reading input until a newline seen or timeout
-    while (true)
-    {
-        read_result = read_poll(device_fd, &ch, 1, timeout);
-        if (read_result < 0)
-        {
-            ret = -1; // Error
-            linebuf[bytes_read] = '\0';
-            goto error_rl;
-        }
-        else if (!read_result)
-        {
-            // Timeout returns a non-empty linebuf as a 'line'
-            ret = bytes_read;
-            linebuf[bytes_read] = '\0';
-            break;
-        }
-        else // we got a character, so handle it
-        {
-            if (ch == '\n')
-            {
-                linebuf[bytes_read] = '\0';
-                break;
-            }
-            else if (bytes_read <= (READ_LINE_SIZE-2))
-            {
-                if (isprint(ch)) // store all printable chars
-                {
-                    linebuf[bytes_read++] = ch;
-                }
-            }
-        }
-    }
+    luaL_buffinit(L, &b);
+    luaL_prepbuffer(&b);
+    while (true) {
+        int ret = read_poll(device_fd, &ch, 1, timeout);
 
-    if (bytes_read)
-    {
-        echo_buffer(linebuf, bytes_read);
-    }
-    ret = bytes_read;
+        if (ret < 0)
+            return luaL_error(L, "%s", strerror(errno));
 
-error_rl:
-    lua_pushnumber(L, ret);
-    lua_pushlstring(L, linebuf, ret);
-    return 2;
+        if (ret == 0)
+        {
+            luaL_pushresult(&b);
+            maybe_echo(L);
+            lua_pushnil(L);
+            lua_insert(L, -2);
+            return 2;
+        }
+
+        if (ch == '\n')
+        {
+            luaL_pushresult(&b);
+            maybe_echo(L);
+            return 1;
+        }
+
+        luaL_addchar(&b, ch);
+    }
 }
 
-// lua: expect(string, timeout)
-static int expect(lua_State *L)
-{
-    const char *string = lua_tostring(L, 1);
-    long timeout = lua_tointeger(L, 2);
-    regex_t regex;
-    int ret = 0;
-    char c;
-
-    // Resets buffer to ignore previous `expect` calls
-    buffer_size = 0;
-    match_string[0] = '\0';
-
-    if ((string == NULL) || (timeout < 0))
-    {
-        ret = -1;
-        goto error;
-    }
-
-    if (timeout == 0)
-    {
-        // Let poll() wait forever
-        timeout = -1;
-    }
-
-    // Compile the regular expression
-    ret = regcomp(&regex, string, REG_EXTENDED);
-    if (ret)
-    {
-        tio_error_print("Could not compile regex");
-        ret = -1;
-        goto error;
-    }
-
-    // Main loop to read and match
-    while (true)
-    {
-        ssize_t bytes_read = read_poll(device_fd, &c, 1, timeout);
-        if (bytes_read > 0)
-        {
-            putchar(c);
-            expect_buffer_add(c);
-
-            if (option.log)
-            {
-                log_putc(c);
-            }
-
-            // Match against the entire buffer
-            if (match_regex(&regex))
-            {
-                ret = 1;
-                break;
-            }
-        }
-        else
-        {
-            // Timeout or error
-            break;
-        }
-    }
-
-    // Cleanup
-    regfree(&regex);
-
-error:
-    lua_pushnumber(L, ret);
-    lua_pushstring(L, match_string);
-    return 2;
-}
-
-// lua: exit(code)
-static int exit_(lua_State *L)
-{
-    long code = lua_tointeger(L, 1);
-
-    exit(code);
-
-    return 0;
-}
-
-// lua: list = tty_search()
-static int tty_search_(lua_State *L)
+// lua: table = tio.ttysearch()
+static int api_ttysearch(lua_State *L)
 {
     UNUSED(L);
     GList *iter;
@@ -556,66 +424,7 @@ static void script_buffer_run(lua_State *L, const char *script_buffer)
     }
 }
 
-static const struct luaL_Reg tio_lib[] =
-{
-    { "sleep", sleep_},
-    { "msleep", msleep},
-    { "line_set", line_set},
-    { "send", modem_send},
-    { "write", write_},
-    { "read", read_string},
-    { "read_line", read_line},
-    { "expect", expect},
-    { "exit", exit_},
-    { "tty_search", tty_search_},
-    {NULL, NULL}
-};
-
-#if !defined LUA_VERSION_NUM || LUA_VERSION_NUM==501
-/*
-** Adapted from Lua 5.2.0 (for backwards compatibility)
-*/
-static void luaL_setfuncs (lua_State *L, const luaL_Reg *l, int nup)
-{
-  luaL_checkstack(L, nup+1, "too many upvalues");
-  for (; l->name != NULL; l++) {  /* fill the table with given functions */
-    int i;
-    lua_pushstring(L, l->name);
-    for (i = 0; i < nup; i++)  /* copy upvalues to the top */
-      lua_pushvalue(L, -(nup+1));
-    lua_pushcclosure(L, l->func, nup);  /* closure with those upvalues */
-    lua_settable(L, -(nup + 3));
-  }
-  lua_pop(L, nup);  /* remove upvalues */
-}
-#endif
-
-static void script_load(lua_State *L)
-{
-    int error;
-
-    error = luaL_loadbuffer(L, script_init, strlen(script_init), "tio") || lua_pcall(L, 0, 0, 0);
-    if (error)
-    {
-        tio_error_print("%s\n", lua_tostring(L, -1));
-        lua_pop(L, 1); // Pop error message from the stack
-    }
-}
-
-int lua_register_tio(lua_State *L)
-{
-    // Register lxi functions
-    lua_getglobal(L, "_G");
-    luaL_setfuncs(L, tio_lib, 0);
-    lua_pop(L, 1);
-
-    // Load lua init script
-    script_load(L);
-
-    return 0;
-}
-
-void script_file_run(lua_State *L, const char *filename)
+static void script_file_run(lua_State *L, const char *filename)
 {
     if (strlen(filename) == 0)
     {
@@ -631,13 +440,39 @@ void script_file_run(lua_State *L, const char *filename)
     }
 }
 
-void script_set_global(lua_State *L, const char *name, long value)
+static const struct luaL_Reg tio_lib[] =
+{
+    { "echo", api_echo},
+    { "sleep", api_sleep},
+    { "msleep", api_msleep},
+    { "line_set", line_set},
+    { "send", api_send},
+    { "write", api_write},
+    { "read", api_read},
+    { "readline", api_readline},
+    { "ttysearch", api_ttysearch},
+    {NULL, NULL}
+};
+
+static void script_load(lua_State *L)
+{
+    int error;
+
+    error = luaL_loadbuffer(L, script_init, strlen(script_init), "tio") || lua_pcall(L, 0, 0, 0);
+    if (error)
+    {
+        tio_error_print("%s\n", lua_tostring(L, -1));
+        lua_pop(L, 1); // Pop error message from the stack
+    }
+}
+
+static void script_set_global(lua_State *L, const char *name, long value)
 {
     lua_pushnumber(L, value);
     lua_setglobal(L, name);
 }
 
-void script_set_globals(lua_State *L)
+static void script_set_globals(lua_State *L)
 {
     script_set_global(L, "toggle", 2);
     script_set_global(L, "high", 1);
@@ -646,6 +481,14 @@ void script_set_globals(lua_State *L)
     script_set_global(L, "XMODEM_1K", XMODEM_1K);
     script_set_global(L, "YMODEM", YMODEM);
 }
+
+#if LUA_VERSION_NUM >= 502
+static int luaopen_tio(lua_State *L)
+{
+    luaL_newlib(L, tio_lib);
+    return 1;
+}
+#endif
 
 void script_run(int fd, const char *script_filename)
 {
@@ -656,8 +499,15 @@ void script_run(int fd, const char *script_filename)
     L = luaL_newstate();
     luaL_openlibs(L);
 
-    // Bind tio functions
-    lua_register_tio(L);
+#if LUA_VERSION_NUM >= 502
+    luaL_requiref(L, "tio", luaopen_tio, 1);
+#else
+    luaL_register(L, "tio", tio_lib);
+#endif
+    lua_pop(L, 1);
+
+    // Load lua init script
+    script_load(L);
 
     // Initialize globals
     script_set_globals(L);

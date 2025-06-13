@@ -288,12 +288,12 @@ $ cat data.bin | tio /dev/ttyUSB0
 
 Manipulate modem lines on connect:
 ```
-$ tio --script "set{DTR=high,RTS=low}; msleep(100); set{DTR=toggle,RTS=toggle}" /dev/ttyUSB0
+$ tio --script "tio.set{DTR=high,RTS=low}; tio.msleep(100); tio.set{DTR=toggle,RTS=toggle}" /dev/ttyUSB0
 ```
 
 Pipe command to serial device and wait for line response within 1 second:
 ```
-$ echo "*IDN?" | tio /dev/ttyACM0 --script "expect('\r\n', 1000)" --mute
+$ echo "*IDN?" | tio /dev/ttyACM0 --script "tio.expect('\r\n', 1000)" --mute
 KORAD KD3305P V4.2 SN:32475045
 ```
 
@@ -365,12 +365,12 @@ color = 11
 [svf2]
 device = /dev/ttyUSB0
 baudrate = 9600
-script = expect("login: "); write("root\n"); expect("Password: "); write("root\n")
+script = tio.expect("login: "); tio.write("root\n"); tio.expect("Password: "); tio.write("root\n")
 color = 12
 
 [esp32]
 device = /dev/serial/by-id/usb-0403_6014-if00-port0
-script = set{DTR=high,RTS=low}; msleep(100); set{DTR=low,RTS=high}; msleep(100); set{RTS=low}
+script = tio.set{DTR=high,RTS=low}; tio.msleep(100); tio.set{DTR=low,RTS=high}; tio.msleep(100); tio.set{RTS=low}
 script-run = once
 color = 13
 
@@ -395,72 +395,80 @@ Another more elaborate configuration file example is available [here](examples/c
 
 Tio suppots Lua scripting to easily automate interaction with the tty device.
 
-In addition to the Lua API tio makes the following functions available:
+In addition to the standard Lua API tio makes the following functions
+and variables available:
 
-```
-expect(string, timeout)
-      Expect string - waits for string to match or timeout before continueing.
-      Supports regular expressions. Special characters must be escaped with '\\'.
-      Timeout is in milliseconds, defaults to 0 meaning it will wait forever.
 
-      Returns 1 on successful match, 0 on timeout, or -1 on error.
+#### `tio.expect(pattern, timeout)`
 
-      On successful match it also returns the match string as second return value.
+Waits for the Lua pattern to match or timeout before continuing.
+Timeout is in milliseconds, defaults to 0 meaning it will wait forever.
 
-read(size, timeout)
-      Read from serial device. If timeout is 0 or not provided it will wait
-      forever until data is ready to read.
+Returns the captures from the pattern or `nil` on timeout.
 
-      Returns number of bytes read on success, 0 on timeout, or -1 on error.
+#### `tio.read(size, timeout)`
 
-      On success, returns read string as second return value.
+Read up to `size` bytes from serial device. If timeout is 0 or not provided it
+will wait forever until data is ready to read.
 
-read_line(timeout)
-      Read line from serial device. If timeout is 0 or not provided it will
-      wait forever until data is ready to read.
+Returns a string up to `size` bytes long on success and `nil` on timeout.
 
-      Returns number of bytes read on success, 0 on timeout, or -1 on error.
+#### `tio.readline(timeout)`
 
-      On success, returns the string that was read as second return value.
-      Also emits a single timestamp to stdout and log file per options.timestamp
-      and options.log.
+Read line from serial device. If timeout is 0 or not provided it will wait
+forever until data is ready to read.
 
-write(string)
-      Write string to serial device.
+Returns a string on success and `nil` on timeout.  On timeout a partially read
+line may be returned as a second return value.
 
-      Returns number of bytes written on success or -1 on error.
+#### `tio.write(string)`
 
-send(file, protocol)
-      Send file using x/y-modem protocol.
+Write string to serial device.
 
-      Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
+Returns the `tio` table.
 
-tty_search()
-      Search for serial devices.
+#### `tio.send(file, protocol)`
 
-      Returns a table of number indexed tables, one for each serial device
-      found.  Each of these tables contains the serial device information accessible
-      via the following string indexed elements "path", "tid", "uptime", "driver",
-      "description".
+Send file using x/y-modem protocol.
 
-      Returns nil if no serial devices are found.
+Protocol can be any of `XMODEM_1K`, `XMODEM_CRC`, `YMODEM`.
 
-set{line=state, ...}
-      Set state of one or multiple tty modem lines.
+#### `tio.ttysearch()`
 
-      Line can be any of DTR, RTS, CTS, DSR, CD, RI
+Search for serial devices.
 
-      State is high, low, or toggle.
+Returns a table of number indexed tables, one for each serial device found.
+Each of these tables contains the serial device information accessible via the
+following string indexed elements "path", "tid", "uptime", "driver",
+"description".
 
-sleep(seconds)
-      Sleep for seconds.
+Returns `nil` if no serial devices are found.
 
-msleep(ms)
-      Sleep for miliseconds.
+#### `tio.set{line=state, ...}`
+Set state of one or multiple tty modem lines.
 
-exit(code)
-      Exit with exit code.
-```
+Line can be any of `DTR`, `RTS`, `CTS`, `DSR`, `CD`, `RI`
+
+State is `high`, `low`, or `toggle`.
+
+#### `tio.sleep(seconds)`
+
+Sleep for seconds.
+
+#### `tio.msleep(ms)`
+
+Sleep for milliseconds.
+
+#### `tio.alwaysecho`
+
+A boolean value, defaults to `true`.
+
+If `tio.alwaysecho` is `false`, the result of `tio.read`, `tio.readline` or
+`tio.expect` will only be returned from the function and not logged or printed.
+
+If `tio.alwaysecho` is set to `true`, reading functions also emit a single
+timestamp to stdout and log file per `options.timestamp` and `options.log`.
+
 
 ## 4. Installation
 
