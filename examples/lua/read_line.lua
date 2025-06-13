@@ -1,17 +1,15 @@
-read(1000, 8000) -- read initial config
-write("\n")
-read(650, 100) -- main menu
-write("S") -- S menu
-n = 1
-while n > 0 do -- while not empty, read more
-  n, str = read_line(25)
-end
+tio.read(1000, 8000) -- read initial config
+tio.write("\n")
+tio.read(650, 100) -- main menu
+tio.write("S") -- S menu
+repeat
+  str = tio.readline(25)
+until str == nil
 while true do
-  write("t") -- query PV table
-  msleep(880)
-  n = 1
-  while n > 0 do -- while not empty, read more
-    n, str = read_line(60)
-    msleep(60)
-  end
+  tio.write("t") -- query PV table
+  tio.msleep(880)
+  repeat
+    str = tio.readline(60)
+    tio.msleep(60)
+  until str == nil
 end

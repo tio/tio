@@ -69,7 +69,7 @@ color = 13
 [esp32]
 device = /dev/ttyUSB0
 color = 14
-script = set{DTR=high,RTS=low}; msleep(100); set{DTR=low,RTS=high}; msleep(100); set{RTS=low}
+script = tio.set{DTR=high,RTS=low}; tio.msleep(100); tio.set{DTR=low,RTS=high}; tio.msleep(100); tio.set{RTS=low}
 script-run = always
 
 [buspirate]

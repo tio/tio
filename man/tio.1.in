@@ -433,49 +433,40 @@ Send ctrl-t character
 Tio suppots Lua scripting to easily automate interaction with the tty device.
 
 In addition to the standard Lua API tio makes the following functions
-available:
+and variables available:
 
 .TP 6n
 
-.IP "\fBexpect(string, timeout)"
-Expect string - waits for string to match or timeout before continuing.
-Supports regular expressions. Special characters must be escaped with '\e\e'.
+.IP "\fBtio.expect(pattern, timeout)"
+Waits for the Lua pattern to match or timeout before continuing.
 Timeout is in milliseconds, defaults to 0 meaning it will wait forever.
 
-Returns 1 on successful match, 0 on timeout, or -1 on error.
+Returns the captures from the pattern or nil on timeout.
 
-On successful match it also returns the match string as second return value.
-
-.IP "\fBread(size, timeout)"
+.IP "\fBtio.read(size, timeout)"
 Read up to size bytes from serial device. If timeout is 0 or not provided it
 will wait forever until data is ready to read.
 
-Returns number of bytes read on success, 0 on timeout, or -1 on error.
+Returns a string up to size bytes long on success and nil on timeout.
 
-On success, returns read string as second return value.  Also emits a single
-timestamp to stdout and log file per options.timestamp and options.log.
-
-.IP "\fBread_line(timeout)"
+.IP "\fBtio.readline(timeout)"
 Read line from serial device. If timeout is 0 or not provided it will wait
 forever until data is ready to read.
 
-Returns number of bytes read on success, 0 on timeout, or -1 on error.
+Returns a string on success and nil on timeout.  On timeout a partially read
+line may be returned as a second return value.
 
-On success, returns the string that was read as second return value.  Also
-emits a single timestamp to stdout and log file per options.timestamp
-and options.log.
-
-.IP "\fBwrite(string)"
+.IP "\fBtio.write(string)"
 Write string to serial device.
 
-Returns number of bytes written on success or -1 on error.
+Returns the tio table.
 
-.IP "\fBsend(file, protocol)"
+.IP "\fBtio.send(file, protocol)"
 Send file using x/y-modem protocol.
 
 Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
 
-.IP "\fBtty_search()"
+.IP "\fBtio.ttysearch()"
 Search for serial devices.
 
 Returns a table of number indexed tables, one for each serial device found.
@@ -485,19 +476,26 @@ following string indexed elements "path", "tid", "uptime", "driver",
 
 Returns nil if no serial devices are found.
 
-.IP "\fBset{line=state, ...}"
+.IP "\fBtio.set{line=state, ...}"
 Set state of one or multiple tty modem lines.
 
 Line can be any of DTR, RTS, CTS, DSR, CD, RI
 
 State is high, low, or toggle.
 
-.IP "\fBsleep(seconds)"
+.IP "\fBtio.sleep(seconds)"
 Sleep for seconds.
-.IP "\fBmsleep(ms)"
+.IP "\fBtio.msleep(ms)"
 Sleep for milliseconds.
-.IP "\fBexit(code)"
-Exit with exit code.
+
+.IP "\fBtio.alwaysecho"
+A boolean value, defaults to true.
+
+If tio.alwaysecho is false, the result of tio.read, tio.readline or tio.expect
+will only be returned from the function and not logged or printed.
+
+If tio.alwaysecho is set to true, reading functions also emit a single
+timestamp to stdout and log file per options.timestamp and options.log.
 
 .SH "CONFIGURATION FILE"
 .PP
@@ -726,7 +724,7 @@ expect -i $uart "prompt> "
 .TP
 It is also possible to use tio's own simpler expect/send script functionality to e.g. automate logins:
 
-$ tio --script 'expect("login: "); write("root\\n"); expect("Password: "); write("root\\n")' /dev/ttyUSB0
+$ tio --script 'tio.expect("login: "); tio.write("root\\n"); tio.expect("Password: "); tio.write("root\\n")' /dev/ttyUSB0
 
 .TP
 Redirect device I/O to network file socket for remote TTY sharing:
@@ -747,7 +745,7 @@ $ echo "ls -la" | tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-p
 .TP
 Pipe command to serial device and wait for line response within 1 second:
 
-$ echo "*IDN?" | tio /dev/ttyACM0 --script "expect('\\r\\n', 1000)" --mute
+$ echo "*IDN?" | tio /dev/ttyACM0 --script "tio.expect('\\r\\n', 1000)" --mute
 .TP
 
 .TP
@@ -768,7 +766,7 @@ $ tio --rs-485 --rs-485-config=RTS_ON_SEND=1,RX_DURING_TX /dev/ttyUSB0
 .TP
 Manipulate DTR and RTS lines upon first connect to reset connected microcontroller:
 
-$ tio --script "set{DTR=high,RTS=low}; msleep(100); set{RTS=toggle}" --script-run once /dev/ttyUSB0
+$ tio --script "tio.set{DTR=high,RTS=low}; tio.msleep(100); tio.set{RTS=toggle}" --script-run once /dev/ttyUSB0
 
 .SH "WEBSITE"
 .PP

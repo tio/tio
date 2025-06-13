@@ -1,6 +1,6 @@
 io.write("Searching... ")
 
-local device = tty_search()
+local device = tio.ttysearch()
 
 io.write("done\r\n")
 

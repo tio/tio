@@ -13,14 +13,13 @@ local logins = {
     },
 }
 
-local found, match_str = expect("\\w+- login:", 10)
-if (1 == found) then
-    local hostname = string.match(match_str, "^%w+")
+local hostname = tio.expect("^(%g+) login:", 10)
+if hostname then
     local login = logins[hostname]
     if (nil ~= login) then
-        write(login.username .. "\n")
-        expect("Password:")
-        write(login.password .. "\n")
+        tio.write(login.username .. "\n")
+        tio.expect("Password:")
+        tio.write(login.password .. "\n")
     else
         io.write("\r\nDon't know login info for " .. hostname .. "\r\n")
     end
