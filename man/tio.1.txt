@@ -289,6 +289,10 @@ OPTIONS
 
               Execute shell command with I/O redirected to device
 
+       --complete-profiles
+
+              Prints profiles (for shell completion)
+
        -v, --version
 
               Display program version.

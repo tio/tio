@@ -171,6 +171,7 @@ void option_print_help(char *argv[])
     printf("      --script-file <filename>           Run script from file\n");
     printf("      --script-run once|always|never     Run script on connect (default: always)\n");
     printf("      --exec <command>                   Execute shell command with I/O redirected to device\n");
+    printf("      --complete-profiles                Prints profiles (for shell completion)\n");
     printf("  -v, --version                          Display version\n");
     printf("  -h, --help                             Display help\n");
     printf("\n");

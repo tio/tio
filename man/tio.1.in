@@ -372,6 +372,10 @@ Default value is "always".
 Execute shell command with I/O redirected to device
 
 .TP
+.BR "\-\-complete-profiles
+
+Prints profiles (for shell completion)
+.TP
 .BR \-v ", " \-\-version
 
 Display program version.
