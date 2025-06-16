@@ -46,6 +46,7 @@ _tio()
              --script-file \
              --script-run \
              --exec \
+             --complete-profiles \
           -v --version \
           -h --help"
 
