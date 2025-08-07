@@ -2068,31 +2068,11 @@ GList *tty_search_for_serial_devices(void)
     /* Check if device list is empty */
     if (!device_list)
     {
-        tio_error_print("No serial devices found");
         return NULL;
     }
 
     /* Sort device list by uptime */
     device_list = g_list_sort(device_list, compare_uptime);
-
-    /* Print header for device listing */
-    print_padded("Device", listing_device_name_length_max, ' ');
-    printf(" TID      Uptime [s] Driver           Description\n");
-    print_padded("", listing_device_name_length_max, '-');
-    printf(" ---- -------------- ---------------- --------------------------\n");
-
-    /* Print sorted device list */
-    for (GList *l = device_list; l; l = l->next)
-    {
-        device_t *dev = l->data;
-        printf("%-*s %-4s %14.3f %-16s %s\n",
-               (int)listing_device_name_length_max, dev->path,
-               dev->tid ?: "",
-               dev->uptime,
-               dev->driver ?: "",
-               dev->description ?: "");
-    }
-    printf("\n");
 
     return device_list;
 }
