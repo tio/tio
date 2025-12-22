@@ -689,7 +689,7 @@ int xymodem_send(int sio, const char *filename, modem_mode_t mode)
             rc = -1;
             if (strlen(filename) > 977) break; /* hdr block overrun */
             p  = stpncpy(hdr, filename, 1024) + 1;
-            p += sprintf(p, "%ld %lo %o", len, stat.st_mtime, stat.st_mode);
+            p += sprintf(p, "%zu %lo %o", len, stat.st_mtime, stat.st_mode);
 
             if (xmodem_1k(sio, hdr, p - hdr, 0) < 0) break; /* hdr with metadata */
             if (xmodem_1k(sio, buf, len,     1) < 0) break; /* xmodem file */
