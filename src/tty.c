@@ -2536,6 +2536,13 @@ int tty_connect(void)
     char*  now = NULL;
     struct timeval tval_before = {}, tval_now, tval_result;
 
+    /* Check that device is not a directory */
+    if (fs_dir_exists(device_name))
+    {
+        tio_error_printf("Device path '%s' is a directory, not a tty device", device_name);
+        exit(EXIT_FAILURE);
+    }
+
     /* Open tty device */
     device_fd = open(device_name, O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (device_fd < 0)
