@@ -1,0 +1,26 @@
+name: Fedora Build
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: fedora-42
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+    - name: Install Dependencies
+      run: |
+        sudo dnf update -y
+        sudo dnf upgrade -y
+        sudo dnf update -y bash-completion git meson ninja-build lua lua-libs lua-devel liblua5.2-dev glib2-devel
+    - name: Build & Install
+      run: |
+        meson setup build --prefix $HOME/opt/tio
+        meson compile -C build --verbose
+        meson install -C build
