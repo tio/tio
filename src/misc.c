@@ -98,12 +98,17 @@ int read_poll(int fd, void *data, size_t len, int timeout)
         if (fds.revents & POLLIN)
         {
             // Read ready data
+            // return value should not be 0
             return read(fd, data, len);
+        }
+        else /* if (fds.revents & (POLLERR | POLLHUP | POLLNVAL)) */
+        {
+            return -1;
         }
     }
 
     /* Timeout */
-    return ret;
+    return 0;
 }
 
 // Function to calculate djb2 hash of string
@@ -170,6 +175,7 @@ bool match_patterns(const char *string, const char *patterns)
     pattern = strtok(patterns_copy, ",");
     while (pattern != NULL)
     {
+        // clang-format off
         // Check if the string matches the current pattern
         #ifdef FNM_EXTMATCH
             if (fnmatch(pattern, string, FNM_EXTMATCH) == 0)
@@ -180,6 +186,7 @@ bool match_patterns(const char *string, const char *patterns)
             free(patterns_copy);
             return true;
         }
+        // clang-format on
 
         // Move to the next pattern
         pattern = strtok(NULL, ",");

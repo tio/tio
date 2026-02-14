@@ -61,6 +61,7 @@ enum opt_t
     OPT_EXEC,
 };
 
+// clang-format off
 /* Default options */
 struct option_t option =
 {
@@ -125,6 +126,7 @@ struct option_t option =
     .map_i_msb2lsb = false,
     .map_o_ign_cr = false,
 };
+// clang-format on
 
 void option_print_help(char *argv[])
 {
@@ -833,12 +835,14 @@ void options_print()
     tio_printf(" Output line delay: %d", option.output_line_delay);
     tio_printf(" Automatic connect strategy: %s", option_auto_connect_state_to_string(option.auto_connect));
     tio_printf(" Automatic reconnect: %s", option.no_reconnect ? "true" : "false");
+    // clang-format off
     tio_printf(" Pulse duration: DTR=%d RTS=%d CTS=%d DSR=%d DCD=%d RI=%d", option.dtr_pulse_duration,
                                                                             option.rts_pulse_duration,
                                                                             option.cts_pulse_duration,
                                                                             option.dsr_pulse_duration,
                                                                             option.dcd_pulse_duration,
                                                                             option.ri_pulse_duration);
+    // clang-format on
     tio_printf(" Input mode: %s", option_input_mode_to_string(option.input_mode));
     tio_printf(" Output mode: %s", option_output_mode_to_string(option.output_mode));
     tio_printf(" Alert: %s", option_alert_state_to_string(option.alert));
@@ -887,8 +891,9 @@ void options_parse(int argc, char *argv[])
         option.vt100 = true;
     }
 
-    while (1)
+    while (true)
     {
+        // clang-format off
         static struct option long_options[] =
         {
             {"baudrate",             required_argument, 0, 'b'                     },
@@ -932,6 +937,7 @@ void options_parse(int argc, char *argv[])
             {"complete-profiles",    no_argument,       0, OPT_COMPLETE_PROFILES   },
             {0,                      0,                 0,  0                      }
         };
+        // clang-format on
 
         /* getopt_long stores the option index here */
         int option_index = 0;
@@ -1131,7 +1137,7 @@ void options_parse(int argc, char *argv[])
     /* Assume first non-option is the target (tty device, profile, tid) */
     if (strcmp(option.target, ""))
     {
-            optind++;
+        optind++;
     }
     else if (optind < argc)
     {
@@ -1176,6 +1182,7 @@ void options_parse_final(int argc, char *argv[])
 #ifdef __CYGWIN__
     unsigned char portnum;
     char *tty_win;
+    // clang-format off
     if ( ((strncmp("COM", option.target, 3) == 0)
         || (strncmp("com", option.target, 3) == 0) )
         && (sscanf(option.target + 3, "%hhu", &portnum) == 1)
@@ -1184,5 +1191,6 @@ void options_parse_final(int argc, char *argv[])
         asprintf(&tty_win, "/dev/ttyS%hhu", portnum - 1);
         option.target = tty_win;
     }
+    // clang-format on
 #endif
 }

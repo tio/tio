@@ -147,6 +147,7 @@ typedef enum
     SUBCOMMAND_MAP,
 } sub_command_t;
 
+// clang-format off
 const char random_array[] =
 {
 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x28, 0x20, 0x28, 0x0A, 0x20,
@@ -160,6 +161,7 @@ const char random_array[] =
 0x66, 0x65, 0x65, 0x20, 0x62, 0x72, 0x65, 0x61, 0x6B, 0x21, 0x0A, 0x20, 0x0A,
 0x00
 };
+// clang-format on
 
 bool interactive_mode = true;
 
@@ -212,7 +214,7 @@ inline static bool is_valid_hex(char c)
 
 inline static unsigned char char_to_nibble(char c)
 {
-    if(c >= '0' && c <= '9')
+    if (c >= '0' && c <= '9')
     {
         return c - '0';
     }
@@ -257,22 +259,23 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
 {
     ssize_t retval = 0, bytes_written = 0;
     size_t i;
+    unsigned char *cbuf = (unsigned char *)buffer;
 
     if (option.map_o_ltu)
     {
         // Convert lower case to upper case
-        for (i = 0; i<count; i++)
+        for (i = 0; i < count; i++)
         {
-            *((unsigned char*)buffer+i) = toupper(*((unsigned char*)buffer+i));
+            cbuf[i] = toupper(cbuf[i]);
         }
     }
 
     if (option.output_delay || option.output_line_delay)
     {
         // Write byte by byte with output delay
-        for (i=0; i<count; i++)
+        for (i = 0; i < count; i++)
         {
-            retval = write(fd, buffer, 1);
+            retval = write(fd, &cbuf[i], 1);
             if (retval < 0)
             {
                 // Error
@@ -281,15 +284,14 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
             }
             bytes_written += retval;
 
-            if (option.output_line_delay && *(unsigned char*)buffer == '\n')
-            {
-                delay(option.output_line_delay);
-            }
-
             fsync(fd);
             tcdrain(fd);
 
-            if (option.output_delay)
+            if (option.output_line_delay && cbuf[i] == '\n')
+            {
+                delay(option.output_line_delay);
+            }
+            else if (option.output_delay)
             {
                 delay(option.output_delay);
             }
@@ -331,7 +333,7 @@ void *tty_stdin_input_thread(void *arg)
     pthread_mutex_unlock(&mutex_input_ready);
 
     // Input loop for stdin
-    while (1)
+    while (true)
     {
         /* Input from stdin ready */
         byte_count = read(STDIN_FILENO, input_buffer, BUFSIZ);
@@ -360,7 +362,8 @@ void *tty_stdin_input_thread(void *arg)
             for (int i = 0; i<byte_count; i++)
             {
                 // first do key hit check for xmodem abort
-                if (!key_hit) {
+                if (!key_hit)
+                {
                     key_hit = input_buffer[i];
                     byte_count--;
                     memcpy(input_buffer+i, input_buffer+i+1, byte_count-i);
@@ -383,7 +386,7 @@ void *tty_stdin_input_thread(void *arg)
                             exit(EXIT_SUCCESS);
                             break;
                         case KEY_SHIFT_F:
-                            tio_printf("Flushed data I/O buffers")
+                            tio_printf("Flushed data I/O buffers");
                             tcflush(device_fd, TCIOFLUSH);
                             break;
                         default:
@@ -414,7 +417,8 @@ void tty_input_thread_create(void)
 {
     pthread_mutex_lock(&mutex_input_ready);
 
-    if (pthread_create(&thread, NULL, tty_stdin_input_thread, NULL) != 0) {
+    if (pthread_create(&thread, NULL, tty_stdin_input_thread, NULL) != 0)
+    {
         tio_error_printf("pthread_create() error");
         exit(1);
     }
@@ -631,6 +635,7 @@ void tty_output_mode_set(output_mode_t mode)
 
 static void mappings_print(void)
 {
+    // clang-format off
     if (option.map_i_cr_nl || option.map_ign_cr || option.map_i_ff_escc ||
         option.map_i_nl_cr || option.map_i_nl_crnl || option.map_i_cr_crnl ||
         option.map_o_cr_nl || option.map_o_del_bs || option.map_o_nl_crnl ||
@@ -656,6 +661,7 @@ static void mappings_print(void)
     {
         tio_printf(" Mappings: none");
     }
+    // clang-format on
 }
 
 void handle_command_sequence(char input_char, char *output_char, bool *forward)
@@ -756,7 +762,35 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
 
                             tio_printf("Ready to receiving file '%s'  ", line);
                             tio_printf("Press any key to abort transfer");
-                            ret = xymodem_send(device_fd, line, XMODEM_CRC);
+                            ret = xymodem_receive(device_fd, line, XMODEM_CRC);
+                            tio_printf("%s", ret < 0 ? "Aborted" : "Done");
+                        }
+                        break;
+
+                    case KEY_3:
+                        tio_printf("Send file with XMODEM-SUM");
+                        tio_printf_raw("Enter file name: ");
+                        if (tio_readln())
+                        {
+                            int ret;
+
+                            tio_printf("Sending file '%s'  ", line);
+                            tio_printf("Press any key to abort transfer");
+                            ret = xymodem_send(device_fd, line, XMODEM_SUM);
+                            tio_printf("%s", ret < 0 ? "Aborted" : "Done");
+                        }
+                        break;
+
+                    case KEY_4:
+                        tio_printf("Receive file with XMODEM-SUM");
+                        tio_printf_raw("Enter file name: ");
+                        if (tio_readln())
+                        {
+                            int ret;
+
+                            tio_printf("Ready to receiving file '%s'  ", line);
+                            tio_printf("Press any key to abort transfer");
+                            ret = xymodem_receive(device_fd, line, XMODEM_SUM);
                             tio_printf("%s", ret < 0 ? "Aborted" : "Done");
                         }
                         break;
@@ -1011,6 +1045,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 break;
 
             case KEY_M:
+                // clang-format off
                 /* Change mapping of characters on input or output */
                 tio_printf("Please enter which mapping to set or unset:");
                 tio_printf(" (0) ICRNL: %s mapping CR to NL on input (unless IGNCR is set)",
@@ -1039,6 +1074,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                         option.map_o_nulbrk ? "Unset" : "Set");
                 tio_printf(" (c) OIGNCR: %s ignoring CR on output",
                         option.map_o_ign_cr ? "Unset" : "Set");
+                // clang-format on
 
                 // Process next input character as sub command
                 sub_command = SUBCOMMAND_MAP;
@@ -1050,7 +1086,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
 
             case KEY_R:
                 /* Run script */
-                tio_printf("Run Lua script")
+                tio_printf("Run Lua script");
                 tio_printf_raw("Enter file name: ");
                 if (tio_readln())
                 {
@@ -1119,6 +1155,8 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 tio_printf(" (0) XMODEM-1K send");
                 tio_printf(" (1) XMODEM-CRC send");
                 tio_printf(" (2) XMODEM-CRC receive");
+                tio_printf(" (3) XMODEM-SUM send");
+                tio_printf(" (4) XMODEM-SUM receive");
                 // Process next input character as sub command
                 sub_command = SUBCOMMAND_XMODEM;
                 break;
@@ -1126,12 +1164,13 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
             case KEY_Y:
                 tio_printf("Send file with YMODEM");
                 tio_printf_raw("Enter file name: ");
-                if (tio_readln()) {
-		    int ret;
+                if (tio_readln())
+                {
+                    int ret;
 
                     tio_printf("Sending file '%s'  ", line);
                     tio_printf("Press any key to abort transfer");
-		    ret = xymodem_send(device_fd, line, YMODEM);
+                    ret = xymodem_send(device_fd, line, YMODEM);
                     tio_printf("%s", ret < 0 ? "Aborted" : "Done");
                 }
                 break;
@@ -1194,9 +1233,9 @@ void stdout_restore(void)
     // If terminal is vt100
     if (option.vt100)
     {
-      // Disable DEC Special Graphics character set just in case it was randomly
-      // enabled by noise from serial device.
-      putchar('\017');
+        // Disable DEC Special Graphics character set just in case it was randomly
+        // enabled by noise from serial device.
+        putchar('\017');
     }
 }
 
@@ -2044,7 +2083,8 @@ GList *tty_search_for_serial_devices(void)
         }
 
         /* Populate device info */
-        *device_info = (device_t) {
+        *device_info = (device_t)
+        {
             .path = devicePath,
             .tid = g_strdup(tid),
             .uptime = uptime,
@@ -2361,7 +2401,7 @@ void tty_wait_for_device(void)
                 // Happens when port unpluged
                 if (errno == EACCES)
                 {
-                    goto error;
+                    break;
                 }
 #elif defined(__APPLE__)
                 if (errno == EBADF)

@@ -43,7 +43,7 @@ when used in combination with [tmux](https://tmux.github.io).
    * Useful for reconnecting when serial device has no serial device by ID
  * Support for non-standard baud rates
  * Support for mark and space parity
- * X-modem (1K/CRC) and Y-modem file upload
+ * X-modem (1K/CRC/Checksum) and Y-modem file upload
  * Support for RS-485 mode
  * List available serial devices
    * By device
@@ -431,7 +431,7 @@ Returns the `tio` table.
 
 Send file using x/y-modem protocol.
 
-Protocol can be any of `XMODEM_1K`, `XMODEM_CRC`, `YMODEM`.
+Protocol can be any of `XMODEM_1K`, `XMODEM_CRC`, `XMODEM_SUM`, `YMODEM`.
 
 #### `tio.ttysearch()`
 

@@ -45,6 +45,7 @@
 
 static int device_fd;
 
+// clang-format off
 static char script_init[] =
 "tio.set = function(arg)\n"
 "    local dtr = arg.DTR or -1\n"
@@ -71,6 +72,7 @@ static char script_init[] =
 "end\n"
 "tio.alwaysecho = true\n"
 "setmetatable(tio, tio)\n";
+// clang-format on
 
 static bool alwaysecho(lua_State *L)
 {
@@ -100,7 +102,9 @@ static int api_echo(lua_State *L)
                 log_printf("\n[%s] %s", pTimeStampNow, str);
             }
         }
-    } else {
+    }
+    else
+    {
         for (size_t i=0; i<len; i++)
         {
             putchar(str[i]);
@@ -237,6 +241,12 @@ static int api_send(lua_State *L)
             tio_printf("%s", ret < 0 ? "Aborted" : "Done");
             break;
 
+        case XMODEM_SUM:
+            tio_printf("Sending file '%s' using XMODEM-SUM", file);
+            ret = xymodem_send(device_fd, file, XMODEM_SUM);
+            tio_printf("%s", ret < 0 ? "Aborted" : "Done");
+            break;
+
         case YMODEM:
             tio_printf("Sending file '%s' using YMODEM", file);
             ret = xymodem_send(device_fd, file, YMODEM);
@@ -255,7 +265,8 @@ static int api_write(lua_State *L)
     ssize_t ret;
     int attempts = 100;
 
-    do {
+    do
+    {
         ret = write(device_fd, string, len);
         if (ret < 0)
             return luaL_error(L, "%s", strerror(errno));
@@ -319,7 +330,8 @@ static int api_read(lua_State *L)
 }
 
 // lua: string = tio.readline(timeout)
-static int api_readline(lua_State *L) {
+static int api_readline(lua_State *L)
+{
     int timeout = lua_tointeger(L, 1); //ms
     luaL_Buffer b;
     char ch;
@@ -331,7 +343,8 @@ static int api_readline(lua_State *L) {
 
     luaL_buffinit(L, &b);
     luaL_prepbuffer(&b);
-    while (true) {
+    while (true)
+    {
         int ret = read_poll(device_fd, &ch, 1, timeout);
 
         if (ret < 0)
@@ -440,6 +453,7 @@ static void script_file_run(lua_State *L, const char *filename)
     }
 }
 
+// clang-format off
 static const struct luaL_Reg tio_lib[] =
 {
     { "echo", api_echo},
@@ -453,6 +467,7 @@ static const struct luaL_Reg tio_lib[] =
     { "ttysearch", api_ttysearch},
     {NULL, NULL}
 };
+// clang-format on
 
 static void script_load(lua_State *L)
 {
@@ -477,6 +492,7 @@ static void script_set_globals(lua_State *L)
     script_set_global(L, "toggle", 2);
     script_set_global(L, "high", 1);
     script_set_global(L, "low", 0);
+    script_set_global(L, "XMODEM_SUM", XMODEM_SUM);
     script_set_global(L, "XMODEM_CRC", XMODEM_CRC);
     script_set_global(L, "XMODEM_1K", XMODEM_1K);
     script_set_global(L, "YMODEM", YMODEM);

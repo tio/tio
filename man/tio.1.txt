@@ -158,7 +158,7 @@ OPTIONS
 
        -m, --map <flags>
 
-              Map (replace, translate) characters on input to the serial device or output from the serial device. The following mapping flags are supported:
+              Map (replace, translate) characters on input from the serial device or output to the serial device. The following mapping flags are supported:
 
               ICRNL       Map CR to NL on input (unless IGNCR is set)
 
@@ -342,7 +342,7 @@ KEY COMMANDS
 
        ctrl-t v        Show version
 
-       ctrl-t x        Send file using the XMODEM-1K or XMODEM-CRC protocol (prompts for file name and protocol)
+       ctrl-t x        Send file using the XMODEM-1K or XMODEM-CRC or XMODEM-SUM protocol (prompts for file name and protocol)
 
        ctrl-t y        Send file using the YMODEM protocol (prompts for file name)
 
@@ -382,7 +382,7 @@ SCRIPT API
        send(file, protocol)
              Send file using x/y-modem protocol.
 
-             Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
+             Protocol can be any of XMODEM_1K, XMODEM_CRC, XMODEM_SUM, YMODEM.
 
        tty_search()
              Search for serial devices.

@@ -90,7 +90,7 @@ static void readline_input_cr(void)
             rl_history_count++;
         }
         else
-    {
+        {
             free(rl_history[0]);
             memmove(&rl_history[0], &rl_history[1], (RL_HISTORY_MAX - 1) * sizeof(char*));
             rl_history[RL_HISTORY_MAX - 1] = strndup(rl_line, rl_line_length);
@@ -139,6 +139,7 @@ static void readline_input_left_bracket(void)
     }
     else
     {
+        readline_input_char('[');
         rl_escape = 0;
     }
 }

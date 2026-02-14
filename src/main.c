@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     /* Configure input terminal */
     if (isatty(fileno(stdin)))
     {
-       stdin_configure();
+        stdin_configure();
     }
     else
     {
@@ -110,7 +110,8 @@ int main(int argc, char *argv[])
     if (interactive_mode)
     {
         tio_printf("Press ctrl-%c q to quit", option.prefix_key);
-    } else
+    }
+    else
     {
         tio_printf("Non-interactive mode enabled");
         tio_printf("Press ctrl-c to quit");
