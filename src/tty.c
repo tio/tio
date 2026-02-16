@@ -2639,7 +2639,7 @@ int tty_connect(void)
             else if (ret > 0)
             {
                 // Forward to tty device
-                ret = write(device_fd, &input_char, 1);
+                ret = tty_write(device_fd, &input_char, 1);
                 if (ret < 0)
                 {
                     tio_error_printf("Could not write to serial device (%s)", strerror(errno));
@@ -2668,6 +2668,7 @@ int tty_connect(void)
     // Exit if piped input
     if (interactive_mode == false)
     {
+        tty_sync(device_fd);
         exit(EXIT_SUCCESS);
     }
 
