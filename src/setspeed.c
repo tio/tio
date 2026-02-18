@@ -60,6 +60,31 @@ int setspeed(int fd, int baudrate)
     return ioctl(fd, IOSSIOSPEED, (char *)&baudrate);
 }
 
+#elif defined (__CYGWIN__)
+#include <windows.h>
+#include <io.h>
+int setspeed(int fd, int baudrate)
+{
+    HANDLE hSerial = (HANDLE)_get_osfhandle(fd);
+    DCB dcbSerialParams = {0};
+    dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
+
+    if (!GetCommState(hSerial, &dcbSerialParams))
+    {
+        int err = GetLastError();
+        errno = err == ERROR_INVALID_HANDLE ? ENODEV : EINVAL;
+        return -1;
+    }
+    dcbSerialParams.BaudRate = baudrate;
+    if (!SetCommState(hSerial, &dcbSerialParams))
+    {
+        int err = GetLastError();
+        errno = err == ERROR_INVALID_HANDLE ? ENODEV : EINVAL;
+        return -1;
+    }
+    return 0;
+}
+
 #else
 int setspeed(int fd, int baudrate)
 {

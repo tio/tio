@@ -1266,7 +1266,7 @@ void tty_configure(void)
         BAUDRATE_CASES
 
         default:
-#if defined (HAVE_TERMIOS2) || defined (HAVE_IOSSIOSPEED)
+#if defined (HAVE_TERMIOS2) || defined (HAVE_IOSSIOSPEED) || defined (__CYGWIN__)
             standard_baudrate = false;
             break;
 #else
@@ -2361,7 +2361,7 @@ void tty_wait_for_device(void)
                 // Happens when port unpluged
                 if (errno == EACCES)
                 {
-                    goto error;
+                    break;
                 }
 #elif defined(__APPLE__)
                 if (errno == EBADF)
