@@ -122,6 +122,7 @@ Options:
       --exclude-drivers <pattern>        Exclude drivers by pattern
       --exclude-tids <pattern>           Exclude topology IDs by pattern
   -n, --no-reconnect                     Do not reconnect
+  -N, --no-tty-restore                   Do not restore initial TTY device settings
   -e, --local-echo                       Enable local echo
       --input-mode normal|hex|line       Select input mode (default: normal)
       --output-mode normal|hex|hexN      Select output mode (default: normal)

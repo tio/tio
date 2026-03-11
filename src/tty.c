@@ -2600,10 +2600,13 @@ int tty_connect(void)
         rs485_mode_enable(device_fd);
     }
 
-    /* Make sure we restore tty settings on exit */
+    /* Make sure we restore tty settings on exit unless ordered to keep current settings */
     if (first)
     {
-        atexit(&tty_restore);
+        if (option.no_tty_restore == false)
+        {
+            atexit(&tty_restore);
+        }
         first = false;
     }
 

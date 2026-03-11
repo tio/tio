@@ -94,6 +94,12 @@ OPTIONS
 
               This means that tio will exit if it fails to connect to device or an established connection is lost.
 
+       -N, --no-tty-restore
+
+              Do not restore initial TTY device settings.
+
+              This means that tio will exit without trying to restore TTY device settings that existed when tio was started.
+
        -e, --local-echo
 
               Enable local echo.

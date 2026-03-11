@@ -19,6 +19,7 @@ output-delay = 0
 output-line-delay = 0
 auto-connect = direct
 no-reconnect = false
+no-tty-restore = false
 local-echo = false
 input-mode = normal
 output-mode = normal

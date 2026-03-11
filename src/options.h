@@ -61,6 +61,7 @@ struct option_t
     int dcd_pulse_duration;
     int ri_pulse_duration;
     bool no_reconnect;
+    bool no_tty_restore;
     auto_connect_t auto_connect;
     bool log;
     bool log_append;

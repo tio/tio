@@ -23,6 +23,7 @@ _tio()
              --exclude-drivers \
              --exclude-tids \
           -n --no-reconnect \
+          -N --no-tty-restore \
           -e --local-echo \
           -l --log \
              --log-file \
