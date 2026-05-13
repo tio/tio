@@ -62,7 +62,7 @@ extern char ansi_format[];
         if (option.color < 0) \
         fprintf (stdout, format, ## args); \
         else \
-        fprintf (stdout, "%s" format ANSI_RESET, ansi_format, ## args); \
+        fprintf (stdout, ANSI_RESET "%s" format ANSI_RESET, ansi_format, ## args); \
     } \
 }
 
