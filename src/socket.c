@@ -101,7 +101,7 @@ static bool socket_stale(const char *path)
         strncpy(addr.sun_path, path, sizeof(addr.sun_path) - 1);
 
         /* Perform connect to test if socket is active */
-        if (connect(sockfd, (struct sockaddr *) &addr, sizeof(struct sockaddr_un)) == -1)
+        if (connect(sfd, (struct sockaddr *) &addr, sizeof(struct sockaddr_un)) == -1)
         {
             if (errno == ECONNREFUSED)
             {
@@ -111,7 +111,7 @@ static bool socket_stale(const char *path)
         }
 
         /* Cleanup */
-        close(sockfd);
+        close(sfd);
     }
 
     return stale;
