@@ -406,14 +406,20 @@ void *tty_stdin_input_thread(void *arg)
         }
 
         // Write all bytes read to pipe
+        char *write_ptr = input_buffer;
         while (byte_count > 0)
         {
-            bytes_written = write(pipefd[1], input_buffer, byte_count);
+            bytes_written = write(pipefd[1], write_ptr, byte_count);
             if (bytes_written < 0)
             {
+                if (errno == EINTR)
+                {
+                    continue;
+                }
                 tio_warning_printf("Could not write to pipe (%s)", strerror(errno));
                 break;
             }
+            write_ptr += bytes_written;
             byte_count -= bytes_written;
         }
     }
