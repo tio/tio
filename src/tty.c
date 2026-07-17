@@ -258,21 +258,20 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
     ssize_t retval = 0, bytes_written = 0;
     size_t i;
 
-    if (option.map_o_ltu)
-    {
-        // Convert lower case to upper case
-        for (i = 0; i<count; i++)
-        {
-            *((unsigned char*)buffer+i) = toupper(*((unsigned char*)buffer+i));
-        }
-    }
-
     if (option.output_delay || option.output_line_delay)
     {
         // Write byte by byte with output delay
         for (i=0; i<count; i++)
         {
-            retval = write(fd, buffer, 1);
+            unsigned char output_byte = *((const unsigned char*)buffer+i);
+
+            if (option.map_o_ltu)
+            {
+                // Convert lower case to upper case
+                output_byte = toupper(output_byte);
+            }
+
+            retval = write(fd, &output_byte, 1);
             if (retval < 0)
             {
                 // Error
@@ -281,7 +280,7 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
             }
             bytes_written += retval;
 
-            if (option.output_line_delay && *(unsigned char*)buffer == '\n')
+            if (option.output_line_delay && output_byte == '\n')
             {
                 delay(option.output_line_delay);
             }
@@ -305,6 +304,16 @@ ssize_t tty_write(int fd, const void *buffer, size_t count)
 
         // Copy bytes to tty write buffer
         memcpy(tty_buffer_write_ptr, buffer, count);
+
+        if (option.map_o_ltu)
+        {
+            // Convert lower case to upper case
+            for (i = 0; i<count; i++)
+            {
+                tty_buffer_write_ptr[i] = toupper((unsigned char)tty_buffer_write_ptr[i]);
+            }
+        }
+
         tty_buffer_write_ptr += count;
         tty_buffer_count += count;
         bytes_written = count;
