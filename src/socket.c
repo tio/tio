@@ -101,7 +101,7 @@ static bool socket_stale(const char *path)
         strncpy(addr.sun_path, path, sizeof(addr.sun_path) - 1);
 
         /* Perform connect to test if socket is active */
-        if (connect(sockfd, (struct sockaddr *) &addr, sizeof(struct sockaddr_un)) == -1)
+        if (connect(sfd, (struct sockaddr *) &addr, sizeof(struct sockaddr_un)) == -1)
         {
             if (errno == ECONNREFUSED)
             {
@@ -111,7 +111,7 @@ static bool socket_stale(const char *path)
         }
 
         /* Cleanup */
-        close(sockfd);
+        close(sfd);
     }
 
     return stale;
@@ -124,7 +124,7 @@ void socket_configure(void)
     struct sockaddr_in6 sockaddr_inet6 = {};
     struct sockaddr *sockaddr_p;
     socklen_t socklen;
-    int optval;
+    int optval = 1;
 
     /* Parse socket string */
 
@@ -226,15 +226,19 @@ void socket_configure(void)
         exit(EXIT_FAILURE);
     }
 
-#if defined(SO_NOSIGPIPE) && !defined(MSG_NOSIGNAL)
-    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR | SO_NOSIGPIPE, &optval, sizeof(optval)))
-#else
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)))
-#endif
     {
         tio_error_printf("Failed to set socket options (%s)", strerror(errno));
         exit(EXIT_FAILURE);
     }
+
+#if defined(SO_NOSIGPIPE) && !defined(MSG_NOSIGNAL)
+    if (setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)))
+    {
+        tio_error_printf("Failed to set socket options (%s)", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+#endif
 
     /* Bind */
     if (bind(sockfd, sockaddr_p, socklen) < 0)
