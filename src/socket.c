@@ -124,7 +124,7 @@ void socket_configure(void)
     struct sockaddr_in6 sockaddr_inet6 = {};
     struct sockaddr *sockaddr_p;
     socklen_t socklen;
-    int optval;
+    int optval = 1;
 
     /* Parse socket string */
 
@@ -226,15 +226,19 @@ void socket_configure(void)
         exit(EXIT_FAILURE);
     }
 
-#if defined(SO_NOSIGPIPE) && !defined(MSG_NOSIGNAL)
-    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR | SO_NOSIGPIPE, &optval, sizeof(optval)))
-#else
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)))
-#endif
     {
         tio_error_printf("Failed to set socket options (%s)", strerror(errno));
         exit(EXIT_FAILURE);
     }
+
+#if defined(SO_NOSIGPIPE) && !defined(MSG_NOSIGNAL)
+    if (setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)))
+    {
+        tio_error_printf("Failed to set socket options (%s)", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+#endif
 
     /* Bind */
     if (bind(sockfd, sockaddr_p, socklen) < 0)
