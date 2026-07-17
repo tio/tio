@@ -54,6 +54,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <time.h>
+#include <poll.h>
 #include <dirent.h>
 #include <pthread.h>
 #include <glib.h>
@@ -233,16 +234,26 @@ inline static unsigned char char_to_nibble(char c)
 void tty_sync(int fd)
 {
     ssize_t count;
+    char *p = tty_buffer;
 
     while (tty_buffer_count > 0)
     {
-        count = write(fd, tty_buffer, tty_buffer_count);
+        count = write(fd, p, tty_buffer_count);
         if (count < 0)
         {
+            if ((errno == EAGAIN) || (errno == EWOULDBLOCK) || (errno == EINTR))
+            {
+                // Device is not ready for more data, wait for it to become writable
+                struct pollfd pfd = { .fd = fd, .events = POLLOUT };
+                poll(&pfd, 1, -1);
+                continue;
+            }
+
             // Error
             tio_debug_printf("Write error while flushing tty buffer (%s)", strerror(errno));
             break;
         }
+        p += count;
         tty_buffer_count -= count;
         fsync(fd);
         tcdrain(fd);
