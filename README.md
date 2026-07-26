@@ -141,6 +141,7 @@ Options:
       --rs-485-config <config>           Set RS-485 configuration
       --alert bell|blink|none            Alert on connect/disconnect (default: none)
       --mute                             Mute tio messages
+      --cobs                             Enable COBS decoding of incoming data
       --script <string>                  Run script from string
       --script-file <filename>           Run script from file
       --script-run once|always|never     Run script on connect (default: always)

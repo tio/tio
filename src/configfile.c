@@ -272,6 +272,7 @@ static void config_parse_keys(GKeyFile *key_file, char *group)
         string = NULL;
     }
     config_get_bool(key_file, group, "mute", &option.mute);
+    config_get_bool(key_file, group, "cobs", &option.cobs);
     config_get_string(key_file, group, "script", &option.script, NULL);
     config_get_string(key_file, group, "script-file", &option.script_filename, NULL);
     config_get_string(key_file, group, "script-run", &string, NULL);

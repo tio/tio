@@ -16,6 +16,7 @@ tio_sources = [
   'misc.c',
   'tty.c',
   'print.c',
+  'cobs.c',
   'configfile.c',
   'signals.c',
   'socket.c',

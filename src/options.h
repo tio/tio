@@ -78,6 +78,7 @@ struct option_t
     bool prefix_enabled;
     bool mute;
     bool rs485;
+    bool cobs;
     uint32_t rs485_config_flags;
     int32_t rs485_delay_rts_before_send;
     int32_t rs485_delay_rts_after_send;

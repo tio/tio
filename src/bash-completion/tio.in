@@ -42,6 +42,7 @@ _tio()
              --rs-485-config \
              --alert \
              --mute \
+             --cobs \
              --script \
              --script-file \
              --script-run \

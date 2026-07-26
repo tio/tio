@@ -350,6 +350,14 @@ Default value is "none".
 Mute tio messages.
 
 .TP
+.BR "\-\-cobs"
+
+Enable decoding of incoming COBS (Consistent Overhead Byte Stuffing) encoded
+data. Incoming bytes are treated as a stream of COBS encoded packets, each
+delimited by a zero byte, and only the decoded payload of each packet is
+printed. This is useful when the serial device emits framed COBS packets.
+
+.TP
 .BR "\-\-script \fI<string>
 
 Run script from string.
