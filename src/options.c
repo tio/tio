@@ -50,6 +50,7 @@ enum opt_t
     OPT_ALERT,
     OPT_COMPLETE_PROFILES,
     OPT_MUTE,
+    OPT_COBS,
     OPT_SCRIPT,
     OPT_SCRIPT_FILE,
     OPT_SCRIPT_RUN,
@@ -96,6 +97,7 @@ struct option_t option =
     .prefix_enabled = true,
     .mute = false,
     .rs485 = false,
+    .cobs = false,
     .rs485_config_flags = 0,
     .rs485_delay_rts_before_send = -1,
     .rs485_delay_rts_after_send = -1,
@@ -167,6 +169,7 @@ void option_print_help(char *argv[])
     printf("      --rs-485-config <config>           Set RS-485 configuration\n");
     printf("      --alert bell|blink|none            Alert on connect/disconnect (default: none)\n");
     printf("      --mute                             Mute tio messages\n");
+    printf("      --cobs                             Enable COBS decoding of incoming data\n");
     printf("      --script <string>                  Run script from string\n");
     printf("      --script-file <filename>           Run script from file\n");
     printf("      --script-run once|always|never     Run script on connect (default: always)\n");
@@ -842,6 +845,7 @@ void options_print()
     tio_printf(" Input mode: %s", option_input_mode_to_string(option.input_mode));
     tio_printf(" Output mode: %s", option_output_mode_to_string(option.output_mode));
     tio_printf(" Alert: %s", option_alert_state_to_string(option.alert));
+    tio_printf(" COBS decoding: %s", option.cobs ? "true" : "false");
     if (option.log)
     {
         tio_printf(" Log file: %s", log_get_filename());
@@ -923,6 +927,7 @@ void options_parse(int argc, char *argv[])
             {"rs-485-config",        required_argument, 0, OPT_RS485_CONFIG        },
             {"alert",                required_argument, 0, OPT_ALERT               },
             {"mute",                 no_argument,       0, OPT_MUTE                },
+            {"cobs",                 no_argument,       0, OPT_COBS                },
             {"script",               required_argument, 0, OPT_SCRIPT              },
             {"script-file",          required_argument, 0, OPT_SCRIPT_FILE         },
             {"script-run",           required_argument, 0, OPT_SCRIPT_RUN          },
@@ -1086,6 +1091,10 @@ void options_parse(int argc, char *argv[])
 
             case OPT_MUTE:
                 option.mute = true;
+                break;
+
+            case OPT_COBS:
+                option.cobs = true;
                 break;
 
             case OPT_SCRIPT:

@@ -29,6 +29,7 @@ log-strip = false
 color = bold
 rs-485 = false
 alert = none
+cobs = false
 script-run = always
 prefix-ctrl-key = t
 

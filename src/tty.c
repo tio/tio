@@ -75,6 +75,7 @@
 #include "xymodem.h"
 #include "fs.h"
 #include "readline.h"
+#include "cobs.h"
 
 /* tty device listing configuration */
 
@@ -183,6 +184,8 @@ static int pipefd[2];
 static pthread_mutex_t mutex_input_ready = PTHREAD_MUTEX_INITIALIZER;
 static char line[PATH_MAX];
 static size_t listing_device_name_length_max = 0;
+
+static cobs_decoder_t cobs_decoder;
 
 static void optional_local_echo(char c)
 {
@@ -2575,6 +2578,8 @@ int tty_connect(void)
         do_timestamp = true;
     }
 
+    cobs_decoder_reset(&cobs_decoder);
+
     /* Manage print output mode */
     tty_output_mode_set(option.output_mode);
 
@@ -2742,6 +2747,17 @@ int tty_connect(void)
                     static unsigned long count = 0;
 
                     input_char = input_buffer[i];
+
+                    if (option.cobs)
+                    {
+                        unsigned char decoded;
+                        if (!cobs_decode_put_byte(&cobs_decoder,
+                                (unsigned char)input_char, &decoded))
+                        {
+                            continue;
+                        }
+                        input_char = (char)decoded;
+                    }
 
                     /* Handle timestamps */
                     switch (option.output_mode)
