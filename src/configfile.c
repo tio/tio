@@ -171,6 +171,13 @@ static void config_parse_keys(GKeyFile *key_file, char *group)
 
     config_get_integer(key_file, group, "output-delay", &option.output_delay, 0, INT_MAX);
     config_get_integer(key_file, group, "output-line-delay", &option.output_line_delay, 0, INT_MAX);
+    config_get_string(key_file, group, "output-line-delay-char", &string, NULL);
+    if (string != NULL)
+    {
+        option_parse_output_line_delay_char(string);
+        g_free((void *)string);
+        string = NULL;
+    }
     config_get_string(key_file, group, "line-pulse-duration", &string, NULL);
     if (string != NULL)
     {
@@ -189,6 +196,7 @@ static void config_parse_keys(GKeyFile *key_file, char *group)
     config_get_string(key_file, group, "exclude-drivers", &option.exclude_devices, NULL);
     config_get_string(key_file, group, "exclude-tids", &option.exclude_devices, NULL);
     config_get_bool(key_file, group, "no-reconnect", &option.no_reconnect);
+    config_get_bool(key_file, group, "no-tty-restore", &option.no_tty_restore);
     config_get_bool(key_file, group, "local-echo", &option.local_echo);
     config_get_string(key_file, group, "input-mode", &string, "normal", "hex", "line", NULL);
     if (string != NULL)
@@ -201,6 +209,20 @@ static void config_parse_keys(GKeyFile *key_file, char *group)
     if (string != NULL)
     {
         option_parse_output_mode(string, &option.output_mode);
+        g_free((void *)string);
+        string = NULL;
+    }
+    config_get_string(key_file, group, "raw", &string, NULL);
+    if (string != NULL)
+    {
+        option_parse_raw(string, &option.raw);
+        g_free((void *)string);
+        string = NULL;
+    }
+    config_get_string(key_file, group, "raw-interactive", &string, NULL);
+    if (string != NULL)
+    {
+        option_parse_raw(string, &option.raw_interactive);
         g_free((void *)string);
         string = NULL;
     }
@@ -225,6 +247,13 @@ static void config_parse_keys(GKeyFile *key_file, char *group)
     if (string != NULL)
     {
         option_parse_mappings(string);
+        g_free((void *)string);
+        string = NULL;
+    }
+    config_get_string(key_file, group, "keymap", &string, NULL);
+    if (string != NULL)
+    {
+        option_parse_key_mappings(string);
         g_free((void *)string);
         string = NULL;
     }
@@ -272,6 +301,7 @@ static void config_parse_keys(GKeyFile *key_file, char *group)
         string = NULL;
     }
     config_get_bool(key_file, group, "mute", &option.mute);
+    config_get_string(key_file, group, "script-init-file", &option.script_init_filename, NULL);
     config_get_string(key_file, group, "script", &option.script, NULL);
     config_get_string(key_file, group, "script-file", &option.script_filename, NULL);
     config_get_string(key_file, group, "script-run", &string, NULL);

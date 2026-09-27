@@ -28,6 +28,9 @@
 #include <regex.h>
 #include <errno.h>
 #include "print.h"
+#include "misc.h"
+
+static pid_t shell_command_pid = 0;
 
 void delay(long ms)
 {
@@ -49,6 +52,16 @@ int ctrl_key_code(unsigned char key)
     if ((key >= 'a') && (key <= 'z'))
     {
         return key & ~0x60;
+    }
+
+    return -1;
+}
+
+int ctrl_key_char(int key_code)
+{
+    if (key_code >= ('a' & ~0x60) && key_code <= ('z' & ~0x60))
+    {
+        return key_code | 0x60;
     }
 
     return -1;
@@ -98,13 +111,52 @@ int read_poll(int fd, void *data, size_t len, int timeout)
         if (fds.revents & POLLIN)
         {
             // Read ready data
+            // return value should not be 0
             return read(fd, data, len);
+        }
+        else /* if (fds.revents & (POLLERR | POLLHUP | POLLNVAL)) */
+        {
+            return -1;
         }
     }
 
     /* Timeout */
-    return ret;
+    return 0;
 }
+
+ssize_t write_poll(int fd, const void *data, size_t len, int timeout)
+{
+    struct pollfd fds;
+    ssize_t ret = 0;
+
+    fds.events = POLLOUT;
+    fds.fd = fd;
+
+    /* Wait data available */
+    ret = poll(&fds, 1, timeout);
+    if (ret < 0)
+    {
+        tio_error_print("%s", strerror(errno));
+        return ret;
+    }
+    else if (ret > 0)
+    {
+        if (fds.revents & POLLOUT)
+        {
+            // Ready to write
+            // return value should not be 0
+            return write(fd, data, len);
+        }
+        else /* if (fds.revents & (POLLERR | POLLHUP | POLLNVAL)) */
+        {
+            return -1;
+        }
+    }
+
+    /* Timeout */
+    return 0;
+}
+
 
 // Function to calculate djb2 hash of string
 unsigned long djb2_hash(const unsigned char *str)
@@ -170,6 +222,7 @@ bool match_patterns(const char *string, const char *patterns)
     pattern = strtok(patterns_copy, ",");
     while (pattern != NULL)
     {
+        // clang-format off
         // Check if the string matches the current pattern
         #ifdef FNM_EXTMATCH
             if (fnmatch(pattern, string, FNM_EXTMATCH) == 0)
@@ -180,6 +233,7 @@ bool match_patterns(const char *string, const char *patterns)
             free(patterns_copy);
             return true;
         }
+        // clang-format on
 
         // Move to the next pattern
         pattern = strtok(NULL, ",");
@@ -189,38 +243,76 @@ bool match_patterns(const char *string, const char *patterns)
     return false;
 }
 
-// Function that forks subprocess, redirects its stdin and stdout to the
+// Function that forks subprocess, redirects its stdout and stderr to the
 // specified filedescriptor, and runs command.
 int execute_shell_command(int fd, const char *command)
 {
-    pid_t pid;
+    #define READ_END 0
+    #define WRITE_END 1
     int status;
+    int pipefd_c2p[2];
+    int pipefd_p2c[2];
+
+#if defined(__linux__)
+    static bool done_once = false;
+    if (!done_once)
+    {
+        atexit(&terminate_shell_command);
+        done_once = true;
+    }
+#endif
+
+    // Create Pipes
+    if (pipe(pipefd_c2p) == -1 || pipe(pipefd_p2c) == -1)
+    {
+        tio_error_print("pipe() failed (%s)", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
 
     // Fork a child process
-    pid = fork();
-    if (pid == -1)
+    shell_command_pid = fork();
+    if (shell_command_pid == -1)
     {
         // Error occurred
         tio_error_print("fork() failed (%s)", strerror(errno));
         exit(EXIT_FAILURE);
     }
-    else if (pid == 0)
+    else if (shell_command_pid == 0)
     {
         // Child process
+        close(pipefd_c2p[READ_END]);
+        close(pipefd_p2c[WRITE_END]);
 
         tio_printf("Executing shell command '%s'", command);
 
-        // Redirect stdout and stderr to the file descriptor
-        if (dup2(fd, STDOUT_FILENO) == -1 || dup2(fd, STDERR_FILENO) == -1)
+        // Redirect stdin and stdout to the parent-pipe
+        if (dup2(pipefd_c2p[WRITE_END], STDOUT_FILENO) == -1 ||
+            dup2(pipefd_p2c[READ_END], STDIN_FILENO) == -1)
         {
             tio_error_print("dup2() failed (%s)", strerror(errno));
             exit(EXIT_FAILURE);
+        }
+
+        // command prefix '?' excludes stderr from redirection
+        if (command[0] == '?')
+        {
+            command += 1;
+        }
+        else
+        {
+            if (dup2(pipefd_c2p[WRITE_END], STDERR_FILENO) == -1)
+            {
+                tio_error_print("dup2() failed (%s)", strerror(errno));
+                exit(EXIT_FAILURE);
+            }
         }
 
         // Execute the shell command
         execl("/bin/sh", "sh", "-c", command, (char *)NULL);
 
         // If execlp() returns, it means an error occurred
+        close(pipefd_c2p[WRITE_END]);
+        close(pipefd_p2c[READ_END]);
         perror("execlp");
         tio_error_print("execlp() failed (%s)", strerror(errno));
         exit(EXIT_FAILURE);
@@ -228,9 +320,69 @@ int execute_shell_command(int fd, const char *command)
     else
     {
         // Parent process
+        fd_set rdfs;
+        int maxfd;
+        char buf[BUFSIZ];
+        int bytes;
+
+        close(pipefd_c2p[WRITE_END]);
+        close(pipefd_p2c[READ_END]);
+
+        while (true)
+        {
+            FD_ZERO(&rdfs);
+            FD_SET(fd, &rdfs);
+            FD_SET(pipefd_c2p[READ_END], &rdfs);
+            maxfd = MAX(fd, pipefd_c2p[READ_END]);
+
+            /* Block until input becomes available or timeout */
+            status = select(maxfd + 1, &rdfs, NULL, NULL, NULL);
+            if (status < 0)
+            {
+                tio_warning_printf("select() failed(%s)", strerror(errno));
+                break;
+            }
+
+            if (FD_ISSET(fd, &rdfs))
+            {
+                bytes = read(fd, buf, sizeof(buf));
+                if (bytes <= 0)
+                {
+                    tio_warning_printf("Could not read from tty device");
+                    break;
+                }
+                rx_total += bytes;
+                write(pipefd_p2c[WRITE_END], buf, bytes);
+            }
+
+            if (FD_ISSET(pipefd_c2p[READ_END], &rdfs))
+            {
+                // Read pipe and transfer to tty device.
+                bytes = read(pipefd_c2p[READ_END], buf, sizeof(buf));
+                if (bytes < 0)
+                {
+                    tio_warning_printf("Could not write to tty device");
+                }
+                else if (bytes == 0)
+                {
+                    // Shell command has finished.
+                    break;
+                }
+
+                if (tty_write(fd, buf, bytes) < 0)
+                {
+                    tio_warning_printf("Could not write to tty device");
+                }
+                tty_sync(fd);
+            }
+        }
+
+        close(pipefd_p2c[WRITE_END]);
+        close(pipefd_c2p[READ_END]);
 
         // Wait for the child process to finish
-        waitpid(pid, &status, 0);
+        waitpid(shell_command_pid, &status, 0);
+        shell_command_pid = 0;
 
         if (WIFEXITED(status))
         {
@@ -243,11 +395,30 @@ int execute_shell_command(int fd, const char *command)
             return -1;
         }
     }
-
     return 0;
 }
 
+#if defined(__linux__)
+
+void terminate_shell_command(void)
+{
+    // If previous shell command pid is remain, terminate it.
+    if (shell_command_pid != 0)
+    {
+        #define PKILL_BUFSIZ 80
+        char pkill_buf[PKILL_BUFSIZ] = {0};
+        int bytes;
+        bytes = snprintf(pkill_buf, PKILL_BUFSIZ, "/usr/bin/pkill -P %d", shell_command_pid);
+        if (bytes > 0 && bytes < PKILL_BUFSIZ)
+        {
+            system(pkill_buf);
+        }
+    }
+}
+
+#endif
+
 void clear_line()
 {
-    print("\r\033[K");
+    printf("\r\033[K");
 }

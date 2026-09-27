@@ -1,0 +1,54 @@
+Please refer to NEWS for the digest featuress of the upstream repository.
+
+Hidefumi Yabu:
+ * Add Lua API tio.twrite() that supports output-mapping, output-delay, and input-mode
+ * Add option output-line-delay-char to specify the line-delay trigger character
+ * Add --script function to the ctrl-t r key command ("Run script")
+ * Add support for multiple patterns to the Lua API tio.expects()
+ * Add cleanup-read to tio.expect[s] to speed up pattern matching
+ * Add tio.C constants table to the Lua API
+ * Add tio.C.NOWAIT and tio.C.WAIT_FOREVER timeout constants to tio.read and tio.expect[s]
+ * Add history and line-editing support with a simple prompt to ctrl-t command string input
+ * Add a simple prompt to line-input-mode (history and line-editing already supported)
+ * Make the Lua interpreter keep its state while tio is running
+ * Add socket examples for bidirectional command helpers and pexpect
+ * Add Lua REPL mode that supporting multi-line statements and line editing
+ * Remove the taint flag setting from clear_line() and print_line()
+ * Change serial device writes to write_poll (poll() + write()) to prevent non-blocking write errors
+ * Fix execute_shell_command to use tty_write so output-delay and output-mapping work
+ * Fix non-interactive mode to use tty_write so output-delay and output-mapping work
+ * Fix ctrl-t c to display yes/no for functions instead of true/false settings
+ * Add options --raw and --raw-interactive and ctrl-t j/J subcommands for raw communication
+ * Add bidirectional redirection to shell command execution (ctrl-t R and --exec option)
+ * Add option --script-init-file to load and execute a file when tio starts
+ * Add user key-script mapping (--keymap, ctrl-t k)
+ * Add Lua functions that handle input from a thread that uses standard input. (2026/4/4)
+    tio.inkey()
+    tio.input()
+    tio.inputline()
+ * Add Lua API functions equivalent to some key commands
+    tio.receive()
+    tio.send_break()
+    tio.line_get()
+    tio.set_local_echo()
+    tio.set_log()
+    tio.flush_data_io_buffer()
+    tio.set_input_mode()
+    tio.set_output_mode()
+    tio.set_raw_mode()
+    tio.set_raw_mode_interactive()
+    tio.set_timestamp_mode()
+    tio.exec_shell_command()
+    tio.get_state()
+    tio.get_version()
+    tio.set_keymap()
+    tio.subcmd_println(), tio.subcmd_warning_println(), tio.subcmd_error_println()
+    tio.subcmd_puts(), tio.subcmd_warning_puts(), tio.subcmd_error_println()
+ * Add feature to save/load the line-input-history to/from files on exit/startup.
+   To suppress this feature, add option --no-line-history-save.
+
+Erling Sigurdson:
+ * Add option --no-tty-restore / -N that omits tty_restore() call - #348
+
+Dr. Bernd Donner <BerndDonner>
+ * Fix formatted Lua subcmd warning and error output - #2

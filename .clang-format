@@ -3,3 +3,7 @@ IndentWidth: 4
 AllowShortFunctionsOnASingleLine: None
 KeepEmptyLinesAtTheStartOfBlocks: false
 BreakBeforeBraces: Allman
+IndentCaseLabels: true
+ColumnLimit: 144
+SortIncludes: false
+SkipMacroDefinitionBody: true

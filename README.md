@@ -43,8 +43,9 @@ when used in combination with [tmux](https://tmux.github.io).
    * Useful for reconnecting when serial device has no serial device by ID
  * Support for non-standard baud rates
  * Support for mark and space parity
- * X-modem (1K/CRC) and Y-modem file upload
+ * X-modem (1K/CRC/Checksum) and Y-modem file upload
  * Support for RS-485 mode
+ * Support for raw mode and switching by key operations
  * List available serial devices
    * By device
      * Including topology ID, uptime, driver, description
@@ -59,7 +60,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Switchable independent input and output
    * Normal mode
    * Hex mode (output supports variable width)
-   * Line mode (input only)
+   * Line mode (input only, it supports line-editing and history)
  * Timestamp support
    * Per line in normal output mode
    * Output timeout timestamps in hex output mode
@@ -87,6 +88,7 @@ when used in combination with [tmux](https://tmux.github.io).
  * Remapping of prefix key
  * Lua scripting support for automation
    * Run script manually or automatically at connect (once/always/never)
+   * Run script and preload functions and variables when tio starts up
    * Simple expect/send like functionality with support for regular expressions
    * Manipulate port modem lines (useful for microcontroller reset/boot etc.)
    * Send files via x/y-modem protocol
@@ -116,12 +118,14 @@ Options:
   -p, --parity odd|even|none|mark|space  Parity (default: none)
   -o, --output-delay <ms>                Output character delay (default: 0)
   -O, --output-line-delay <ms>           Output line delay (default: 0)
+      --output-line-delay-char cr|lf     Output line delay trigger character (default: lf)
       --line-pulse-duration <duration>   Set line pulse duration
   -a, --auto-connect new|latest|direct   Automatic connect strategy (default: direct)
       --exclude-devices <pattern>        Exclude devices by pattern
       --exclude-drivers <pattern>        Exclude drivers by pattern
       --exclude-tids <pattern>           Exclude topology IDs by pattern
   -n, --no-reconnect                     Do not reconnect
+  -N, --no-tty-restore                   Do not restore initial TTY device settings
   -e, --local-echo                       Enable local echo
       --input-mode normal|hex|line       Select input mode (default: normal)
       --output-mode normal|hex|hexN      Select output mode (default: normal)
@@ -135,16 +139,21 @@ Options:
       --log-append                       Append to log file
       --log-strip                        Strip control characters and escape sequences
   -m, --map <flags>                      Map characters
+      --keymap <keymaps>                 Set key-script mappings
   -c, --color 0..255|bold|none|list      Colorize tio text (default: bold)
   -S, --socket <socket>                  Redirect I/O to socket
+      --raw off|on|on-nodelay            Select raw mode for non-interactive use (default: on)
+      --raw-interactive off|on|on-nodelay  Select raw mode for interactive use (default: off)
       --rs-485                           Enable RS-485 mode
       --rs-485-config <config>           Set RS-485 configuration
       --alert bell|blink|none            Alert on connect/disconnect (default: none)
       --mute                             Mute tio messages
+      --script-init-file <filename>      Set initial script file to run at startup
       --script <string>                  Run script from string
       --script-file <filename>           Run script from file
       --script-run once|always|never     Run script on connect (default: always)
       --exec <command>                   Execute shell command with I/O redirected to device
+      --complete-profiles                Prints profiles (for shell completion)
   -v, --version                          Display version
   -h, --help                             Display help
 
@@ -312,6 +321,9 @@ ctrl-t ? to list the available key commands.
 [15:02:53.269]  ctrl-t F       Flush data I/O buffers
 [15:02:53.269]  ctrl-t g       Toggle serial port line
 [15:02:53.269]  ctrl-t i       Toggle input mode
+[15:02:53.269]  ctrl-t j       Toggle raw mode for non-interactive use
+[15:02:53.269]  ctrl-t J       Toggle raw mode for interactive use
+[15:02:53.269]  ctrl-t k       Set key-script mappings
 [15:02:53.269]  ctrl-t l       Clear screen
 [15:02:53.269]  ctrl-t L       Show line states
 [15:02:53.269]  ctrl-t m       Change mapping of characters on input or output
@@ -329,6 +341,10 @@ ctrl-t ? to list the available key commands.
 ```
 
 If needed, the prefix key (ctrl-t) can be remapped via configuration file.
+And you can also map scripts as user key commands using keymap entries in the configuration file.
+
+When key commands request line input, you can edit the line and call the history by using the cursor keys and backspace key.
+The history is maintained while tio is running.
 
 ### 3.3 Configuration file
 
@@ -353,6 +369,9 @@ databits = 8
 parity = none
 stopbits = 1
 color = 10
+script-init-file = /home/user/.tio-init-script.lua
+# ctrl-t 1 runs setup-script.lua and ctrl-t 9 runs the tio file transfer built-in with xmodem-checksum.
+keymap = @1=setup-device.lua @9=!tio.send("firmfile", tio.C.XM_SUM)
 
 [rpi3]
 device = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTGQVXBL-if00-port0
@@ -395,20 +414,28 @@ Another more elaborate configuration file example is available [here](examples/c
 
 Tio suppots Lua scripting to easily automate interaction with the tty device.
 
-In addition to the standard Lua API tio makes the following functions
-and variables available:
-
+In addition to the standard Lua API tio makes the functions and variables available
+The following are representative. See the man page for the complete list.:
 
 #### `tio.expect(pattern, timeout)`
 
 Waits for the Lua pattern to match or timeout before continuing.
-Timeout is in milliseconds, defaults to 0 meaning it will wait forever.
+Timeout is in milliseconds, defaults to tio.C.WAIT_FOREVER(==0) meaning it will wait forever.
 
-Returns the captures from the pattern or `nil` on timeout.
+Returns the captures from the pattern and all received data if matched.
+Or return nil and all received data if timeout.
+
+#### `tio.expects(pattern-table, timeout)`
+
+Waits for any of the multiple Lua pattens to match or timeout before continuing.
+Timeout is in milliseconds, defaults to tio.C.WAIT_FOREVER(==0) meaning it will wait forever.
+
+Returns the index of the matched pattern, the captures from it and all recieved data.
+Or return nil, nil and all received data if timeout.
 
 #### `tio.read(size, timeout)`
 
-Read up to `size` bytes from serial device. If timeout is 0 or not provided it
+Read up to `size` bytes from serial device. If timeout is tio.C.WAIT_FOREVER(==0) or not provided it
 will wait forever until data is ready to read.
 
 Returns a string up to `size` bytes long on success and `nil` on timeout.
@@ -423,15 +450,29 @@ line may be returned as a second return value.
 
 #### `tio.write(string)`
 
-Write string to serial device.
+Write string to serial device without any of input-editing, output-mapping or output-delay.
 
-Returns the `tio` table.
+Returns the tio table on success or nil on error.
+
+#### `tio.twrite(string)`
+
+Write string to serial device with input-editing, output-mapping and output-delay.
+
+Returns the tio table on success or nil on error.
 
 #### `tio.send(file, protocol)`
 
 Send file using x/y-modem protocol.
 
-Protocol can be any of `XMODEM_1K`, `XMODEM_CRC`, `YMODEM`.
+Protocol can be any of `XMODEM_1K`, `XMODEM_CRC`, `XMODEM_SUM`, `YMODEM`.
+Alternatively, it can be one of tio.C.XM_1K, tio.C.XM_CRC, tio.C.XM_SUM, or tio.C.YM_NORMAL.
+
+#### `tio.receive(file, protocol)`
+
+eceive a file using the XMODEM protocol.
+
+protocol can be one of XMODEM_CRC or XMODEM_SUM.
+Alternatively, use tio.C.XM_CRC or tio.C.XM_SUM.
 
 #### `tio.ttysearch()`
 
@@ -450,6 +491,7 @@ Set state of one or multiple tty modem lines.
 Line can be any of `DTR`, `RTS`, `CTS`, `DSR`, `CD`, `RI`
 
 State is `high`, `low`, or `toggle`.
+Alternatively, it can be one of tio.C.LN_HIGH, tio.C.LN_LOW, tio.C.LN_TOGGLE.
 
 #### `tio.sleep(seconds)`
 
@@ -458,6 +500,45 @@ Sleep for seconds.
 #### `tio.msleep(ms)`
 
 Sleep for milliseconds.
+
+#### `tio.inkey(timeout)`
+
+Read a key press as a string.
+
+timeout is specified in milliseconds.
+Defaults to tio.C.NOWAIT (==-1), meaning the call returns immediately.
+If set to tio.C.WAIT_FOREVER (==0), the function blocks until a key is pressed.
+
+Returns nil on timeout.
+
+#### `tio.input(prompt)`
+
+Display a prompt and read user input until Enter is pressed.
+Basic editing is supported (Backspace key).
+
+If prompt is omitted, no prompt is displayed.
+Returns the entered string.
+
+#### `tio.inputline(prompt)`
+
+Display a prompt and read a line of input until Enter is pressed.
+Supports line editing (cursor keys, Backspace) and command history.
+
+Returns the entered string.
+
+#### `tio.set_keymap(keymaps)`
+
+Add, update, or remove key mappings.
+
+#### `tio.subcmd_println(fmt, ...)`
+
+Print a formatted line using sub-command style output
+(e.g. [<timestamp>] <message>).
+
+#### `tio.subcmd_puts(string)`
+
+Print string using sub-command style output.
+(e.g. [<time-stamp>] <string>).
 
 #### `tio.alwaysecho`
 
@@ -572,3 +653,18 @@ tio is GPLv2+. See LICENSE file for more details.
 Maintained by Martin Lund \<martin.lund@keep-it-simple.com>
 
 See the AUTHORS file for full list of contributors.
+
+
+## 10. About this fork
+
+(This section will be moved to NEWS and AUTHORS when merged into the upstreaming repository.)
+
+See the NEWS_THIS_FORK file for full list of additional features.
+
+The majority of the code added in this fork was contributed by Hideufumi Yabu (yabu76@gmail.com).
+However, the following commits also incorporate code from existing pull requests that was deemed useful.
+Thank you for great useful code. :-)
+
+c74273ecaa132cf3076d8469a3a401fbced6e097: PR #348 by Erling Sigurdson.
+
+See the AUTHORS_THIS_FORK file for full list of the authors.

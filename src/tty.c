@@ -117,6 +117,9 @@
 #define KEY_SHIFT_F 0x46
 #define KEY_G 0x67
 #define KEY_I 0x69
+#define KEY_J 0x6A
+#define KEY_SHIFT_J 0x4A
+#define KEY_K 0x6B
 #define KEY_L 0x6C
 #define KEY_SHIFT_L 0x4C
 #define KEY_M 0x6D
@@ -147,6 +150,10 @@ typedef enum
     SUBCOMMAND_MAP,
 } sub_command_t;
 
+#define MLINE_MAX 4096
+#define INKEY_CHARS_MAX 16
+
+// clang-format off
 const char random_array[] =
 {
 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x28, 0x20, 0x28, 0x0A, 0x20,
@@ -160,17 +167,20 @@ const char random_array[] =
 0x66, 0x65, 0x65, 0x20, 0x62, 0x72, 0x65, 0x61, 0x6B, 0x21, 0x0A, 0x20, 0x0A,
 0x00
 };
+// clang-format on
 
 bool interactive_mode = true;
+state_t state = STATE_STARTING;
 
 char key_hit = 0xff;
 
 const char* device_name = NULL;
 GList *device_list = NULL;
-static struct termios tio, tio_old, stdout_new, stdout_old, stdin_new, stdin_old;
-static unsigned long rx_total = 0, tx_total = 0;
+static struct termios tio, tio_raw, tio_old, stdout_new, stdout_old, stdin_new, stdin_old;
+unsigned long rx_total = 0, tx_total = 0;
 static bool connected = false;
 static bool standard_baudrate = true;
+static bool tty_tcsetattr_first = true;
 static void (*printchar)(char c);
 static int device_fd;
 static char hex_chars[2];
@@ -181,8 +191,12 @@ static char *tty_buffer_write_ptr = tty_buffer;
 static pthread_t thread;
 static int pipefd[2];
 static pthread_mutex_t mutex_input_ready = PTHREAD_MUTEX_INITIALIZER;
-static char line[PATH_MAX];
+char line[PATH_MAX], mline[MLINE_MAX];
+char inkey_chars[INKEY_CHARS_MAX];
 static size_t listing_device_name_length_max = 0;
+static readline_t *readline_ctx = NULL;
+static readline_t *subcmd_readline_ctx = NULL;
+static readline_t *script_repl_readline_ctx = NULL;
 
 static void optional_local_echo(char c)
 {
@@ -212,7 +226,7 @@ inline static bool is_valid_hex(char c)
 
 inline static unsigned char char_to_nibble(char c)
 {
-    if(c >= '0' && c <= '9')
+    if (c >= '0' && c <= '9')
     {
         return c - '0';
     }
@@ -230,87 +244,302 @@ inline static unsigned char char_to_nibble(char c)
     }
 }
 
+raw_t tty_get_raw_mode(void)
+{
+    switch (state)
+    {
+        case STATE_INTERACTIVE:
+            return option.raw_interactive;
+
+        case STATE_STARTING:
+        case STATE_PIPED_INPUT:
+        case STATE_EXEC_SHELL_COMMAND:
+        case STATE_XYMODEM:
+        default:
+            return option.raw;
+    }
+}
+
+/* Activate or change port settings */
+int tty_tcsetattr(int fd)
+{
+    static struct termios tio_cur;
+    static int baudrate_cur;
+
+    if ( ! connected )
+    {
+        return -1;
+    }
+
+    int ret = 0;
+    raw_t raw = tty_get_raw_mode();
+    struct termios *tiop = (raw == RAW_OFF) ? &tio : &tio_raw;
+
+    /* If no need to change, no-op and return */
+    if (tty_tcsetattr_first == false &&
+        memcmp(&tio_cur, tiop, sizeof(struct termios)) == 0 &&
+        baudrate_cur == option.baudrate) {
+        tio_debug_printf("same termios. skip tty_tcsetattr.");
+        return 0;
+    }
+
+#if defined(__CYGWIN__)
+    int line_state;
+
+    /* save line state for buggy tcsetattr */
+    if (ioctl(fd, TIOCMGET, &line_state) < 0)
+    {
+        tio_warning_printf("Could not get line state (%s)", strerror(errno));
+        return -1;
+    }
+#endif
+
+    if (tcsetattr(fd, TCSANOW, tiop) == -1)
+    {
+        tio_error_printf_silent("Could not apply port settings (%s)", strerror(errno));
+        tty_tcsetattr_first = true;
+        ret = -1;
+        goto tcsetattr_error_end;
+    }
+
+    /* Set arbitrary baudrate (only works on supported platforms) */
+    if (!standard_baudrate)
+    {
+        if (setspeed(device_fd, option.baudrate) != 0)
+        {
+            tio_error_printf_silent("Could not set baudrate speed (%s)", strerror(errno));
+            tty_tcsetattr_first = true;
+            ret = -1;
+            goto setspeed_error_end;
+        }
+    }
+
+    /* Port settings changed successfully */
+    memcpy(&tio_cur, tiop, sizeof(tio_cur));
+    baudrate_cur = option.baudrate;
+    tty_tcsetattr_first = false;
+
+ tcsetattr_error_end:
+ setspeed_error_end:
+
+#if defined(__CYGWIN__)
+    /* restore line state for buggy tcsetattr */
+    if (option.flow == FLOW_HARD)
+    {
+        /* hardware flow control */
+        /* touch DTR only, don't touch RTS */
+        int tiocm_dtr = TIOCM_DTR;
+        int action = (line_state & TIOCM_DTR) ? TIOCMBIS /* DTR=LOW */ : TIOCMBIC /* DTR=HIGH */ ;
+        if (ioctl(fd, action, &tiocm_dtr) < 0)
+        {
+            tio_warning_printf("Could not set line state (%s)", strerror(errno));
+            ret = -1;
+        }
+    }
+    else
+    {
+        /* not hardware flow control */
+        /* restore DTR and RTS at the same time */
+        if (ioctl(fd, TIOCMSET, &line_state) < 0)
+        {
+            tio_warning_printf("Could not set line state (%s)", strerror(errno));
+            ret = -1;
+        }
+    }
+#endif
+
+    return ret;
+}
+
 void tty_sync(int fd)
 {
+    /* If output_delay is valid, tty_buffer should be already empty.
+     * So this function doesn't consider output_delay options. */
     ssize_t count;
+    size_t remain = tty_buffer_count;
+    char *cp = tty_buffer;
 
-    while (tty_buffer_count > 0)
+    while (remain > 0)
     {
-        count = write(fd, tty_buffer, tty_buffer_count);
+        count = write_poll(fd, cp, remain, POLL_FOREVER);
         if (count < 0)
         {
             // Error
             tio_debug_printf("Write error while flushing tty buffer (%s)", strerror(errno));
             break;
         }
-        tty_buffer_count -= count;
-        fsync(fd);
-        tcdrain(fd);
+        cp += count;
+        remain -= count;
+
+        // Update transmit statistics
+        tx_total += count;
+
+        // Reduce the number of additional writes
+        if (remain > 0)
+        {
+            int estimated_sendtime_us = (int)((int64_t)count * 10 * 1000 * 1000 / option.baudrate);
+            if (estimated_sendtime_us > 300 * 1000)
+                usleep(300 * 1000);
+            else
+                usleep(estimated_sendtime_us);
+        }
     }
+    fsync(fd);
+    tcdrain(fd);
 
     // Reset
     tty_buffer_write_ptr = tty_buffer;
     tty_buffer_count = 0;
 }
 
-ssize_t tty_write(int fd, const void *buffer, size_t count)
+static ssize_t tty_raw_write(int fd)
 {
-    ssize_t retval = 0, bytes_written = 0;
-    size_t i;
-
-    if (option.map_o_ltu)
+    raw_t raw = tty_get_raw_mode();
+    if ((raw == RAW_ON_NODELAY) ||
+        ((raw == RAW_ON_DELAY) && ( ! option.output_delay )) ||
+        ((raw == RAW_OFF) && ( ! (option.output_delay || option.output_line_delay || option.map_o_nulbrk) )))
     {
-        // Convert lower case to upper case
-        for (i = 0; i<count; i++)
-        {
-            *((unsigned char*)buffer+i) = toupper(*((unsigned char*)buffer+i));
-        }
+        return 0; // No-op in this function, write in tty_sync()
     }
 
-    if (option.output_delay || option.output_line_delay)
+    // Write byte by byte with output delay and null break
+    ssize_t retval = 0;
+    size_t i;
+
+    for (i = 0; i < tty_buffer_count; i++)
     {
-        // Write byte by byte with output delay
-        for (i=0; i<count; i++)
+        if ((raw == RAW_OFF) && (tty_buffer[i] == 0) && (option.map_o_nulbrk))
         {
-            retval = write(fd, buffer, 1);
+            retval = tcsendbreak(fd, 0);
             if (retval < 0)
             {
-                // Error
-                tio_debug_printf("Write error (%s)", strerror(errno));
-                break;
+                tio_warning_printf("Could not send break");
+                goto error;
             }
-            bytes_written += retval;
+            continue;
+        }
 
-            if (option.output_line_delay && *(unsigned char*)buffer == '\n')
+        retval = write_poll(fd, &tty_buffer[i], 1, POLL_FOREVER);
+        if (retval < 0)
+        {
+            // Error
+            tio_debug_printf("Write error (%s)", strerror(errno));
+            goto error;
+        }
+
+        fsync(fd);
+        tcdrain(fd);
+
+        // Update transmit statistics
+        tx_total++;
+
+        if ((raw == RAW_OFF) && (option.output_line_delay) && (tty_buffer[i] == option.output_line_delay_char))
+        {
+            delay(option.output_line_delay);
+        }
+        else if (option.output_delay)
+        {
+            delay(option.output_delay);
+        }
+    }
+    retval = tty_buffer_count;
+    // Path-through
+
+ error:
+    // Reset
+    tty_buffer_write_ptr = tty_buffer;
+    tty_buffer_count = 0;
+
+    return retval;
+}
+
+ssize_t tty_write(int fd, const void *buffer, size_t count)
+{
+    int status;
+    const char *cp = (char *)buffer;
+    size_t i;
+    raw_t raw = tty_get_raw_mode();
+    if (raw != RAW_OFF)
+    {
+        /* RAW mode */
+        for (i = 0; i < count; i++, cp++)
+        {
+            if (tty_buffer_count >= BUFSIZ)
             {
-                delay(option.output_line_delay);
+                status = tty_raw_write(fd);
+                if (status < 0)
+                {
+                    return status;
+                }
+                tty_sync(fd);
             }
 
-            fsync(fd);
-            tcdrain(fd);
-
-            if (option.output_delay)
-            {
-                delay(option.output_delay);
-            }
+            *tty_buffer_write_ptr = *cp;
+            tty_buffer_write_ptr++;
+            tty_buffer_count++;
         }
     }
     else
     {
-        // Force write of tty buffer if too full
-        if ((tty_buffer_count + count) > BUFSIZ)
+        /* not RAW mode */
+        for (i = 0; i < count; i++, cp++)
         {
-            tty_sync(fd);
-        }
+            if (tty_buffer_count >= BUFSIZ)
+            {
+                status = tty_raw_write(fd);
+                if (status < 0)
+                {
+                    return status;
+                }
+                tty_sync(fd);
+            }
 
-        // Copy bytes to tty write buffer
-        memcpy(tty_buffer_write_ptr, buffer, count);
-        tty_buffer_write_ptr += count;
-        tty_buffer_count += count;
-        bytes_written = count;
+            /* Map output character */
+            char *tp;
+            int bytes_add;
+
+            bytes_add = -1; /* negative value means "not mapped yet" */
+            tp = tty_buffer_write_ptr;
+            if ((*cp == 127) && (option.map_o_del_bs))
+            {
+                *tp = '\b';
+                bytes_add = 1;
+            }
+            if ((*cp == '\r') && (option.map_o_cr_nl))
+            {
+                *tp = '\n';
+                bytes_add = 1;
+            }
+            if ((*cp == '\r') && (option.map_o_ign_cr))
+            {
+                bytes_add = 0;
+            }
+            if ((*cp == '\n' || *cp == '\r') && (option.map_o_nl_crnl))
+            {
+                *tp = '\r';
+                *(tp + 1) = '\n';
+                bytes_add = 2;
+            }
+            if (bytes_add < 0)
+            {
+                *tp = (option.map_o_ltu) ? toupper(*cp) : *cp;
+                bytes_add = 1;
+            }
+
+            if (bytes_add > 0)
+            {
+                tty_buffer_write_ptr += bytes_add;
+                tty_buffer_count += bytes_add;
+            }
+        }
     }
 
-    return bytes_written;
+    status = tty_raw_write(fd);
+    if (status < 0)
+    {
+        return status;
+    }
+    return count;
 }
 
 void *tty_stdin_input_thread(void *arg)
@@ -331,7 +560,7 @@ void *tty_stdin_input_thread(void *arg)
     pthread_mutex_unlock(&mutex_input_ready);
 
     // Input loop for stdin
-    while (1)
+    while (true)
     {
         /* Input from stdin ready */
         byte_count = read(STDIN_FILENO, input_buffer, BUFSIZ);
@@ -360,7 +589,8 @@ void *tty_stdin_input_thread(void *arg)
             for (int i = 0; i<byte_count; i++)
             {
                 // first do key hit check for xmodem abort
-                if (!key_hit) {
+                if (!key_hit)
+                {
                     key_hit = input_buffer[i];
                     byte_count--;
                     memcpy(input_buffer+i, input_buffer+i+1, byte_count-i);
@@ -383,8 +613,19 @@ void *tty_stdin_input_thread(void *arg)
                             exit(EXIT_SUCCESS);
                             break;
                         case KEY_SHIFT_F:
-                            tio_printf("Flushed data I/O buffers")
+                            tio_printf("Flushed data I/O buffers");
                             tcflush(device_fd, TCIOFLUSH);
+                            break;
+                        case KEY_SHIFT_R:
+                            if (state == STATE_EXEC_SHELL_COMMAND)
+                            {
+#if defined(__linux__)
+                                tio_printf("Terminated shell command");
+                                terminate_shell_command();
+#else
+                                tio_warning_printf("The previous command is still running");
+#endif
+                            }
                             break;
                         default:
                             break;
@@ -414,7 +655,8 @@ void tty_input_thread_create(void)
 {
     pthread_mutex_lock(&mutex_input_ready);
 
-    if (pthread_create(&thread, NULL, tty_stdin_input_thread, NULL) != 0) {
+    if (pthread_create(&thread, NULL, tty_stdin_input_thread, NULL) != 0)
+    {
         tio_error_printf("pthread_create() error");
         exit(1);
     }
@@ -453,10 +695,6 @@ static void handle_hex_prompt(char c)
         {
             tio_warning_printf("Could not write to tty device");
         }
-        else
-        {
-            tx_total++;
-        }
     }
 }
 
@@ -483,10 +721,10 @@ static const char *tty_line_name(int mask)
 
 void tty_line_set(int fd, tty_line_config_t line_config[])
 {
-    static int state;
+    static int line_state;
     int i = 0;
 
-    if (ioctl(fd, TIOCMGET, &state) < 0)
+    if (ioctl(fd, TIOCMGET, &line_state) < 0)
     {
         tio_warning_printf("Could not get line state (%s)", strerror(errno));
         return;
@@ -499,21 +737,21 @@ void tty_line_set(int fd, tty_line_config_t line_config[])
             if (line_config[i].value == 0)
             {
                 // Low
-                state |= line_config[i].mask;
+                line_state |= line_config[i].mask;
                 tio_printf("Setting %s to LOW", tty_line_name(line_config[i].mask));
             }
             else if (line_config[i].value == 1)
             {
                 // High
-                state &= ~line_config[i].mask;
+                line_state &= ~line_config[i].mask;
                 tio_printf("Setting %s to HIGH", tty_line_name(line_config[i].mask));
             }
             else if (line_config[i].value == 2)
             {
                 // Toggle
-                state ^= line_config[i].mask;
+                line_state ^= line_config[i].mask;
 
-                if (state & line_config[i].mask)
+                if (line_state & line_config[i].mask)
                 {
                     tio_printf("Setting %s to LOW", tty_line_name(line_config[i].mask));
                 }
@@ -525,7 +763,7 @@ void tty_line_set(int fd, tty_line_config_t line_config[])
         }
     }
 
-    if (ioctl(fd, TIOCMSET, &state) < 0)
+    if (ioctl(fd, TIOCMSET, &line_state) < 0)
     {
         tio_warning_printf("Could not set line state (%s)", strerror(errno));
     }
@@ -533,26 +771,26 @@ void tty_line_set(int fd, tty_line_config_t line_config[])
 
 void tty_line_toggle(int fd, int mask)
 {
-    int state;
+    int line_state;
 
-    if (ioctl(fd, TIOCMGET, &state) < 0)
+    if (ioctl(fd, TIOCMGET, &line_state) < 0)
     {
         tio_warning_printf("Could not get line state (%s)", strerror(errno));
         return;
     }
 
-    if (state & mask)
+    if (line_state & mask)
     {
-        state &= ~mask;
+        line_state &= ~mask;
         tio_printf("Setting %s to HIGH", tty_line_name(mask));
     }
     else
     {
-        state |= mask;
+        line_state |= mask;
         tio_printf("Setting %s to LOW", tty_line_name(mask));
     }
 
-    if (ioctl(fd, TIOCMSET, &state) < 0)
+    if (ioctl(fd, TIOCMSET, &line_state) < 0)
     {
         tio_warning_printf("Could not set line state (%s)", strerror(errno));
     }
@@ -585,9 +823,31 @@ static void tty_line_poke(int fd, int mask, tty_line_mode_t mode, unsigned int d
     }
 }
 
-static int tio_readln(void)
+int tty_inkey(int mseconds)
+{
+    int ret;
+
+    memset(inkey_chars, 0, INKEY_CHARS_MAX);
+
+    if ((ret = read_poll(pipefd[0], &inkey_chars[0], 1, (int)mseconds)) <= 0)
+    {
+        return ret;
+    }
+    if ((ret = read_poll(pipefd[0], &inkey_chars[1], INKEY_CHARS_MAX - 2, 0)) < 0)
+    {
+        return ret;
+    }
+    return ret + 1;
+}
+
+int tty_simple_readln(const char *prompt)
 {
     char *p = line;
+
+    /* print prompt */
+    if (prompt && (prompt[0] != '\0')) {
+        tio_printf_raw("%s", prompt);
+    }
 
     /* Read line, accept BS and DEL as rubout characters */
     for (p = line ; p < &line[PATH_MAX-1]; )
@@ -608,8 +868,43 @@ static int tio_readln(void)
             p++;
         }
     }
+    write(STDOUT_FILENO, "\n", 1);
     *p = 0;
+
     return (p - line);
+}
+
+static int tty_readln(readline_t *ctx, const char *title_prompt)
+{
+    if (title_prompt && (title_prompt[0] != '\0')) {
+        tio_printf_raw("%s\r\n", title_prompt);
+    }
+    readline_prompt_for_input(ctx);
+
+    /* Read line with line edit and history. */
+    char c;
+    while (true)
+    {
+        if (read(pipefd[0], &c, 1) > 0)
+        {
+            readline_input(ctx, c);
+            if (c == '\r') break;
+        }
+    }
+    strncpy(line, readline_get(ctx), PATH_MAX - 1);
+    line[PATH_MAX - 1] = 0;
+
+    return strlen(line);
+}
+
+static int tty_script_repl_readln()
+{
+    return tty_readln(script_repl_readline_ctx, "");
+}
+
+int tty_subcmd_readln(const char *title_prompt)
+{
+    return tty_readln(subcmd_readline_ctx, title_prompt);
 }
 
 void tty_output_mode_set(output_mode_t mode)
@@ -631,6 +926,7 @@ void tty_output_mode_set(output_mode_t mode)
 
 static void mappings_print(void)
 {
+    // clang-format off
     if (option.map_i_cr_nl || option.map_ign_cr || option.map_i_ff_escc ||
         option.map_i_nl_cr || option.map_i_nl_crnl || option.map_i_cr_crnl ||
         option.map_o_cr_nl || option.map_o_del_bs || option.map_o_nl_crnl ||
@@ -656,13 +952,58 @@ static void mappings_print(void)
     {
         tio_printf(" Mappings: none");
     }
+    // clang-format on
+}
+
+static void handle_script_repl(void)
+{
+    bool local_echo_bkup = option.local_echo;
+    int line_len;
+    int mline_len = 0;
+
+    option.local_echo = true;
+    tio_printf("Enter Lua REPL mode (@exit to exit)");
+
+    strcpy(mline, "");
+    while (true)
+    {
+        tty_script_repl_readln();
+        if (strcmp(line, "@exit") == 0)
+            break;
+        line_len = strlen(line);
+
+        if (line_len > 0)
+        {
+            if (mline_len + line_len + 1 > MLINE_MAX)
+            {
+                tio_printf("Too long lines. The size should be lesser then %d bytes", MLINE_MAX);
+                strcpy(mline, "");
+                mline_len = 0;
+                continue;
+            }
+
+            strcat(&mline[mline_len], line);
+            mline_len += line_len;
+
+            if (mline_len > 0 && mline[mline_len - 1] == '\\')
+            {
+                mline[mline_len - 1] = '\n';
+                continue;
+            }
+        }
+        script_do_line(mline);
+        strcpy(mline, "");
+        mline_len = 0;
+    }
+
+    option.local_echo = local_echo_bkup;
 }
 
 void handle_command_sequence(char input_char, char *output_char, bool *forward)
 {
     char unused_char;
     bool unused_bool;
-    int state;
+    int line_state;
     static tty_line_mode_t line_mode;
     static sub_command_t sub_command = SUBCOMMAND_NONE;
     static char previous_char = 0;
@@ -717,12 +1058,14 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 break;
 
             case SUBCOMMAND_XMODEM:
+                state_t state_orig = state;
+                state = STATE_XYMODEM;
+                tty_tcsetattr(device_fd);
                 switch (input_char)
                 {
                     case KEY_0:
                         tio_printf("Send file with XMODEM-1K");
-                        tio_printf_raw("Enter file name: ");
-                        if (tio_readln())
+                        if (tty_subcmd_readln("Enter file name: "))
                         {
                             int ret;
 
@@ -735,8 +1078,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
 
                     case KEY_1:
                         tio_printf("Send file with XMODEM-CRC");
-                        tio_printf_raw("Enter file name: ");
-                        if (tio_readln())
+                        if (tty_subcmd_readln("Enter file name: "))
                         {
                             int ret;
 
@@ -749,14 +1091,39 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
 
                     case KEY_2:
                         tio_printf("Receive file with XMODEM-CRC");
-                        tio_printf_raw("Enter file name: ");
-                        if (tio_readln())
+                        if (tty_subcmd_readln("Enter file name: "))
                         {
                             int ret;
 
                             tio_printf("Ready to receiving file '%s'  ", line);
                             tio_printf("Press any key to abort transfer");
-                            ret = xymodem_send(device_fd, line, XMODEM_CRC);
+                            ret = xymodem_receive(device_fd, line, XMODEM_CRC);
+                            tio_printf("%s", ret < 0 ? "Aborted" : "Done");
+                        }
+                        break;
+
+                    case KEY_3:
+                        tio_printf("Send file with XMODEM-SUM");
+                        if (tty_subcmd_readln("Enter file name: "))
+                        {
+                            int ret;
+
+                            tio_printf("Sending file '%s'  ", line);
+                            tio_printf("Press any key to abort transfer");
+                            ret = xymodem_send(device_fd, line, XMODEM_SUM);
+                            tio_printf("%s", ret < 0 ? "Aborted" : "Done");
+                        }
+                        break;
+
+                    case KEY_4:
+                        tio_printf("Receive file with XMODEM-SUM");
+                        if (tty_subcmd_readln("Enter file name: "))
+                        {
+                            int ret;
+
+                            tio_printf("Ready to receiving file '%s'  ", line);
+                            tio_printf("Press any key to abort transfer");
+                            ret = xymodem_receive(device_fd, line, XMODEM_SUM);
                             tio_printf("%s", ret < 0 ? "Aborted" : "Done");
                         }
                         break;
@@ -765,6 +1132,8 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                         tio_error_print("Invalid protocol option");
                         break;
                 }
+                state = state_orig;
+                tty_tcsetattr(device_fd);
                 break;
 
             case SUBCOMMAND_MAP:
@@ -852,6 +1221,26 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
             return;
         }
 
+        // Handle user keymapped commands
+        for (int idx = 0; idx < KEYMAP_MAX; idx++)
+        {
+            if ((input_char >= 0x00) && (input_char <= 0x1f))
+            {
+                int ctrl_key_ch = ctrl_key_char(input_char);
+                if ((ctrl_key_ch >= 0) &&
+                    (strncmp("ctrl-", keymaps[idx].key, 5) == 0) && (keymaps[idx].key[5] == ctrl_key_ch))
+                {
+                    script_run(keymaps[idx].func);
+                    goto handle_commands_end;
+                }
+            }
+            else if (input_char == keymaps[idx].key[0] && keymaps[idx].key[1] == '\0')
+            {
+                script_run(keymaps[idx].func);
+                goto handle_commands_end;
+            }
+        }
+
         // Handle commands
         switch (input_char)
         {
@@ -865,6 +1254,9 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 tio_printf(" ctrl-%c F       Flush data I/O buffers", option.prefix_key);
                 tio_printf(" ctrl-%c g       Toggle serial port line", option.prefix_key);
                 tio_printf(" ctrl-%c i       Toggle input mode", option.prefix_key);
+                tio_printf(" ctrl-%c j       Toggle raw mode for non-interactive use", option.prefix_key);
+                tio_printf(" ctrl-%c J       Toggle raw mode for interactive use", option.prefix_key);
+                tio_printf(" ctrl-%c k       Set key-script mappings", option.prefix_key);
                 tio_printf(" ctrl-%c l       Clear screen", option.prefix_key);
                 tio_printf(" ctrl-%c L       Show line states", option.prefix_key);
                 tio_printf(" ctrl-%c m       Change mapping of characters on input or output", option.prefix_key);
@@ -879,21 +1271,22 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 tio_printf(" ctrl-%c x       Send/Receive file via Xmodem", option.prefix_key);
                 tio_printf(" ctrl-%c y       Send file via Ymodem", option.prefix_key);
                 tio_printf(" ctrl-%c ctrl-%c  Send ctrl-%c character", option.prefix_key, option.prefix_key, option.prefix_key);
+                keymaps_print("User key commands:", 1);
                 break;
 
             case KEY_SHIFT_L:
-                if (ioctl(device_fd, TIOCMGET, &state) < 0)
+                if (ioctl(device_fd, TIOCMGET, &line_state) < 0)
                 {
                     tio_warning_printf("Could not get line state (%s)", strerror(errno));
                     break;
                 }
                 tio_printf("Line states:");
-                tio_printf(" DTR: %s", (state & TIOCM_DTR) ? "LOW" : "HIGH");
-                tio_printf(" RTS: %s", (state & TIOCM_RTS) ? "LOW" : "HIGH");
-                tio_printf(" CTS: %s", (state & TIOCM_CTS) ? "LOW" : "HIGH");
-                tio_printf(" DSR: %s", (state & TIOCM_DSR) ? "LOW" : "HIGH");
-                tio_printf(" DCD: %s", (state & TIOCM_CD) ? "LOW" : "HIGH");
-                tio_printf(" RI : %s", (state & TIOCM_RI) ? "LOW" : "HIGH");
+                tio_printf(" DTR: %s", (line_state & TIOCM_DTR) ? "LOW" : "HIGH");
+                tio_printf(" RTS: %s", (line_state & TIOCM_RTS) ? "LOW" : "HIGH");
+                tio_printf(" CTS: %s", (line_state & TIOCM_CTS) ? "LOW" : "HIGH");
+                tio_printf(" DSR: %s", (line_state & TIOCM_DSR) ? "LOW" : "HIGH");
+                tio_printf(" DCD: %s", (line_state & TIOCM_CD) ? "LOW" : "HIGH");
+                tio_printf(" RI : %s", (line_state & TIOCM_RI) ? "LOW" : "HIGH");
                 break;
 
             case KEY_F:
@@ -954,6 +1347,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                     rs485_print_config();
                 }
                 mappings_print();
+                keymaps_print(" Keymaps:", 4);
                 break;
 
             case KEY_E:
@@ -1005,12 +1399,63 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 }
                 break;
 
+            case KEY_J:
+                option.raw += 1;
+                switch (option.raw)
+                {
+                    case RAW_ON_DELAY:
+                        tio_printf("Turn on raw mode for non-interactive use");
+                        break;
+                    case RAW_ON_NODELAY:
+                        tio_printf("Turn on raw-nodelay mode for non-interactive use");
+                        break;
+                    case RAW_OFF:
+                    default:
+                        option.raw = RAW_OFF;
+                        tio_printf("Turn off raw mode for non-interactive use");
+                        break;
+                }
+                if (state != STATE_INTERACTIVE)
+                {
+                    tty_tcsetattr(device_fd);
+                }
+                break;
+
+            case KEY_SHIFT_J:
+                option.raw_interactive += 1;
+                switch (option.raw_interactive)
+                {
+                    case RAW_ON_DELAY:
+                        tio_printf("Turn on raw mode for interactive use");
+                        break;
+                    case RAW_ON_NODELAY:
+                        tio_printf("Turn on raw-nodelay mode for interactive use");
+                        break;
+                    case RAW_OFF:
+                    default:
+                        option.raw_interactive = RAW_OFF;
+                        tio_printf("Turn off raw mode for interactive use");
+                        break;
+                }
+                if (state == STATE_INTERACTIVE)
+                {
+                    tty_tcsetattr(device_fd);
+                }
+                break;
+
+            case KEY_K:
+                /* Set keymap */
+                tty_subcmd_readln("Enter keymap @<key>=<script-file>|!<script> :");
+                option_parse_key_mappings(line);
+                break;
+
             case KEY_L:
                 /* Clear screen using ANSI/VT100 escape code */
                 printf("\033c");
                 break;
 
             case KEY_M:
+                // clang-format off
                 /* Change mapping of characters on input or output */
                 tio_printf("Please enter which mapping to set or unset:");
                 tio_printf(" (0) ICRNL: %s mapping CR to NL on input (unless IGNCR is set)",
@@ -1039,6 +1484,7 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                         option.map_o_nulbrk ? "Unset" : "Set");
                 tio_printf(" (c) OIGNCR: %s ignoring CR on output",
                         option.map_o_ign_cr ? "Unset" : "Set");
+                // clang-format on
 
                 // Process next input character as sub command
                 sub_command = SUBCOMMAND_MAP;
@@ -1050,26 +1496,31 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
 
             case KEY_R:
                 /* Run script */
-                tio_printf("Run Lua script")
-                tio_printf_raw("Enter file name: ");
-                if (tio_readln())
+                tio_printf("Run Lua script");
+                tty_subcmd_readln("Enter file name or \"!\" lua commands or \"@\" direction to interpreter: ");
+                if (strcmp(line, "@repl") == 0)
                 {
-                    clear_line();
-                    script_run(device_fd, line);
+                    handle_script_repl();
                 }
                 else
                 {
                     clear_line();
-                    script_run(device_fd, NULL);
+                    script_run(line);
                 }
                 break;
 
             case KEY_SHIFT_R:
                 /* Execute shell command */
                 tio_printf("Execute shell command with I/O redirected to device");
-                tio_printf_raw("Enter command: ");
-                if (tio_readln())
+                if (tty_subcmd_readln("Enter command (\"?\" prefix prevents redirection of stderr): "))
+                {
+                    state_t state_orig = state;
+                    state = STATE_EXEC_SHELL_COMMAND;
+                    tty_tcsetattr(device_fd);
                     execute_shell_command(device_fd, line);
+                    state = state_orig;
+                    tty_tcsetattr(device_fd);
+                }
                 break;
 
             case KEY_S:
@@ -1119,19 +1570,26 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 tio_printf(" (0) XMODEM-1K send");
                 tio_printf(" (1) XMODEM-CRC send");
                 tio_printf(" (2) XMODEM-CRC receive");
+                tio_printf(" (3) XMODEM-SUM send");
+                tio_printf(" (4) XMODEM-SUM receive");
                 // Process next input character as sub command
                 sub_command = SUBCOMMAND_XMODEM;
                 break;
 
             case KEY_Y:
                 tio_printf("Send file with YMODEM");
-                tio_printf_raw("Enter file name: ");
-                if (tio_readln()) {
-		    int ret;
+                if (tty_subcmd_readln("Enter file name: "))
+                {
+                    int ret;
+                    state_t state_orig = state;
 
                     tio_printf("Sending file '%s'  ", line);
                     tio_printf("Press any key to abort transfer");
-		    ret = xymodem_send(device_fd, line, YMODEM);
+                    state = STATE_XYMODEM;
+                    tty_tcsetattr(device_fd);
+                    ret = xymodem_send(device_fd, line, YMODEM);
+                    state = state_orig;
+                    tty_tcsetattr(device_fd);
                     tio_printf("%s", ret < 0 ? "Aborted" : "Done");
                 }
                 break;
@@ -1144,6 +1602,8 @@ void handle_command_sequence(char input_char, char *output_char, bool *forward)
                 /* Ignore unknown ctrl-t escaped keys */
                 break;
         }
+
+    handle_commands_end:
     }
 
     previous_char = input_char;
@@ -1194,9 +1654,9 @@ void stdout_restore(void)
     // If terminal is vt100
     if (option.vt100)
     {
-      // Disable DEC Special Graphics character set just in case it was randomly
-      // enabled by noise from serial device.
-      putchar('\017');
+        // Disable DEC Special Graphics character set just in case it was randomly
+        // enabled by noise from serial device.
+        putchar('\017');
     }
 }
 
@@ -1408,6 +1868,11 @@ void tty_configure(void)
     {
         tio.c_iflag |= ICRNL;
     }
+
+    /* Create raw-mode configuration */
+    memcpy(&tio_raw, &tio, sizeof(tio_raw));
+    tio_raw.c_iflag &= ~(IXON | IXOFF | IXANY);
+    tio_raw.c_iflag &= ~(INLCR | IGNCR | ICRNL);
 }
 
 void tty_reconfigure(void)
@@ -1417,7 +1882,7 @@ void tty_reconfigure(void)
     if (connected)
     {
         /* Activate new port settings */
-        tcsetattr(device_fd, TCSANOW, &tio);
+        tty_tcsetattr(device_fd);
     }
 }
 
@@ -2044,7 +2509,8 @@ GList *tty_search_for_serial_devices(void)
         }
 
         /* Populate device info */
-        *device_info = (device_t) {
+        *device_info = (device_t)
+        {
             .path = devicePath,
             .tid = g_strdup(tid),
             .uptime = uptime,
@@ -2361,7 +2827,7 @@ void tty_wait_for_device(void)
                 // Happens when port unpluged
                 if (errno == EACCES)
                 {
-                    goto error;
+                    break;
                 }
 #elif defined(__APPLE__)
                 if (errno == EBADF)
@@ -2429,38 +2895,26 @@ void tty_restore(void)
     }
 }
 
+/* output mode and local echo handling */
 void forward_to_tty(int fd, char output_char)
 {
     int status;
 
-    /* Map output character */
-    if ((output_char == 127) && (option.map_o_del_bs))
-    {
-        output_char = '\b';
-    }
-    if ((output_char == '\r') && (option.map_o_cr_nl))
-    {
-        output_char = '\n';
-    }
     if ((output_char == '\r') && (option.map_o_ign_cr))
     {
         return;
     }
 
-    /* Map newline character */
+    /* local echo special case in newline character */
     if ((output_char == '\n' || output_char == '\r') && (option.map_o_nl_crnl))
     {
-        const char *crlf = "\r\n";
-
-        optional_local_echo(crlf[0]);
-        optional_local_echo(crlf[1]);
-        status = tty_write(fd, crlf, 2);
+        optional_local_echo('\r');
+        optional_local_echo('\n');
+        status = tty_write(fd, &output_char, 1);
         if (status < 0)
         {
             tio_warning_printf("Could not write to tty device");
         }
-
-        tx_total += 2;
     }
     else
     {
@@ -2479,22 +2933,11 @@ void forward_to_tty(int fd, char output_char)
                         optional_local_echo(output_char);
                     }
 
-                    if ((output_char == 0) && (option.map_o_nulbrk))
-                    {
-                        status = tcsendbreak(fd, 0);
-                    }
-                    else
-                    {
-                        status = tty_write(fd, &output_char, 1);
-                    }
-
+                    status = tty_write(fd, &output_char, 1);
                     if (status < 0)
                     {
                         tio_warning_printf("Could not write to tty device");
                     }
-
-                    /* Update transmit statistics */
-                    tx_total++;
                 }
                 break;
 
@@ -2513,7 +2956,6 @@ void forward_to_tty(int fd, char output_char)
                     else
                     {
                         optional_local_echo(output_char);
-                        tx_total++;
                     }
                 }
                 break;
@@ -2521,6 +2963,76 @@ void forward_to_tty(int fd, char output_char)
             case OUTPUT_MODE_END:
                 break;
         }
+    }
+}
+
+static int make_history_file_path(char *buf, int buf_size, const char *deco)
+{
+    int len;
+    char *home = getenv("HOME");
+    if (!home)
+    {
+        tio_error_printf("Could not specify home directory from HOME environment variable.");
+        return -1;
+    }
+
+    if (deco && *deco != '\0')
+        snprintf(buf, buf_size, "%s/.tio_history_%s_%s", home, option.target, deco);
+    else
+        snprintf(buf, buf_size, "%s/.tio_history_%s", home, option.target);
+
+    for (len = strlen(home) + 1; buf[len] == '\0' || len < buf_size; len++)
+    {
+        if (buf[len] == '/')
+            buf[len] = '_';
+    }
+    return len;
+}
+
+
+void tty_init(void)
+{
+    // Initialize readline like history
+    char history_file_path[PATH_MAX];
+
+    if (make_history_file_path(history_file_path, PATH_MAX, "") > 0)
+    {
+        readline_ctx = readline_create(history_file_path);
+    }
+    if (make_history_file_path(history_file_path, PATH_MAX, "subcmd") > 0)
+    {
+        subcmd_readline_ctx = readline_create(history_file_path);
+    }
+    if (make_history_file_path(history_file_path, PATH_MAX, "repl") > 0)
+    {
+        script_repl_readline_ctx = readline_create(history_file_path);
+    }
+
+    if (readline_ctx == NULL || subcmd_readline_ctx == NULL || script_repl_readline_ctx == NULL)
+    {
+        tio_error_printf("Could not allocate readline buffer.");
+        exit(EXIT_FAILURE);
+    }
+
+    readline_set_prompt(readline_ctx, "> ");
+    readline_set_prompt(subcmd_readline_ctx, ">> ");
+    readline_set_prompt(script_repl_readline_ctx, "-> ");
+
+    if (!option.no_line_history_save)
+    {
+        readline_load(readline_ctx);
+        readline_load(subcmd_readline_ctx);
+        readline_load(script_repl_readline_ctx);
+    }
+}
+
+void tty_exit(void)
+{
+    if (!option.no_line_history_save)
+    {
+        readline_save(readline_ctx);
+        readline_save(subcmd_readline_ctx);
+        readline_save(script_repl_readline_ctx);
     }
 }
 
@@ -2536,6 +3048,8 @@ int tty_connect(void)
     char*  now = NULL;
     struct timeval tval_before = {}, tval_now, tval_result;
 
+    state = STATE_STARTING;
+
     /* Open tty device */
     device_fd = open(device_name, O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (device_fd < 0)
@@ -2548,7 +3062,7 @@ int tty_connect(void)
     if (!isatty(device_fd))
     {
         tio_error_printf("Not a tty device");
-        exit(EXIT_FAILURE);;
+        exit(EXIT_FAILURE);
     }
 
     /* Lock device file */
@@ -2600,37 +3114,31 @@ int tty_connect(void)
         rs485_mode_enable(device_fd);
     }
 
-    /* Make sure we restore tty settings on exit */
+    /* Make sure we restore tty settings on exit unless ordered to keep current settings */
     if (first)
     {
-        atexit(&tty_restore);
+        if (option.no_tty_restore == false)
+        {
+            atexit(&tty_restore);
+        }
         first = false;
     }
 
-    /* Activate new port settings */
-    status = tcsetattr(device_fd, TCSANOW, &tio);
+    /* Activate new port settings and set speed for non-interactive phase */
+    tty_tcsetattr_first = true;
+    status = tty_tcsetattr(device_fd);
     if (status == -1)
     {
-        tio_error_printf_silent("Could not apply port settings (%s)", strerror(errno));
         goto error_tcsetattr;
-    }
-
-    /* Set arbitrary baudrate (only works on supported platforms) */
-    if (!standard_baudrate)
-    {
-        if (setspeed(device_fd, option.baudrate) != 0)
-        {
-            tio_error_printf_silent("Could not set baudrate speed (%s)", strerror(errno));
-            goto error_setspeed;
-        }
     }
 
     /* If stdin is a pipe forward all input to tty device */
     if (interactive_mode == false)
     {
+        state = STATE_PIPED_INPUT;
         while (true)
         {
-            int ret = read(pipefd[0], &input_char, 1);
+            int ret = read(pipefd[0], input_buffer, BUFSIZ);
             if (ret < 0)
             {
                 tio_error_printf("Could not read from pipe (%s)", strerror(errno));
@@ -2639,7 +3147,7 @@ int tty_connect(void)
             else if (ret > 0)
             {
                 // Forward to tty device
-                ret = write(device_fd, &input_char, 1);
+                ret = tty_write(device_fd, input_buffer, ret);
                 if (ret < 0)
                 {
                     tio_error_printf("Could not write to serial device (%s)", strerror(errno));
@@ -2652,12 +3160,15 @@ int tty_connect(void)
                 break;
             }
         }
+        tty_sync(device_fd);
     }
 
     /* Manage script activation */
+    script_device_bind(device_fd);
+
     if (option.script_run != SCRIPT_RUN_NEVER)
     {
-        script_run(device_fd, NULL);
+        script_run_as_specified_by_options();
 
         if (option.script_run == SCRIPT_RUN_ONCE)
         {
@@ -2665,7 +3176,7 @@ int tty_connect(void)
         }
     }
 
-    // Exit if piped input
+    // Exit if piped input or given execute option
     if (interactive_mode == false)
     {
         exit(EXIT_SUCCESS);
@@ -2673,12 +3184,18 @@ int tty_connect(void)
 
     if (option.exec != NULL)
     {
+        state = STATE_EXEC_SHELL_COMMAND;
         status = execute_shell_command(device_fd, option.exec);
         exit(status);
     }
 
-    // Initialize readline like history
-    readline_init();
+    /* Activate new port settings for interactive phase */
+    state = STATE_INTERACTIVE;
+    status = tty_tcsetattr(device_fd);
+    if (status == -1)
+    {
+        goto error_tcsetattr;
+    }
 
     /* Input loop */
     while (true)
@@ -2932,15 +3449,16 @@ int tty_connect(void)
                                     if (input_char == '\r')
                                     {
                                         // Carriage return
-                                        readline_input(input_char);
+                                        readline_input(readline_ctx, input_char);
+                                        print_prompt(readline_ctx);
 
                                         // Write current line to tty device
-                                        char *rl_line = readline_get();
+                                        char *rl_line = readline_get(readline_ctx);
                                         tty_write(device_fd, rl_line, strlen(rl_line));
                                     }
                                     else
                                     {
-                                        readline_input(input_char);
+                                        readline_input(readline_ctx, input_char);
                                         forward = false;
                                     }
                                     break;
@@ -3002,10 +3520,10 @@ int tty_connect(void)
 
     return TIO_SUCCESS;
 
-error_setspeed:
 error_tcsetattr:
 error_tcgetattr:
 error_read:
+    script_device_unbind();
     tty_disconnect();
 error_open:
     return TIO_ERROR;

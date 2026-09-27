@@ -29,5 +29,10 @@ typedef enum
     SCRIPT_RUN_END,
 } script_run_t;
 
-void script_run(int fd, const char *script_filename);
+void script_interp_init(void);
+void script_device_bind(int fd);
+void script_device_unbind(void);
+void script_run(const char *script_filename);
+void script_run_as_specified_by_options(void);
+void script_do_line(const char *script_line);
 const char *script_run_state_to_string(script_run_t state);

@@ -21,14 +21,15 @@
 
 #pragma once
 
-typedef enum {
+typedef enum
+{
     XMODEM_1K,
     XMODEM_CRC,
+    XMODEM_SUM,
     YMODEM,
 } modem_mode_t;
 
 extern char key_hit;
 
 int xymodem_send(int sio, const char *filename, modem_mode_t mode);
-
 int xymodem_receive(int sio, const char *filename, modem_mode_t mode);

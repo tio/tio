@@ -24,15 +24,27 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#define POLL_NOWAIT (0)
+#define POLL_FOREVER (-1)
+
+#define TOSTRING_(x) #x
+#define TOSTR(x) TOSTRING_(x)
+
 #define UNUSED(expr) do { (void)(expr); } while (0)
 
 void delay(long ms);
 int ctrl_key_code(unsigned char key);
+int ctrl_key_char(int key_code);
 bool regex_match(const char *string, const char *pattern);
 unsigned long djb2_hash(const unsigned char *str);
 void *base62_encode(unsigned long num, char *output);
 int read_poll(int fd, void *data, size_t len, int timeout);
+ssize_t write_poll(int fd, const void *data, size_t len, int timeout);
 double get_current_time(void);
 bool match_patterns(const char *string, const char *patterns);
 int execute_shell_command(int fd, const char *command);
 void clear_line();
+
+#if defined(__linux__)
+void terminate_shell_command(void);
+#endif

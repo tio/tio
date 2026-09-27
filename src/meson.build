@@ -53,6 +53,11 @@ if host_machine.system() == 'darwin'
   tio_dep += [iokit_dep, corefoundation_dep]
 endif
 
+if host_machine.system() == 'haiku'
+  network_dep = meson.get_compiler('c').find_library('network', required:true)
+  tio_dep += [network_dep]
+endif
+
 tio_c_args = ['-Wshadow','-Wno-unused-result']
 
 if enable_setspeed2

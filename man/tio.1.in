@@ -52,6 +52,11 @@ Set output delay [ms] inserted between each sent character (default: 0).
 Set output delay [ms] inserted between each sent line (default: 0).
 
 .TP
+.BR "    \-\-output\-line\-delay\-char " cr | lf
+
+Set trigger character of output line delay (default: lf).
+
+.TP
 .BR "    \-\-line\-pulse\-duration " \fI<duration>
 
 Set the pulse duration [ms] of each serial port line using the following key
@@ -122,6 +127,14 @@ Do not reconnect.
 
 This means that tio will exit if it fails to connect to device or an
 established connection is lost.
+
+.TP
+.BR \-N ", " \-\-no\-tty\-restore
+
+Do not restore initial TTY device settings.
+
+This means that tio will exit without trying to restore TTY device
+settings that existed when tio was started.
 
 .TP
 .BR \-e ", " "\-\-local\-echo
@@ -205,8 +218,8 @@ Strip control characters and escape sequences from log.
 .TP
 .BR \-m ", " "\-\-map " \fI<flags>
 
-Map (replace, translate) characters on input to the serial device or output
-from the serial device. The following mapping flags are supported:
+Map (replace, translate) characters on input from the serial device or output
+to the serial device. The following mapping flags are supported:
 
 .RS
 .TP 12n
@@ -236,7 +249,7 @@ Map lowercase characters to uppercase on output
 Map nul (zero) to send break signal on output
 .IP "\fBOIGNCR"
 Ignore CR on output
-.P
+.PP
 If defining more than one flag, the flags must be comma separated.
 .RE
 
@@ -251,8 +264,9 @@ In hex input mode bytes can be sent by typing the \fBtwo-character
 hexadecimal\fR representation of the 1 byte value, e.g.: to send \fI0xA\fR you
 must type \fI0a\fR or \fI0A\fR.
 
-In line input mode input characters are sent when you press enter. The only
-editing feature supported in this mode is backspace.
+In line input mode input characters are sent when you press enter.
+You can use the cursor keys and backspace key to edit the line and recall command
+history. The history is maintained while tio is running.
 
 Default value is "normal".
 
@@ -301,11 +315,41 @@ Unix Domain Socket (file)
 Internet Socket (network)
 .IP "\fBinet6:<port>"
 Internet IPv6 Socket (network)
-.P
+.PP
 If port is 0 or no port is provided default port 3333 is used.
-.P
+.PP
 At present there is a hardcoded limit of 16 clients connected at one time.
 .RE
+
+.TP
+.BR "    \-\-raw " off|on|on-nodelay
+
+nSet raw mode for non-interactive use.
+Non-interactive use is Piped-input / Shell command execution / XYMODEM transferring.
+
+The raw option can be set to one of the following:
+
+.RS
+.TP 20n
+.IP "\fBoff"
+flow control, character mapping and output delay are enabled
+.IP "\fBon"
+software flow control and character mapping are disabled; output delay remains enabled
+.IP "\fBon-nodelay"
+software flow control, character mapping and output delay is disabled
+.PP
+Default value is "on".
+.RE
+
+.TP
+.BR "    \-\-raw-interactive " off|on|on-nodelay
+
+Set raw mode for interactive use.
+Interactive use is normal terminal input/output and socket redirection.
+
+This is useful when transferring files through socket redirection.
+
+Default value is "off".
 
 .TP
 .BR "    \-\-rs\-485"
@@ -330,7 +374,7 @@ Set RTS delay (ms) before sending
 Set RTS delay (ms) after sending
 .IP \fBRX_DURING_TX
 Receive data even while sending data
-.P
+.PP
 If defining more than one key or key value pair, they must be comma separated.
 .RE
 
@@ -350,14 +394,38 @@ Default value is "none".
 Mute tio messages.
 
 .TP
+.BR "\-\-no-line-history-save"
+
+Do not save line-input-hisoty on exit and load on startup.
+
+History files are the following:
+
+.PP
+.I $HOME/.tio_history_<<connection_name>>
+.PP
+.I $HOME/.tio_history_<<connection_name>>_subcmd
+.PP
+.I $HOME/.tio_history_<<connection_name>>_repl
+
+
+.TP
+.BR "\-\-script\-init\-file \fI<filename>"
+
+Run script from file with filename on tio's startup.
+
+Execution occurs before connecting to the device, and loaded functions and variables are preserved.
+
+The default is <<not\-specified>>, which only loads built\-in functions and variables.
+
+.TP
 .BR "\-\-script \fI<string>
 
-Run script from string.
+Run script from string on connect.
 
 .TP
 .BR "\-\-script\-file \fI<filename>
 
-Run script from file with filename.
+Run script from file with filename on connect.
 
 .TP
 .BR "\-\-script\-run once|always|never"
@@ -370,6 +438,11 @@ Default value is "always".
 .BR "\-\-exec \fI<command>
 
 Execute shell command with I/O redirected to device
+
+The standard output and standard error of a shell command are redirected to the device through tio's output filters (with output mapping and output delay enabled), and input from the device is redirected to
+the standard input of the shell command.
+
+If you specify '?' as a shell commands prefix, standard error output will not be redirected. This allows you to use some communication commands such as sz/rz.
 
 .TP
 .BR "\-\-complete-profiles
@@ -403,6 +476,10 @@ Flush data I/O buffers (discard data written but not transmitted and data receiv
 Toggle serial port line
 .IP "\fBctrl-t i"
 Toggle input mode
+.IP "\fBctrl-t j"
+Toggle raw mode for non-interactive use
+.IP "\fBctrl-t J"
+Toggle raw mode for interactive use
 .IP "\fBctrl-t l"
 Clear screen
 .IP "\fBctrl-t L"
@@ -426,7 +503,7 @@ Toggle line timestamp mode
 .IP "\fBctrl-t v"
 Show version
 .IP "\fBctrl-t x"
-Send file using the XMODEM-1K or XMODEM-CRC protocol (prompts for file name and protocol)
+Send file using the XMODEM-1K, XMODEM-CRC or XMODEM-SUM protocol (prompts for file name and protocol)
 .IP "\fBctrl-t y"
 Send file using the YMODEM protocol (prompts for file name)
 .IP "\fBctrl-t ctrl-t"
@@ -434,7 +511,7 @@ Send ctrl-t character
 
 .SH "SCRIPT API"
 .PP
-Tio suppots Lua scripting to easily automate interaction with the tty device.
+Tio supports Lua scripting to easily automate interaction with the tty device.
 
 In addition to the standard Lua API tio makes the following functions
 and variables available:
@@ -442,33 +519,56 @@ and variables available:
 .TP 6n
 
 .IP "\fBtio.expect(pattern, timeout)"
-Waits for the Lua pattern to match or timeout before continuing.
-Timeout is in milliseconds, defaults to 0 meaning it will wait forever.
+Waits for the Lua pattern to match or timeout before continuing. Special characters must be escaped with '\\' or '%'.
+Timeout is in milliseconds, defaults to tio.C.WAIT_FOREVER(==0) meaning it will wait forever.
 
-Returns the captures from the pattern or nil on timeout.
+On success, returns the captures from the pattern and all received data.
+On timeout, returns nil and all received data.
+
+.IP "\fBtio.expects(pattern-table, timeout)"
+Waits for any of the multiple Lua patterns to match or timeout before continuing. Special characters must be escaped with '\\' or '%'.
+Timeout is in milliseconds, defaults to tio.C.WAIT_FOREVER(==0) meaning it will wait forever.
+
+On success, returns the index of the matched pattern, the captures from it and all received data.
+On timeout, returns nil, nil and all received data.
 
 .IP "\fBtio.read(size, timeout)"
-Read up to size bytes from serial device. If timeout is 0 or not provided it
-will wait forever until data is ready to read.
+Read up to size bytes from serial device. If timeout is tio.C.WAIT_FOREVER(==0) or not provided it will wait forever until data is ready to read.
+If the timeout is tio.C.NOWAIT (==-1), the function immediately reads as much data as possible from the serial device's RX buffer, up to a maximum of <size> bytes, and returns.
 
-Returns a string up to size bytes long on success and nil on timeout.
+On success, returns read data as string. Also emits a single timestamp to stdout and log file per options.timestamp and options.log.
+On timeout, returns nil and received data.
 
 .IP "\fBtio.readline(timeout)"
-Read line from serial device. If timeout is 0 or not provided it will wait
-forever until data is ready to read.
+Read line from serial device. If timeout is tio.C.WAIT_FOREVER(==0) or not provided it will wait forever until data is ready to read.
+The line separater is LF (0x0a).
 
-Returns a string on success and nil on timeout.  On timeout a partially read
-line may be returned as a second return value.
+On success, returns received line as string. Also emits a single timestamp to stdout and log file per options.timestamp and options.log.
+On timeout, returns nil and received data.
 
 .IP "\fBtio.write(string)"
-Write string to serial device.
+Write string to serial device without input-editing, output-mapping, or output-delay.
 
-Returns the tio table.
+Returns the tio table on success or nil on error.
+
+.IP "\fBtio.twrite(string)"
+Write string to serial device with input-editing, output-mapping and output-delay.
+
+Returns tio table on success or nil on error.
 
 .IP "\fBtio.send(file, protocol)"
 Send file using x/y-modem protocol.
 
-Protocol can be any of XMODEM_1K, XMODEM_CRC, YMODEM.
+Protocol can be any of XMODEM_1K, XMODEM_CRC, XMODEM_SUM, YMODEM.
+It can alternatively be one of tio.C.XM_1K, tio.C.XM_CRC, tio.C.XM_SUM, tio.C.YM_NORMAL.
+
+.IP "\fBtio.receive(file, protocol)"
+Receive a file using the XMODEM protocol.
+
+Protocol can be any of XMODEM_CRC or XMODEM_SUM.
+It can alternatively be one of tio.C.XM_CRC or tio.C.XM_SUM.
+
+Returns the tio table on success or nil on error.
 
 .IP "\fBtio.ttysearch()"
 Search for serial devices.
@@ -489,8 +589,159 @@ State is high, low, or toggle.
 
 .IP "\fBtio.sleep(seconds)"
 Sleep for seconds.
+
 .IP "\fBtio.msleep(ms)"
 Sleep for milliseconds.
+
+.IP "\fBtio.send_break()"
+Send break signal.
+It is equivalent to the key command ctrl-t b.
+
+.IP "\fBtio.line_get()"
+Get state of multiple tty modem lines.
+It is equivalent to the key command ctrl-t L.
+
+Return 6 values DTR, RTS, CTS, DSR, CD, RI.
+Each return value is high (==tio.C.LN_HIGH) or low (==tio.C.LN_LOW).
+
+.IP "\fBtio.set_local_echo(on_off)"
+Change the local echo setting.
+It is equivalent to the key command ctrl-t e.
+
+The argument on_off is a boolean value. true means on and false means off. If omitted, it is set to true.
+
+.IP "\fBtio.set_log(on_off)"
+Change the log-file setting.
+It is equivalent to the key command ctrl-t f.
+
+The argument on_off is a boolean value. true means on and false means off. If omitted, it is set to true.
+
+.IP "\fBtio.flush_data_io_buffer()"
+Flush read/write data in I/O buffers.
+It is equivalent to the key command ctrl-t F.
+
+.IP "\fBtio.set_input_mode(input_mode)"
+Change the input mode.
+It is equivalent to the key command ctrl-t i.
+
+The argument input_mode is one of tio.C.IM_NORMAL, tio.C.IM_HEX, tio.C.IM_LINE.
+
+.IP "\fBtio.set_output_mode(output_mode)"
+Change the output mode.
+It is equivalent to the key command ctrl-t o.
+
+The argument output_mode is one of tio.C.OM_NORMAL, tio.C.OM_HEX.
+
+.IP "\fBtio.set_raw_mode(raw_mode)"
+Change the raw mode for non-interactive use.
+It is equivalent to the key command ctrl-t j.
+
+The argument raw_mode is one of tio.C.RAW_OFF, tio.C.RAW_ON, tio.C.RAW_ON_NODELAY.
+
+.IP "\fBtio.set_raw_mode_interactive(raw_mode)"
+Change the raw mode for interactive use.
+It is equivalent to the key command ctrl-t J.
+
+The argument raw_mode is one of tio.C.RAW_OFF, tio.C.RAW_ON, tio.C.RAW_ON_NODELAY.
+
+.IP "\fBtio.set_timestamp_mode(timestamp_mode)"
+Change the timestamp mode.
+It is equivalent to the key command ctrl-t t.
+
+The argument timestamp_mode is one of tio.C.TS_OFF, tio.C.TS_24HOUR, tio.C.TS_24HOUR_START, tio.C.TS_24HOUR_DELTA, tio.C.TS_ISO861, tio.C.TS_EPOCH, tio.C.TS_EPOCH_USEC.
+
+.IP "\fBtio.exec_shell_command(shell_commands)"
+Execute /bin/sh -c <<shell_commands>>.
+Normally, standard output / standard error is forwarded to tio's output filter which do output mapping and output delay.
+If the shell commands starts with '?', '?' is removed and standard error is not forwarded.
+It is equivalent to the key command ctrl-t R.
+
+The argument shell_commands is string.
+
+.IP "\fBtio.get_state()"
+Return the main state of tio as a integer.
+Return value is one of tio.C.SA_INTERACTIVE, tio.C.SA_STARTING, tio.C.SA_PIPED_INPUT, tio.C.SA_PIPED_INPUT, tio.C.SA_EXEC_SHELL_COMMAND, tio.C.SA_XYMODEM.
+
+.IP "\fBtio.get_version()"
+Return the version of tio as a string.
+It is equivalent to the key command ctrl-t v.
+
+.IP "\fBtio.inkey(timeout)"
+Read a key press and return it as a string.
+
+Timeout is in milliseconds. If timeout is tio.C.WAIT_FOREVER(==0),
+the function blocks until a key is pressed. If timeout is
+tio.C.NOWAIT (==-1) or not provided, the function returns
+immediately.
+
+Returns the key as a string on success, or nil on timeout.
+
+.IP "\fBtio.input(prompt)"
+Display a prompt and read user input until Enter is pressed.
+
+Basic line editing is supported (Backspace key).
+
+If prompt is not provided, no prompt is displayed.
+
+Returns the entered string.
+
+.IP "\fBtio.inputline(prompt)"
+Display a prompt and read a line of input until Enter is pressed.
+
+Supports line editing (cursor keys, Backspace) and command history.
+
+Returns the entered string.
+
+.IP "\fBtio.set_keymap(keymaps)"
+Add, update, or remove key mappings.
+
+The keymaps argument uses the same syntax as the --keymap option:
+
+  @<key-1>=<script-description-1>
+  @<key-2>=<script-description-2>
+  ...
+  @<key-N>=<script-description-N>
+
+Each <script-description> must be either a script filename or an
+inline script prefixed with '!'.
+
+When a mapping is defined, pressing Ctrl-t followed by <key-n>
+executes the corresponding script.
+
+If a key already has a mapping, it is updated. If
+<script-description> is empty, the mapping is removed.
+
+User-defined key mappings take precedence over default key bindings,
+except for "Ctrl-t q", which is always reserved.
+
+This function allows key mappings to be modified at runtime after tio
+has started.
+
+.IP "\fBtio.subcmd_println(fmt, ...)"
+Print a formatted line using sub-command style output.
+
+The output format is:
+      [<timestamp>] <formatted message>
+
+.IP "\fBtio.subcmd_warning_println(fmt, ...)"
+Print a formatted warning line using sub-command style output.
+
+.IP "\fBtio.subcmd_error_println(fmt, ...)"
+Push a formatted error line using sub-command style output to error message buffer.
+This error message is displayed when tio terminates.
+
+.IP "\fBtio.subcmd_puts(string)"
+Print a string using sub-command style output.
+
+The output format is:
+      [<timestamp>] <string>
+
+.IP "\fBtio.subcmd_warning_puts(string)"
+Print a warning string using sub-command style output.
+
+.IP "\fBtio.subcmd_error_puts(string)"
+Push an error string using sub-command style output to error message buffer.
+This error message is displayed when tio terminates.
 
 .IP "\fBtio.alwaysecho"
 A boolean value, defaults to true.
@@ -500,6 +751,10 @@ will only be returned from the function and not logged or printed.
 
 If tio.alwaysecho is set to true, reading functions also emit a single
 timestamp to stdout and log file per options.timestamp and options.log.
+
+.IP "\fBos.exit(code)"
+Exit tio process with exit code (like ctrl-t q).
+
 
 .SH "CONFIGURATION FILE"
 .PP
@@ -550,6 +805,8 @@ Set parity
 Set output character delay
 .IP "\fBoutput-line-delay"
 Set output line delay
+.IP "\fBoutput-line-delay-char"
+Set trigger character of output line delay
 .IP "\fBline-pulse-duration"
 Set line pulse duration
 .IP "\fBno-reconnect"
@@ -574,6 +831,8 @@ Set timestamp format
 Set timestamp timeout
 .IP "\fBmap"
 Map characters on input or output
+.IP "\fBkeymap"
+Set key-script mappings
 .IP "\fBcolor"
 Colorize tio text using ANSI color code ranging from 0 to 255
 .IP "\fBinput-mode"
@@ -592,12 +851,16 @@ Set RS-485 configuration
 Set alert action on connect/disconnect
 .IP "\fBmute"
 Mute tio messages
+.IP "\fBno-line-history-save"
+Do not save line-edit-history on exit and load on startup
+.IP "\fBscript-init-file"
+Run script from file on tio's startup
 .IP "\fBscript"
-Run script from string
+Run script from string on connect
 .IP "\fBscript-file"
-Run script from file
+Run script from file on connect
 .IP "\fBscript-run"
-Run script on connect
+Set condition to run script on connect
 .IP "\fBexec"
 Execute shell command with I/O redirected to device
 
@@ -771,6 +1034,31 @@ $ tio --rs-485 --rs-485-config=RTS_ON_SEND=1,RX_DURING_TX /dev/ttyUSB0
 Manipulate DTR and RTS lines upon first connect to reset connected microcontroller:
 
 $ tio --script "tio.set{DTR=high,RTS=low}; tio.msleep(100); tio.set{RTS=toggle}" --script-run once /dev/ttyUSB0
+
+.TP
+Manipulate DTR and RTS lines by pressing ctrl-t 1:
+
+$ tio --keymap '@1=!tio.set{DTR=high,RTS=low}; tio.msleep(100); tio.set{RTS=toggle}' /dev/ttyUSB0
+
+.TP
+Send file to device by sz command:
+
+$ tio --exec '?sz -b file' /dev/ttyUSB0
+
+.TP
+Receive file from device by rz command:
+
+$ tio --exec '?rz -b' /dev/ttyUSB0
+
+.TP
+Send file to device by gkermit command:
+
+$ tio --exec '?gkermit -XSs file' /dev/ttyUSB0
+
+.TP
+Receive file from device by gkermit command:
+
+$ tio --exec '?gkermit -XSr' /dev/ttyUSB0
 
 .SH "WEBSITE"
 .PP

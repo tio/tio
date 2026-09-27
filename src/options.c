@@ -44,12 +44,15 @@ enum opt_t
     OPT_LOG_DIRECTORY,
     OPT_LOG_STRIP,
     OPT_LOG_APPEND,
+    OPT_OUTPUT_LINE_DELAY_CHAR,
     OPT_LINE_PULSE_DURATION,
     OPT_RS485,
     OPT_RS485_CONFIG,
     OPT_ALERT,
     OPT_COMPLETE_PROFILES,
     OPT_MUTE,
+    OPT_NO_LINE_HISTORY_SAVE,
+    OPT_SCRIPT_INIT_FILE,
     OPT_SCRIPT,
     OPT_SCRIPT_FILE,
     OPT_SCRIPT_RUN,
@@ -59,8 +62,12 @@ enum opt_t
     OPT_EXCLUDE_DRIVERS,
     OPT_EXCLUDE_TIDS,
     OPT_EXEC,
+    OPT_RAW,
+    OPT_RAW_INTERACTIVE,
+    OPT_KEYMAP,
 };
 
+// clang-format off
 /* Default options */
 struct option_t option =
 {
@@ -72,6 +79,7 @@ struct option_t option =
     .parity = PARITY_NONE,
     .output_delay = 0,
     .output_line_delay = 0,
+    .output_line_delay_char = '\n',
     .dtr_pulse_duration = 100,
     .rts_pulse_duration = 100,
     .cts_pulse_duration = 100,
@@ -79,6 +87,7 @@ struct option_t option =
     .dcd_pulse_duration = 100,
     .ri_pulse_duration = 100,
     .no_reconnect = false,
+    .no_tty_restore = false,
     .auto_connect = AUTO_CONNECT_DIRECT,
     .log = false,
     .log_append = false,
@@ -95,12 +104,14 @@ struct option_t option =
     .prefix_key = 't',
     .prefix_enabled = true,
     .mute = false,
+    .no_line_history_save = false,
     .rs485 = false,
     .rs485_config_flags = 0,
     .rs485_delay_rts_before_send = -1,
     .rs485_delay_rts_after_send = -1,
     .alert = ALERT_NONE,
     .complete_profiles = false,
+    .script_init_filename = NULL,
     .script = NULL,
     .script_filename = NULL,
     .script_run = SCRIPT_RUN_ALWAYS,
@@ -124,7 +135,13 @@ struct option_t option =
     .map_o_nulbrk = false,
     .map_i_msb2lsb = false,
     .map_o_ign_cr = false,
+    .raw = RAW_ON_DELAY,
+    .raw_interactive = RAW_OFF,
+    .keymap = NULL,
 };
+// clang-format on
+
+struct keymap_t keymaps[KEYMAP_MAX] = {0};
 
 void option_print_help(char *argv[])
 {
@@ -142,12 +159,14 @@ void option_print_help(char *argv[])
     printf("  -p, --parity odd|even|none|mark|space  Parity (default: none)\n");
     printf("  -o, --output-delay <ms>                Output character delay (default: 0)\n");
     printf("  -O, --output-line-delay <ms>           Output line delay (default: 0)\n");
+    printf("      --output-line-delay-char cr|lf     Output line delay trigger character (default: lf)\n");
     printf("      --line-pulse-duration <duration>   Set line pulse duration\n");
     printf("  -a, --auto-connect new|latest|direct   Automatic connect strategy (default: direct)\n");
     printf("      --exclude-devices <pattern>        Exclude devices by pattern\n");
     printf("      --exclude-drivers <pattern>        Exclude drivers by pattern\n");
     printf("      --exclude-tids <pattern>           Exclude topology IDs by pattern\n");
     printf("  -n, --no-reconnect                     Do not reconnect\n");
+    printf("  -N, --no-tty-restore                   Do not restore initial TTY device settings\n");
     printf("  -e, --local-echo                       Enable local echo\n");
     printf("      --input-mode normal|hex|line       Select input mode (default: normal)\n");
     printf("      --output-mode normal|hex|hexN      Select output mode (default: normal)\n");
@@ -161,12 +180,17 @@ void option_print_help(char *argv[])
     printf("      --log-append                       Append to log file\n");
     printf("      --log-strip                        Strip control characters and escape sequences\n");
     printf("  -m, --map <flags>                      Map characters\n");
+    printf("      --keymap <keymaps>                 Set key-script mappings\n");
     printf("  -c, --color 0..255|bold|none|list      Colorize tio text (default: bold)\n");
     printf("  -S, --socket <socket>                  Redirect I/O to socket\n");
+    printf("      --raw off|on|on-nodelay            Select raw mode for non-interactive use (default: on)\n");
+    printf("      --raw-interactive off|on|on-nodelay  Select raw mode for interactive use (default: off)\n");
     printf("      --rs-485                           Enable RS-485 mode\n");
     printf("      --rs-485-config <config>           Set RS-485 configuration\n");
     printf("      --alert bell|blink|none            Alert on connect/disconnect (default: none)\n");
     printf("      --mute                             Mute tio messages\n");
+    printf("      --no-line-history-save             Do not save line-edit-hisoty on exit and load on startup\n");
+    printf("      --script-init-file <filename>      Set initial script file to run at startup\n");
     printf("      --script <string>                  Run script from string\n");
     printf("      --script-file <filename>           Run script from file\n");
     printf("      --script-run once|always|never     Run script on connect (default: always)\n");
@@ -446,9 +470,9 @@ void option_parse_timestamp(const char *arg, timestamp_t *timestamp)
     }
 }
 
-const char *option_alert_state_to_string(alert_t state)
+const char *option_alert_state_to_string(alert_t alert_state)
 {
-    switch (state)
+    switch (alert_state)
     {
         case ALERT_NONE:
             return "none";
@@ -499,6 +523,25 @@ void option_parse_auto_connect(const char *arg, auto_connect_t *auto_connect)
             tio_error_print("Invalid auto-connect strategy '%s'", arg);
             exit(EXIT_FAILURE);
         }
+    }
+}
+
+void option_parse_output_line_delay_char(const char *arg)
+{
+    assert(arg != NULL);
+
+    if (strcmp("cr", arg) == 0)
+    {
+        option.output_line_delay_char = '\r';
+    }
+    else if (strcmp("lf", arg) == 0)
+    {
+        option.output_line_delay_char = '\n';
+    }
+    else
+    {
+        tio_error_print("Invalid char '%s'", arg);
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -703,6 +746,44 @@ const char *option_output_mode_to_string(output_mode_t mode)
     return NULL;
 }
 
+void option_parse_raw(const char *arg, raw_t *raw)
+{
+    assert(arg != NULL);
+
+    if (strcmp("off", arg) == 0)
+    {
+        *raw = RAW_OFF;
+    }
+    else if (strcmp("on", arg) == 0)
+    {
+        *raw = RAW_ON_DELAY;
+    }
+    else if (strcmp("on-nodelay", arg) == 0)
+    {
+        *raw = RAW_ON_NODELAY;
+    }
+    else
+    {
+        tio_error_print("Invalid raw option '%s'", arg);
+        exit(EXIT_FAILURE);
+    }
+}
+
+const char *option_raw_to_string(raw_t raw)
+{
+    switch (raw)
+    {
+        case RAW_OFF:
+            return "off";
+        case RAW_ON_DELAY:
+            return "on";
+        case RAW_ON_NODELAY:
+            return "on-nodelay";
+    }
+
+    return NULL;
+}
+
 void option_parse_script_run(const char *arg, script_run_t *script_run)
 {
     assert(arg != NULL);
@@ -820,27 +901,34 @@ void option_parse_mappings(const char *map)
 
 void options_print()
 {
+    /* note: negative true/false settings are rephrased as affirmative no/yes. */
     tio_printf(" Device: %s", device_name);
     tio_printf(" Baudrate: %u", option.baudrate);
     tio_printf(" Databits: %d", option.databits);
     tio_printf(" Flow: %s", option_flow_to_string(option.flow));
     tio_printf(" Stopbits: %d", option.stopbits);
     tio_printf(" Parity: %s", option_parity_to_string(option.parity));
-    tio_printf(" Local echo: %s", option.local_echo ? "true" : "false");
+    tio_printf(" Local echo: %s", option.local_echo ? "yes" : "no");
     tio_printf(" Timestamp: %s", option_timestamp_format_to_string(option.timestamp));
     tio_printf(" Timestamp timeout: %u", option.timestamp_timeout);
     tio_printf(" Output delay: %d", option.output_delay);
     tio_printf(" Output line delay: %d", option.output_line_delay);
+    tio_printf(" Output line delay char: %s", option.output_line_delay_char == '\r' ? "cr" : "lf");
     tio_printf(" Automatic connect strategy: %s", option_auto_connect_state_to_string(option.auto_connect));
-    tio_printf(" Automatic reconnect: %s", option.no_reconnect ? "true" : "false");
+    tio_printf(" Automatic reconnect: %s", option.no_reconnect ? "no" : "yes");
+    tio_printf(" TTY device settings restore: %s", option.no_tty_restore ? "no" : "yes");
+    // clang-format off
     tio_printf(" Pulse duration: DTR=%d RTS=%d CTS=%d DSR=%d DCD=%d RI=%d", option.dtr_pulse_duration,
                                                                             option.rts_pulse_duration,
                                                                             option.cts_pulse_duration,
                                                                             option.dsr_pulse_duration,
                                                                             option.dcd_pulse_duration,
                                                                             option.ri_pulse_duration);
+    // clang-format on
     tio_printf(" Input mode: %s", option_input_mode_to_string(option.input_mode));
     tio_printf(" Output mode: %s", option_output_mode_to_string(option.output_mode));
+    tio_printf(" Raw (non-interactive): %s", option_raw_to_string(option.raw));
+    tio_printf(" Raw interactive: %s", option_raw_to_string(option.raw_interactive));
     tio_printf(" Alert: %s", option_alert_state_to_string(option.alert));
     if (option.log)
     {
@@ -856,9 +944,18 @@ void options_print()
     {
         tio_printf(" Socket: %s", option.socket);
     }
+    if (option.script_init_filename != NULL)
+    {
+        tio_printf(" Script init file: %s", option.script_init_filename);
+    }
     if (option.script_filename != NULL)
     {
         tio_printf(" Script file: %s", option.script_filename);
+        tio_printf(" Script run: %s", script_run_state_to_string(option.script_run));
+    }
+    if (option.script != NULL)
+    {
+        tio_printf(" Script command: %s", option.script);
         tio_printf(" Script run: %s", script_run_state_to_string(option.script_run));
     }
 }
@@ -887,8 +984,9 @@ void options_parse(int argc, char *argv[])
         option.vt100 = true;
     }
 
-    while (1)
+    while (true)
     {
+        // clang-format off
         static struct option long_options[] =
         {
             {"baudrate",             required_argument, 0, 'b'                     },
@@ -898,12 +996,14 @@ void options_parse(int argc, char *argv[])
             {"parity",               required_argument, 0, 'p'                     },
             {"output-delay",         required_argument, 0, 'o'                     },
             {"output-line-delay" ,   required_argument, 0, 'O'                     },
+            {"output-line-delay-char", required_argument, 0, OPT_OUTPUT_LINE_DELAY_CHAR},
             {"line-pulse-duration",  required_argument, 0, OPT_LINE_PULSE_DURATION },
             {"auto-connect",         required_argument, 0, 'a'                     },
             {"exclude-devices",      required_argument, 0, OPT_EXCLUDE_DEVICES     },
             {"exclude-drivers",      required_argument, 0, OPT_EXCLUDE_DRIVERS     },
             {"exclude-tids",         required_argument, 0, OPT_EXCLUDE_TIDS        },
             {"no-reconnect",         no_argument,       0, 'n'                     },
+            {"no-tty-restore",       no_argument,       0, 'N'                     },
             {"local-echo",           no_argument,       0, 'e'                     },
             {"timestamp",            no_argument,       0, 't'                     },
             {"timestamp-format",     required_argument, 0, OPT_TIMESTAMP_FORMAT    },
@@ -916,13 +1016,18 @@ void options_parse(int argc, char *argv[])
             {"log-strip",            no_argument,       0, OPT_LOG_STRIP           },
             {"socket",               required_argument, 0, 'S'                     },
             {"map",                  required_argument, 0, 'm'                     },
+            {"keymap",               required_argument, 0, OPT_KEYMAP              },
             {"color",                required_argument, 0, 'c'                     },
             {"input-mode",           required_argument, 0, OPT_INPUT_MODE          },
             {"output-mode",          required_argument, 0, OPT_OUTPUT_MODE         },
+            {"raw",                  required_argument, 0, OPT_RAW                 },
+            {"raw-interactive",      required_argument, 0, OPT_RAW_INTERACTIVE     },
             {"rs-485",               no_argument,       0, OPT_RS485               },
             {"rs-485-config",        required_argument, 0, OPT_RS485_CONFIG        },
             {"alert",                required_argument, 0, OPT_ALERT               },
             {"mute",                 no_argument,       0, OPT_MUTE                },
+            {"no-line-history-save", no_argument,       0, OPT_NO_LINE_HISTORY_SAVE },
+            {"script-init-file",     required_argument, 0, OPT_SCRIPT_INIT_FILE    },
             {"script",               required_argument, 0, OPT_SCRIPT              },
             {"script-file",          required_argument, 0, OPT_SCRIPT_FILE         },
             {"script-run",           required_argument, 0, OPT_SCRIPT_RUN          },
@@ -932,12 +1037,13 @@ void options_parse(int argc, char *argv[])
             {"complete-profiles",    no_argument,       0, OPT_COMPLETE_PROFILES   },
             {0,                      0,                 0,  0                      }
         };
+        // clang-format on
 
         /* getopt_long stores the option index here */
         int option_index = 0;
 
         /* Parse argument using getopt_long */
-        c = getopt_long(argc, argv, "b:d:f:s:p:o:O:a:netLlS:m:c:xrvh", long_options, &option_index);
+        c = getopt_long(argc, argv, "b:d:f:s:p:o:O:a:nNetLlS:m:c:xrvh", long_options, &option_index);
 
         /* Detect the end of the options */
         if (c == -1)
@@ -983,6 +1089,10 @@ void options_parse(int argc, char *argv[])
                 option_string_to_integer(optarg, &option.output_line_delay, "output line delay", 0, INT_MAX);
                 break;
 
+            case OPT_OUTPUT_LINE_DELAY_CHAR:
+                option_parse_output_line_delay_char(optarg);
+                break;
+
             case OPT_LINE_PULSE_DURATION:
                 option_parse_line_pulse_duration(optarg);
                 break;
@@ -1005,6 +1115,10 @@ void options_parse(int argc, char *argv[])
 
             case 'n':
                 option.no_reconnect = true;
+                break;
+
+            case 'N':
+                option.no_tty_restore = true;
                 break;
 
             case 'e':
@@ -1088,6 +1202,14 @@ void options_parse(int argc, char *argv[])
                 option.mute = true;
                 break;
 
+            case OPT_NO_LINE_HISTORY_SAVE:
+                option.no_line_history_save = true;
+                break;
+
+            case OPT_SCRIPT_INIT_FILE:
+                option.script_init_filename = optarg;
+                break;
+
             case OPT_SCRIPT:
                 option.script = optarg;
                 break;
@@ -1102,6 +1224,19 @@ void options_parse(int argc, char *argv[])
 
             case OPT_EXEC:
                 option.exec = optarg;
+                break;
+
+            case OPT_RAW:
+                option_parse_raw(optarg, &option.raw);
+                break;
+
+            case OPT_RAW_INTERACTIVE:
+                option_parse_raw(optarg, &option.raw_interactive);
+                break;
+
+            case OPT_KEYMAP:
+                option.keymap = optarg;
+                option_parse_key_mappings(optarg);
                 break;
 
             case 'v':
@@ -1131,7 +1266,7 @@ void options_parse(int argc, char *argv[])
     /* Assume first non-option is the target (tty device, profile, tid) */
     if (strcmp(option.target, ""))
     {
-            optind++;
+        optind++;
     }
     else if (optind < argc)
     {
@@ -1176,6 +1311,7 @@ void options_parse_final(int argc, char *argv[])
 #ifdef __CYGWIN__
     unsigned char portnum;
     char *tty_win;
+    // clang-format off
     if ( ((strncmp("COM", option.target, 3) == 0)
         || (strncmp("com", option.target, 3) == 0) )
         && (sscanf(option.target + 3, "%hhu", &portnum) == 1)
@@ -1184,5 +1320,177 @@ void options_parse_final(int argc, char *argv[])
         asprintf(&tty_win, "/dev/ttyS%hhu", portnum - 1);
         option.target = tty_win;
     }
+    // clang-format on
 #endif
+}
+
+int keymap_set(char *key_str, int key_len, char *func_str, int func_len)
+{
+    char func_str_r[KEYMAP_FUNC_STR_MAX + 1];
+    char *srcp;
+    int dst_ofs;
+    int key_ofs;
+    int empty_idx, matched_idx, idx;
+    bool found_empty = false;
+    bool found_matched = false;
+    bool unset_requested = false;
+
+    if (key_str[key_len] != '\0' || func_str[func_len] != '\0')
+    {
+        return -1;
+    }
+
+    /* key_str should not include spaces */
+    key_ofs = 0;
+    for (key_ofs = 0; key_ofs < key_len; key_ofs++)
+    {
+        if (key_str[key_ofs] == ' ')
+        {
+            tio_error_printf("Key should not include space");
+            return -1;
+        }
+    }
+
+    /* check disallowed key_str */
+    if (strcmp(key_str, "q") == 0)
+    {
+        tio_error_printf("Key %s is immutable", key_str);
+        return -1;
+    }
+
+    /* remove prefix spaces and postfix spaces from func_str */
+    for (srcp = func_str; *srcp != '\0'; srcp++)
+    {
+        if (*srcp != ' ')
+        {
+            break;
+        }
+    }
+    strncpy(func_str_r, srcp, KEYMAP_KEY_STR_MAX);
+    func_str_r[KEYMAP_KEY_STR_MAX] = '\0';
+    for (dst_ofs = strlen(func_str_r) - 1; dst_ofs >= 0; dst_ofs--)
+    {
+        if (func_str_r[dst_ofs] != ' ')
+        {
+            func_str_r[dst_ofs + 1] = '\0';
+            break;
+        }
+    }
+    if (dst_ofs < 0)
+    {
+        func_str_r[0] = '\0';
+    }
+
+    if (strcmp(func_str_r, "nil") == 0 || func_str_r[0] == '\0')
+    {
+        unset_requested = true;
+    }
+
+    /* search for entry which key matched or is empty */
+    for (idx = 0; idx < KEYMAP_MAX; idx++)
+    {
+        if (found_empty == false && keymaps[idx].key[0] == '\0')
+        {
+            empty_idx = idx;
+            found_empty = true;
+        }
+        if (found_matched == false && strcmp(keymaps[idx].key, key_str) == 0)
+        {
+            matched_idx = idx;
+            found_matched = true;
+        }
+        if (found_empty && found_matched)
+        {
+            break;
+        }
+    }
+
+    /* update entry */
+    if (unset_requested)
+    {
+        if (found_matched)
+        {
+            keymaps[matched_idx].key[0] = '\0';
+            keymaps[matched_idx].func[0] = '\0';
+        }
+    }
+    else /* set requested */
+    {
+        if (found_matched)
+        {
+            strcpy(keymaps[matched_idx].key, key_str);
+            strcpy(keymaps[matched_idx].func, func_str);
+        }
+        else if (found_empty)
+        {
+            strcpy(keymaps[empty_idx].key, key_str);
+            strcpy(keymaps[empty_idx].func, func_str);
+        }
+        else
+        {
+            tio_error_printf("Too many keymaps", key_str);
+            return -1;
+        }
+    }
+    return 0;
+}
+
+void keymaps_print(const char *title, int indent)
+{
+    int idx;
+    bool keymap_title_done = false;
+
+    for (idx = 0; idx < KEYMAP_MAX; idx++)
+    {
+        if (keymaps[idx].key[0] == '\0')
+        {
+            continue;
+        }
+        if (!keymap_title_done)
+        {
+            if (title[0] != '\0')
+            {
+                tio_printf("%s", title);
+            }
+            keymap_title_done = true;
+        }
+        tio_printf("%*sctrl-%c %s : %s", indent, " ", option.prefix_key, keymaps[idx].key, keymaps[idx].func);
+    }
+}
+
+void option_parse_key_mappings(const char *keymap)
+{
+    char key_str[KEYMAP_KEY_STR_MAX + 1];
+    char func_str[KEYMAP_FUNC_STR_MAX + 1];
+    int key_len, func_len;
+    char *buffer;
+    char *cp;
+
+    if (keymap == NULL)
+    {
+        return;
+    }
+
+    /* Parse specified key mappings */
+    buffer = strdup(keymap);
+    cp = strchr(buffer, '@');
+    if (cp == NULL)
+    {
+        tio_error_print("Can't find keymap top character '@'");
+        goto parse_end;
+    }
+
+    while (sscanf(cp, "@%" TOSTR(KEYMAP_KEY_STR_MAX) "[^=]=%" TOSTR(KEYMAP_FUNC_STR_MAX) "[^@]", key_str, func_str) == 2)
+    {
+        key_len = strlen(key_str);
+        func_len = strlen(func_str);
+        keymap_set(key_str, key_len, func_str, func_len);
+        cp = strchr(cp + key_len + func_len + 2, '@');
+        if (cp == NULL)
+        {
+            break;
+        }
+    }
+ parse_end:
+    free(buffer);
 }

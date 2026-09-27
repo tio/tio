@@ -43,6 +43,13 @@ typedef enum
     OUTPUT_MODE_END,
 } output_mode_t;
 
+typedef enum
+{
+    RAW_OFF,
+    RAW_ON_DELAY,
+    RAW_ON_NODELAY,
+} raw_t;
+
 /* Options */
 struct option_t
 {
@@ -54,6 +61,7 @@ struct option_t
     parity_t parity;
     int output_delay;
     int output_line_delay;
+    char output_line_delay_char;
     int dtr_pulse_duration;
     int rts_pulse_duration;
     int cts_pulse_duration;
@@ -61,6 +69,7 @@ struct option_t
     int dcd_pulse_duration;
     int ri_pulse_duration;
     bool no_reconnect;
+    bool no_tty_restore;
     auto_connect_t auto_connect;
     bool log;
     bool log_append;
@@ -73,16 +82,20 @@ struct option_t
     int color;
     input_mode_t input_mode;
     output_mode_t output_mode;
+    raw_t raw;
+    raw_t raw_interactive;
     char prefix_code;
     char prefix_key;
     bool prefix_enabled;
     bool mute;
+    bool no_line_history_save;
     bool rs485;
     uint32_t rs485_config_flags;
     int32_t rs485_delay_rts_before_send;
     int32_t rs485_delay_rts_after_send;
     alert_t alert;
     bool complete_profiles;
+    char *script_init_filename;
     char *script;
     char *script_filename;
     script_run_t script_run;
@@ -93,6 +106,7 @@ struct option_t
     int hex_n_value;
     bool vt100;
     char *exec;
+    char *keymap;
     bool map_i_nl_cr;
     bool map_i_cr_nl;
     bool map_ign_cr;
@@ -108,7 +122,18 @@ struct option_t
     bool map_o_ign_cr;
 };
 
+#define KEYMAP_MAX 32
+#define KEYMAP_KEY_STR_MAX 7
+#define KEYMAP_FUNC_STR_MAX 127
+
+struct keymap_t
+{
+    char key[KEYMAP_KEY_STR_MAX + 1];
+    char func[KEYMAP_FUNC_STR_MAX + 1];
+};
+
 extern struct option_t option;
+extern struct keymap_t keymaps[KEYMAP_MAX];
 
 void options_print();
 void options_parse(int argc, char *argv[]);
@@ -121,7 +146,9 @@ void option_parse_parity(const char *arg, parity_t *parity);
 
 void option_parse_output_mode(const char *arg, output_mode_t *mode);
 void option_parse_input_mode(const char *arg, input_mode_t *mode);
+void option_parse_raw(const char *arg, raw_t *raw);
 
+void option_parse_output_line_delay_char(const char *arg);
 void option_parse_line_pulse_duration(const char *arg);
 void option_parse_script_run(const char *arg, script_run_t *script_run);
 void option_parse_alert(const char *arg, alert_t *alert);
@@ -133,3 +160,8 @@ void option_parse_timestamp(const char *arg, timestamp_t *timestamp);
 const char* option_timestamp_format_to_string(timestamp_t timestamp);
 
 void option_parse_mappings(const char *map);
+void option_parse_key_mappings(const char *keymap);
+
+const char* option_raw_to_string(raw_t raw);
+
+void keymaps_print(const char *title, int indent);
