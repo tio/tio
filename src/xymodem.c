@@ -732,8 +732,9 @@ int xymodem_receive(int sio, const char *filename, modem_mode_t mode)
     }
     key_hit = 0xff;
 
-    /* Flush serial and release resources */
-    tcflush(sio, TCIOFLUSH);
+    /* Let the final ACK go out, then flush input only */
+    tcdrain(sio);
+    tcflush(sio, TCIFLUSH);
     close(fd);
     return rc;
 }
